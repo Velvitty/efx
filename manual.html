@@ -216,6 +216,7 @@ body::before {
   display: flex;
   align-items: center;
   gap: 16px;
+  white-space: nowrap;
 }
 
 .section-title::before {
@@ -1688,25 +1689,43 @@ SECS.forEach(function(s){const el=document.getElementById(s.id);if(el)secIO.obse
    텍스트 스크램블
 ══════════════════════════════ */
 const CHARS='▓▒░█▐▌■□▪▫◆◇○●ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&';
-function scramble(el,final,duration){
+function scramble(span,final,duration){
+  /* 한글→한글, 그외→ASCII 로 교체해 글자 너비 변화 없이 스크램블 */
+  const KO='가나다라마바사아자차카타파하';
+  const EN='ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
   let frame=0;
   const total=Math.round(duration/30);
   const chars=final.split('');
   const ti=setInterval(function(){
     const prog=frame/total;
-    el.textContent=chars.map(function(c,i){
-      if(c===' ') return ' ';
+    span.textContent=chars.map(function(c,i){
+      if(c===' '||c==='—'||c==='·') return c;
       if(i/chars.length<prog) return c;
-      return CHARS[Math.floor(Math.random()*CHARS.length)];
+      if(/[가-힣]/.test(c)) return KO[Math.floor(Math.random()*KO.length)];
+      if(/[A-Za-z0-9]/.test(c)) return EN[Math.floor(Math.random()*EN.length)];
+      return c;
     }).join('');
-    if(frame>=total){el.textContent=final;clearInterval(ti);}
+    if(frame>=total){span.textContent=final;clearInterval(ti);}
     frame++;
   },30);
 }
 function observeScramble(el){
-  const original=el.textContent;
+  let span=el.querySelector('.scramble-text');
+  if(!span){
+    const nodes=el.childNodes;
+    let textNode=null;
+    for(let i=nodes.length-1;i>=0;i--){
+      if(nodes[i].nodeType===3&&nodes[i].textContent.trim()){textNode=nodes[i];break;}
+    }
+    if(!textNode) return;
+    span=document.createElement('span');
+    span.className='scramble-text';
+    span.textContent=textNode.textContent;
+    el.replaceChild(span,textNode);
+  }
+  const original=span.textContent;
   const io=new IntersectionObserver(function(entries){
-    if(entries[0].isIntersecting){scramble(el,original,600);io.disconnect();}
+    if(entries[0].isIntersecting){scramble(span,original,600);io.disconnect();}
   },{threshold:.5});
   io.observe(el);
 }
