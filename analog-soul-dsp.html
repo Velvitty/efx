@@ -1,0 +1,4134 @@
+<!DOCTYPE html>
+<!--
+  ╔══════════════════════════════════════════════════════════════════════╗
+  ║           ANALOG SOUL DSP ENGINE                                     ║
+  ║           Copyright (c) 2026 Velvitty(연이). All Rights Reserved.      ║
+  ╠══════════════════════════════════════════════════════════════════════╣
+  ║  LICENSE AGREEMENT / 라이선스 동의                                    ║
+  ║                                                                      ║
+  ║  1. Personal & Non-Commercial Use Only (개인적/비영리 목적 한정)        ║
+  ║     This source code is made available for personal, educational,    ║
+  ║     and non-commercial research purposes only.                       ║
+  ║     이 소스 코드는 개인적인 학습, 교육, 비영리 연구 목적으로만              ║
+  ║     열람 및 실행할 수 있습니다.                                          ║
+  ║                                                                      ║
+  ║  2. No Distribution (배포 금지)                                       ║
+  ║     You are NOT allowed to distribute, sub-license, or sell this     ║
+  ║     software or its source code. Distribution is exclusively         ║
+  ║     reserved by the author.                                          ║
+  ║     이 소프트웨어와 소스 코드의 배포, 라이선스 재부여, 판매는 금지됩니다.    ║
+  ║     모든 배포 권한은 원작자인 Velvitty(연이)에게만 있습니다.                          ║
+  ║                                                                      ║
+  ║  3. No Modified Distribution (수정 후 배포 금지)                       ║
+  ║     You may modify the code for personal study, but you may NOT      ║
+  ║     distribute the modified version to others.                       ║
+  ║     개인적인 학습을 위한 수정은 허용되나, 수정된 코드의 배포는              ║
+  ║     엄격히 금지됩니다.                                                  ║
+  ║                                                                      ║
+  ║  4. Commercial Use Prohibited (상업적 이용 금지)                       ║
+  ║     Any commercial use is strictly prohibited without explicit        ║
+  ║     written permission from the author.                              ║
+  ║     원작자의 서면 허가 없는 모든 상업적 이용은 엄격히 금지됩니다.           ║
+  ╚══════════════════════════════════════════════════════════════════════╝
+-->
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ANALOG SOUL — DSP ENGINE · Velvitty(연이)</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Share+Tech+Mono&family=Rajdhani:wght@300;400;600&family=JetBrains+Mono:wght@400;500;700&display=swap');
+
+:root {
+  --bg: #080608;
+  --bg2: #0f0d10;
+  --panel: #13111a;
+  --panel2: #1c1825;
+  --border: #2a2535;
+  --border-hi: #4a3f6b;
+  --amber: #ffb300;
+  --amber-dim: #7a5500;
+  --green: #39ff14;
+  --green-dim: #1a5c08;
+  --red: #ff3355;
+  --blue: #00cfff;
+  --purple: #c77dff;
+  --text: #d4c9e8;
+  --muted: #5a4f6e;
+  --vu-bg: #0a0808;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 300;
+  min-height: 100vh;
+  cursor: default;
+}
+
+/* Scanline overlay */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0,0,0,0.07) 2px,
+    rgba(0,0,0,0.07) 4px
+  );
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* CRT glow BG */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% 0%, rgba(199,125,255,0.04) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 80% at 10% 80%, rgba(255,179,0,0.03) 0%, transparent 50%),
+    radial-gradient(ellipse 40% 60% at 90% 20%, rgba(0,207,255,0.03) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.app {
+  position: relative;
+  z-index: 1;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 24px 20px 60px;
+}
+
+/* ===== HEADER ===== */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 0 20px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 24px;
+}
+
+.logo {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.logo h1 {
+  font-family: 'Orbitron', monospace;
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: var(--amber);
+  letter-spacing: 0.08em;
+  text-shadow: 0 0 20px rgba(255,179,0,0.4);
+}
+
+.logo sub {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.65rem;
+  color: var(--muted);
+  letter-spacing: 0.2em;
+}
+
+.header-meters {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+/* VU Meter */
+.vu-pair {
+  display: flex;
+  gap: 3px;
+}
+
+.vu-bar {
+  width: 8px;
+  height: 50px;
+  background: var(--vu-bg);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column-reverse;
+  position: relative;
+}
+
+.vu-fill {
+  width: 100%;
+  height: 0%;
+  transition: height 0.05s;
+  background: linear-gradient(to top, var(--green), #aaff00 70%, var(--amber) 85%, var(--red) 100%);
+}
+
+.vu-label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.55rem;
+  color: var(--muted);
+  text-align: center;
+  margin-top: 4px;
+}
+
+/* ===== DROP ZONE ===== */
+.drop-zone {
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 36px;
+  text-align: center;
+  cursor: pointer;
+  background: var(--panel);
+  margin-bottom: 20px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.2s;
+}
+
+.drop-zone::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,179,0,0.03) 0%, transparent 50%);
+}
+
+.drop-zone:hover, .drop-zone.over {
+  border-color: var(--amber);
+  background: rgba(255,179,0,0.04);
+}
+
+.drop-icon {
+  font-size: 2rem;
+  display: block;
+  margin-bottom: 10px;
+  filter: sepia(1) hue-rotate(20deg);
+}
+
+.drop-zone h2 {
+  font-family: 'Orbitron', monospace;
+  font-size: 0.85rem;
+  color: var(--amber);
+  letter-spacing: 0.1em;
+  margin-bottom: 6px;
+}
+
+.drop-zone p {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.65rem;
+  color: var(--muted);
+  letter-spacing: 0.08em;
+}
+
+#fileInput { display: none; }
+
+/* ===== FILE INFO ===== */
+.file-info {
+  display: none;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 12px 16px;
+  margin-bottom: 20px;
+  align-items: center;
+  gap: 12px;
+}
+.file-info.show { display: flex; }
+
+.fi-led {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 8px var(--green);
+  flex-shrink: 0;
+  animation: blink 2s infinite;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+.fi-name {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.75rem;
+  color: var(--text);
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.fi-meta {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.65rem;
+  color: var(--muted);
+  flex-shrink: 0;
+}
+
+/* ===== SPECTRUM ===== */
+.spectrum-wrap {
+  display: none;
+  margin-bottom: 20px;
+}
+.spectrum-wrap.show { display: block; }
+
+.spec-label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.6rem;
+  color: var(--muted);
+  letter-spacing: 0.15em;
+  margin-bottom: 6px;
+  display: flex;
+  justify-content: space-between;
+}
+
+canvas#spectrum {
+  display: block;
+  width: 100%;
+  height: 90px;
+  background: #050305;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+}
+
+/* ===== TRANSPORT ===== */
+.transport-bar {
+  display: none;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 16px 20px;
+  margin-bottom: 24px;
+}
+.transport-bar.show { display: block; }
+
+.transport-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.btn {
+  font-family: 'JetBrains Mono', 'Orbitron', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.08em;
+  padding: 8px 16px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text);
+  border-radius: 2px;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.btn:hover { border-color: var(--amber); color: var(--amber); }
+.btn.active { border-color: var(--amber); color: var(--amber); background: rgba(255,179,0,0.08); }
+.btn.danger { border-color: var(--red); color: var(--red); }
+.btn.danger:hover { background: rgba(255,51,85,0.1); }
+.btn.export { border-color: var(--blue); color: var(--blue); }
+.btn.export:hover { background: rgba(0,207,255,0.08); }
+.btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+.progress-outer {
+  height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  cursor: pointer;
+  margin-bottom: 8px;
+  position: relative;
+}
+.progress-inner {
+  height: 100%;
+  background: linear-gradient(to right, var(--amber-dim), var(--amber));
+  border-radius: 2px;
+  width: 0%;
+  transition: width 0.1s linear;
+}
+.time-row {
+  display: flex;
+  justify-content: space-between;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.6rem;
+  color: var(--muted);
+}
+
+/* ===== DSP GRID ===== */
+.dsp-section-title {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.6rem;
+  color: var(--muted);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dsp-section-title::before {
+  content: '▸';
+  color: var(--amber);
+}
+
+.dsp-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+/* ===== MODULE CARD ===== */
+.module {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+.module.on { border-color: var(--border-hi); }
+
+.module-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: var(--panel2);
+  border-bottom: 1px solid var(--border);
+}
+
+.module-name {
+  font-family: 'Orbitron', monospace;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  transition: color 0.2s;
+}
+.module.on .module-name { color: var(--amber); }
+
+.module-sub {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.55rem;
+  color: var(--muted);
+  margin-left: 8px;
+  opacity: 0.7;
+}
+
+.module-header-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* LED Toggle */
+.led-toggle {
+  position: relative;
+  cursor: pointer;
+}
+.led-toggle input { display: none; }
+.led-btn {
+  display: block;
+  width: 24px; height: 14px;
+  background: #1a1520;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  position: relative;
+  transition: background 0.2s;
+}
+.led-btn::after {
+  content: '';
+  position: absolute;
+  top: 2px; left: 2px;
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--muted);
+  transition: all 0.2s;
+}
+.led-toggle input:checked + .led-btn {
+  background: rgba(255,179,0,0.15);
+  border-color: var(--amber-dim);
+}
+.led-toggle input:checked + .led-btn::after {
+  left: 12px;
+  background: var(--amber);
+  box-shadow: 0 0 6px var(--amber);
+}
+
+/* Module body */
+.module-body {
+  padding: 14px;
+}
+
+/* Knob row */
+.knob-row {
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 4px;
+}
+
+.knob-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+
+.knob {
+  width: 48px; height: 48px;
+  position: relative;
+  cursor: pointer;
+  user-select: none;
+}
+
+.knob svg {
+  width: 100%; height: 100%;
+  transform: rotate(-135deg);
+}
+
+.knob-arc-bg { fill: none; stroke: var(--border); stroke-width: 4; }
+.knob-arc { fill: none; stroke: var(--amber); stroke-width: 4; stroke-linecap: round; transition: stroke-dashoffset 0.05s; }
+.knob.blue .knob-arc { stroke: var(--blue); }
+.knob.purple .knob-arc { stroke: var(--purple); }
+.knob.green .knob-arc { stroke: var(--green); }
+.knob.red .knob-arc { stroke: var(--red); }
+
+.knob-center {
+  position: absolute;
+  inset: 8px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #2a2535, #0f0d14);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.knob-dot {
+  width: 3px; height: 3px;
+  border-radius: 50%;
+  background: var(--amber);
+  position: absolute;
+  top: 22%;
+  left: 50%;
+  transform: translateX(-50%);
+  transition: all 0.05s;
+}
+
+.knob-label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.55rem;
+  color: var(--muted);
+  letter-spacing: 0.05em;
+  text-align: center;
+}
+.knob-value {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.6rem;
+  color: var(--amber);
+  text-align: center;
+  min-width: 36px;
+}
+.knob.blue ~ .knob-value { color: var(--blue); }
+
+/* Slider */
+.slider-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.slider-label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.6rem;
+  color: var(--muted);
+  width: 72px;
+  flex-shrink: 0;
+}
+.slider-val {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.6rem;
+  color: var(--amber);
+  width: 38px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+input[type=range] {
+  flex: 1;
+  -webkit-appearance: none;
+  height: 3px;
+  background: var(--border);
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+}
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 13px; height: 13px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #ffcc44, var(--amber));
+  border: 1px solid rgba(255,179,0,0.5);
+  cursor: pointer;
+  box-shadow: 0 0 6px rgba(255,179,0,0.4);
+  transition: transform 0.1s;
+}
+input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.3); }
+
+/* Vintage meter */
+.vintage-meter {
+  height: 6px;
+  background: var(--vu-bg);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  margin-top: 8px;
+  overflow: hidden;
+}
+.vintage-meter-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(to right, var(--green-dim), var(--green) 60%, var(--amber) 80%, var(--red));
+  border-radius: 2px;
+  transition: width 0.08s;
+}
+
+/* Info badge */
+.info-badge {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.55rem;
+  color: var(--muted);
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  padding: 2px 6px;
+}
+
+/* HD badge */
+.hd-badge {
+  font-family: 'Orbitron', monospace;
+  font-size: 0.6rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 2px;
+  letter-spacing: 0.08em;
+}
+.hd-badge.hd { background: rgba(0,207,255,0.1); color: var(--blue); border: 1px solid rgba(0,207,255,0.3); }
+.hd-badge.uhd { background: rgba(199,125,255,0.1); color: var(--purple); border: 1px solid rgba(199,125,255,0.3); }
+
+/* HD module */
+.hd-module {
+  grid-column: 1 / -1;
+}
+
+/* Vinyl crackle canvas */
+canvas.crackle-vis {
+  display: block;
+  width: 100%;
+  height: 30px;
+  border-radius: 2px;
+  margin-top: 8px;
+  background: #050305;
+}
+
+
+/* ===== TUBE VISUALIZER ===== */
+.tube-viz-wrap {
+  margin-top: 10px;
+  position: relative;
+}
+.tube-viz-label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+.tube-viz-label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.55rem;
+  color: var(--muted);
+  letter-spacing: 0.08em;
+}
+.tube-viz-thd {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.58rem;
+  color: var(--amber);
+  letter-spacing: 0.05em;
+  transition: color 0.2s;
+}
+.tube-viz-thd.hot { color: var(--red); }
+canvas.tube-vis {
+  display: block;
+  width: 100%;
+  height: auto;       /* attribute 비율(560:72) 유지 */
+  border-radius: 2px;
+  background: #04030a;
+  border: 1px solid #1a1428;
+}
+/* Saturation bar under the canvas */
+.tube-sat-bar-wrap {
+  margin-top: 5px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.tube-sat-bar-label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.5rem;
+  color: var(--muted);
+  white-space: nowrap;
+  letter-spacing: 0.06em;
+  min-width: 30px;
+}
+.tube-sat-bar-bg {
+  flex: 1;
+  height: 5px;
+  background: #0e0c14;
+  border-radius: 3px;
+  overflow: hidden;
+  border: 1px solid #1e1a2e;
+}
+.tube-sat-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  width: 0%;
+  transition: width 0.08s linear, background 0.2s;
+  background: linear-gradient(to right, #ffb300, #ff7700);
+}
+.tube-sat-bar-fill.hot {
+  background: linear-gradient(to right, #ff7700, #ff3355);
+}
+.tube-sat-val {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.5rem;
+  color: var(--amber);
+  min-width: 26px;
+  text-align: right;
+}
+
+/* ===== EXPORT ROW ===== */
+.export-section {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 16px 20px;
+  margin-bottom: 20px;
+}
+.export-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 10px;
+}
+.export-btn-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.export-btn-wrap span {
+  font-family: 'JetBrains Mono', 'Share Tech Mono', monospace;
+  font-size: 0.55rem;
+  color: var(--muted);
+  letter-spacing: 0.05em;
+}
+
+/* ===== SOUNDGOODIZER MODE BUTTONS ===== */
+.sg-mode-btn,
+.atmos-scene-btn {
+  font-family: 'Orbitron', monospace;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  width: 32px; height: 28px;
+  border: 1px solid var(--border);
+  background: var(--bg2);
+  color: var(--muted);
+  border-radius: 2px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.sg-mode-btn:hover, .atmos-scene-btn:hover { border-color: var(--amber); color: var(--amber); }
+.sg-mode-btn.active, .atmos-scene-btn.active {
+  border-color: var(--amber);
+  color: var(--bg);
+  background: var(--amber);
+  box-shadow: 0 0 10px rgba(255,179,0,0.4);
+}
+
+/* ===== STATUS ===== */
+.status-bar {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.65rem;
+  color: var(--muted);
+  letter-spacing: 0.05em;
+  padding: 8px 0;
+  min-height: 28px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.status-bar.ok { color: var(--green); }
+.status-bar.warn { color: var(--amber); }
+.status-bar.err { color: var(--red); }
+.status-led {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  flex-shrink: 0;
+  box-shadow: 0 0 6px currentColor;
+}
+
+/* ===== PROCESSING ===== */
+.overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(5,3,8,0.95);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 20px;
+}
+.overlay.show { display: flex; }
+/* 오버레이 내부 전체를 1/1.5 배율로 */
+.overlay > * { transform: scale(0.833); transform-origin: center center; }
+
+.overlay-title {
+  font-family: 'Orbitron', monospace;
+  font-size: 1.6rem;
+  color: var(--amber);
+  letter-spacing: 0.2em;
+  text-align: center;
+}
+.overlay-sub {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 1.1rem;
+  color: var(--muted);
+  letter-spacing: 0.1em;
+  text-align: center;
+  max-width: 640px;
+}
+/* overlay log */
+.overlay-log {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  min-width: 600px;
+  max-width: 700px;
+  /* 4.5줄 고정: 1줄 = 2em + 8px padding ≈ 38px, 4.5줄 = 171px */
+  height: 171px;
+  overflow: hidden;
+  will-change: contents;
+  margin-top: -8px;
+}
+/* 마지막 0.5줄(~19px)을 그라데이션으로 페이드아웃 */
+.overlay-log::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 38px; /* 1줄 높이 — 아래쪽 절반부터 완전 불투명으로 */
+  background: linear-gradient(to bottom, transparent 0%, rgba(5,3,8,0.97) 55%);
+  pointer-events: none;
+  z-index: 2;
+  will-change: transform;
+}
+.overlay-log-line {
+  font-family: 'JetBrains Mono', 'Share Tech Mono', monospace;
+  font-size: 0.95rem;
+  letter-spacing: 0.04em;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  opacity: 0;
+  max-height: 0;
+  padding-bottom: 0;
+  transform: translateY(-14px);
+  transition: opacity 0.38s ease-out,
+              transform 0.38s cubic-bezier(0.16,1,0.3,1),
+              max-height 0.38s ease,
+              padding-bottom 0.38s ease,
+              color 0.5s ease;
+}
+.overlay-log-line.visible {
+  opacity: 1;
+  transform: translateY(0);
+  max-height: 2em;
+  padding-bottom: 8px;
+}
+.overlay-log-line.exiting {
+  opacity: 0 !important;
+  transform: translateY(20px) !important;
+  max-height: 0 !important;
+  padding-bottom: 0 !important;
+  transition: opacity 0.45s ease-in,
+              transform 0.45s ease-in,
+              max-height 0.45s ease,
+              padding-bottom 0.45s ease !important;
+}
+.overlay-log-line.current { color: var(--amber); }
+.overlay-log-line.past    { color: #4a4555; }
+
+.progress-bar-big {
+  position: relative;
+  width: 640px;
+  height: 5px;
+  background: var(--border);
+  border-radius: 3px;
+}
+.progress-bar-pct {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: 'JetBrains Mono', 'Orbitron', monospace;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: #fff;
+  text-shadow: 0 0 10px var(--amber), 0 0 3px rgba(0,0,0,0.9);
+  pointer-events: none;
+  white-space: nowrap;
+  mix-blend-mode: screen;
+  line-height: 1;
+  margin-top: -18px;
+}
+.progress-bar-big-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--amber-dim) 0%, var(--amber) 50%, var(--amber-dim) 100%);
+  background-size: 200% 100%;
+  border-radius: 2px;
+  width: 0%;
+  transition: none;
+  animation: prog-shimmer 1.6s linear infinite;
+}
+@keyframes prog-shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+@media (max-width: 640px) {
+  .dsp-grid { grid-template-columns: 1fr; }
+  .hd-module { grid-column: 1; }
+  .export-grid { grid-template-columns: 1fr 1fr; }
+}
+
+/* ===== LICENSE FOOTER ===== */
+.license-footer {
+  margin-top: 40px;
+  padding: 16px 20px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.lf-copy {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.65rem;
+  color: var(--muted);
+  letter-spacing: 0.05em;
+}
+.lf-name {
+  color: var(--amber);
+  font-weight: 600;
+}
+.lf-terms {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.6rem;
+  color: var(--muted);
+  flex-wrap: wrap;
+}
+.lf-sep { color: var(--border-hi); }
+@media (max-width: 640px) {
+  .license-footer { flex-direction: column; align-items: flex-start; }
+}
+
+
+/* ===== EULA MODAL ===== */
+.eula-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(4, 3, 8, 0.97);
+  z-index: 5000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.eula-overlay.hidden { display: none; }
+
+.eula-box {
+  width: 100%;
+  max-width: 680px;
+  background: var(--panel);
+  border: 1px solid var(--border-hi);
+  border-radius: 4px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  max-height: 92vh;
+  box-shadow: 0 0 60px rgba(199,125,255,0.08), 0 0 120px rgba(0,0,0,0.8);
+}
+
+.eula-header {
+  background: var(--panel2);
+  border-bottom: 1px solid var(--border);
+  padding: 20px 24px 16px;
+}
+.eula-header-top {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+.eula-title {
+  font-family: 'Orbitron', monospace;
+  font-size: 0.85rem;
+  font-weight: 900;
+  color: var(--amber);
+  letter-spacing: 0.12em;
+  text-shadow: 0 0 16px rgba(255,179,0,0.3);
+}
+.eula-subtitle {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.6rem;
+  color: var(--muted);
+  letter-spacing: 0.1em;
+}
+.eula-version {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.6rem;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+.eula-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-hi) var(--bg2);
+}
+.eula-body::-webkit-scrollbar { width: 5px; }
+.eula-body::-webkit-scrollbar-track { background: var(--bg2); }
+.eula-body::-webkit-scrollbar-thumb { background: var(--border-hi); border-radius: 3px; }
+
+.eula-preamble {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.65rem;
+  color: var(--muted);
+  line-height: 1.8;
+  margin-bottom: 22px;
+  padding: 12px 16px;
+  background: var(--bg2);
+  border-left: 2px solid var(--amber-dim);
+  border-radius: 2px;
+}
+
+.eula-section {
+  margin-bottom: 20px;
+}
+.eula-section-num {
+  font-family: 'Orbitron', monospace;
+  font-size: 0.6rem;
+  font-weight: 700;
+  color: var(--amber);
+  letter-spacing: 0.15em;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.eula-section-num::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+.eula-section-title {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+.eula-section-title .ko {
+  font-size: 0.75rem;
+  color: var(--muted);
+  font-weight: 400;
+  margin-left: 6px;
+}
+.eula-section-body {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.62rem;
+  color: var(--muted);
+  line-height: 1.85;
+}
+.eula-section-body .ko-text {
+  display: block;
+  color: #7a6f8a;
+  margin-top: 5px;
+  font-size: 0.6rem;
+  padding-left: 8px;
+  border-left: 1px solid var(--border);
+}
+.eula-highlight {
+  color: var(--amber);
+  font-weight: 600;
+}
+.eula-warn {
+  color: var(--red);
+}
+
+.eula-consent-notice {
+  margin-top: 24px;
+  padding: 14px 16px;
+  background: rgba(255,179,0,0.05);
+  border: 1px solid var(--amber-dim);
+  border-radius: 3px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.65rem;
+  color: var(--amber);
+  line-height: 1.7;
+  text-align: center;
+  letter-spacing: 0.03em;
+}
+
+.eula-footer {
+  padding: 16px 24px;
+  background: var(--panel2);
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.eula-footer-copy {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.58rem;
+  color: var(--muted);
+}
+.eula-btn-group {
+  display: flex;
+  gap: 8px;
+}
+.eula-btn-decline {
+  font-family: 'Orbitron', monospace;
+  font-size: 0.58rem;
+  letter-spacing: 0.1em;
+  padding: 8px 16px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--muted);
+  border-radius: 2px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.eula-btn-decline:hover { border-color: var(--red); color: var(--red); }
+.eula-btn-accept {
+  font-family: 'Orbitron', monospace;
+  font-size: 0.58rem;
+  letter-spacing: 0.1em;
+  padding: 8px 20px;
+  border: 1px solid var(--amber);
+  background: rgba(255,179,0,0.1);
+  color: var(--amber);
+  border-radius: 2px;
+  cursor: pointer;
+  transition: all 0.15s;
+  box-shadow: 0 0 10px rgba(255,179,0,0.1);
+}
+.eula-btn-accept:hover {
+  background: var(--amber);
+  color: var(--bg);
+  box-shadow: 0 0 20px rgba(255,179,0,0.3);
+}
+
+/* Upload consent badge on drop zone */
+.eula-consent-badge {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.55rem;
+  color: var(--amber-dim);
+  margin-top: 8px;
+  letter-spacing: 0.04em;
+  display: block;
+}
+
+/* ── Drag & Drop ── */
+.module[draggable=true] { cursor: grab; }
+.module[draggable=true]:active { cursor: grabbing; }
+.module.dragging  { opacity: 0.35; }
+
+/* 드래그 핸들: 6점 그리드 패턴 */
+.drag-handle {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 20px; height: 100%; margin-right: 6px;
+  user-select: none; cursor: grab; flex-shrink: 0;
+  opacity: 0.28;
+  transition: opacity 0.15s;
+  padding: 0 2px;
+  /* 6점 도트 그리드 */
+  background-image:
+    radial-gradient(circle, var(--muted) 1.2px, transparent 1.2px);
+  background-size: 5px 5px;
+  background-position: 0 0;
+  background-repeat: repeat;
+  border-radius: 2px;
+  min-height: 28px;
+}
+.drag-handle:hover {
+  opacity: 0.85;
+  background-image: radial-gradient(circle, var(--amber) 1.2px, transparent 1.2px);
+}
+/* 드래그 가능한 모듈 헤더: 좌측 테두리 강조 */
+.module[draggable=true] > .module-header {
+  border-left: 3px solid rgba(255,180,0,0.18);
+  padding-left: 11px;
+  transition: border-color 0.2s;
+}
+.module[draggable=true]:hover > .module-header {
+  border-left-color: rgba(255,180,0,0.55);
+}
+#mod-master .drag-handle { display: none; }
+#mod-master > .module-header { border-left: none; padding-left: 14px; }
+/* 드롭 위치 표시선 */
+.drop-indicator {
+  width: 3px;
+  align-self: stretch;
+  min-height: 60px;
+  background: var(--amber);
+  border-radius: 2px;
+  margin: 0 -1px;
+  box-shadow: 0 0 8px var(--amber), 0 0 2px var(--amber);
+  pointer-events: none;
+  flex-shrink: 0;
+}
+</style>
+</head>
+<body>
+<!-- EULA Modal -->
+<div class="eula-overlay" id="eulaOverlay">
+  <div class="eula-box">
+    <div class="eula-header">
+      <div class="eula-header-top">
+        <div class="eula-title">ANALOG SOUL DSP ENGINE</div>
+      </div>
+      <div class="eula-subtitle">소프트웨어 사용권 계약서 · END USER LICENSE AGREEMENT</div>
+      <div class="eula-version">Copyright © 2026 Velvitty(연이) · Version 2.1 · Effective Date: 2026</div>
+    </div>
+
+    <div class="eula-body" id="eulaBody">
+
+      <div class="eula-preamble">
+        본 계약서를 주의 깊게 읽어주시기 바랍니다. 이 소프트웨어를 사용하거나 음악 파일을 업로드하는 행위는 아래 모든 조항에 동의한 것으로 간주됩니다.<br><br>
+        Please read this agreement carefully. Using this software or uploading any audio file constitutes your acceptance of all terms below.
+      </div>
+
+      <div class="eula-section">
+        <div class="eula-section-num">ARTICLE 01</div>
+        <div class="eula-section-title">Definitions &amp; Parties <span class="ko">정의 및 당사자</span></div>
+        <div class="eula-section-body">
+          "<span class="eula-highlight">Software</span>" refers to ANALOG SOUL DSP ENGINE, including all associated source code, algorithms, audio processing logic, and interface elements developed by the Author.<br>
+          "<span class="eula-highlight">Author</span>" refers to Velvitty(연이), the sole copyright holder.<br>
+          "<span class="eula-highlight">User</span>" refers to any individual or entity accessing or using the Software.
+          <span class="ko-text">
+            "소프트웨어"란 저작자가 개발한 ANALOG SOUL DSP ENGINE의 소스 코드, 알고리즘, 오디오 처리 로직 및 인터페이스 요소 전체를 의미합니다.<br>
+            "저작자"란 유일한 저작권자인 Velvitty(연이)를 의미합니다.<br>
+            "사용자"란 본 소프트웨어에 접근하거나 사용하는 모든 개인 또는 단체를 의미합니다.
+          </span>
+        </div>
+      </div>
+
+      <div class="eula-section">
+        <div class="eula-section-num">ARTICLE 02</div>
+        <div class="eula-section-title">Grant of License <span class="ko">사용권 부여</span></div>
+        <div class="eula-section-body">
+          The Author grants the User a <span class="eula-highlight">limited, non-exclusive, non-transferable, revocable</span> license to access and run this Software solely for personal, educational, and non-commercial research purposes.
+          <span class="ko-text">
+            저작자는 사용자에게 개인적·교육적·비영리 연구 목적에 한정하여 본 소프트웨어를 실행할 수 있는 제한적·비독점적·양도 불가·취소 가능한 사용권을 부여합니다.
+          </span>
+        </div>
+      </div>
+
+      <div class="eula-section">
+        <div class="eula-section-num">ARTICLE 03</div>
+        <div class="eula-section-title">Prohibited Activities <span class="ko">금지 행위</span></div>
+        <div class="eula-section-body">
+          The following are strictly prohibited without explicit written permission from the Author:<br><br>
+          <span class="eula-warn">✕</span> Distribution, redistribution, or sharing of the Software in original or modified form<br>
+          <span class="eula-warn">✕</span> Sub-licensing, selling, renting, or leasing the Software<br>
+          <span class="eula-warn">✕</span> Any commercial use, including use in paid products, services, or workflows<br>
+          <span class="eula-warn">✕</span> Claiming authorship or ownership of the Software<br>
+          <span class="eula-warn">✕</span> Removing or obscuring copyright notices or license information
+          <span class="ko-text">
+            저작자의 서면 허가 없이 아래 행위를 엄격히 금지합니다:<br>
+            원본 또는 수정된 형태의 소프트웨어 배포·재배포·공유 / 서브라이선스 부여·판매·임대·대여 / 유료 제품·서비스·워크플로우에의 사용을 포함한 모든 상업적 이용 / 저작권 또는 소유권 주장 / 저작권 표시 또는 라이선스 정보 삭제·은폐
+          </span>
+        </div>
+      </div>
+
+      <div class="eula-section">
+        <div class="eula-section-num">ARTICLE 04</div>
+        <div class="eula-section-title">Modifications <span class="ko">수정</span></div>
+        <div class="eula-section-body">
+          The User may modify the source code <span class="eula-highlight">for personal study only</span>. Modified versions must retain all original copyright notices. <span class="eula-warn">Distribution of any modified version is strictly prohibited.</span>
+          <span class="ko-text">
+            사용자는 개인적인 학습 목적에 한하여 소스 코드를 수정할 수 있습니다. 수정된 버전에는 모든 원본 저작권 표시를 유지해야 합니다. 수정된 버전의 배포는 엄격히 금지됩니다.
+          </span>
+        </div>
+      </div>
+
+      <div class="eula-section">
+        <div class="eula-section-num">ARTICLE 05</div>
+        <div class="eula-section-title">Intellectual Property <span class="ko">지적 재산권</span></div>
+        <div class="eula-section-body">
+          All intellectual property rights in the Software, including but not limited to copyrights, design rights, and trade secrets, remain exclusively with <span class="eula-highlight">Velvitty(연이)</span>. This Agreement does not transfer any ownership rights to the User.
+          <span class="ko-text">
+            저작권, 디자인권, 영업 비밀을 포함한 소프트웨어의 모든 지적 재산권은 Velvitty(연이)에게 귀속됩니다. 본 계약은 사용자에게 어떠한 소유권도 이전하지 않습니다.
+          </span>
+        </div>
+      </div>
+
+      <div class="eula-section">
+        <div class="eula-section-num">ARTICLE 06</div>
+        <div class="eula-section-title">Disclaimer of Warranties <span class="ko">보증 부인</span></div>
+        <div class="eula-section-body">
+          The Software is provided <span class="eula-highlight">"AS IS"</span> without warranty of any kind. The Author makes no representations or warranties regarding the accuracy, reliability, or fitness for a particular purpose of the Software.
+          <span class="ko-text">
+            본 소프트웨어는 어떠한 보증도 없이 "있는 그대로(AS IS)" 제공됩니다. 저작자는 소프트웨어의 정확성·신뢰성·특정 목적 적합성에 관하여 어떠한 진술이나 보증도 하지 않습니다.
+          </span>
+        </div>
+      </div>
+
+      <div class="eula-section">
+        <div class="eula-section-num">ARTICLE 07</div>
+        <div class="eula-section-title">Limitation of Liability <span class="ko">책임 제한</span></div>
+        <div class="eula-section-body">
+          To the maximum extent permitted by applicable law, the Author shall not be liable for any indirect, incidental, special, or consequential damages arising from the use or inability to use the Software.
+          <span class="ko-text">
+            관련 법률이 허용하는 최대 범위 내에서, 저작자는 소프트웨어의 사용 또는 사용 불능으로 인한 간접적·부수적·특수적·결과적 손해에 대해 책임을 지지 않습니다.
+          </span>
+        </div>
+      </div>
+
+      <div class="eula-section">
+        <div class="eula-section-num">ARTICLE 08</div>
+        <div class="eula-section-title">Termination <span class="ko">계약 해지</span></div>
+        <div class="eula-section-body">
+          This license is effective until terminated. The Author may terminate this license immediately upon notice if the User breaches any provision of this Agreement. Upon termination, the User must cease all use of the Software.
+          <span class="ko-text">
+            본 라이선스는 해지될 때까지 유효합니다. 사용자가 본 계약의 어느 조항이라도 위반하는 경우, 저작자는 즉시 본 라이선스를 해지할 수 있습니다. 해지 시 사용자는 소프트웨어의 모든 사용을 즉시 중단해야 합니다.
+          </span>
+        </div>
+      </div>
+
+      <div class="eula-section">
+        <div class="eula-section-num">ARTICLE 09</div>
+        <div class="eula-section-title">Contact &amp; Permissions <span class="ko">문의 및 허가 요청</span></div>
+        <div class="eula-section-body">
+          For permissions beyond the scope of this license, including commercial use inquiries, please contact the Author directly.
+          <span class="ko-text">
+            상업적 이용 문의를 포함하여 본 라이선스 범위를 초과하는 허가 요청은 저작자에게 직접 문의하시기 바랍니다.
+          </span>
+        </div>
+      </div>
+
+      <div class="eula-consent-notice">
+        ⚠ &nbsp; 음악 파일을 업로드하는 행위는 위 사용권 계약서의 모든 조항을 읽고 이해하였으며,<br>
+        이에 <strong>완전히 동의함</strong>을 확인하는 것으로 간주됩니다.<br><br>
+        Uploading an audio file constitutes your acknowledgment that you have read, understood,<br>
+        and fully agree to all terms of this End User License Agreement.
+      </div>
+
+    </div>
+
+    <div class="eula-footer">
+      <div class="eula-footer-copy">© 2026 Velvitty(연이) · All Rights Reserved</div>
+      <div class="eula-btn-group">
+        <button class="eula-btn-decline" id="eulaDecline">✕ DECLINE</button>
+        <button class="eula-btn-accept" id="eulaAccept">✓ AGREE &amp; CONTINUE</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="app">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="logo">
+      <h1>ANALOG SOUL</h1>
+      <sub>DSP ENGINE v2.2</sub>
+    </div>
+    <div class="header-meters">
+      <div>
+        <div class="vu-pair">
+          <div class="vu-bar"><div class="vu-fill" id="vuL"></div></div>
+          <div class="vu-bar"><div class="vu-fill" id="vuR"></div></div>
+        </div>
+        <div class="vu-label">L / R</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Drop Zone -->
+  <div class="drop-zone" id="dropZone">
+    <input type="file" id="fileInput" accept="audio/*">
+    <span class="drop-icon">⬡</span>
+    <h2>AUDIO FILE INPUT</h2>
+    <p>DRAG & DROP · CLICK TO SELECT · WAV / MP3 / FLAC / OGG / AAC</p>
+    <span class="eula-consent-badge">파일 업로드 시 사용권 계약(EULA)에 동의한 것으로 간주됩니다.</span>
+  </div>
+
+  <!-- File Info -->
+  <div class="file-info" id="fileInfo">
+    <div class="fi-led"></div>
+    <div class="fi-name" id="fiName">—</div>
+    <div class="fi-meta" id="fiMeta">—</div>
+  </div>
+
+  <!-- Spectrum -->
+  <div class="spectrum-wrap" id="specWrap">
+    <div class="spec-label">
+      <span>▸ SPECTRUM ANALYZER</span>
+      <span id="specFreqLabel">20Hz ——————————————————————————— 20kHz</span>
+    </div>
+    <canvas id="spectrum" width="1060" height="90"></canvas>
+  </div>
+
+  <!-- Transport -->
+  <div class="transport-bar" id="transportBar">
+    <div class="transport-controls">
+      <button class="btn active" id="playBtn">▶ PLAY</button>
+      <button class="btn" id="stopBtn">■ STOP</button>
+      <div style="flex:1"></div>
+      <span class="info-badge" id="infoSR">—</span>
+    </div>
+    <div class="progress-outer" id="progOuter">
+      <div class="progress-inner" id="progInner"></div>
+    </div>
+    <div class="time-row">
+      <span id="timeCur">0:00</span>
+      <span id="timeTot">0:00</span>
+    </div>
+  </div>
+
+  <!-- DSP Modules -->
+  <div class="dsp-section-title">PROCESSING CHAIN</div>
+
+  <div class="dsp-grid" id="dspGrid">
+
+    <!-- BBE SONIC MAXIMIZER -->
+    <div class="module" id="mod-comp" draggable="true">
+      <div class="module-header"><span class="drag-handle" title="드래그하여 순서 변경"></span>
+        <div style="display:flex;align-items:baseline;gap:6px">
+          <div class="module-name">COMPRESSOR</div>
+          <div class="module-sub">다이나믹스 제어</div>
+        </div>
+        <div class="module-header-right">
+          <label class="led-toggle"><input type="checkbox" id="compOn"><div class="led-btn"></div></label>
+        </div>
+      </div>
+      <div class="module-body">
+        <div class="slider-row">
+          <span class="slider-label">THRESHOLD</span>
+          <input type="range" id="compThr" min="-60" max="0" value="-18" step="0.5">
+          <span class="slider-val" id="compThrV">-18</span>
+        </div>
+        <div class="slider-row">
+          <span class="slider-label">RATIO</span>
+          <input type="range" id="compRatio" min="1" max="20" value="4" step="0.5">
+          <span class="slider-val" id="compRatioV">4:1</span>
+        </div>
+        <div class="slider-row">
+          <span class="slider-label">ATTACK ms</span>
+          <input type="range" id="compAtk" min="0.1" max="200" value="10" step="0.1">
+          <span class="slider-val" id="compAtkV">10</span>
+        </div>
+        <div class="slider-row">
+          <span class="slider-label">RELEASE ms</span>
+          <input type="range" id="compRel" min="10" max="3000" value="250" step="10">
+          <span class="slider-val" id="compRelV">250</span>
+        </div>
+        <div class="slider-row">
+          <span class="slider-label">MAKEUP dB</span>
+          <input type="range" id="compMake" min="0" max="24" value="4" step="0.5">
+          <span class="slider-val" id="compMakeV">4</span>
+        </div>
+        <div class="slider-row">
+          <span class="slider-label">KNEE</span>
+          <input type="range" id="compKnee" min="0" max="40" value="10" step="1">
+          <span class="slider-val" id="compKneeV">10</span>
+        </div>
+        <div class="vintage-meter"><div class="vintage-meter-fill" id="compMeter"></div></div>
+      </div>
+    </div>
+
+    <div class="module" id="mod-bbe" draggable="true">
+      <div class="module-header"><span class="drag-handle" title="드래그하여 순서 변경"></span>
+        <div style="display:flex;align-items:baseline;gap:6px">
+          <div class="module-name">BBE SONIC MAXIMIZER</div>
+          <div class="module-sub">위상 보정 + 존재감 강화</div>
+        </div>
+        <div class="module-header-right">
+          <label class="led-toggle"><input type="checkbox" id="bbeOn"><div class="led-btn"></div></label>
+        </div>
+      </div>
+      <div class="module-body">
+        <div class="slider-row">
+          <span class="slider-label">LO CONTOUR</span>
+          <input type="range" id="bbeLo" min="0" max="100" value="40" step="1">
+          <span class="slider-val" id="bbeLoV">40</span>
+        </div>
+        <div class="slider-row">
+          <span class="slider-label">PROCESS</span>
+          <input type="range" id="bbeProcess" min="0" max="100" value="60" step="1">
+          <span class="slider-val" id="bbeProcessV">60</span>
+        </div>
+        <div class="slider-row">
+          <span class="slider-label">HI DEF</span>
+          <input type="range" id="bbeHi" min="0" max="100" value="50" step="1">
+          <span class="slider-val" id="bbeHiV">50</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="module" id="mod-tube" draggable="true">
+      <div class="module-header"><span class="drag-handle" title="드래그하여 순서 변경"></span>
+        <div style="display:flex;align-items:baseline;gap:6px">
+          <div class="module-name">VACUUM TUBE</div>
+          <div class="module-sub">짝수 하모닉 포화</div>
+        </div>
+        <div class="module-header-right">
+          <label class="led-toggle"><input type="checkbox" id="tubeOn"><div class="led-btn"></div></label>
+        </div>
+      </div>
+      <div class="module-body">
+        <div class="slider-row">
+          <span class="slider-label">DRIVE</span>
+          <input type="range" id="tubeDrive" min="0" max="100" value="30" step="1">
+          <span class="slider-val" id="tubeDriveV">30</span>
+        </div>
+        <div class="slider-row">
+          <span class="slider-label">BIAS</span>
+          <input type="range" id="tubeBias" min="0" max="100" value="50" step="1">
+          <span class="slider-val" id="tubeBiasV">50</span>
+        </div>
+        <div class="slider-row">
+          <span class="slider-label">OUTPUT</span>
+          <input type="range" id="tubeOut" min="-12" max="6" value="0" step="0.5">
+          <span class="slider-val" id="tubeOutV">0</span>
+        </div>
+        <div class="slider-row">
+          <span class="slider-label">MIX</span>
+          <input type="range" id="tubeMix" min="0" max="100" value="50" step="1">
+          <span class="slider-val" id="tubeMixV">50</span>
+        </div>
+
+        <!-- Tube Visualizer -->
+        <div class="tube-viz-wrap">
+          <div class="tube-viz-label-row">
+            <span class="tube-viz-label">▸ SATURATION WAVEFORM</span>
+            <span class="tube-viz-thd" id="tubeTHD">THD 0.0%</span>
+          </div>
+          <canvas class="tube-vis" id="tubeVis" width="560" height="72"></canvas>
+          <div class="tube-sat-bar-wrap">
+            <span class="tube-sat-bar-label">SAT</span>
+            <div class="tube-sat-bar-bg">
+              <div class="tube-sat-bar-fill" id="tubeSatBar"></div>
+            </div>
+            <span class="tube-sat-val" id="tubeSatVal">0%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="module" id="mod-exciter" draggable="true">
+      <div class="module-header"><span class="drag-handle" title="드래그하여 순서 변경"></span>
+        <div style="display:flex;align-items:baseline;gap:6px">
+          <div class="module-name">EXCITER</div>
+          <div class="module-sub">고역 하모닉 에어</div>
+        </div>
+        <div class="module-header-right">
+          <label class="led-toggle"><input type="checkbox" id="exciterOn"><div class="led-btn"></div></label>
+        </div>
+      </div>
+      <div class="module-body">
+        <div class="slider-row">
+          <span class="slider-label">FREQ</span>
+          <input type="range" id="excFreq" min="2000" max="12000" value="6000" step="100">
+          <span class="slider-val" id="excFreqV">6k</span>
+        </div>
+        <div class="slider-row">
+          <span class="slider-label">DRIVE</span>
+          <input type="range" id="excDrive" min="0" max="100" value="40" step="1">
+          <span class="slider-val" id="excDriveV">40</span>
+        </div>
+        <div class="slider-row">
+          <span class="slider-label">MIX</span>
+          <input type="range" id="excMix" min="0" max="100" value="35" step="1">
+          <span class="slider-val" id="excMixV">35</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="module" id="mod-sg" draggable="true">
+      <div class="module-header"><span class="drag-handle" title="드래그하여 순서 변경"></span>
+        <div style="display:flex;align-items:baseline;gap:6px">
+          <div class="module-name">SOUNDGOODIZER</div>
+          <div class="module-sub">멀티밴드 하모닉 인핸서</div>
+        </div>
+        <div class="module-header-right">
+          <label class="led-toggle"><input type="checkbox" id="sgOn"><div class="led-btn"></div></label>
+        </div>
+      </div>
+      <div class="module-body">
+        <!-- Mode A/B/C/D selector -->
+        <div style="display:flex;gap:6px;margin-bottom:12px">
+          <button class="sg-mode-btn active" data-mode="A" id="sgModeA">A</button>
+          <button class="sg-mode-btn" data-mode="B" id="sgModeB">B</button>
+          <button class="sg-mode-btn" data-mode="C" id="sgModeC">C</button>
+          <button class="sg-mode-btn" data-mode="D" id="sgModeD">D</button>
+          <span id="sgModeDesc" style="font-family:'Share Tech Mono',monospace;font-size:0.55rem;color:var(--muted);margin-left:6px;align-self:center">Warm & Punchy</span>
+        </div>
+        <div class="slider-row">
+          <span class="slider-label">AMOUNT</span>
+          <input type="range" id="sgAmount" min="0" max="100" value="50" step="1">
+          <span class="slider-val" id="sgAmountV">50</span>
+        </div>
+        <div class="slider-row">
+          <span class="slider-label">LOW SAT</span>
+          <input type="range" id="sgLowSat" min="0" max="100" value="60" step="1">
+          <span class="slider-val" id="sgLowSatV">60</span>
+        </div>
+        <div class="slider-row">
+          <span class="slider-label">MID SAT</span>
+          <input type="range" id="sgMidSat" min="0" max="100" value="50" step="1">
+          <span class="slider-val" id="sgMidSatV">50</span>
+        </div>
+        <div class="slider-row">
+          <span class="slider-label">HI SAT</span>
+          <input type="range" id="sgHiSat" min="0" max="100" value="40" step="1">
+          <span class="slider-val" id="sgHiSatV">40</span>
+        </div>
+        <div class="slider-row">
+          <span class="slider-label">STEREO</span>
+          <input type="range" id="sgStereo" min="0" max="100" value="55" step="1">
+          <span class="slider-val" id="sgStereoV">55</span>
+        </div>
+        <div class="vintage-meter"><div class="vintage-meter-fill" id="sgMeter"></div></div>
+      </div>
+    </div>
+
+    <div class="module" id="mod-vinyl" draggable="true">
+      <div class="module-header"><span class="drag-handle" title="드래그하여 순서 변경"></span>
+        <div style="display:flex;align-items:baseline;gap:6px">
+          <div class="module-name">VINYL RECORD</div>
+          <div class="module-sub">아날로그 턴테이블 시뮬</div>
+        </div>
+        <div class="module-header-right">
+          <label class="led-toggle"><input type="checkbox" id="vinylOn"><div class="led-btn"></div></label>
+        </div>
+      </div>
+      <div class="module-body">
+        <div class="slider-row">
+          <span class="slider-label">CRACKLE</span>
+          <input type="range" id="vinylCrackle" min="0" max="100" value="30" step="1">
+          <span class="slider-val" id="vinylCrackleV">30</span>
+        </div>
+        <div class="slider-row">
+          <span class="slider-label">WOBBLE</span>
+          <input type="range" id="vinylWobble" min="0" max="100" value="25" step="1">
+          <span class="slider-val" id="vinylWobbleV">25</span>
+        </div>
+        <div class="slider-row">
+          <span class="slider-label">WEAR</span>
+          <input type="range" id="vinylWear" min="0" max="100" value="40" step="1">
+          <span class="slider-val" id="vinylWearV">40</span>
+        </div>
+        <div class="slider-row">
+          <span class="slider-label">CROSSTALK</span>
+          <input type="range" id="vinylCross" min="0" max="100" value="20" step="1">
+          <span class="slider-val" id="vinylCrossV">20</span>
+        </div>
+        <canvas class="crackle-vis" id="crackleVis" width="300" height="30"></canvas>
+      </div>
+    </div>
+
+    <div class="module" id="mod-atmos" draggable="true">
+      <div class="module-header"><span class="drag-handle" title="드래그하여 순서 변경"></span>
+        <div style="display:flex;align-items:baseline;gap:6px">
+          <div class="module-name">DOLBY ATMOS</div>
+          <div class="module-sub">공간 오디오 시뮬레이터</div>
+        </div>
+        <div class="module-header-right">
+          <span class="hd-badge" style="background:rgba(0,207,255,0.08);border-color:#00cfff44;color:#00cfff;margin-right:6px">3D SPATIAL</span>
+          <label class="led-toggle"><input type="checkbox" id="atmosOn"><div class="led-btn"></div></label>
+        </div>
+      </div>
+      <div class="module-body">
+        <!-- Scene preset buttons -->
+        <div style="display:flex;gap:5px;margin-bottom:12px;flex-wrap:wrap">
+          <button class="atmos-scene-btn active" style="width:auto;padding:0 10px;font-size:0.5rem;letter-spacing:0.06em" data-scene="cinema" id="atmosCinema">CINEMA</button>
+          <button class="atmos-scene-btn" style="width:auto;padding:0 10px;font-size:0.5rem;letter-spacing:0.06em" data-scene="concert" id="atmosConcert">CONCERT</button>
+          <button class="atmos-scene-btn" style="width:auto;padding:0 10px;font-size:0.5rem;letter-spacing:0.06em" data-scene="stadium" id="atmosStadium">STADIUM</button>
+          <button class="atmos-scene-btn" style="width:auto;padding:0 10px;font-size:0.5rem;letter-spacing:0.06em" data-scene="studio" id="atmosStudio">STUDIO</button>
+          <button class="atmos-scene-btn" style="width:auto;padding:0 10px;font-size:0.5rem;letter-spacing:0.06em" data-scene="club" id="atmosClub">CLUB</button>
+        </div>
+        <div class="slider-row">
+          <span class="slider-label">SPACE</span>
+          <input type="range" id="atmosSpace" min="0" max="100" value="60" step="1">
+          <span class="slider-val" id="atmosSpaceV">60</span>
+        </div>
+        <div class="slider-row">
+          <span class="slider-label">HEIGHT</span>
+          <input type="range" id="atmosHeight" min="0" max="100" value="45" step="1">
+          <span class="slider-val" id="atmosHeightV">45</span>
+        </div>
+        <div class="slider-row">
+          <span class="slider-label">DEPTH</span>
+          <input type="range" id="atmosDepth" min="0" max="100" value="50" step="1">
+          <span class="slider-val" id="atmosDepthV">50</span>
+        </div>
+        <div class="slider-row">
+          <span class="slider-label">REVERB</span>
+          <input type="range" id="atmosReverb" min="0" max="100" value="35" step="1">
+          <span class="slider-val" id="atmosReverbV">35</span>
+        </div>
+        <div class="slider-row">
+          <span class="slider-label">OBJECT MIX</span>
+          <input type="range" id="atmosObject" min="0" max="100" value="40" step="1">
+          <span class="slider-val" id="atmosObjectV">40</span>
+        </div>
+        <div class="slider-row">
+          <span class="slider-label">DRY/WET</span>
+          <input type="range" id="atmosMix" min="0" max="100" value="60" step="1">
+          <span class="slider-val" id="atmosMixV">60</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="module" id="mod-master">
+      <div class="module-header">
+        <div style="display:flex;align-items:baseline;gap:6px">
+          <div class="module-name">MASTERING CHAIN</div>
+          <div class="module-sub">멀티밴드 + 리미터 + 스테레오</div>
+        </div>
+        <div class="module-header-right">
+          <label class="led-toggle"><input type="checkbox" id="masterOn"><div class="led-btn"></div></label>
+        </div>
+      </div>
+      <div class="module-body">
+        <div style="font-family:'Share Tech Mono',monospace;font-size:0.55rem;color:var(--muted);margin-bottom:8px;letter-spacing:0.1em">MULTI-BAND COMP</div>
+        <div class="slider-row">
+          <span class="slider-label">LOW COMP</span>
+          <input type="range" id="mbLow" min="1" max="10" value="2" step="0.5">
+          <span class="slider-val" id="mbLowV">2:1</span>
+        </div>
+        <div class="slider-row">
+          <span class="slider-label">MID COMP</span>
+          <input type="range" id="mbMid" min="1" max="10" value="3" step="0.5">
+          <span class="slider-val" id="mbMidV">3:1</span>
+        </div>
+        <div class="slider-row">
+          <span class="slider-label">HIGH COMP</span>
+          <input type="range" id="mbHigh" min="1" max="10" value="2" step="0.5">
+          <span class="slider-val" id="mbHighV">2:1</span>
+        </div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:0.55rem;color:var(--muted);margin:10px 0 8px;letter-spacing:0.1em">STEREO + LIMITER</div>
+        <div class="slider-row">
+          <span class="slider-label">STEREO WIDTH</span>
+          <input type="range" id="stereoWidth" min="0" max="200" value="110" step="1">
+          <span class="slider-val" id="stereoWidthV">110</span>
+        </div>
+        <div class="slider-row">
+          <span class="slider-label">CEILING dB</span>
+          <input type="range" id="limiterCeil" min="-6" max="0" value="-0.3" step="0.1">
+          <span class="slider-val" id="limiterCeilV">-0.3</span>
+        </div>
+        <div class="slider-row">
+          <span class="slider-label">OUTPUT GAIN</span>
+          <input type="range" id="masterGain" min="-12" max="12" value="0" step="0.5">
+          <span class="slider-val" id="masterGainV">0</span>
+        </div>
+        <div class="vintage-meter"><div class="vintage-meter-fill" id="masterMeter"></div></div>
+      </div>
+    </div>
+
+    <div class="module hd-module" id="mod-hd">
+      <div class="module-header">
+        <div style="display:flex;align-items:baseline;gap:10px">
+          <div class="module-name">HIGH-RESOLUTION RESTORATION</div>
+          <span class="hd-badge hd">96kHz / 24bit</span>
+          <span class="hd-badge uhd">192kHz / 32bit</span>
+        </div>
+        <div class="module-header-right">
+          <span style="font-family:'Share Tech Mono',monospace;font-size:0.55rem;color:var(--muted)">Export 전용</span>
+        </div>
+      </div>
+      <div class="module-body">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+          <div>
+            <div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:var(--blue);letter-spacing:0.1em;margin-bottom:10px">▸ HD RESTORE — 96kHz / 24bit</div>
+            <div style="font-family:'Share Tech Mono',monospace;font-size:0.55rem;color:var(--muted);line-height:1.7;margin-bottom:10px">
+              • 20kHz~48kHz 대역: 원본 데이터 하모닉 합성으로 채움<br>
+              • 오버샘플링 × 2 (OfflineAudioContext 96kHz)<br>
+              • 16bit → 24bit 양자화 노이즈 쉐이핑
+            </div>
+            <div class="slider-row">
+              <span class="slider-label">HF SYNTH</span>
+              <input type="range" id="hdHF" min="0" max="100" value="60" step="1">
+              <span class="slider-val" id="hdHFV">60</span>
+            </div>
+            <div class="slider-row">
+              <span class="slider-label">SMOOTH</span>
+              <input type="range" id="hdSmooth" min="0" max="100" value="40" step="1">
+              <span class="slider-val" id="hdSmoothV">40</span>
+            </div>
+          </div>
+          <div>
+            <div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:var(--purple);letter-spacing:0.1em;margin-bottom:10px">▸ ULTRA HD RESTORE — 192kHz / 32bit</div>
+            <div style="font-family:'Share Tech Mono',monospace;font-size:0.55rem;color:var(--muted);line-height:1.7;margin-bottom:10px">
+              • HD 복원 결과를 재차 × 2 업샘플링<br>
+              • 20kHz~96kHz 초고역 하모닉 합성<br>
+              • 16/24bit → 32bit float 변환
+            </div>
+            <div class="slider-row">
+              <span class="slider-label">UHF SYNTH</span>
+              <input type="range" id="uhdHF" min="0" max="100" value="50" step="1">
+              <span class="slider-val" id="uhdHFV">50</span>
+            </div>
+            <div class="slider-row">
+              <span class="slider-label">AIR MIX</span>
+              <input type="range" id="uhdAir" min="0" max="100" value="35" step="1">
+              <span class="slider-val" id="uhdAirV">35</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /dsp-grid -->
+
+  <!-- Export Section -->
+  <div class="dsp-section-title">EXPORT</div>
+  <div class="export-section">
+    <div class="export-grid">
+      <div class="export-btn-wrap">
+        <button class="btn export" id="expWav" disabled>⬇ WAV 44.1kHz / 16bit</button>
+        <span>DSP 처리된 원본 샘플레이트 WAV</span>
+      </div>
+      <div class="export-btn-wrap">
+        <button class="btn export" id="expHD" disabled>⬇ HD RESTORE 96kHz / 24bit</button>
+        <span>고해상도 복원 + DSP 처리</span>
+      </div>
+      <div class="export-btn-wrap">
+        <button class="btn export" id="expUHD" disabled>⬇ ULTRA HD 192kHz / 32bit</button>
+        <span>초고해상도 복원 + DSP 처리</span>
+      </div>
+      <div class="export-btn-wrap">
+        <button class="btn danger" id="resetBtn">✕ 초기화</button>
+        <span>파일 및 설정 초기화</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Status -->
+  <div class="status-bar" id="statusBar">
+    <div class="status-led"></div>
+    <span>오디오 파일을 업로드하여 시작하세요.</span>
+  </div>
+
+</div>
+
+<!-- Processing overlay -->
+<div class="overlay" id="overlay">
+  <div class="overlay-title" id="overlayTitle">PROCESSING...</div>
+  <div class="overlay-sub" id="overlaySub">잠시만 기다려 주세요</div>
+  <div class="progress-bar-big"><div class="progress-bar-big-fill" id="overlayProg"></div><span class="progress-bar-pct" id="overlayPct">0%</span></div>
+  <div class="overlay-log" id="overlayLog"></div>
+</div>
+
+<script>
+// ============================================================
+// ANALOG SOUL DSP ENGINE — Main Script
+// ============================================================
+
+let audioCtx = null;
+let sourceBuf = null;
+let srcNode = null;
+let analyser = null;
+let isPlaying = false;
+let startedAt = 0;
+let pausedAt = 0;
+let specAnimID = null;  // 스펙트럼 전용
+let progAnimID = null;  // 진행 바 전용
+let originalFile = null;
+
+// Live DSP nodes
+let liveDSP = {}; // rebuilt on each play
+let eulaAccepted = false; // set to true on file upload or EULA accept
+
+function ctx() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  return audioCtx;
+}
+
+// ---- File Drop ----
+const dropZone = document.getElementById('dropZone');
+const fileInput = document.getElementById('fileInput');
+
+dropZone.addEventListener('click', () => fileInput.click());
+dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('over'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('over'));
+dropZone.addEventListener('drop', e => { e.preventDefault(); dropZone.classList.remove('over'); loadFile(e.dataTransfer.files[0]); });
+fileInput.addEventListener('change', () => fileInput.files[0] && loadFile(fileInput.files[0]));
+
+async function loadFile(file) {
+  if (!file.type.startsWith('audio/') && !file.name.match(/\.(wav|mp3|flac|ogg|aac|m4a)$/i)) {
+    setStatus('오디오 파일만 지원됩니다.', 'err'); return;
+  }
+  // 파일 업로드 = EULA 동의로 간주
+  if (!eulaAccepted) {
+    eulaAccepted = true;
+    document.getElementById('eulaOverlay').classList.add('hidden');
+  }
+  originalFile = file;
+  setStatus('디코딩 중...', 'warn');
+  const ab = await file.arrayBuffer();
+  try {
+    sourceBuf = await ctx().decodeAudioData(ab);
+  } catch(e) { setStatus('디코딩 실패: ' + e.message, 'err'); return; }
+
+  const dur = sourceBuf.duration;
+  const sr = sourceBuf.sampleRate;
+  const ch = sourceBuf.numberOfChannels;
+  document.getElementById('fiName').textContent = file.name;
+  document.getElementById('fiMeta').textContent = `${fmt(dur)} · ${(sr/1000).toFixed(1)}kHz · ${ch}ch · ${(file.size/1024/1024).toFixed(2)}MB`;
+  document.getElementById('infoSR').textContent = `${(sr/1000).toFixed(1)}kHz / ${Math.round(file.size*8/dur/1000)}kbps`;
+  document.getElementById('timeTot').textContent = fmt(dur);
+  document.getElementById('fileInfo').classList.add('show');
+  document.getElementById('specWrap').classList.add('show');
+  document.getElementById('transportBar').classList.add('show');
+  document.getElementById('expWav').disabled = false;
+  document.getElementById('expHD').disabled = false;
+  document.getElementById('expUHD').disabled = false;
+  setStatus(`로드 완료 — ${file.name}`, 'ok');
+  drawCrackle();
+}
+
+// ---- Toggle module active state ----
+const modMap = { bbeOn:'bbe', tubeOn:'tube', vinylOn:'vinyl', exciterOn:'exciter', sgOn:'sg', atmosOn:'atmos', compOn:'comp', masterOn:'master' };
+['bbeOn','tubeOn','vinylOn','exciterOn','sgOn','atmosOn','compOn','masterOn'].forEach(id => {
+  const mod = id.replace('On','');
+  const el = document.getElementById(id);
+  el.addEventListener('change', function() {
+    document.getElementById('mod-' + modMap[id]).classList.toggle('on', this.checked);
+    if (isPlaying) { hotswapDSP(); } // 재생 유지하며 체인만 교체
+  });
+});
+// init toggle state
+Object.keys(modMap).forEach(id => {
+  document.getElementById('mod-' + modMap[id]).classList.toggle('on', document.getElementById(id).checked);
+});
+
+// ---- Sliders ----
+function bindSlider(id, valId, fmt2) {
+  const el = document.getElementById(id);
+  const vel = document.getElementById(valId);
+  el.addEventListener('input', function() {
+    vel.textContent = fmt2 ? fmt2(this.value) : this.value;
+    onParamChange();
+  });
+}
+const hz = v => parseFloat(v) >= 1000 ? (v/1000).toFixed(0)+'k' : v;
+const ratio = v => parseFloat(v).toFixed(1)+':1';
+
+bindSlider('bbeLo','bbeLoV');
+bindSlider('bbeProcess','bbeProcessV');
+bindSlider('bbeHi','bbeHiV');
+bindSlider('tubeDrive','tubeDriveV');
+bindSlider('tubeBias','tubeBiasV');
+bindSlider('tubeOut','tubeOutV');
+bindSlider('tubeMix','tubeMixV');
+bindSlider('vinylCrackle','vinylCrackleV', v => { drawCrackle(); return v; });
+bindSlider('vinylWobble','vinylWobbleV');
+bindSlider('vinylWear','vinylWearV');
+bindSlider('vinylCross','vinylCrossV');
+bindSlider('excFreq','excFreqV', hz);
+bindSlider('excDrive','excDriveV');
+bindSlider('excMix','excMixV');
+bindSlider('compThr','compThrV');
+bindSlider('compRatio','compRatioV', ratio);
+bindSlider('compAtk','compAtkV');
+bindSlider('compRel','compRelV');
+bindSlider('compMake','compMakeV');
+bindSlider('compKnee','compKneeV');
+bindSlider('mbLow','mbLowV', ratio);
+bindSlider('mbMid','mbMidV', ratio);
+bindSlider('mbHigh','mbHighV', ratio);
+bindSlider('stereoWidth','stereoWidthV');
+bindSlider('limiterCeil','limiterCeilV');
+bindSlider('masterGain','masterGainV');
+bindSlider('sgAmount','sgAmountV');
+bindSlider('sgLowSat','sgLowSatV');
+bindSlider('sgMidSat','sgMidSatV');
+bindSlider('sgHiSat','sgHiSatV');
+bindSlider('sgStereo','sgStereoV');
+bindSlider('atmosSpace','atmosSpaceV');
+bindSlider('atmosHeight','atmosHeightV');
+bindSlider('atmosDepth','atmosDepthV');
+bindSlider('atmosReverb','atmosReverbV');
+bindSlider('atmosObject','atmosObjectV');
+bindSlider('atmosMix','atmosMixV');
+bindSlider('hdHF','hdHFV');
+bindSlider('hdSmooth','hdSmoothV');
+bindSlider('uhdHF','uhdHFV');
+bindSlider('uhdAir','uhdAirV');
+
+function onParamChange() {
+  if (isPlaying) applyLiveDSP();
+}
+
+// ---- Soundgoodizer Mode Presets ----
+const SG_MODES = {
+  A: { desc: 'Warm & Punchy',       lowSat:60, midSat:50, hiSat:35, stereo:55, loFreq:250,  hiFreq:4000,  loQ:0.7, hiQ:0.8, drive:0.4 },
+  B: { desc: 'Bright & Airy',       lowSat:35, midSat:45, hiSat:70, stereo:70, loFreq:180,  hiFreq:6000,  loQ:0.6, hiQ:1.0, drive:0.55 },
+  C: { desc: 'Full & Rich',         lowSat:75, midSat:60, hiSat:45, stereo:45, loFreq:300,  hiFreq:3500,  loQ:0.8, hiQ:0.7, drive:0.5  },
+  D: { desc: 'Crispy & Detailed',   lowSat:40, midSat:65, hiSat:80, stereo:65, loFreq:200,  hiFreq:8000,  loQ:0.6, hiQ:1.2, drive:0.6  },
+};
+let sgMode = 'A';
+
+document.querySelectorAll('.sg-mode-btn').forEach(btn => {
+  btn.addEventListener('click', function() {
+    // data-mode 없는 버튼(Atmos 씬 버튼 등)은 무시
+    if (!this.dataset.mode) return;
+    sgMode = this.dataset.mode;
+    document.querySelectorAll('.sg-mode-btn[data-mode]').forEach(b => b.classList.remove('active'));
+    this.classList.add('active');
+    const preset = SG_MODES[sgMode];
+    if (!preset) return;
+    document.getElementById('sgModeDesc').textContent = preset.desc;
+    // Apply preset values to sliders
+    document.getElementById('sgLowSat').value = preset.lowSat;
+    document.getElementById('sgLowSatV').textContent = preset.lowSat;
+    document.getElementById('sgMidSat').value = preset.midSat;
+    document.getElementById('sgMidSatV').textContent = preset.midSat;
+    document.getElementById('sgHiSat').value = preset.hiSat;
+    document.getElementById('sgHiSatV').textContent = preset.hiSat;
+    document.getElementById('sgStereo').value = preset.stereo;
+    document.getElementById('sgStereoV').textContent = preset.stereo;
+    onParamChange();
+  });
+});
+
+
+// ---- Dolby Atmos Scene Presets ----
+const ATMOS_SCENES = {
+  cinema:  { space:75, height:55, depth:65, reverb:40, object:50, rt60:1.8, earlyMs:22, roomSize:0.85 },
+  concert: { space:85, height:50, depth:70, reverb:55, object:45, rt60:2.4, earlyMs:35, roomSize:0.95 },
+  stadium: { space:95, height:40, depth:80, reverb:70, object:35, rt60:3.2, earlyMs:55, roomSize:1.0  },
+  studio:  { space:25, height:20, depth:30, reverb:12, object:30, rt60:0.4, earlyMs:8,  roomSize:0.4  },
+  club:    { space:55, height:35, depth:45, reverb:30, object:60, rt60:0.9, earlyMs:15, roomSize:0.65 },
+};
+let atmosScene = 'cinema';
+
+document.querySelectorAll('.atmos-scene-btn').forEach(btn => {
+  btn.addEventListener('click', function() {
+    atmosScene = this.dataset.scene;
+    document.querySelectorAll('.atmos-scene-btn').forEach(b => b.classList.remove('active'));
+    this.classList.add('active');
+    const p = ATMOS_SCENES[atmosScene];
+    const setSlider = (id, val) => {
+      document.getElementById(id).value = val;
+      document.getElementById(id + 'V').textContent = val;
+    };
+    setSlider('atmosSpace',  p.space);
+    setSlider('atmosHeight', p.height);
+    setSlider('atmosDepth',  p.depth);
+    setSlider('atmosReverb', p.reverb);
+    setSlider('atmosObject', p.object);
+    onParamChange();
+  });
+});
+
+// Dolby Atmos impulse response generator
+// Creates a synthetic reverb IR with early reflections + late reverb tail
+function makeAtmosIR(ac, scene, spaceAmt, heightAmt, depthAmt) {
+  const p     = ATMOS_SCENES[scene] || ATMOS_SCENES.cinema;
+  const rt60  = p.rt60 * (0.4 + spaceAmt * 0.8);   // 공간 크기에 따라 잔향 시간 조절
+  const sr    = ac.sampleRate;
+  const len   = Math.ceil(sr * (rt60 + 0.5));
+  const ir    = ac.createBuffer(2, len, sr);
+
+  // Early reflections: 여러 지연시간에 감쇠된 반사음 추가
+  const earlyDelays = [0.007, 0.013, 0.017, 0.023, 0.031, 0.041, 0.053, 0.067, 0.079, 0.097];
+  const earlyGains  = [0.85,  0.72,  0.68,  0.61,  0.54,  0.48,  0.42,  0.36,  0.30,  0.24 ];
+
+  // Height channel contribution: 위에서 오는 반사음 시뮬레이션
+  const heightDelay = 0.006 + heightAmt * 0.012; // 6~18ms (천장 거리에 따라)
+  const heightGain  = heightAmt * 0.55;
+
+  // Depth cue: 뒤에서 오는 늦은 반사음
+  const depthDelay = 0.04 + depthAmt * 0.06;
+  const depthGain  = depthAmt * 0.45;
+
+  for (let ch = 0; ch < 2; ch++) {
+    const data = ir.getChannelData(ch);
+    const isRight = ch === 1;
+
+    // Dirac impulse at start
+    data[0] = 1.0;
+
+    // Early reflections (L/R slightly different for HRTF-like width)
+    earlyDelays.forEach((d, i) => {
+      const idx = Math.floor(d * sr);
+      if (idx < len) {
+        const pan = isRight ? (0.9 + i * 0.01) : (1.1 - i * 0.01);
+        data[idx] += earlyGains[i] * pan * 0.6;
+      }
+    });
+
+    // Height channel (ceiling reflection)
+    const hIdx = Math.floor(heightDelay * sr);
+    if (hIdx < len) data[hIdx] += heightGain * 0.5;
+    const hIdx2 = Math.floor((heightDelay * 1.6) * sr);
+    if (hIdx2 < len) data[hIdx2] += heightGain * 0.3;
+
+    // Depth reflection
+    const dIdx = Math.floor(depthDelay * sr);
+    if (dIdx < len) {
+      data[dIdx] += depthGain * (isRight ? 0.6 : 0.5);
+    }
+
+    // Late reverb tail: exponential decay noise
+    const onset = Math.floor(p.earlyMs / 1000 * sr);
+    let b0 = 0, b1 = 0, b2 = 0; // diffusion filtering
+    for (let i = onset; i < len; i++) {
+      const t    = (i - onset) / sr;
+      const env  = Math.exp(-t * 6.91 / rt60); // -60dB in rt60 seconds
+      const raw  = (Math.random() * 2 - 1);
+      // Lowpass-filter the noise for more natural tail
+      b0 = 0.98 * b0 + 0.02 * raw;
+      b1 = 0.95 * b1 + 0.05 * b0;
+      b2 = 0.90 * b2 + 0.10 * b1;
+      const side = isRight ? 0.03 : -0.03; // slight L/R decorrelation
+      data[i] += (b2 + side * raw) * env * 0.35 * spaceAmt;
+    }
+  }
+  return ir;
+}
+
+// ---- Build Live DSP Chain ----
+function buildLiveChain() {
+  const ac = ctx();
+  const nodes = {};
+
+  // Input gain
+  nodes.inputGain = ac.createGain();
+  nodes.inputGain.gain.value = 1.0;
+
+  // --- BBE ---
+  // BBE Sonic Maximizer 작동 원리:
+  // 1. Lo Contour: 저역에 위상 지연(allpass)을 걸어 저역이 고역보다 늦게 도달하게 함
+  //    → 고역이 상대적으로 앞으로 나오는 "위상 보정" 효과
+  // 2. Process: 중고역 Presence 부스트 (2~5kHz shelving)
+  // 3. Hi Def: 초고역 Air 부스트 (8~12kHz peaking)
+  nodes.bbeAllpass1 = ac.createBiquadFilter();  // 저역 위상 지연 1단
+  nodes.bbeAllpass1.type = 'allpass';
+  nodes.bbeAllpass1.frequency.value = 150;
+  nodes.bbeAllpass1.Q.value = 0.5;
+
+  nodes.bbeAllpass2 = ac.createBiquadFilter();  // 저역 위상 지연 2단 (더 낮은 주파수)
+  nodes.bbeAllpass2.type = 'allpass';
+  nodes.bbeAllpass2.frequency.value = 80;
+  nodes.bbeAllpass2.Q.value = 0.7;
+
+  nodes.bbeLowMix = ac.createGain();   // 위상 지연된 저역 mix 양 제어
+  nodes.bbeDirectGain = ac.createGain(); // 원본 직통 경로
+  nodes.bbeLowPhaseGain = ac.createGain(); // 위상 지연 경로 gain
+  nodes.bbeSumGain = ac.createGain();  // 합산 후 gain 보상
+
+  nodes.bbePresence = ac.createBiquadFilter(); // Presence: 2~5kHz 부스트
+  nodes.bbePresence.type = 'peaking';
+  nodes.bbePresence.frequency.value = 3200;
+  nodes.bbePresence.Q.value = 0.6;
+  nodes.bbePresence.gain.value = 0;
+
+  nodes.bbeHiDef = ac.createBiquadFilter();    // Hi Def: 8~12kHz 에어 부스트
+  nodes.bbeHiDef.type = 'highShelf';
+  nodes.bbeHiDef.frequency.value = 8000;
+  nodes.bbeHiDef.gain.value = 0;
+
+  // --- Tube (even harmonic distortion via WaveShaperNode) ---
+  // 실제 진공관 회로 구조:
+  // 입력 → [저역 bypass] → [중고역만 포화] → [저역 보상 EQ] → 출력
+  // 저역(~150Hz 이하)은 포화 회로를 거치지 않고 직접 합산 (저역 상실 방지)
+  // 포화 후 고역(8kHz+)을 약간 롤오프해서 쨍함 제거
+  nodes.tubeInputHPF = ac.createBiquadFilter();  // 포화기에 들어가는 신호: 150Hz HPF
+  nodes.tubeInputHPF.type = 'highpass';
+  nodes.tubeInputHPF.frequency.value = 150;
+  nodes.tubeInputHPF.Q.value = 0.5;
+
+  nodes.tubeWaveShaper = ac.createWaveShaper();
+  nodes.tubeWaveShaper.oversample = '2x';        // 4x는 고역 하모닉 과잉 → 2x로
+
+  nodes.tubeOutputLPF = ac.createBiquadFilter(); // 포화 후 고역 쨍함 완화 롤오프
+  nodes.tubeOutputLPF.type = 'lowshelf';
+  nodes.tubeOutputLPF.frequency.value = 6000;
+  nodes.tubeOutputLPF.gain.value = -2;           // 기본 -2dB, applyLiveDSP에서 조절
+
+  nodes.tubeOutputHiCut = ac.createBiquadFilter(); // 포화 후 초고역 부드러운 롤오프
+  nodes.tubeOutputHiCut.type = 'highshelf';
+  nodes.tubeOutputHiCut.frequency.value = 10000;
+  nodes.tubeOutputHiCut.gain.value = -3;
+
+  nodes.tubeLowBypass = ac.createGain();         // 저역 직통 경로 (포화 bypass)
+  nodes.tubeLowBPF = ac.createBiquadFilter();    // 저역 bypass용 LPF
+  nodes.tubeLowBPF.type = 'lowpass';
+  nodes.tubeLowBPF.frequency.value = 150;
+  nodes.tubeLowBPF.Q.value = 0.5;
+
+  nodes.tubeLowCompensate = ac.createBiquadFilter(); // 저역 보상 EQ (+저역 warmth)
+  nodes.tubeLowCompensate.type = 'peaking';
+  nodes.tubeLowCompensate.frequency.value = 100;
+  nodes.tubeLowCompensate.Q.value = 0.8;
+  nodes.tubeLowCompensate.gain.value = 2;
+
+  // tubeDryGain removed (dry path eliminated to prevent bass tripling)
+  nodes.tubeWetGain = ac.createGain();
+  nodes.tubeOutGain = ac.createGain();
+  nodes.tubeMixOut = ac.createGain();
+
+  // --- Vinyl ---
+  nodes.vinylLPF = ac.createBiquadFilter();
+  nodes.vinylLPF.type = 'lowpass';
+  nodes.vinylHighRolloff = ac.createBiquadFilter();
+  nodes.vinylHighRolloff.type = 'highshelf';
+
+  // Vinyl noise gen (AudioWorklet not available, use ScriptProcessor)
+  nodes.vinylNoiseGain = ac.createGain();
+
+  // Create noise oscillator using offline buffer approach
+  nodes.vinylNoiseSource = createVinylNoise(ac);
+  nodes.vinylNoiseSource.loop = true;
+
+  // Crackle at random intervals — buffer
+  nodes.crackleGain = ac.createGain();
+
+  // --- Exciter ---
+  nodes.excHPF = ac.createBiquadFilter();
+  nodes.excHPF.type = 'highpass';
+  nodes.excShaper = ac.createWaveShaper();
+  nodes.excShaper.oversample = '2x';
+  nodes.excBPF = ac.createBiquadFilter();
+  nodes.excBPF.type = 'bandpass';
+  nodes.excDryGain2 = ac.createGain();
+  nodes.excWetGain2 = ac.createGain();
+  nodes.excMixOut = ac.createGain();
+
+  // --- Soundgoodizer ---
+  // 3-band parallel saturation + stereo enhancer
+  // Low band saturator
+  nodes.sgLPF = ac.createBiquadFilter(); nodes.sgLPF.type = 'lowpass';
+  nodes.sgLowShaper = ac.createWaveShaper(); nodes.sgLowShaper.oversample = '4x';
+  nodes.sgLowGain = ac.createGain();
+  // Mid band saturator
+  nodes.sgBPF = ac.createBiquadFilter(); nodes.sgBPF.type = 'bandpass';
+  nodes.sgMidShaper = ac.createWaveShaper(); nodes.sgMidShaper.oversample = '4x';
+  nodes.sgMidGain = ac.createGain();
+  // High band saturator
+  nodes.sgHPF = ac.createBiquadFilter(); nodes.sgHPF.type = 'highpass';
+  nodes.sgHiShaper = ac.createWaveShaper(); nodes.sgHiShaper.oversample = '2x';
+  nodes.sgHiGain = ac.createGain();
+  // Mix bus
+  nodes.sgDry = ac.createGain();
+  nodes.sgWet = ac.createGain();
+  nodes.sgMixOut = ac.createGain();
+  // Post dynamic EQ (subtle pumping Maximus-style)
+  nodes.sgDynEQ = ac.createBiquadFilter(); nodes.sgDynEQ.type = 'peaking'; nodes.sgDynEQ.frequency.value = 2500; nodes.sgDynEQ.Q.value = 0.7;
+  nodes.sgOutputComp = ac.createDynamicsCompressor();
+  nodes.sgOutputComp.threshold.value = -12; nodes.sgOutputComp.ratio.value = 2;
+  nodes.sgOutputComp.attack.value = 0.003; nodes.sgOutputComp.release.value = 0.15; nodes.sgOutputComp.knee.value = 6;
+
+
+  // --- Dolby Atmos Spatial Simulator ---
+  // Architecture:
+  //   input → [dry] ──────────────────────────────────────────────┐
+  //         → [earlyReflConv] → earlyGain                         ├→ atmosMixGain → out
+  //         → [lateReverbConv] → lateGain                         │
+  //         → [haasDelayL+R] → objectWidenGain (M/S width)  ──────┘
+  nodes.atmosDryGain      = ac.createGain();   // dry path
+  nodes.atmosEarlyConv    = ac.createConvolver(); nodes.atmosEarlyConv.normalize = false;
+  nodes.atmosEarlyGain    = ac.createGain();
+  nodes.atmosLateConv     = ac.createConvolver(); nodes.atmosLateConv.normalize  = false;
+  nodes.atmosLateGain     = ac.createGain();
+  // Haas effect: slight delay on one channel → stereo width perception
+  nodes.atmosHaasL        = ac.createDelay(0.05); nodes.atmosHaasL.delayTime.value = 0.0;
+  nodes.atmosHaasR        = ac.createDelay(0.05); nodes.atmosHaasR.delayTime.value = 0.002;
+  nodes.atmosSplitter     = ac.createChannelSplitter(2);
+  nodes.atmosMerger       = ac.createChannelMerger(2);
+  nodes.atmosObjectGain   = ac.createGain();
+  // Height EQ: boost 8kHz+ slightly on reverb tail for "overhead" perception
+  nodes.atmosHeightEQ     = ac.createBiquadFilter();
+  nodes.atmosHeightEQ.type = 'highShelf';
+  nodes.atmosHeightEQ.frequency.value = 8000;
+  nodes.atmosHeightEQ.gain.value      = 3;
+  // Final mix
+  nodes.atmosWetGain      = ac.createGain();
+  nodes.atmosMixOut       = ac.createGain();
+
+  // --- Compressor ---
+  nodes.compressor = ac.createDynamicsCompressor();
+
+  // --- Mastering: multi-band comp ---
+  // Linkwitz-Riley 크로스오버: 각 밴드를 독립 처리 후 합산
+  // 크로스오버 주파수: 120Hz (서브 / 저역), 500Hz (저역 / 중역), 5kHz (중역 / 고역)
+  // LPF 2단 직렬 = LR 저역통과, HPF 2단 직렬 = LR 고역통과 → 합산 시 위상 보정됨
+
+  // [Sub + Low band] ~120Hz: 서브/킥 LR LPF
+  nodes.mbLP1a = ac.createBiquadFilter(); nodes.mbLP1a.type='lowpass';  nodes.mbLP1a.frequency.value=120; nodes.mbLP1a.Q.value=0.707;
+  nodes.mbLP1b = ac.createBiquadFilter(); nodes.mbLP1b.type='lowpass';  nodes.mbLP1b.frequency.value=120; nodes.mbLP1b.Q.value=0.707;
+  nodes.mbComp1 = ac.createDynamicsCompressor();
+  nodes.mbOutGain1 = ac.createGain(); nodes.mbOutGain1.gain.value=1.0;
+
+  // [Low-Mid band] 120Hz~500Hz: 베이스/로우미드 LR BPF
+  nodes.mbHP2a = ac.createBiquadFilter(); nodes.mbHP2a.type='highpass'; nodes.mbHP2a.frequency.value=120; nodes.mbHP2a.Q.value=0.707;
+  nodes.mbHP2b = ac.createBiquadFilter(); nodes.mbHP2b.type='highpass'; nodes.mbHP2b.frequency.value=120; nodes.mbHP2b.Q.value=0.707;
+  nodes.mbLP2a = ac.createBiquadFilter(); nodes.mbLP2a.type='lowpass';  nodes.mbLP2a.frequency.value=500; nodes.mbLP2a.Q.value=0.707;
+  nodes.mbLP2b = ac.createBiquadFilter(); nodes.mbLP2b.type='lowpass';  nodes.mbLP2b.frequency.value=500; nodes.mbLP2b.Q.value=0.707;
+  nodes.mbComp2 = ac.createDynamicsCompressor();
+  nodes.mbOutGain2 = ac.createGain(); nodes.mbOutGain2.gain.value=1.0;
+
+  // [Mid band] 500Hz~5kHz: 보컬/악기 LR BPF
+  nodes.mbHP3a = ac.createBiquadFilter(); nodes.mbHP3a.type='highpass'; nodes.mbHP3a.frequency.value=500; nodes.mbHP3a.Q.value=0.707;
+  nodes.mbHP3b = ac.createBiquadFilter(); nodes.mbHP3b.type='highpass'; nodes.mbHP3b.frequency.value=500; nodes.mbHP3b.Q.value=0.707;
+  nodes.mbLP3a = ac.createBiquadFilter(); nodes.mbLP3a.type='lowpass';  nodes.mbLP3a.frequency.value=5000; nodes.mbLP3a.Q.value=0.707;
+  nodes.mbLP3b = ac.createBiquadFilter(); nodes.mbLP3b.type='lowpass';  nodes.mbLP3b.frequency.value=5000; nodes.mbLP3b.Q.value=0.707;
+  nodes.mbComp3 = ac.createDynamicsCompressor();
+  nodes.mbOutGain3 = ac.createGain(); nodes.mbOutGain3.gain.value=1.0;
+
+  // [High band] 5kHz~: 에어/심벌즈 LR HPF
+  nodes.mbHP4a = ac.createBiquadFilter(); nodes.mbHP4a.type='highpass'; nodes.mbHP4a.frequency.value=5000; nodes.mbHP4a.Q.value=0.707;
+  nodes.mbHP4b = ac.createBiquadFilter(); nodes.mbHP4b.type='highpass'; nodes.mbHP4b.frequency.value=5000; nodes.mbHP4b.Q.value=0.707;
+  nodes.mbComp4 = ac.createDynamicsCompressor();
+  nodes.mbOutGain4 = ac.createGain(); nodes.mbOutGain4.gain.value=1.0;
+
+  nodes.mbMixGain = ac.createGain(); nodes.mbMixGain.gain.value=1.0; // 합산 노드 (레벨은 각 band outGain에서 제어)
+
+  // Stereo width (mid/side via splitter/merger)
+  nodes.splitter = ac.createChannelSplitter(2);
+  nodes.merger = ac.createChannelMerger(2);
+
+  // Limiter
+  nodes.limiter = ac.createDynamicsCompressor();
+  nodes.limiter.threshold.value = -0.3;
+  nodes.limiter.ratio.value = 20;
+  nodes.limiter.attack.value = 0.001;
+  nodes.limiter.release.value = 0.1;
+  nodes.limiter.knee.value = 0;
+
+  // Output
+  nodes.outputGain = ac.createGain();
+
+  // Analyser
+  nodes.analyser = ac.createAnalyser();
+  nodes.analyser.fftSize = 2048;
+
+  liveDSP = nodes;
+  return nodes;
+}
+
+function createVinylNoise(ac) {
+  const bufLen = ac.sampleRate * 2;
+  const noiseBuf = ac.createBuffer(2, bufLen, ac.sampleRate);
+  for (let c = 0; c < 2; c++) {
+    const d = noiseBuf.getChannelData(c);
+    let b0=0,b1=0,b2=0,b3=0,b4=0,b5=0,b6=0;
+    for (let i = 0; i < bufLen; i++) {
+      const white = Math.random() * 2 - 1;
+      // Pink noise approximation
+      b0 = 0.99886*b0 + white*0.0555179;
+      b1 = 0.99332*b1 + white*0.0750759;
+      b2 = 0.96900*b2 + white*0.1538520;
+      b3 = 0.86650*b3 + white*0.3104856;
+      b4 = 0.55000*b4 + white*0.5329522;
+      b5 = -0.7616*b5 - white*0.0168980;
+      d[i] = (b0+b1+b2+b3+b4+b5+b6+white*0.5362) * 0.11;
+      b6 = white * 0.115926;
+    }
+  }
+  const src = ac.createBufferSource();
+  src.buffer = noiseBuf;
+  src.loop = true;
+  return src;
+}
+
+function makeTubeCurve(drive, bias) {
+  // 실제 진공관 삼극관(triode)의 전달 특성 근사:
+  // - 비대칭 소프트 클리핑 → 2nd harmonic(짝수) 위주 생성
+  // - 입력 레벨이 낮을 때도 미세한 포화가 일어나는 "warmth" 특성
+  // - 양의 반주기와 음의 반주기를 다르게 처리 (bias 비대칭)
+  const n = 4096; // 더 촘촘한 커브로 고역 앨리어싱 감소
+  const curve = new Float32Array(n);
+  const d = 1.0 + drive * 1.2;     // drive 범위 완화 (과도한 왜곡 방지)
+  const b = (bias - 50) / 100 * 0.15; // bias 영향 축소
+
+  for (let i = 0; i < n; i++) {
+    const x = (i * 2 / (n - 1)) - 1;
+    const xb = x + b;
+
+    // 양의 반주기: 부드러운 tanh 포화 (2nd harmonic 주성분)
+    // 음의 반주기: 약간 더 이른 포화 (비대칭 → 짝수 하모닉 생성 원리)
+    let y;
+    if (xb >= 0) {
+      y = Math.tanh(xb * d);
+    } else {
+      // 음의 반주기는 살짝 더 강한 포화 → 비대칭 → 2nd harmonic
+      y = Math.tanh(xb * d * 1.15);
+    }
+
+    // 레벨 보상: WaveShaper 통과 후 평균 게인이 줄어드는 것 보상
+    curve[i] = y / Math.tanh(d);
+  }
+  return curve;
+}
+
+function makeSGCurve(saturation, drive) {
+  // Soundgoodizer uses a soft-knee polynomial saturator that emphasizes even harmonics
+  // at low levels and odd harmonics at higher levels — the "fattening" character
+  const n = 2048;
+  const curve = new Float32Array(n);
+  const k = 1 + saturation * 2.5;
+  const d = 1 + drive * 1.5;
+  for (let i = 0; i < n; i++) {
+    const x = (i * 2 / n) - 1;
+    const xd = x * d;
+    // Blend of soft-clip (even harmonics) and cubic (odd harmonics)
+    const soft = xd / (1 + Math.abs(xd) * k);         // even-harmonic-rich
+    const cubic = xd - (xd * xd * xd) / (3 * k);      // odd-harmonic-rich
+    const blend = saturation; // 0=even-dominant, 1=balanced
+    curve[i] = soft * (1 - blend * 0.3) + cubic * (blend * 0.3);
+    // Normalize
+    curve[i] = Math.max(-1, Math.min(1, curve[i]));
+  }
+  return curve;
+}
+
+function makeExciterCurve(drive) {
+  const n = 1024;
+  const curve = new Float32Array(n);
+  const d = 1 + drive * 0.05;
+  for (let i = 0; i < n; i++) {
+    const x = (i * 2 / n) - 1;
+    curve[i] = Math.tanh(x * d * 3);
+  }
+  return curve;
+}
+
+function connectLiveChain(nodes, ac) {
+  const bbeEnabled    = document.getElementById('bbeOn').checked;
+  const tubeEnabled   = document.getElementById('tubeOn').checked;
+  const vinylEnabled  = document.getElementById('vinylOn').checked;
+  const excEnabled    = document.getElementById('exciterOn').checked;
+  const sgEnabled     = document.getElementById('sgOn').checked;
+  const atmosEnabled  = document.getElementById('atmosOn').checked;
+  const compEnabled   = document.getElementById('compOn').checked;
+  const masterEnabled = document.getElementById('masterOn').checked;
+
+  // 모든 노드의 기존 연결 완전 해제 (이전 체인 잔재 제거)
+  Object.values(nodes).forEach(n => {
+    if (n && typeof n.disconnect === 'function') {
+      try { n.disconnect(); } catch(e) {}
+    }
+  });
+
+  let chain = nodes.inputGain;
+
+  // BBE
+  if (bbeEnabled) {
+    // 위상 보정: 저역 allpass 지연 경로와 직통 경로를 합산
+    // 직통 경로 (고역은 위상 지연 없이 그대로 통과)
+    chain.connect(nodes.bbeDirectGain);
+    // 저역 위상 지연 경로 (allpass 2단 → 저역만 늦어짐)
+    chain.connect(nodes.bbeAllpass1);
+    nodes.bbeAllpass1.connect(nodes.bbeAllpass2);
+    nodes.bbeAllpass2.connect(nodes.bbeLowPhaseGain);
+    // 두 경로 합산
+    nodes.bbeDirectGain.connect(nodes.bbeSumGain);
+    nodes.bbeLowPhaseGain.connect(nodes.bbeSumGain);
+    // Presence 부스트 → Hi Def 에어 부스트
+    nodes.bbeSumGain.connect(nodes.bbePresence);
+    nodes.bbePresence.connect(nodes.bbeHiDef);
+    chain = nodes.bbeHiDef;
+  }
+
+  // TUBE
+  if (tubeEnabled) {
+    // 저역 bypass 경로: bass(<120Hz)는 포화 없이 직통
+    chain.connect(nodes.tubeLowBPF);
+    nodes.tubeLowBPF.connect(nodes.tubeLowBypass);
+    nodes.tubeLowBypass.connect(nodes.tubeMixOut);
+
+    // 포화 경로: HPF(>100Hz) → WaveShaper → HF rolloff → 저역 보상 → wet gain
+    chain.connect(nodes.tubeInputHPF);
+    nodes.tubeInputHPF.connect(nodes.tubeWaveShaper);
+    nodes.tubeWaveShaper.connect(nodes.tubeOutputLPF);
+    nodes.tubeOutputLPF.connect(nodes.tubeOutputHiCut);
+    nodes.tubeOutputHiCut.connect(nodes.tubeLowCompensate);
+    nodes.tubeLowCompensate.connect(nodes.tubeWetGain);
+    nodes.tubeWetGain.connect(nodes.tubeMixOut);
+
+    // (dry 전체 경로 제거 — 저역 3중 중첩 방지)
+    nodes.tubeMixOut.connect(nodes.tubeOutGain);
+    chain = nodes.tubeOutGain;
+  }
+
+  // VINYL
+  if (vinylEnabled) {
+    chain.connect(nodes.vinylLPF);
+    nodes.vinylLPF.connect(nodes.vinylHighRolloff);
+    // Add noise
+    nodes.vinylNoiseSource.connect(nodes.vinylNoiseGain);
+    nodes.vinylNoiseGain.connect(nodes.vinylHighRolloff);
+    chain = nodes.vinylHighRolloff;
+  }
+
+  // EXCITER
+  if (excEnabled) {
+    chain.connect(nodes.excDryGain2);
+    chain.connect(nodes.excHPF);
+    nodes.excHPF.connect(nodes.excShaper);
+    nodes.excShaper.connect(nodes.excBPF);
+    nodes.excBPF.connect(nodes.excWetGain2);
+    nodes.excDryGain2.connect(nodes.excMixOut);
+    nodes.excWetGain2.connect(nodes.excMixOut);
+    chain = nodes.excMixOut;
+  }
+
+  // SOUNDGOODIZER
+  if (sgEnabled) {
+    chain.connect(nodes.sgDry);
+
+    // Low band path
+    chain.connect(nodes.sgLPF);
+    nodes.sgLPF.connect(nodes.sgLowShaper);
+    nodes.sgLowShaper.connect(nodes.sgLowGain);
+    nodes.sgLowGain.connect(nodes.sgWet);
+
+    // Mid band path
+    chain.connect(nodes.sgBPF);
+    nodes.sgBPF.connect(nodes.sgMidShaper);
+    nodes.sgMidShaper.connect(nodes.sgMidGain);
+    nodes.sgMidGain.connect(nodes.sgWet);
+
+    // High band path
+    chain.connect(nodes.sgHPF);
+    nodes.sgHPF.connect(nodes.sgHiShaper);
+    nodes.sgHiShaper.connect(nodes.sgHiGain);
+    nodes.sgHiGain.connect(nodes.sgWet);
+
+    nodes.sgDry.connect(nodes.sgMixOut);
+    nodes.sgWet.connect(nodes.sgMixOut);
+    nodes.sgMixOut.connect(nodes.sgDynEQ);
+    nodes.sgDynEQ.connect(nodes.sgOutputComp);
+    chain = nodes.sgOutputComp;
+  }
+
+
+  // DOLBY ATMOS SPATIAL
+  if (atmosEnabled) {
+    const spaceAmt  = parseFloat(document.getElementById('atmosSpace').value)  / 100;
+    const heightAmt = parseFloat(document.getElementById('atmosHeight').value) / 100;
+    const depthAmt  = parseFloat(document.getElementById('atmosDepth').value)  / 100;
+    const reverbAmt = parseFloat(document.getElementById('atmosReverb').value) / 100;
+    const objectAmt = parseFloat(document.getElementById('atmosObject').value) / 100;
+    const mixAmt    = parseFloat(document.getElementById('atmosMix').value)    / 100;
+
+    // Build & assign impulse responses
+    const ir = makeAtmosIR(ac, atmosScene, spaceAmt, heightAmt, depthAmt);
+    nodes.atmosEarlyConv.buffer = ir;
+    nodes.atmosLateConv.buffer  = ir;
+
+    // 레벨 설계: dry + wet = 1.0 합계 유지 (합산 시 레벨 폭발 방지)
+    // wet 내부 분배: early 50% + late 25% + object 25% = 100%
+    const dryAmt = 1.0 - mixAmt;
+
+    // Dry path
+    chain.connect(nodes.atmosDryGain);
+    nodes.atmosDryGain.gain.value = dryAmt;
+
+    // Early reflections → height EQ → early gain (wet의 50%)
+    chain.connect(nodes.atmosEarlyConv);
+    nodes.atmosEarlyConv.connect(nodes.atmosHeightEQ);
+    nodes.atmosHeightEQ.connect(nodes.atmosEarlyGain);
+    nodes.atmosEarlyGain.gain.value = mixAmt * reverbAmt * 0.50;
+
+    // Late reverb tail (wet의 25%)
+    chain.connect(nodes.atmosLateConv);
+    nodes.atmosLateConv.connect(nodes.atmosLateGain);
+    nodes.atmosLateGain.gain.value = mixAmt * reverbAmt * 0.25;
+
+    // Object widening / Haas (wet의 25%)
+    chain.connect(nodes.atmosSplitter);
+    nodes.atmosSplitter.connect(nodes.atmosHaasL, 0);
+    nodes.atmosSplitter.connect(nodes.atmosHaasR, 1);
+    nodes.atmosHaasR.delayTime.value = 0.001 + objectAmt * 0.004;
+    nodes.atmosHaasL.connect(nodes.atmosMerger, 0, 0);
+    nodes.atmosHaasR.connect(nodes.atmosMerger, 0, 1);
+    nodes.atmosMerger.connect(nodes.atmosObjectGain);
+    nodes.atmosObjectGain.gain.value = mixAmt * objectAmt * 0.25;
+
+    // 합산 → 총 게인 = dryAmt + wetAmt ≈ 1.0
+    nodes.atmosDryGain.connect(nodes.atmosMixOut);
+    nodes.atmosEarlyGain.connect(nodes.atmosMixOut);
+    nodes.atmosLateGain.connect(nodes.atmosMixOut);
+    nodes.atmosObjectGain.connect(nodes.atmosMixOut);
+
+    chain = nodes.atmosMixOut;
+  }
+
+  // COMPRESSOR
+  if (compEnabled) {
+    chain.connect(nodes.compressor);
+    chain = nodes.compressor;
+  }
+
+  // MASTERING
+  if (masterEnabled) {
+    // 4-band LR 크로스오버 멀티밴드 컴프레서
+    // Band 1: Sub/Low ~120Hz (LR LPF 2단)
+    chain.connect(nodes.mbLP1a);
+    nodes.mbLP1a.connect(nodes.mbLP1b);
+    nodes.mbLP1b.connect(nodes.mbComp1);
+    nodes.mbComp1.connect(nodes.mbOutGain1);
+    nodes.mbOutGain1.connect(nodes.mbMixGain);
+
+    // Band 2: LowMid 120Hz~500Hz (LR HPF→LR LPF)
+    chain.connect(nodes.mbHP2a);
+    nodes.mbHP2a.connect(nodes.mbHP2b);
+    nodes.mbHP2b.connect(nodes.mbLP2a);
+    nodes.mbLP2a.connect(nodes.mbLP2b);
+    nodes.mbLP2b.connect(nodes.mbComp2);
+    nodes.mbComp2.connect(nodes.mbOutGain2);
+    nodes.mbOutGain2.connect(nodes.mbMixGain);
+
+    // Band 3: Mid 500Hz~5kHz (LR HPF→LR LPF)
+    chain.connect(nodes.mbHP3a);
+    nodes.mbHP3a.connect(nodes.mbHP3b);
+    nodes.mbHP3b.connect(nodes.mbLP3a);
+    nodes.mbLP3a.connect(nodes.mbLP3b);
+    nodes.mbLP3b.connect(nodes.mbComp3);
+    nodes.mbComp3.connect(nodes.mbOutGain3);
+    nodes.mbOutGain3.connect(nodes.mbMixGain);
+
+    // Band 4: High 5kHz~ (LR HPF 2단)
+    chain.connect(nodes.mbHP4a);
+    nodes.mbHP4a.connect(nodes.mbHP4b);
+    nodes.mbHP4b.connect(nodes.mbComp4);
+    nodes.mbComp4.connect(nodes.mbOutGain4);
+    nodes.mbOutGain4.connect(nodes.mbMixGain);
+
+    nodes.mbMixGain.connect(nodes.limiter);
+    chain = nodes.limiter;
+  }
+
+  chain.connect(nodes.outputGain);
+  nodes.outputGain.connect(nodes.analyser);
+  nodes.analyser.connect(ac.destination);
+}
+
+function applyLiveDSP() {
+  const nodes = liveDSP;
+  if (!nodes.inputGain) return;
+  const ac = ctx();
+
+  // BBE
+  const bbeLoVal  = parseFloat(document.getElementById('bbeLo').value)      / 100;
+  const bbeProc   = parseFloat(document.getElementById('bbeProcess').value)  / 100;
+  const bbeHiVal  = parseFloat(document.getElementById('bbeHi').value)       / 100;
+  if (nodes.bbeAllpass1 && document.getElementById('bbeOn').checked) {
+    // Lo Contour: allpass 주파수를 조절해 위상 지연 대역폭 제어
+    // 값이 높을수록 더 넓은 저역에 위상 지연 적용
+    nodes.bbeAllpass1.frequency.value = 80 + bbeLoVal * 200;   // 80~280Hz
+    nodes.bbeAllpass1.Q.value         = 0.3 + bbeLoVal * 0.8;
+    nodes.bbeAllpass2.frequency.value = 40 + bbeLoVal * 100;   // 40~140Hz
+    nodes.bbeAllpass2.Q.value         = 0.5 + bbeLoVal * 0.5;
+
+    // 직통 경로는 항상 1.0, 위상 지연 경로는 Lo 값에 따라 mix
+    nodes.bbeDirectGain.gain.value    = 1.0;
+    nodes.bbeLowPhaseGain.gain.value  = bbeLoVal * 0.6; // 너무 강하면 빗살 필터 발생하므로 제한
+    nodes.bbeSumGain.gain.value       = 1.0 / (1 + bbeLoVal * 0.6); // 합산 레벨 보상
+
+    // Process: 3.2kHz 중고역 존재감 부스트 (최대 +9dB)
+    nodes.bbePresence.gain.value = bbeProc * 9;
+
+    // Hi Def: 8kHz 이상 에어 부스트 (최대 +10dB)
+    nodes.bbeHiDef.gain.value = bbeHiVal * 10;
+  }
+
+  // Tube
+  const tubeDrive = parseFloat(document.getElementById('tubeDrive').value) / 100;
+  const tubeBias  = parseFloat(document.getElementById('tubeBias').value);
+  const tubeOut   = parseFloat(document.getElementById('tubeOut').value);
+  const tubeMix   = parseFloat(document.getElementById('tubeMix').value) / 100;
+  if (nodes.tubeWaveShaper && document.getElementById('tubeOn').checked) {
+    nodes.tubeWaveShaper.curve = makeTubeCurve(tubeDrive, tubeBias);
+
+    // 저역 bypass 경로: 포화 없이 저역을 살림
+    nodes.tubeLowBPF.frequency.value = 120 + tubeDrive * 80; // drive 높을수록 더 넓게 bypass
+    nodes.tubeLowBypass.gain.value = 1.0;
+
+    // 포화 경로 HPF: 저역이 WaveShaper에 들어가지 않도록
+    nodes.tubeInputHPF.frequency.value = 100 + tubeDrive * 80;
+
+    // 포화 후 고역 완화: drive 강할수록 고역 더 많이 롤오프 (쨍함 방지)
+    nodes.tubeOutputLPF.frequency.value = 6000;
+    nodes.tubeOutputLPF.gain.value = -(1 + tubeDrive * 4); // -1 ~ -5dB
+    nodes.tubeOutputHiCut.frequency.value = 9000;
+    nodes.tubeOutputHiCut.gain.value = -(2 + tubeDrive * 6); // -2 ~ -8dB
+
+    // 저역 warmth 보상: 포화 경로에서 손실된 저역 에너지 보상
+    nodes.tubeLowCompensate.gain.value = 1.5 + tubeDrive * 3; // +1.5 ~ +4.5dB
+
+    // lowBypass: 항상 1.0 (저역은 항상 통과), wetGain: tubeMix로 포화량 조절
+    nodes.tubeLowBypass.gain.value = 1.0;
+    nodes.tubeWetGain.gain.value   = 0.3 + tubeMix * 0.7; // 최소 0.3, 최대 1.0
+    nodes.tubeOutGain.gain.value = Math.pow(10, tubeOut / 20);
+  }
+
+  // Vinyl
+  const wearVal = parseFloat(document.getElementById('vinylWear').value) / 100;
+  const crackleVal = parseFloat(document.getElementById('vinylCrackle').value) / 100;
+  if (nodes.vinylLPF && document.getElementById('vinylOn').checked) {
+    nodes.vinylLPF.frequency.value = 20000 - wearVal * 8000;
+    nodes.vinylHighRolloff.frequency.value = 8000;
+    nodes.vinylHighRolloff.gain.value = -wearVal * 4;
+    nodes.vinylNoiseGain.gain.value = crackleVal * 0.03;
+  }
+
+  // Exciter
+  const excFreq = parseFloat(document.getElementById('excFreq').value);
+  const excDriveVal = parseFloat(document.getElementById('excDrive').value) / 100;
+  const excMixVal = parseFloat(document.getElementById('excMix').value) / 100;
+  if (nodes.excHPF && document.getElementById('exciterOn').checked) {
+    nodes.excHPF.frequency.value = excFreq;
+    nodes.excBPF.frequency.value = excFreq * 1.5;
+    nodes.excBPF.Q.value = 0.8;
+    nodes.excShaper.curve = makeExciterCurve(excDriveVal);
+    nodes.excDryGain2.gain.value = 1.0;
+    nodes.excWetGain2.gain.value = excMixVal * 0.5;
+  }
+
+
+  // Dolby Atmos
+  if (nodes.atmosEarlyConv && document.getElementById('atmosOn').checked) {
+    const spaceAmt  = parseFloat(document.getElementById('atmosSpace').value)  / 100;
+    const heightAmt = parseFloat(document.getElementById('atmosHeight').value) / 100;
+    const depthAmt  = parseFloat(document.getElementById('atmosDepth').value)  / 100;
+    const reverbAmt = parseFloat(document.getElementById('atmosReverb').value) / 100;
+    const objectAmt = parseFloat(document.getElementById('atmosObject').value) / 100;
+    const mixAmt    = parseFloat(document.getElementById('atmosMix').value)    / 100;
+    const ac2       = ctx();
+
+    // Rebuild IR on param change (debounced by rAF rate)
+    const ir = makeAtmosIR(ac2, atmosScene, spaceAmt, heightAmt, depthAmt);
+    nodes.atmosEarlyConv.buffer = ir;
+    nodes.atmosLateConv.buffer  = ir;
+
+    const dryAmt2 = 1.0 - mixAmt;
+    nodes.atmosDryGain.gain.value    = dryAmt2;
+    nodes.atmosEarlyGain.gain.value  = mixAmt * reverbAmt * 0.50;
+    nodes.atmosLateGain.gain.value   = mixAmt * reverbAmt * 0.25;
+    nodes.atmosHaasR.delayTime.value = 0.001 + objectAmt * 0.004;
+    nodes.atmosObjectGain.gain.value = mixAmt * objectAmt * 0.25;
+    nodes.atmosHeightEQ.gain.value   = heightAmt * 6;
+  }
+
+  // Soundgoodizer
+  const sgAmount = parseFloat(document.getElementById('sgAmount').value) / 100;
+  const sgLowSat = parseFloat(document.getElementById('sgLowSat').value) / 100;
+  const sgMidSat = parseFloat(document.getElementById('sgMidSat').value) / 100;
+  const sgHiSat  = parseFloat(document.getElementById('sgHiSat').value)  / 100;
+  const sgStereo = parseFloat(document.getElementById('sgStereo').value) / 100;
+  const preset = SG_MODES[sgMode];
+  if (nodes.sgLPF && document.getElementById('sgOn').checked) {
+    nodes.sgLPF.frequency.value  = preset.loFreq;
+    nodes.sgBPF.frequency.value  = (preset.loFreq + preset.hiFreq) / 2;
+    nodes.sgBPF.Q.value          = preset.loQ;
+    nodes.sgHPF.frequency.value  = preset.hiFreq;
+    nodes.sgLowShaper.curve = makeSGCurve(sgLowSat, preset.drive);
+    nodes.sgMidShaper.curve = makeSGCurve(sgMidSat, preset.drive * 0.85);
+    nodes.sgHiShaper.curve  = makeSGCurve(sgHiSat,  preset.drive * 0.7);
+    nodes.sgLowGain.gain.value = sgLowSat * 0.7;
+    nodes.sgMidGain.gain.value = sgMidSat * 0.5;
+    nodes.sgHiGain.gain.value  = sgHiSat  * 0.4;
+    nodes.sgDry.gain.value  = 1.0;
+    nodes.sgWet.gain.value  = sgAmount * 0.6;
+    nodes.sgMixOut.gain.value = 1.0 / (1 + sgAmount * 0.3); // prevent clipping
+    nodes.sgDynEQ.gain.value = sgAmount * 3; // subtle presence boost
+    // Stereo enhancement (reflected in output comp release — wider = slower release = more space)
+    nodes.sgOutputComp.release.value = 0.08 + sgStereo * 0.22;
+    nodes.sgOutputComp.threshold.value = -10 - sgAmount * 8;
+    // Update SG meter
+    const sgGR = Math.max(0, -nodes.sgOutputComp.reduction) * 5;
+    document.getElementById('sgMeter').style.width = Math.min(100, sgGR + sgAmount * 40) + '%';
+  }
+
+  // Compressor
+  if (nodes.compressor) {
+    nodes.compressor.threshold.value = parseFloat(document.getElementById('compThr').value);
+    nodes.compressor.ratio.value = parseFloat(document.getElementById('compRatio').value);
+    nodes.compressor.attack.value = parseFloat(document.getElementById('compAtk').value) / 1000;
+    nodes.compressor.release.value = parseFloat(document.getElementById('compRel').value) / 1000;
+    nodes.compressor.knee.value = parseFloat(document.getElementById('compKnee').value);
+    nodes.outputGain.gain.value = Math.pow(10, parseFloat(document.getElementById('compMake').value) / 20);
+  }
+
+  // Mastering multiband
+  if (nodes.mbComp1) {
+    const mbL    = parseFloat(document.getElementById('mbLow').value);
+    const mbM    = parseFloat(document.getElementById('mbMid').value);
+    const mbH    = parseFloat(document.getElementById('mbHigh').value);
+    const width  = parseFloat(document.getElementById('stereoWidth').value) / 100;
+
+    // Band 1: Sub/Low (~120Hz) — 저역 과도한 펌핑 방지가 핵심
+    // attack 느리게(저역 과도음 통과), release 빠르게(벙벙댐 방지)
+    nodes.mbComp1.threshold.value = -24;
+    nodes.mbComp1.ratio.value     = Math.min(mbL, 4);  // 저역은 ratio 최대 4:1로 제한
+    nodes.mbComp1.attack.value    = 0.030;   // 30ms — 킥 타격음 통과
+    nodes.mbComp1.release.value   = 0.080;   // 80ms — 빠른 release로 벙벙댐 방지
+    nodes.mbComp1.knee.value      = 10;
+    nodes.mbOutGain1.gain.value   = 0.95;    // 저역 밴드 출력 미세하게 줄여 합산 시 과잉 방지
+
+    // Band 2: LowMid (120~500Hz) — 베이스 박스감 제어 (LOW COMP 슬라이더 공유)
+    nodes.mbComp2.threshold.value = -22;
+    nodes.mbComp2.ratio.value     = Math.min(mbL, 5);
+    nodes.mbComp2.attack.value    = 0.015;   // 15ms
+    nodes.mbComp2.release.value   = 0.120;   // 120ms
+    nodes.mbComp2.knee.value      = 8;
+    nodes.mbOutGain2.gain.value   = 1.0;
+
+    // Band 3: Mid (500Hz~5kHz) — 보컬/악기 존재감
+    nodes.mbComp3.threshold.value = -20;
+    nodes.mbComp3.ratio.value     = mbM;
+    nodes.mbComp3.attack.value    = 0.005;   // 5ms
+    nodes.mbComp3.release.value   = 0.180;   // 180ms
+    nodes.mbComp3.knee.value      = 6;
+    nodes.mbOutGain3.gain.value   = 1.0;
+
+    // Band 4: High (5kHz~) — 에어/심벌즈
+    nodes.mbComp4.threshold.value = -22;
+    nodes.mbComp4.ratio.value     = Math.min(mbH, 3); // 고역 ratio도 제한
+    nodes.mbComp4.attack.value    = 0.002;   // 2ms
+    nodes.mbComp4.release.value   = 0.150;   // 150ms
+    nodes.mbComp4.knee.value      = 5;
+    nodes.mbOutGain4.gain.value   = 1.0;
+
+    nodes.mbMixGain.gain.value = 1.0;
+
+    if (nodes.limiter) {
+      nodes.limiter.threshold.value = parseFloat(document.getElementById('limiterCeil').value);
+      nodes.limiter.ratio.value     = 20;
+      nodes.limiter.attack.value    = 0.001;
+      nodes.limiter.release.value   = 0.050;
+    }
+    nodes.outputGain.gain.value = Math.pow(10, parseFloat(document.getElementById('masterGain').value) / 20);
+  }
+}
+
+// ---- Playback ----
+document.getElementById('playBtn').addEventListener('click', () => isPlaying ? pausePlay() : startPlay());
+document.getElementById('stopBtn').addEventListener('click', stopPlay);
+
+// 재생 중 DSP 체인 교체 — srcNode/타이머/스펙트럼 루프 건드리지 않음
+function hotswapDSP() {
+  if (!isPlaying || !srcNode) return;
+  const ac = ctx();
+
+  // 1. srcNode 및 기존 체인 전체 연결 해제
+  try { srcNode.disconnect(); } catch(e) {}
+  if (liveDSP) {
+    Object.values(liveDSP).forEach(n => {
+      if (n && typeof n.disconnect === 'function') {
+        try { n.disconnect(); } catch(e) {}
+      }
+    });
+  }
+
+  // 2. 새 체인 빌드 + 연결
+  const nodes = buildLiveChain();
+  connectLiveChain(nodes, ac);
+  applyLiveDSP();
+
+  // 3. srcNode를 새 체인 입력에 연결
+  srcNode.connect(nodes.inputGain);
+
+  // 4. vinyl noise 처리 (새 체인에 맞게)
+  if (nodes.vinylNoiseSource) {
+    try { nodes.vinylNoiseSource.start(); } catch(e) {}
+  }
+
+  // 5. 스펙트럼이 새 analyser를 보도록 재시작 (isPlaying은 그대로 true)
+  drawSpectrum();
+}
+
+function startPlay() {
+  if (!sourceBuf) return;
+  const ac = ctx();
+  if (ac.state === 'suspended') ac.resume();
+  stopPlay();
+
+  const nodes = buildLiveChain();
+  connectLiveChain(nodes, ac);
+  applyLiveDSP();
+
+  srcNode = ac.createBufferSource();
+  srcNode.buffer = sourceBuf;
+  srcNode.connect(nodes.inputGain);
+  srcNode.onended = () => { if (isPlaying) { isPlaying = false; document.getElementById('playBtn').textContent = '▶ PLAY'; pausedAt = 0; } };
+
+  if (nodes.vinylNoiseSource) try { nodes.vinylNoiseSource.start(); } catch(e){}
+
+  startedAt = ac.currentTime - pausedAt;
+  srcNode.start(0, pausedAt);
+  isPlaying = true;
+  document.getElementById('playBtn').textContent = '⏸ PAUSE';
+  drawSpectrum();
+  updateProgress();
+}
+
+function pausePlay() {
+  if (!isPlaying) return;
+  pausedAt = audioCtx.currentTime - startedAt;
+  srcNode.stop();
+  isPlaying = false;
+  document.getElementById('playBtn').textContent = '▶ PLAY';
+  cancelAnimationFrame(specAnimID); specAnimID = null;
+  cancelAnimationFrame(progAnimID); progAnimID = null;
+}
+
+function stopPlay() {
+  if (srcNode) { try { srcNode.stop(); } catch(e){} srcNode = null; }
+  if (liveDSP.vinylNoiseSource) try { liveDSP.vinylNoiseSource.stop(); } catch(e){}
+  isPlaying = false; pausedAt = 0;
+  document.getElementById('playBtn').textContent = '▶ PLAY';
+  document.getElementById('progInner').style.width = '0%';
+  document.getElementById('timeCur').textContent = '0:00';
+  cancelAnimationFrame(specAnimID); specAnimID = null;
+  cancelAnimationFrame(progAnimID); progAnimID = null;
+}
+
+document.getElementById('progOuter').addEventListener('click', e => {
+  if (!sourceBuf) return;
+  const r = e.currentTarget.getBoundingClientRect();
+  pausedAt = ((e.clientX - r.left) / r.width) * sourceBuf.duration;
+  if (isPlaying) startPlay();
+});
+
+function updateProgress() {
+  if (!isPlaying || !sourceBuf) return;
+  const elapsed = audioCtx.currentTime - startedAt;
+  const pct = Math.min(100, (elapsed / sourceBuf.duration) * 100);
+  document.getElementById('progInner').style.width = pct + '%';
+  document.getElementById('timeCur').textContent = fmt(elapsed);
+  progAnimID = requestAnimationFrame(updateProgress);
+}
+
+// ---- Spectrum + VU ----
+function drawSpectrum() {
+  // 이전 스펙트럼 루프 완전 종료
+  cancelAnimationFrame(specAnimID);
+  specAnimID = null;
+
+  const analyser = liveDSP.analyser;
+  if (!analyser) return;
+
+  const canvas = document.getElementById('spectrum');
+  const c = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  const data = new Uint8Array(analyser.frequencyBinCount);
+  const sr = analyser.context.sampleRate;
+
+  // 이 루프가 소유한 analyser 스냅샷 — 재빌드 감지용
+  const myAnalyser = analyser;
+
+  function frame() {
+    // 재생 중지 또는 analyser가 교체됐으면 조용히 종료
+    if (!isPlaying || liveDSP.analyser !== myAnalyser) {
+      c.clearRect(0, 0, W, H);
+      document.getElementById('vuL').style.height = '0%';
+      document.getElementById('vuR').style.height = '0%';
+      specAnimID = null;
+      return;
+    }
+
+    analyser.getByteFrequencyData(data);
+    c.clearRect(0, 0, W, H);
+
+    // Gradient spectrum bars
+    const total = data.length;
+    for (let i = 0; i < total; i++) {
+      const v = data[i] / 255;
+      const x = (i / total) * W;
+      const bw = W / total + 0.5;
+      const bh = v * H;
+      const hue = 270 - v * 150;
+      c.fillStyle = `hsla(${hue},90%,${30 + v*40}%,${0.4+v*0.6})`;
+      c.fillRect(x, H - bh, bw, bh);
+    }
+
+    // Frequency grid lines
+    c.strokeStyle = 'rgba(80,60,100,0.3)';
+    c.lineWidth = 1;
+    [100, 1000, 5000, 10000, 16000].forEach(f => {
+      const x = Math.log10(f / 20) / Math.log10(sr / 2 / 20) * W;
+      c.beginPath(); c.moveTo(x, 0); c.lineTo(x, H); c.stroke();
+    });
+
+    // VU meters
+    const rms = Math.sqrt(data.reduce((a, v) => a + v * v, 0) / data.length) / 255;
+    const vuPct = Math.min(100, rms * 300);
+    document.getElementById('vuL').style.height = vuPct + '%';
+    document.getElementById('vuR').style.height = (vuPct * (0.9 + Math.random() * 0.2)) + '%';
+
+    // Comp GR meter
+    const compNode = liveDSP.compressor;
+    if (compNode && document.getElementById('compOn').checked) {
+      const gr = Math.max(0, -compNode.reduction) * 4;
+      document.getElementById('compMeter').style.width = Math.min(100, gr) + '%';
+    }
+
+    specAnimID = requestAnimationFrame(frame);
+  }
+
+  specAnimID = requestAnimationFrame(frame);
+}
+
+// ---- Crackle Visualizer ----
+function drawCrackle() {
+  const canvas = document.getElementById('crackleVis');
+  const c = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  c.clearRect(0,0,W,H);
+  const crackle = parseFloat(document.getElementById('vinylCrackle').value) / 100;
+  c.strokeStyle = '#3a1a2a';
+  c.beginPath();
+  c.moveTo(0, H/2);
+  let x = 0;
+  while (x < W) {
+    const y = H/2 + (Math.random()-0.5) * 3;
+    c.lineTo(x, y);
+    x += 1;
+    if (Math.random() < crackle * 0.03) {
+      c.strokeStyle = `rgba(255,179,0,${Math.random()})`;
+      c.stroke(); c.beginPath();
+      c.moveTo(x, H/2);
+      const spike = (Math.random()-0.5) * H * crackle;
+      c.lineTo(x+1, H/2 + spike);
+      c.lineTo(x+2, H/2);
+      c.stroke(); c.beginPath();
+      c.strokeStyle = '#3a1a2a';
+      c.moveTo(x+2, H/2);
+      x += 2;
+    }
+  }
+  c.stroke();
+}
+
+// ============================================================
+// OFFLINE RENDERING + EXPORT
+// ============================================================
+
+async function buildOfflineChain(offCtx, params) {
+  const ac = offCtx;
+  const src = ac.createBufferSource();
+  src.buffer = params.inputBuffer;
+  let chain = src;
+
+  // ── DOM 순서 기반 모듈 실행 순서 결정 ──────────────────────────────────
+  // dspGrid 내 모듈들을 현재 DOM 순서대로 읽고,
+  // mod-master는 항상 맨 마지막에 별도 처리 (고정)
+  const EFFECT_MAP = {
+    'mod-bbe':     'bbe',
+    'mod-tube':    'tube',
+    'mod-vinyl':   'vinyl',
+    'mod-exciter': 'exciter',
+    'mod-sg':      'sg',
+    'mod-atmos':   'atmos',
+    'mod-comp':    'comp',
+  };
+
+  const grid = document.getElementById('dspGrid');
+  const orderedEffects = [];
+  if (grid) {
+    const modules = grid.querySelectorAll('.module');
+    modules.forEach(function(mod) {
+      const key = EFFECT_MAP[mod.id];
+      if (key) orderedEffects.push(key);
+    });
+  }
+  // fallback: DOM이 없을 경우 기본 순서
+  if (orderedEffects.length === 0) {
+    orderedEffects.push('bbe','tube','vinyl','exciter','sg','atmos','comp');
+  }
+
+  // ── 각 이펙트 처리 함수 ────────────────────────────────────────────────
+  function applyBBE() {
+    if (!params.bbeEnabled) return;
+    const ap1 = ac.createBiquadFilter(); ap1.type='allpass'; ap1.frequency.value=80+params.bbeLo*200; ap1.Q.value=0.3+params.bbeLo*0.8;
+    const ap2 = ac.createBiquadFilter(); ap2.type='allpass'; ap2.frequency.value=40+params.bbeLo*100; ap2.Q.value=0.5+params.bbeLo*0.5;
+    const dirG = ac.createGain(); dirG.gain.value=1.0;
+    const phsG = ac.createGain(); phsG.gain.value=params.bbeLo*0.6;
+    const sumG = ac.createGain(); sumG.gain.value=1.0/(1+params.bbeLo*0.6);
+    chain.connect(dirG); dirG.connect(sumG);
+    chain.connect(ap1); ap1.connect(ap2); ap2.connect(phsG); phsG.connect(sumG);
+    const pres = ac.createBiquadFilter(); pres.type='peaking'; pres.frequency.value=3200; pres.Q.value=0.6; pres.gain.value=params.bbeProc*9;
+    const hidf = ac.createBiquadFilter(); hidf.type='highShelf'; hidf.frequency.value=8000; hidf.gain.value=params.bbeHi*10;
+    sumG.connect(pres); pres.connect(hidf);
+    chain = hidf;
+  }
+
+  function applyTube() {
+    if (!params.tubeEnabled) return;
+    const inHPF = ac.createBiquadFilter(); inHPF.type='highpass'; inHPF.frequency.value=100+params.tubeDrive*80; inHPF.Q.value=0.5;
+    const ws = ac.createWaveShaper(); ws.curve=makeTubeCurve(params.tubeDrive, params.tubeBias); ws.oversample='2x';
+    const outLPF = ac.createBiquadFilter(); outLPF.type='lowshelf'; outLPF.frequency.value=6000; outLPF.gain.value=-(1+params.tubeDrive*4);
+    const outHiCut = ac.createBiquadFilter(); outHiCut.type='highshelf'; outHiCut.frequency.value=9000; outHiCut.gain.value=-(2+params.tubeDrive*6);
+    const loComp = ac.createBiquadFilter(); loComp.type='peaking'; loComp.frequency.value=100; loComp.Q.value=0.8; loComp.gain.value=1.5+params.tubeDrive*3;
+    const lowLPF = ac.createBiquadFilter(); lowLPF.type='lowpass'; lowLPF.frequency.value=120+params.tubeDrive*80; lowLPF.Q.value=0.5;
+    const lowByp = ac.createGain(); lowByp.gain.value=1.0;
+    const wet = ac.createGain(); wet.gain.value=0.3+params.tubeMix*0.7;
+    const mixOut = ac.createGain();
+    const outG = ac.createGain(); outG.gain.value=Math.pow(10, params.tubeOut/20);
+    chain.connect(lowLPF); lowLPF.connect(lowByp); lowByp.connect(mixOut);
+    chain.connect(inHPF); inHPF.connect(ws); ws.connect(outLPF); outLPF.connect(outHiCut); outHiCut.connect(loComp); loComp.connect(wet); wet.connect(mixOut);
+    mixOut.connect(outG);
+    chain = outG;
+  }
+
+  function applyVinyl() {
+    if (!params.vinylEnabled) return;
+    const lpf = ac.createBiquadFilter(); lpf.type='lowpass'; lpf.frequency.value=20000-params.vinylWear*8000;
+    const hsh = ac.createBiquadFilter(); hsh.type='highShelf'; hsh.frequency.value=8000; hsh.gain.value=-params.vinylWear*4;
+    const noiseSrc = createVinylNoise(ac); noiseSrc.loop=true;
+    const noiseG = ac.createGain(); noiseG.gain.value = params.vinylCrackle * 0.03;
+    noiseSrc.connect(noiseG); noiseG.connect(hsh);
+    chain.connect(lpf); lpf.connect(hsh);
+    noiseSrc.start(0);
+    chain = hsh;
+  }
+
+  function applyExciter() {
+    if (!params.excEnabled) return;
+    const hpf = ac.createBiquadFilter(); hpf.type='highpass'; hpf.frequency.value=params.excFreq;
+    const shaper = ac.createWaveShaper(); shaper.curve=makeExciterCurve(params.excDrive); shaper.oversample='2x';
+    const bpf = ac.createBiquadFilter(); bpf.type='bandpass'; bpf.frequency.value=params.excFreq*1.5; bpf.Q.value=0.8;
+    const dry = ac.createGain(); dry.gain.value=1;
+    const wet = ac.createGain(); wet.gain.value=params.excMix*0.5;
+    const mix = ac.createGain();
+    chain.connect(dry); chain.connect(hpf); hpf.connect(shaper); shaper.connect(bpf); bpf.connect(wet);
+    dry.connect(mix); wet.connect(mix);
+    chain = mix;
+  }
+
+  function applySG() {
+    if (!params.sgEnabled) return;
+    const preset = SG_MODES[params.sgMode];
+    const dry = ac.createGain(); dry.gain.value = 1.0;
+    const wetBus = ac.createGain(); wetBus.gain.value = params.sgAmount * 0.6;
+    const mixOut = ac.createGain(); mixOut.gain.value = 1.0 / (1 + params.sgAmount * 0.3);
+    const lpf = ac.createBiquadFilter(); lpf.type='lowpass'; lpf.frequency.value=preset.loFreq;
+    const lSh = ac.createWaveShaper(); lSh.curve=makeSGCurve(params.sgLowSat, preset.drive); lSh.oversample='4x';
+    const lG = ac.createGain(); lG.gain.value = params.sgLowSat * 0.7;
+    chain.connect(lpf); lpf.connect(lSh); lSh.connect(lG); lG.connect(wetBus);
+    const bpf = ac.createBiquadFilter(); bpf.type='bandpass'; bpf.frequency.value=(preset.loFreq+preset.hiFreq)/2; bpf.Q.value=preset.loQ;
+    const mSh = ac.createWaveShaper(); mSh.curve=makeSGCurve(params.sgMidSat, preset.drive*0.85); mSh.oversample='4x';
+    const mG = ac.createGain(); mG.gain.value = params.sgMidSat * 0.5;
+    chain.connect(bpf); bpf.connect(mSh); mSh.connect(mG); mG.connect(wetBus);
+    const hpf2 = ac.createBiquadFilter(); hpf2.type='highpass'; hpf2.frequency.value=preset.hiFreq;
+    const hSh = ac.createWaveShaper(); hSh.curve=makeSGCurve(params.sgHiSat, preset.drive*0.7); hSh.oversample='2x';
+    const hG = ac.createGain(); hG.gain.value = params.sgHiSat * 0.4;
+    chain.connect(hpf2); hpf2.connect(hSh); hSh.connect(hG); hG.connect(wetBus);
+    chain.connect(dry); dry.connect(mixOut); wetBus.connect(mixOut);
+    const dynEQ = ac.createBiquadFilter(); dynEQ.type='peaking'; dynEQ.frequency.value=2500; dynEQ.Q.value=0.7; dynEQ.gain.value=params.sgAmount*3;
+    const outComp = ac.createDynamicsCompressor();
+    outComp.threshold.value = -10 - params.sgAmount*8; outComp.ratio.value=2;
+    outComp.attack.value=0.003; outComp.release.value=0.08+params.sgStereo*0.22; outComp.knee.value=6;
+    mixOut.connect(dynEQ); dynEQ.connect(outComp);
+    chain = outComp;
+  }
+
+  function applyAtmos() {
+    if (!params.atmosEnabled) return;
+    const ir = makeAtmosIR(ac, params.atmosScene, params.atmosSpace, params.atmosHeight, params.atmosDepth);
+    const earlyConv = ac.createConvolver(); earlyConv.normalize = false; earlyConv.buffer = ir;
+    const earlyGain = ac.createGain(); earlyGain.gain.value = params.atmosMix * params.atmosReverb * 0.50;
+    const heightEQ  = ac.createBiquadFilter(); heightEQ.type='highShelf'; heightEQ.frequency.value=8000; heightEQ.gain.value=params.atmosHeight*6;
+    const lateConv  = ac.createConvolver(); lateConv.normalize = false; lateConv.buffer = ir;
+    const lateGain  = ac.createGain(); lateGain.gain.value = params.atmosMix * params.atmosReverb * 0.25;
+    const splitter  = ac.createChannelSplitter(2);
+    const haasL     = ac.createDelay(0.05); haasL.delayTime.value = 0.0;
+    const haasR     = ac.createDelay(0.05); haasR.delayTime.value = 0.001 + params.atmosObject * 0.004;
+    const merger    = ac.createChannelMerger(2);
+    const objGain   = ac.createGain(); objGain.gain.value = params.atmosMix * params.atmosObject * 0.25;
+    const dryGain   = ac.createGain(); dryGain.gain.value = 1.0 - params.atmosMix;
+    const mixOut    = ac.createGain();
+    chain.connect(dryGain); dryGain.connect(mixOut);
+    chain.connect(earlyConv); earlyConv.connect(heightEQ); heightEQ.connect(earlyGain); earlyGain.connect(mixOut);
+    chain.connect(lateConv); lateConv.connect(lateGain); lateGain.connect(mixOut);
+    chain.connect(splitter);
+    splitter.connect(haasL, 0); splitter.connect(haasR, 1);
+    haasL.connect(merger, 0, 0); haasR.connect(merger, 0, 1);
+    merger.connect(objGain); objGain.connect(mixOut);
+    chain = mixOut;
+  }
+
+  function applyComp() {
+    if (!params.compEnabled) return;
+    const comp = ac.createDynamicsCompressor();
+    comp.threshold.value=params.compThr; comp.ratio.value=params.compRatio;
+    comp.attack.value=params.compAtk/1000; comp.release.value=params.compRel/1000;
+    comp.knee.value=params.compKnee;
+    const makeupG = ac.createGain(); makeupG.gain.value=Math.pow(10,params.compMake/20);
+    chain.connect(comp); comp.connect(makeupG);
+    chain = makeupG;
+  }
+
+  function applyMaster() {
+    if (!params.masterEnabled) return;
+    const mixG = ac.createGain(); mixG.gain.value = 1.0;
+    function lrLP(freq) {
+      const a = ac.createBiquadFilter(); a.type='lowpass'; a.frequency.value=freq; a.Q.value=0.707;
+      const b = ac.createBiquadFilter(); b.type='lowpass'; b.frequency.value=freq; b.Q.value=0.707;
+      a.connect(b); return { in: a, out: b };
+    }
+    function lrHP(freq) {
+      const a = ac.createBiquadFilter(); a.type='highpass'; a.frequency.value=freq; a.Q.value=0.707;
+      const b = ac.createBiquadFilter(); b.type='highpass'; b.frequency.value=freq; b.Q.value=0.707;
+      a.connect(b); return { in: a, out: b };
+    }
+    const lp1 = lrLP(120);
+    const c1 = ac.createDynamicsCompressor();
+    c1.threshold.value=-24; c1.ratio.value=Math.min(params.mbLow,4);
+    c1.attack.value=0.030; c1.release.value=0.080; c1.knee.value=10;
+    const g1 = ac.createGain(); g1.gain.value=0.95;
+    chain.connect(lp1.in); lp1.out.connect(c1); c1.connect(g1); g1.connect(mixG);
+    const hp2=lrHP(120), lp2=lrLP(500);
+    const c2 = ac.createDynamicsCompressor();
+    c2.threshold.value=-22; c2.ratio.value=params.mbLow;
+    c2.attack.value=0.015; c2.release.value=0.120; c2.knee.value=8;
+    chain.connect(hp2.in); hp2.out.connect(lp2.in); lp2.out.connect(c2); c2.connect(mixG);
+    const hp3=lrHP(500), lp3=lrLP(5000);
+    const c3 = ac.createDynamicsCompressor();
+    c3.threshold.value=-20; c3.ratio.value=params.mbMid;
+    c3.attack.value=0.005; c3.release.value=0.180; c3.knee.value=6;
+    chain.connect(hp3.in); hp3.out.connect(lp3.in); lp3.out.connect(c3); c3.connect(mixG);
+    const hp4=lrHP(5000);
+    const c4 = ac.createDynamicsCompressor();
+    c4.threshold.value=-22; c4.ratio.value=Math.min(params.mbHigh,3);
+    c4.attack.value=0.002; c4.release.value=0.150; c4.knee.value=5;
+    chain.connect(hp4.in); hp4.out.connect(c4); c4.connect(mixG);
+    const limiter = ac.createDynamicsCompressor();
+    limiter.threshold.value=params.limCeil; limiter.ratio.value=20;
+    limiter.attack.value=0.001; limiter.release.value=0.050; limiter.knee.value=0;
+    mixG.connect(limiter);
+    chain = limiter;
+  }
+
+  const EFFECT_FN = {
+    'bbe':     applyBBE,
+    'tube':    applyTube,
+    'vinyl':   applyVinyl,
+    'exciter': applyExciter,
+    'sg':      applySG,
+    'atmos':   applyAtmos,
+    'comp':    applyComp,
+  };
+
+  // ── DOM 순서대로 처리 (꺼진 이펙트는 자동 건너뜀) ─────────────────────
+  for (const key of orderedEffects) {
+    if (EFFECT_FN[key]) EFFECT_FN[key]();
+  }
+
+  // ── 마스터링은 항상 마지막 ─────────────────────────────────────────────
+  applyMaster();
+
+  const outG = ac.createGain();
+  outG.gain.value = params.outputGain;
+  chain.connect(outG); outG.connect(ac.destination);
+  src.start(0);
+  return src;
+}
+
+function getParams(inputBuffer) {
+  return {
+    inputBuffer,
+    bbeEnabled: document.getElementById('bbeOn').checked,
+    bbeLo: parseFloat(document.getElementById('bbeLo').value)/100,
+    bbeProc: parseFloat(document.getElementById('bbeProcess').value)/100,
+    bbeHi: parseFloat(document.getElementById('bbeHi').value)/100,
+    tubeEnabled: document.getElementById('tubeOn').checked,
+    tubeDrive: parseFloat(document.getElementById('tubeDrive').value)/100,
+    tubeBias: parseFloat(document.getElementById('tubeBias').value),
+    tubeOut: parseFloat(document.getElementById('tubeOut').value),
+    tubeMix: parseFloat(document.getElementById('tubeMix').value)/100,
+    vinylEnabled: document.getElementById('vinylOn').checked,
+    vinylCrackle: parseFloat(document.getElementById('vinylCrackle').value)/100,
+    vinylWear: parseFloat(document.getElementById('vinylWear').value)/100,
+    vinylWobble: parseFloat(document.getElementById('vinylWobble').value)/100,
+    vinylCross: parseFloat(document.getElementById('vinylCross').value)/100,
+    excEnabled: document.getElementById('exciterOn').checked,
+    excFreq: parseFloat(document.getElementById('excFreq').value),
+    excDrive: parseFloat(document.getElementById('excDrive').value)/100,
+    excMix: parseFloat(document.getElementById('excMix').value)/100,
+    sgEnabled: document.getElementById('sgOn').checked,
+    sgMode: sgMode,
+    sgAmount: parseFloat(document.getElementById('sgAmount').value)/100,
+    sgLowSat: parseFloat(document.getElementById('sgLowSat').value)/100,
+    sgMidSat: parseFloat(document.getElementById('sgMidSat').value)/100,
+    sgHiSat:  parseFloat(document.getElementById('sgHiSat').value)/100,
+    sgStereo: parseFloat(document.getElementById('sgStereo').value)/100,
+    compEnabled: document.getElementById('compOn').checked,
+    compThr: parseFloat(document.getElementById('compThr').value),
+    compRatio: parseFloat(document.getElementById('compRatio').value),
+    compAtk: parseFloat(document.getElementById('compAtk').value),
+    compRel: parseFloat(document.getElementById('compRel').value),
+    compKnee: parseFloat(document.getElementById('compKnee').value),
+    compMake: parseFloat(document.getElementById('compMake').value),
+    masterEnabled: document.getElementById('masterOn').checked,
+    mbLow: parseFloat(document.getElementById('mbLow').value),
+    mbMid: parseFloat(document.getElementById('mbMid').value),
+    mbHigh: parseFloat(document.getElementById('mbHigh').value),
+    limCeil: parseFloat(document.getElementById('limiterCeil').value),
+    outputGain: Math.pow(10, parseFloat(document.getElementById('masterGain').value)/20),
+    atmosEnabled: document.getElementById('atmosOn').checked,
+    atmosScene:   atmosScene,
+    atmosSpace:   parseFloat(document.getElementById('atmosSpace').value)/100,
+    atmosHeight:  parseFloat(document.getElementById('atmosHeight').value)/100,
+    atmosDepth:   parseFloat(document.getElementById('atmosDepth').value)/100,
+    atmosReverb:  parseFloat(document.getElementById('atmosReverb').value)/100,
+    atmosObject:  parseFloat(document.getElementById('atmosObject').value)/100,
+    atmosMix:     parseFloat(document.getElementById('atmosMix').value)/100,
+    hdHF: parseFloat(document.getElementById('hdHF').value)/100,
+    hdSmooth: parseFloat(document.getElementById('hdSmooth').value)/100,
+    uhdHF: parseFloat(document.getElementById('uhdHF').value)/100,
+    uhdAir: parseFloat(document.getElementById('uhdAir').value)/100,
+  };
+}
+
+// ---- HD Upsample: FFT 기반 스펙트럼 연장 복원 ----
+async function applyHDRestoration(buffer, targetSR, bitDepth, hfStrength, smooth, onProgress) {
+  if (!buffer) return;
+
+  const ch    = buffer.numberOfChannels;
+  const sr    = buffer.sampleRate;
+  const N     = 4096;
+  const half  = N >> 1;
+  const hop   = N >> 2;
+  const binHz = sr / N;
+
+  const win = new Float32Array(N);
+  for (let i = 0; i < N; i++) win[i] = 0.5 - 0.5 * Math.cos(2 * Math.PI * i / N);
+
+  function fft(re, im) {
+    const n = re.length;
+    for (let i=1,j=0;i<n;i++){
+      let bit=n>>1;for(;j&bit;bit>>=1)j^=bit;j^=bit;
+      if(i<j){[re[i],re[j]]=[re[j],re[i]];[im[i],im[j]]=[im[j],im[i]];}
+    }
+    for (let len=2;len<=n;len<<=1){
+      const ang=-2*Math.PI/len,wRe=Math.cos(ang),wIm=Math.sin(ang);
+      for (let i=0;i<n;i+=len){
+        let cRe=1,cIm=0;
+        for (let j=0;j<len>>1;j++){
+          const uRe=re[i+j],uIm=im[i+j];
+          const vRe=re[i+j+len/2]*cRe-im[i+j+len/2]*cIm;
+          const vIm=re[i+j+len/2]*cIm+im[i+j+len/2]*cRe;
+          re[i+j]=uRe+vRe;im[i+j]=uIm+vIm;
+          re[i+j+len/2]=uRe-vRe;im[i+j+len/2]=uIm-vIm;
+          const nRe=cRe*wRe-cIm*wIm;cIm=cRe*wIm+cIm*wRe;cRe=nRe;
+        }
+      }
+    }
+  }
+  function ifft(re, im) {
+    for(let i=0;i<re.length;i++)im[i]=-im[i];
+    fft(re,im);
+    for(let i=0;i<re.length;i++){re[i]/=re.length;im[i]=-im[i]/re.length;}
+  }
+
+  // ── STEP 1: cutBin 탐지 — 스펙트럼이 급격히 떨어지는 절박 주파수 ────
+  let cutBin = half - 2;
+  {
+    const d0 = buffer.getChannelData(0);
+    const avgMag = new Float32Array(half + 1);
+    let cnt = 0;
+    const scanHop = Math.max(hop*8, Math.floor(d0.length/20));
+    const tRe = new Float32Array(N), tIm = new Float32Array(N);
+    for (let fs=0; fs<d0.length-N; fs+=scanHop) {
+      for (let i=0;i<N;i++){const idx=fs+i;tRe[i]=idx<d0.length?d0[idx]*win[i]:0;tIm[i]=0;}
+      fft(tRe,tIm);
+      for (let k=1;k<=half;k++) avgMag[k]+=Math.sqrt(tRe[k]*tRe[k]+tIm[k]*tIm[k]);
+      cnt++;
+    }
+    for (let k=1;k<=half;k++) avgMag[k]/=Math.max(1,cnt);
+
+    // dB 스펙트럼 (8bin 스무딩)
+    const dBs = new Float32Array(half+1);
+    for (let k=4;k<=half-4;k++){
+      let s=0; for(let j=-4;j<=4;j++) s+=avgMag[k+j]; s/=9;
+      dBs[k]=20*Math.log10(Math.max(s,1e-12));
+    }
+
+    // 1~4kHz 기준 레벨
+    const refLo=Math.round(1000/binHz), refHi=Math.round(4000/binHz);
+    let refDb=0,refN=0;
+    for(let k=refLo;k<=refHi&&k<=half;k++){refDb+=dBs[k];refN++;}
+    refDb/=Math.max(1,refN);
+
+    // 탐색 상한: sr/4 (업샘플 노이즈 영역 제외)
+    // 예) 96kHz 버퍼 → 24kHz 이하만 탐색
+    const searchCeil = Math.round(half * 0.5); // = sr/4
+    const winB = 12;
+    cutBin = searchCeil; // 기본값
+
+    // 높은 주파수부터 내려오며 탐색
+    // 연속 winB개 bin 평균이 기준보다 30dB 이상 낮지 않은 최초 지점
+    for(let k=searchCeil-winB; k>=winB; k-=Math.max(1,winB>>1)){
+      let avg=0; for(let j=0;j<winB;j++) avg+=dBs[k+j]; avg/=winB;
+      if(avg > refDb-30){ cutBin=k+winB; break; }
+    }
+
+    // 추가 검증: cutBin 직후 급격한 드롭 확인
+    // cutBin+winB 지점이 cutBin보다 15dB 이상 낮으면 컷 확정
+    // 낮지 않으면 더 위에서 절벽을 찾은 것 → 아래로 재탐색
+    {
+      const checkK = Math.min(half-winB, cutBin+winB);
+      let checkAvg=0; for(let j=0;j<winB;j++) checkAvg+=dBs[checkK+j]; checkAvg/=winB;
+      const cutAvg_ref = dBs[Math.max(1,cutBin-2)];
+      if(checkAvg > cutAvg_ref - 15){
+        // 절벽이 아님 → 더 낮은 주파수에서 재탐색 (더 급격한 드롭 기준)
+        for(let k=cutBin-winB; k>=winB; k-=Math.max(1,winB>>1)){
+          let cur=0,nxt=0;
+          for(let j=0;j<winB;j++){cur+=dBs[k+j]; nxt+=dBs[k+j+winB];}
+          cur/=winB; nxt/=winB;
+          if(cur-nxt > 20){ cutBin=k+winB; break; } // 20dB 급감 = 컷
+        }
+      }
+    }
+
+    cutBin = Math.max(Math.round(half*0.05), Math.min(cutBin, searchCeil));
+    console.log(`[HD] cutBin=${cutBin}, cutHz=${(cutBin*binHz).toFixed(0)}Hz, refDb=${refDb.toFixed(1)}dB, sr=${sr}`);
+  }
+  // ── STEP 2: 파라미터 ──────────────────────────────────────────────────
+  // cutHz에서 25% 앞부터 XF 시작
+  const xfStart = Math.max(1, Math.round(cutBin * 0.75));
+
+  // 배음 레벨: 2x=1/2, 4x=1/4, 8x=1/8, 16x=1/16, 32x=1/32, 64x=1/64, 128x=1/128
+  const harmonics = [2, 4, 8, 16, 32, 64, 128];
+  const levels    = [0.5, 0.25, 0.125, 0.0625, 0.03125, 0.015625, 0.0078125];
+  const lvlScale  = 0.5 + hfStrength;
+
+  const origRMS = [];
+  for (let c=0;c<ch;c++){
+    const d=buffer.getChannelData(c);
+    let s2=0;for(let i=0;i<d.length;i++)s2+=d[i]*d[i];
+    origRMS.push(Math.sqrt(s2/d.length));
+  }
+
+  // ── STEP 3: 채널별 처리 ───────────────────────────────────────────────
+  for (let c=0;c<ch;c++){
+    const data = buffer.getChannelData(c);
+    const len  = data.length;
+    const out  = new Float32Array(len);
+    const norm = new Float32Array(len);
+    const re = new Float32Array(N), im = new Float32Array(N);
+
+    let _frameIdx=0;
+    for (let frameStart=0; frameStart<len; frameStart+=hop, _frameIdx++){
+      // 64프레임마다 브라우저에 제어권 반환 + 진행률 콜백
+      if(_frameIdx%64===0){
+        if(onProgress) onProgress(c, frameStart, len);
+        await new Promise(r=>setTimeout(r,0));
+      }
+      for(let i=0;i<N;i++){const idx=frameStart+i;re[i]=idx<len?data[idx]*win[i]:0;im[i]=0;}
+      fft(re,im);
+
+      const oRe=new Float32Array(N),oIm=new Float32Array(N);
+      for(let k=0;k<N;k++){oRe[k]=re[k];oIm[k]=im[k];}
+      const oMag=new Float32Array(half+1);
+      for(let k=1;k<=half;k++) oMag[k]=Math.sqrt(oRe[k]*oRe[k]+oIm[k]*oIm[k]);
+
+      re.fill(0); im.fill(0);
+
+      // 1 xfStart 이하: 원음 그대로
+      for(let k=1;k<xfStart;k++){re[k]=oRe[k];im[k]=oIm[k];}
+
+      // 2 xfStart~cutBin: 원음 페이드아웃 + 2차배음 페이드인 (순방향)
+      for(let k=xfStart;k<=cutBin&&k<=half;k++){
+        const t=( k-xfStart)/Math.max(1,cutBin-xfStart);
+        const wO=0.5+0.5*Math.cos(Math.PI*t);
+        const wH=1.0-wO;
+        re[k]+=oRe[k]*wO; im[k]+=oIm[k]*wO;
+        // src j=k/2 -> dest k*2 이지만 여기선 dest=k 구간이므로 j=k/2
+        const j2=k/2;
+        const lo2=Math.floor(j2),hi2=Math.min(lo2+1,half),f2=j2-lo2;
+        if(lo2>=1){
+          const m=(oMag[lo2]*(1-f2)+oMag[Math.min(hi2,half)]*f2)*levels[0]*lvlScale;
+          const p=Math.atan2(oIm[lo2],oRe[lo2]);
+          re[k]+=m*Math.cos(p)*wH; im[k]+=m*Math.sin(p)*wH;
+        }
+      }
+
+      // 3 순방향 배음: src bin j -> dest bin j*order
+      // 각 배음이 인접 배음 구간 25%씩 침범, 코사인 페이드인/아웃
+      // 경계에서 두 배음이 동시 기여 → 딥 없음
+      for(let oi=0;oi<harmonics.length;oi++){
+        const order=harmonics[oi];
+        const lev=levels[oi]*lvlScale;
+        const cLo=cutBin*(order/2);
+        const cHi=Math.min(half,cutBin*order);
+        if(cLo>half)break;
+        const ov=(cHi-cLo)*0.25;
+        const fLo=oi===0?cLo:Math.max(1,cLo-ov);
+        const fHi=Math.min(half,cHi+ov);
+        const jLo=Math.max(1,Math.ceil(fLo/order));
+        const jHi=Math.min(half,Math.floor(fHi/order));
+        for(let j=jLo;j<=jHi;j++){
+          const dk=j*order;
+          if(dk<1||dk>half)continue;
+          const m=oMag[j]*lev;
+          const p=Math.atan2(oIm[j],oRe[j]);
+          let w=1.0;
+          if(dk<cLo){
+            const t=(dk-fLo)/Math.max(1,cLo-fLo);
+            w=0.5-0.5*Math.cos(Math.PI*t); // 0->1 페이드인
+          }else if(dk>cHi){
+            const t=(dk-cHi)/Math.max(1,fHi-cHi);
+            w=0.5+0.5*Math.cos(Math.PI*t); // 1->0 페이드아웃
+          }
+          re[dk]+=m*Math.cos(p)*w;
+          im[dk]+=m*Math.sin(p)*w;
+        }
+      }
+
+      // 합성 구간 가우시안 mag 스무딩 (스파이크 제거)
+      {
+        const gauss=[0.0625,0.25,0.375,0.25,0.0625];
+        const sr2=new Float32Array(half+1), si2=new Float32Array(half+1);
+        for(let k=1;k<xfStart;k++){sr2[k]=re[k];si2[k]=im[k];}
+        for(let k=xfStart;k<half;k++){
+          let mSum=0,wSum=0;
+          for(let d=-2;d<=2;d++){
+            const kk=k+d; if(kk<1||kk>=half)continue;
+            mSum+=Math.sqrt(re[kk]*re[kk]+im[kk]*im[kk])*gauss[d+2];
+            wSum+=gauss[d+2];
+          }
+          const mag=wSum>0?mSum/wSum:0;
+          const ph=Math.atan2(im[k],re[k]);
+          sr2[k]=mag*Math.cos(ph); si2[k]=mag*Math.sin(ph);
+        }
+        for(let k=1;k<half;k++){re[k]=sr2[k];im[k]=si2[k];}
+      }
+      // 켤레 대칭
+      for(let k=1;k<half;k++){re[N-k]=re[k];im[N-k]=-im[k];}
+
+      ifft(re,im);
+      for(let i=0;i<N;i++){
+        const idx=frameStart+i;
+        if(idx<len){out[idx]+=re[i]*win[i];norm[idx]+=win[i]*win[i];}
+      }
+    }
+
+    for(let i=0;i<len;i++){
+      if(norm[i]>0.01) data[i]=out[i]/norm[i];
+    }
+  }
+
+  // RMS 매칭
+  for(let c=0;c<ch;c++){
+    const d=buffer.getChannelData(c);
+    let rms=0;for(let i=0;i<d.length;i++)rms+=d[i]*d[i];
+    rms=Math.sqrt(rms/d.length);
+    if(rms>origRMS[c]*1.01){
+      const g=origRMS[c]/rms;
+      for(let i=0;i<d.length;i++)d[i]*=g;
+    }
+  }
+
+  // 피크 리밋
+  for(let c=0;c<ch;c++){
+    const d=buffer.getChannelData(c);
+    for(let i=0;i<d.length;i++)if(Math.abs(d[i])>0.99)d[i]=Math.sign(d[i])*0.99;
+  }
+}
+
+document.getElementById('expWav').addEventListener('click', () => exportAudio('wav'));
+document.getElementById('expHD').addEventListener('click',  () => exportAudio('hd'));
+document.getElementById('expUHD').addEventListener('click', () => exportAudio('uhd'));
+
+var _exporting = false;
+async function exportAudio(mode) {
+  if (!sourceBuf || _exporting) return;
+  _exporting = true;
+  stopPlay();
+
+  const params = getParams(sourceBuf);
+  const baseName = originalFile ? originalFile.name.replace(/\.[^.]+$/,'') : 'output';
+
+  let targetSR, bitDepth, suffix, hfStr, smooth, uhdHF, uhdAir;
+  if (mode === 'wav') { targetSR = sourceBuf.sampleRate; bitDepth = 16; suffix = '_dsp'; }
+  else if (mode === 'hd') { targetSR = 96000; bitDepth = 24; suffix = '_HD96k24bit'; hfStr = params.hdHF; smooth = params.hdSmooth; }
+  else { targetSR = 192000; bitDepth = 32; suffix = '_UHD192k32bit'; hfStr = params.uhdHF; smooth = params.uhdAir; }
+
+  showOverlay('DSP 렌더링 중...', '잠시만 기다려 주세요', 10);
+
+  // Step 1: render DSP at target sample rate
+  const duration = sourceBuf.duration;
+  const ch = sourceBuf.numberOfChannels;
+  const offCtx = new OfflineAudioContext(ch, Math.ceil(duration * targetSR), targetSR);
+
+  try {
+    // Resample source buffer if needed
+    let inputBuf = sourceBuf;
+    if (targetSR !== sourceBuf.sampleRate) {
+      // Use OfflineAudioContext to resample first
+      const resCtx = new OfflineAudioContext(ch, Math.ceil(duration * targetSR), targetSR);
+      const rSrc = resCtx.createBufferSource();
+      rSrc.buffer = sourceBuf;
+      rSrc.connect(resCtx.destination);
+      rSrc.start(0);
+      setOverlayProg(20, '리샘플링 중...', '▸ 원본 샘플레이트 → 타겟 SR 변환 중...');
+      inputBuf = await resCtx.startRendering();
+    }
+
+    params.inputBuffer = inputBuf;
+    const offCtx2 = new OfflineAudioContext(ch, Math.ceil(duration * targetSR), targetSR);
+    // DSP 체인: 40→63 서서히 채우기 (OfflineAudioContext는 진행률 노출 안 함)
+    setOverlayProg(40, 'DSP 체인 처리 중...');
+    await buildOfflineChain(offCtx2, params);
+    // 렌더링 시작 직전 가짜 진행 타이머 — 활성화된 이펙트 DOM 순서 반영
+    let _dspPct = 40;
+    // 활성화된 이펙트 순서 읽기
+    const _EFFECT_MSGS = {
+      'mod-bbe':     ['▸ BBE — 저음 보강 중...', '▸ BBE — 위상 보정 중...', '▸ BBE — 고주파 선명도 올리는 중...'],
+      'mod-tube':    ['▸ TUBE — 진공관 포화 먹이는 중...', '▸ TUBE — 홀수 배음 입히는 중...', '▸ TUBE — 저역 따뜻하게 물드는 중...'],
+      'mod-vinyl':   ['▸ VINYL — 판 돌아가는 느낌 만드는 중...', '▸ VINYL — 표면 잡음 살짝 입히는 중...'],
+      'mod-exciter': ['▸ EXCITER — 고역 배음 살려내는 중...', '▸ EXCITER — 원음이랑 섞는 중...'],
+      'mod-sg':      ['▸ SG — 저음대 꽉 잡는 중...', '▸ SG — 중음대 두께 올리는 중...', '▸ SG — 고음대 공기 넣는 중...'],
+      'mod-atmos':   ['▸ ATMOS — 공간감 펼치는 중...', '▸ ATMOS — 높이감 입히는 중...'],
+      'mod-comp':    ['▸ COMP — 튀어나온 부분 눌러주는 중...', '▸ COMP — 조용한 부분 끌어올리는 중...'],
+    };
+    const _ENABLED_MAP = {
+      'mod-bbe': params.bbeEnabled, 'mod-tube': params.tubeEnabled,
+      'mod-vinyl': params.vinylEnabled, 'mod-exciter': params.excEnabled,
+      'mod-sg': params.sgEnabled, 'mod-atmos': params.atmosEnabled,
+      'mod-comp': params.compEnabled,
+    };
+    const _dspDetails = [];
+    {
+      const _grid = document.getElementById('dspGrid');
+      if (_grid) {
+        _grid.querySelectorAll('.module').forEach(function(mod) {
+          if (_ENABLED_MAP[mod.id] && _EFFECT_MSGS[mod.id]) {
+            _EFFECT_MSGS[mod.id].forEach(function(m){ _dspDetails.push(m); });
+          }
+        });
+      }
+    }
+    if (params.masterEnabled) {
+      _dspDetails.push('▸ MASTER — 저·중·고역 균형 맞추는 중...', '▸ MASTER — 음량 천장 막아두는 중...', '▸ MASTER — 마무리 정리 중...');
+    }
+    if (_dspDetails.length === 0) _dspDetails.push('▸ DSP 처리 중...');
+    const _dspTimer = setInterval(function(){
+      if(_dspPct < 62){
+        _dspPct += 1;
+        const _di = Math.floor((_dspPct-40)/22*_dspDetails.length);
+        setOverlayProg(_dspPct, 'DSP 체인 처리 중...', _dspDetails[Math.min(_di,_dspDetails.length-1)]);
+      }
+    }, 60);
+    let rendered = await offCtx2.startRendering();
+    clearInterval(_dspTimer);
+
+    // Step 2: HD restoration
+    if (mode !== 'wav' && hfStr > 0) {
+      setOverlayProg(65, '고해상도 복원 합성 중...');
+      await new Promise(r => setTimeout(r, 30));
+      const _hdTotalCh = rendered.numberOfChannels;
+      const _hdDetailMsgs = [
+        '▸ 음원에서 주파수가 잘린 지점 찾는 중...',
+        '▸ 어디서부터 끊겼는지 확인하는 중...',
+        '▸ 잘린 부분 이어붙일 구간 설정 중...',
+        '▸ 원음 서서히 걷어내는 중...',
+        '▸ 끊긴 고음 복원 시작하는 중...',
+        '▸ 2배 고음 채우는 중...',
+        '▸ 4배 고음 덧대는 중...',
+        '▸ 8배 초고음 입히는 중...',
+        '▸ 16배 고음 아주 살짝 얹는 중...',
+        '▸ 32배 극고음 희미하게 넣는 중...',
+        '▸ 64~128배 공기층 만드는 중...',
+        '▸ 복원된 고음 경계 매끄럽게 이어붙이는 중...',
+        '▸ 튀어나온 주파수 다듬는 중...',
+        '▸ 시간 축으로 다시 조립하는 중...',
+        '▸ 원음 볼륨이랑 맞추는 중...',
+        '▸ 너무 커진 부분 잡아주는 중...',
+        '▸ 마무리 정리 중...',
+      ];
+      await applyHDRestoration(rendered, targetSR, bitDepth, hfStr, smooth,
+        function(chIdx, frameStart, len){
+          const chProg = (chIdx + frameStart/len) / _hdTotalCh;
+          const pct = Math.round(65 + chProg * 22);
+          const msgIdx = Math.floor(chProg * (_hdDetailMsgs.length - 1));
+          setOverlayProg(pct,
+            '고해상도 복원 합성 중... ' + Math.min(100,Math.round(chProg*100)) + '%',
+            '▸ ' + _hdDetailMsgs[Math.min(msgIdx, _hdDetailMsgs.length-1)]
+          );
+        }
+      );
+    }
+
+    // UHD: 2패스 제거 — 같은 버퍼에 2번 처리하면 노이즈 2배 누적됨
+
+    setOverlayProg(88, 'WAV 인코딩 중...', '▸ PCM 샘플 비트 변환 및 헤더 작성 중...');
+    await new Promise(r => setTimeout(r, 30));
+
+    const wavData = encodeWAV(rendered, bitDepth);
+    const blob = new Blob([wavData], { type: 'audio/wav' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = baseName + suffix + '.wav';
+    a.click(); URL.revokeObjectURL(url);
+
+    setOverlayProg(100, '완료!', '▸ 파일 다운로드 준비 완료');
+    await new Promise(r => setTimeout(r, 500));
+    hideOverlay();
+    setStatus(`저장 완료: ${baseName+suffix}.wav (${(blob.size/1024/1024).toFixed(2)}MB)`, 'ok');
+  } catch(e) {
+    hideOverlay();
+    setStatus('렌더링 오류: ' + e.message, 'err');
+    console.error(e);
+  } finally {
+    _exporting = false;
+  }
+}
+
+
+function encodeWAV(buffer, bitDepth) {
+  const ch = buffer.numberOfChannels;
+  const sr = buffer.sampleRate;
+  const len = buffer.length;
+  const bps = bitDepth;
+  const bytePerSample = bps / 8;
+  const dataSize = len * ch * bytePerSample;
+  const ab = new ArrayBuffer(44 + dataSize);
+  const view = new DataView(ab);
+
+  const ws = (o,s) => { for(let i=0;i<s.length;i++) view.setUint8(o+i,s.charCodeAt(i)); };
+  ws(0,'RIFF'); view.setUint32(4,36+dataSize,true); ws(8,'WAVE');
+  ws(12,'fmt '); view.setUint32(16,16,true);
+  // PCM=1, float32=3
+  view.setUint16(20, bitDepth===32 ? 3 : 1, true);
+  view.setUint16(22,ch,true);
+  view.setUint32(24,sr,true);
+  view.setUint32(28,sr*ch*bytePerSample,true);
+  view.setUint16(32,ch*bytePerSample,true);
+  view.setUint16(34,bps,true);
+  ws(36,'data'); view.setUint32(40,dataSize,true);
+
+  let off = 44;
+  for (let i = 0; i < len; i++) {
+    for (let c = 0; c < ch; c++) {
+      const s = buffer.getChannelData(c)[i];
+      if (bitDepth === 32) {
+        view.setFloat32(off, s, true); off += 4;
+      } else if (bitDepth === 24) {
+        const v = Math.max(-1,Math.min(1,s));
+        const iv = Math.round(v * 8388607);
+        view.setUint8(off, iv & 0xff);
+        view.setUint8(off+1, (iv >> 8) & 0xff);
+        view.setUint8(off+2, (iv >> 16) & 0xff);
+        off += 3;
+      } else {
+        const v = Math.max(-1,Math.min(1,s));
+        view.setInt16(off, Math.round(v * 32767), true); off += 2;
+      }
+    }
+  }
+  return ab;
+}
+
+// ---- Reset ----
+document.getElementById('resetBtn').addEventListener('click', () => {
+  stopPlay();
+  sourceBuf = null; originalFile = null;
+  fileInput.value = '';
+  document.getElementById('fileInfo').classList.remove('show');
+  document.getElementById('specWrap').classList.remove('show');
+  document.getElementById('transportBar').classList.remove('show');
+  document.getElementById('expWav').disabled = true;
+  document.getElementById('expHD').disabled = true;
+  document.getElementById('expUHD').disabled = true;
+  document.getElementById('spectrum').getContext('2d').clearRect(0,0,1060,90);
+  setStatus('초기화되었습니다.', '');
+});
+
+// ---- Helpers ----
+function fmt(s) {
+  const m = Math.floor(s/60), sec = Math.floor(s%60);
+  return `${m}:${sec.toString().padStart(2,'0')}`;
+}
+
+function setStatus(msg, type) {
+  const el = document.getElementById('statusBar');
+  el.innerHTML = `<div class="status-led"></div><span>${msg}</span>`;
+  el.className = 'status-bar' + (type ? ' '+type : '');
+}
+
+var _overlayLog = [];
+var _lastDetail = null;
+
+function showOverlay(title, sub, pct) {
+  document.getElementById('overlayTitle').textContent = title;
+  document.getElementById('overlaySub').textContent = sub;
+  document.getElementById('overlayProg').style.width = pct + '%';
+  var _pi = document.getElementById('overlayPct'); if(_pi) _pi.textContent = pct + '%';
+  document.getElementById('overlay').classList.add('show');
+  _overlayLog = [];
+  _lastDetail = null;
+  document.getElementById('overlayLog').innerHTML = '';
+}
+
+function _pushLog(detail) {
+  if(!detail || detail === _lastDetail) return;
+  _lastDetail = detail;
+
+  var log = document.getElementById('overlayLog');
+  var lines = log.querySelectorAll('.overlay-log-line:not(.exiting)');
+
+  // 기존 라인들: 4번째(마지막)가 있으면 exiting으로 아래로 밀어내기
+  if(lines.length >= 5) {
+    var last = lines[lines.length - 1];
+    last.classList.remove('past');
+    last.classList.add('exiting');
+    setTimeout(function(){ if(last.parentNode) last.parentNode.removeChild(last); }, 400);
+  }
+
+  // 기존 current → past 전환 (color 트랜지션)
+  lines.forEach(function(el) {
+    el.classList.remove('current');
+    el.classList.add('past');
+  });
+
+  // 새 라인을 맨 위에 삽입
+  var el = document.createElement('div');
+  el.className = 'overlay-log-line current';
+  el.textContent = detail;
+  log.insertBefore(el, log.firstChild);
+  requestAnimationFrame(function(){
+    requestAnimationFrame(function(){ el.classList.add('visible'); });
+  });
+
+  _overlayLog.unshift(detail);
+  if(_overlayLog.length > 5) _overlayLog.pop();
+}
+
+function setOverlayProg(pct, sub, detail) {
+  document.getElementById('overlayProg').style.width = pct + '%';
+  var pctEl = document.getElementById('overlayPct');
+  if(pctEl) pctEl.textContent = pct + '%';
+  if(sub) document.getElementById('overlaySub').textContent = sub;
+  if(detail) _pushLog(detail);
+}
+function hideOverlay() { document.getElementById('overlay').classList.remove('show'); }
+
+
+// ---- EULA ----
+
+document.getElementById('eulaAccept').addEventListener('click', () => {
+  eulaAccepted = true;
+  document.getElementById('eulaOverlay').classList.add('hidden');
+});
+
+document.getElementById('eulaDecline').addEventListener('click', () => {
+  // Soft decline: close and disable all interaction
+  document.getElementById('eulaOverlay').style.background = 'rgba(4,3,8,0.99)';
+  document.getElementById('eulaOverlay').innerHTML =
+    '<div style="text-align:center;font-family:Orbitron,monospace;color:var(--muted);font-size:0.75rem;letter-spacing:0.15em;line-height:2.2">' +
+    '<div style="font-size:1.2rem;color:var(--red);margin-bottom:16px">✕</div>' +
+    '사용권 계약에 동의하지 않으셨습니다.<br>' +
+    '<span style="font-size:0.6rem">You have declined the EULA. This software cannot be used.</span><br><br>' +
+    '<span style="font-size:0.6rem;color:var(--border-hi)">© 2026 Velvitty(연이)</span>' +
+    '</div>';
+});
+
+// EULA consent is handled inside loadFile directly
+
+
+// ---- Tube Saturation Visualizer ----
+let tubeVizAnimID = null;
+let tubeVizPhase  = 0;
+
+function drawTubeViz() {
+  const canvas = document.getElementById('tubeVis');
+  // 내부 픽셀 좌표계는 attribute 값 고정(560×72), CSS가 시각적 스케일 담당
+  if (!canvas) { tubeVizAnimID = requestAnimationFrame(drawTubeViz); return; }
+  const W   = canvas.width;   // 560
+  const H   = canvas.height;  // 72
+  const mid = H / 2;
+  const c   = canvas.getContext('2d');
+
+  const drive   = parseFloat(document.getElementById('tubeDrive').value) / 100;
+  const bias    = parseFloat(document.getElementById('tubeBias').value);
+  const mix     = parseFloat(document.getElementById('tubeMix').value) / 100;
+  const enabled = document.getElementById('tubeOn').checked;
+
+  // tube curve 파라미터
+  const d = 1.0 + drive * 1.2;
+  const b = (bias - 50) / 100 * 0.15;
+  const inputLevel = 0.3 + drive * 0.5;
+
+  // THD 계산: 사인파 → tube curve → 푸리에 분석
+  let fund = 0, h2 = 0, h3 = 0;
+  const N = 512;
+  for (let i = 0; i < N; i++) {
+    const angle = (2 * Math.PI * i) / N;
+    const x = Math.sin(angle) * inputLevel;
+    let y;
+    if (x >= 0) y = Math.tanh(d * x + b) / Math.tanh(d);
+    else        y = Math.tanh(d * x * 1.15 + b) / Math.tanh(d * 1.15);
+    y = y * mix + x * (1 - mix);
+    fund += y * Math.sin(angle);
+    h2   += y * Math.sin(2 * angle);
+    h3   += y * Math.sin(3 * angle);
+  }
+  fund = Math.abs(fund) * 2 / N;
+  h2   = Math.abs(h2)   * 2 / N;
+  h3   = Math.abs(h3)   * 2 / N;
+  const thd    = fund > 0.001 ? Math.sqrt(h2 * h2 + h3 * h3) / fund * 100 : 0;
+  const satPct = Math.min(100, Math.round(thd * 3));
+
+  // DOM 업데이트
+  const thdEl = document.getElementById('tubeTHD');
+  const barEl = document.getElementById('tubeSatBar');
+  const valEl = document.getElementById('tubeSatVal');
+  if (thdEl) { thdEl.textContent = 'THD ' + thd.toFixed(1) + '%'; thdEl.classList.toggle('hot', thd > 8); }
+  if (barEl) { barEl.style.width = satPct + '%'; barEl.classList.toggle('hot', satPct > 70); }
+  if (valEl) { valEl.textContent = satPct + '%'; }
+
+  // 캔버스 초기화
+  c.clearRect(0, 0, W, H);
+
+  // 배경 그리드
+  c.strokeStyle = 'rgba(60,40,100,0.22)';
+  c.lineWidth = 1;
+  c.beginPath(); c.moveTo(0, mid); c.lineTo(W, mid); c.stroke();
+  for (let i = 1; i < 4; i++) {
+    c.beginPath(); c.moveTo(W * i / 4, 0); c.lineTo(W * i / 4, H); c.stroke();
+  }
+  // 클립 한계선
+  const clipY = mid * 0.12;
+  c.strokeStyle = 'rgba(255,51,85,0.15)';
+  c.setLineDash([3, 5]);
+  c.beginPath(); c.moveTo(0, clipY); c.lineTo(W, clipY); c.stroke();
+  c.beginPath(); c.moveTo(0, H - clipY); c.lineTo(W, H - clipY); c.stroke();
+  c.setLineDash([]);
+
+  if (!enabled) {
+    // 비활성: 흐린 플랫 라인
+    c.strokeStyle = 'rgba(90,79,110,0.5)';
+    c.lineWidth = 1.5;
+    c.beginPath(); c.moveTo(0, mid); c.lineTo(W, mid); c.stroke();
+    tubeVizAnimID = requestAnimationFrame(drawTubeViz);
+    return;
+  }
+
+  // 위상 스크롤
+  const cycles = 2.5;
+  tubeVizPhase = (tubeVizPhase + 0.018) % 1;
+
+  // 입력 신호 (파란 얇은 선)
+  c.beginPath();
+  c.strokeStyle = 'rgba(0,160,220,0.40)';
+  c.lineWidth = 1;
+  for (let px = 0; px < W; px++) {
+    const t  = (px / W * cycles + tubeVizPhase) * 2 * Math.PI;
+    const xv = Math.sin(t) * inputLevel;
+    const py = mid - xv * (mid - 5);
+    if (px === 0) c.moveTo(px, py); else c.lineTo(px, py);
+  }
+  c.stroke();
+
+  // 출력 파형 그라디언트
+  const isHot = thd > 8;
+  const grad = c.createLinearGradient(0, 0, 0, H);
+  grad.addColorStop(0,   isHot ? 'rgba(255,51,85,0.95)'  : 'rgba(255,150,0,0.95)');
+  grad.addColorStop(0.5, isHot ? 'rgba(255,100,0,0.80)'  : 'rgba(255,190,0,0.80)');
+  grad.addColorStop(1,   isHot ? 'rgba(255,51,85,0.95)'  : 'rgba(255,150,0,0.95)');
+
+  // 출력 파형 fill
+  c.beginPath();
+  c.fillStyle = isHot ? 'rgba(255,51,85,0.06)' : 'rgba(255,150,0,0.06)';
+  c.moveTo(0, mid);
+  for (let px = 0; px < W; px++) {
+    const t  = (px / W * cycles + tubeVizPhase) * 2 * Math.PI;
+    const xv = Math.sin(t) * inputLevel;
+    let yv;
+    if (xv >= 0) yv = Math.tanh(d * xv + b) / Math.tanh(d);
+    else         yv = Math.tanh(d * xv * 1.15 + b) / Math.tanh(d * 1.15);
+    yv = yv * mix + xv * (1 - mix);
+    c.lineTo(px, mid - yv * (mid - 5));
+  }
+  c.lineTo(W, mid);
+  c.closePath();
+  c.fill();
+
+  // 출력 파형 선
+  c.beginPath();
+  c.strokeStyle = grad;
+  c.lineWidth = 2;
+  for (let px = 0; px < W; px++) {
+    const t  = (px / W * cycles + tubeVizPhase) * 2 * Math.PI;
+    const xv = Math.sin(t) * inputLevel;
+    let yv;
+    if (xv >= 0) yv = Math.tanh(d * xv + b) / Math.tanh(d);
+    else         yv = Math.tanh(d * xv * 1.15 + b) / Math.tanh(d * 1.15);
+    yv = yv * mix + xv * (1 - mix);
+    const py = mid - yv * (mid - 5);
+    if (px === 0) c.moveTo(px, py); else c.lineTo(px, py);
+  }
+  c.stroke();
+
+  tubeVizAnimID = requestAnimationFrame(drawTubeViz);
+}
+
+function stopTubeViz() {
+  cancelAnimationFrame(tubeVizAnimID);
+  tubeVizAnimID = null;
+}
+// Init crackle
+drawCrackle();
+drawTubeViz();
+</script>
+
+  <!-- License Footer -->
+  <div class="license-footer">
+    <div class="lf-copy">Copyright © 2026 <span class="lf-name">Velvitty(연이)</span>. All Rights Reserved.</div>
+    <div class="lf-terms">
+      <span>개인·비영리 연구 한정</span>
+      <span class="lf-sep">·</span>
+      <span>배포 금지</span>
+      <span class="lf-sep">·</span>
+      <span>수정 후 배포 금지</span>
+      <span class="lf-sep">·</span>
+      <span>상업적 이용 금지</span>
+    </div>
+  </div>
+
+
+<script>
+// ---- DSP Module Drag & Drop (line indicator) ----
+(function(){
+  var grid = document.getElementById('dspGrid');
+  if(!grid) return;
+  var dragging = null;
+  var indicator = null;
+  var lastRef = undefined; // 마지막 insertBefore 참조 캐시
+
+  function getIndicator(){
+    if(!indicator){
+      indicator = document.createElement('div');
+      indicator.className = 'drop-indicator';
+    }
+    return indicator;
+  }
+
+  function removeIndicator(){
+    if(indicator && indicator.parentNode) indicator.parentNode.removeChild(indicator);
+    lastRef = undefined;
+  }
+
+  function placeIndicator(refNode){
+    if(lastRef === refNode) return; // 같은 위치면 DOM 조작 생략 → 팔락거림 방지
+    lastRef = refNode;
+    grid.insertBefore(getIndicator(), refNode || null);
+  }
+
+  // 헤더 pointerdown → 드래그 활성화 / 그 외 → 비활성
+  grid.addEventListener('pointerdown', function(e){
+    var mod = e.target.closest('.module');
+    if(!mod || mod.id === 'mod-master') return;
+    var inHeader = !!e.target.closest('.module-header');
+    var inInteractive = !!e.target.closest('input, button, label, select, textarea, .led-toggle, .knob-wrap');
+    mod.draggable = inHeader && !inInteractive;
+  });
+
+  grid.addEventListener('dragstart', function(e){
+    var mod = e.target.closest('.module');
+    if(!mod || mod.id === 'mod-master'){ e.preventDefault(); return; }
+    dragging = mod;
+    setTimeout(function(){ mod.classList.add('dragging'); }, 0);
+    e.dataTransfer.effectAllowed = 'move';
+  });
+
+  grid.addEventListener('dragend', function(){
+    removeIndicator();
+    if(dragging){ dragging.classList.remove('dragging'); dragging = null; }
+    var master = document.getElementById('mod-master');
+    var hd = document.getElementById('mod-hd');
+    if(master) grid.insertBefore(master, hd || null);
+  });
+
+  grid.addEventListener('dragover', function(e){
+    e.preventDefault();
+    // indicator 위에서 발생한 이벤트는 무시 (팔락거림 핵심 원인)
+    if(e.target === indicator || (indicator && indicator.contains(e.target))) return;
+
+    var target = e.target.closest('.module');
+    if(!target || target === dragging || target.id === 'mod-master') return;
+
+    var rect = target.getBoundingClientRect();
+    var after = e.clientX >= rect.left + rect.width / 2;
+
+    if(!after){
+      placeIndicator(target);
+    } else {
+      // target 다음 형제 (indicator, dragging 건너뜀)
+      var next = target.nextSibling;
+      while(next && (next === indicator || next === dragging)) next = next.nextSibling;
+      placeIndicator(next || null);
+    }
+  });
+
+  grid.addEventListener('dragleave', function(e){
+    if(!grid.contains(e.relatedTarget)) removeIndicator();
+  });
+
+  grid.addEventListener('drop', function(e){
+    e.preventDefault();
+    if(indicator && indicator.parentNode === grid){
+      grid.insertBefore(dragging, indicator);
+    }
+    removeIndicator();
+    var master = document.getElementById('mod-master');
+    var hd = document.getElementById('mod-hd');
+    if(master) grid.insertBefore(master, hd || null);
+  });
+})();
+</script>
+
+</body>
+</html>
