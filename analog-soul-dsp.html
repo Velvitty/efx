@@ -271,9 +271,134 @@ body::before {
 /* ===== SPECTRUM ===== */
 .spectrum-wrap {
   display: none;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
 }
 .spectrum-wrap.show { display: block; }
+
+/* 좌우 2분할 그리드 */
+.spectrum-ab {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+/* ===== X축 범위 고정 스위치 ===== */
+.spec-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 10px;
+  padding: 6px 10px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+}
+.spec-toolbar-label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.55rem;
+  letter-spacing: 0.16em;
+  color: var(--muted);
+}
+.spec-toolbar-note {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.55rem;
+  letter-spacing: 0.08em;
+  color: #6a6478;
+  margin-left: auto;
+}
+
+.axis-switch {
+  position: relative;
+  width: 196px;
+  padding-top: 2px;
+}
+/* 노치 트랙 — |--|--|--| 모양을 배경 그라데이션으로 그린다 */
+.axis-switch::before {
+  content: '';
+  position: absolute;
+  left: 7px; right: 7px; top: 8px;
+  height: 2px;
+  background: var(--border);
+  border-radius: 1px;
+  pointer-events: none;
+}
+.axis-switch::after {
+  content: '';
+  position: absolute;
+  left: 7px; right: 7px; top: 4px;
+  height: 10px;
+  pointer-events: none;
+  /* 4개 눈금 기둥 — 내부 폭 182px 기준 60px 간격으로 0/60/120/180 지점 */
+  background: repeating-linear-gradient(
+    to right,
+    var(--border) 0 2px,
+    transparent 2px 60px
+  );
+}
+.axis-switch input[type=range] {
+  -webkit-appearance: none;
+  appearance: none;
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 18px;
+  margin: 0;
+  background: transparent;
+  cursor: pointer;
+}
+.axis-switch input[type=range]::-webkit-slider-runnable-track {
+  height: 18px; background: transparent;
+}
+.axis-switch input[type=range]::-moz-range-track {
+  height: 18px; background: transparent;
+}
+.axis-switch input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px; height: 14px;
+  margin-top: 2px;
+  border-radius: 50%;
+  background: var(--amber);
+  border: 2px solid #1a1520;
+  box-shadow: 0 0 6px rgba(255,179,0,0.5);
+}
+.axis-switch input[type=range]::-moz-range-thumb {
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  background: var(--amber);
+  border: 2px solid #1a1520;
+  box-shadow: 0 0 6px rgba(255,179,0,0.5);
+}
+.axis-switch-ticks {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.48rem;
+  letter-spacing: 0.06em;
+  color: #4a4555;
+}
+.axis-switch-ticks span { width: 34px; text-align: center; }
+.axis-switch-ticks span:first-child { text-align: left; }
+.axis-switch-ticks span:last-child  { text-align: right; }
+.axis-switch-ticks span.on { color: var(--amber); }
+
+/* 모듈 입력 게인 — 이펙트 진입 전 레벨이라 구분선으로 분리 */
+.slider-row.in-gain {
+  padding-bottom: 8px;
+  margin-bottom: 8px;
+  border-bottom: 1px dashed var(--border);
+}
+.slider-row.in-gain .slider-label { color: var(--blue); }
+
+.spec-panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 10px 12px 8px;
+}
+/* 좌(원음)는 차분한 톤, 우(적용본)는 앰버 강조 */
+.spec-panel.dry { border-left: 2px solid #4a4555; }
+.spec-panel.wet { border-left: 2px solid var(--amber); }
 
 .spec-label {
   font-family: 'Share Tech Mono', monospace;
@@ -283,15 +408,90 @@ body::before {
   margin-bottom: 6px;
   display: flex;
   justify-content: space-between;
+  align-items: baseline;
+}
+.spec-tag.dry { color: #6a6478; }
+.spec-tag.wet { color: var(--amber); }
+.spec-peak {
+  font-size: 0.55rem;
+  color: var(--muted);
+  letter-spacing: 0.08em;
 }
 
-canvas#spectrum {
+/* 클릭 전환 모드 배지 */
+.spec-mode {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.5rem;
+  letter-spacing: 0.12em;
+  color: #6a6478;
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  padding: 1px 6px;
+  margin-left: auto;
+  margin-right: 10px;
+  user-select: none;
+  transition: color 0.25s ease, border-color 0.25s ease;
+}
+.spec-panel.wet .spec-mode.active { color: var(--amber); border-color: var(--amber); }
+.spec-panel.dry .spec-mode.active { color: #78c0d8; border-color: #4a6a78; }
+
+.spec-panel canvas {
   display: block;
   width: 100%;
-  height: 90px;
+  height: 150px;
   background: #050305;
   border: 1px solid var(--border);
-  border-radius: 3px;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+}
+.spec-panel canvas:hover { border-color: #6a5a80; }
+
+/* 주파수 눈금 */
+.spec-axis {
+  position: relative;
+  height: 11px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.5rem;
+  color: #4a4555;
+  letter-spacing: 0.05em;
+  margin-top: 4px;
+  padding: 0 2px;
+}
+/* 주파수 눈금 — 로그 위치에 정확히 놓기 위해 절대 배치 */
+.spec-axis .ftick {
+  position: absolute;
+  top: 0;
+  white-space: nowrap;
+  transform: translateX(-50%);
+}
+.spec-axis .ftick.first { transform: none; }
+.spec-axis .ftick.last  { transform: translateX(-100%); }
+.spec-axis .ftick.nyq   { color: var(--amber); }
+/* 시간축·범례는 기존처럼 양끝 정렬 */
+.spec-axis.flow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* 스펙트로그램 음압 컬러 범례 */
+.sg-legend {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.sg-legend-bar {
+  display: inline-block;
+  width: 84px;
+  height: 7px;
+  border: 1px solid var(--border);
+  border-radius: 2px;
+}
+
+/* 좁은 화면에서는 세로로 */
+@media (max-width: 900px) {
+  .spectrum-ab { grid-template-columns: 1fr; }
 }
 
 /* ===== TRANSPORT ===== */
@@ -419,6 +619,34 @@ canvas#spectrum {
   margin-left: 8px;
   opacity: 0.7;
 }
+
+/* HD/UHD 컬럼 헤더 — 제목 + LIVE 토글 */
+.hd-col-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.hd-live-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  user-select: none;
+}
+.hd-live-toggle > span:first-child {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.5rem;
+  letter-spacing: 0.14em;
+  color: #6a6478;
+}
+.hd-live-toggle:has(input:checked) > span:first-child { color: var(--amber); }
+.hd-live-toggle:has(input:disabled) { opacity: 0.4; cursor: not-allowed; }
+
+/* 실시간 복원 활성 시 모듈 강조 */
+#mod-hd.live-active { border-color: var(--amber); }
+#hdLiveStatus.on { color: var(--amber); }
 
 .module-header-right {
   display: flex;
@@ -1399,13 +1627,49 @@ canvas.tube-vis {
     <div class="fi-meta" id="fiMeta">—</div>
   </div>
 
-  <!-- Spectrum -->
+  <div class="dsp-section-title" id="specSectionTitle" style="display:none">SPECTRUM ANALYZER</div>
   <div class="spectrum-wrap" id="specWrap">
-    <div class="spec-label">
-      <span>▸ SPECTRUM ANALYZER</span>
-      <span id="specFreqLabel">20Hz ——————————————————————————— 20kHz</span>
+
+    <!-- x축 범위 고정 스위치 -->
+    <div class="spec-toolbar">
+      <span class="spec-toolbar-label">X-AXIS</span>
+      <div class="axis-switch">
+        <input type="range" id="axisLock" min="0" max="3" step="1" value="0"
+               title="스펙트럼 가로축 범위 고정">
+        <div class="axis-switch-ticks" id="axisLockTicks">
+          <span class="on">순응</span><span>48</span><span>96</span><span>192</span>
+        </div>
+      </div>
+      <span class="spec-toolbar-note" id="axisRangeNote">—</span>
     </div>
-    <canvas id="spectrum" width="1060" height="90"></canvas>
+
+    <div class="spectrum-ab">
+
+      <!-- 좌: 원음 (DRY) -->
+      <div class="spec-panel dry">
+        <div class="spec-label">
+          <span class="spec-tag dry">◂ ORIGINAL / DRY</span>
+          <span class="spec-mode" id="specModeDry">BARS ⇄</span>
+          <span class="spec-peak" id="specPeakDry">—</span>
+        </div>
+        <canvas id="spectrumDry" width="1040" height="150" title="클릭하여 스펙트로그램으로 전환"></canvas>
+        <div class="spec-axis" id="specAxisDry">
+        </div>
+      </div>
+
+      <!-- 우: 적용본 (WET) -->
+      <div class="spec-panel wet">
+        <div class="spec-label">
+          <span class="spec-tag wet">PROCESSED / WET ▸</span>
+          <span class="spec-mode" id="specModeWet">BARS ⇄</span>
+          <span class="spec-peak" id="specPeakWet">—</span>
+        </div>
+        <canvas id="spectrumWet" width="1040" height="150" title="클릭하여 스펙트로그램으로 전환"></canvas>
+        <div class="spec-axis" id="specAxisWet">
+        </div>
+      </div>
+
+    </div>
   </div>
 
   <!-- Transport -->
@@ -1442,6 +1706,11 @@ canvas.tube-vis {
         </div>
       </div>
       <div class="module-body">
+        <div class="slider-row in-gain">
+          <span class="slider-label">INPUT GAIN</span>
+          <input type="range" id="compIn" min="-24" max="24" value="0" step="0.5">
+          <span class="slider-val" id="compInV">0.0</span>
+        </div>
         <div class="slider-row">
           <span class="slider-label">THRESHOLD</span>
           <input type="range" id="compThr" min="-60" max="0" value="-18" step="0.5">
@@ -1487,6 +1756,11 @@ canvas.tube-vis {
         </div>
       </div>
       <div class="module-body">
+        <div class="slider-row in-gain">
+          <span class="slider-label">INPUT GAIN</span>
+          <input type="range" id="bbeIn" min="-24" max="24" value="0" step="0.5">
+          <span class="slider-val" id="bbeInV">0.0</span>
+        </div>
         <div class="slider-row">
           <span class="slider-label">LO CONTOUR</span>
           <input type="range" id="bbeLo" min="0" max="100" value="40" step="1">
@@ -1516,6 +1790,11 @@ canvas.tube-vis {
         </div>
       </div>
       <div class="module-body">
+        <div class="slider-row in-gain">
+          <span class="slider-label">INPUT GAIN</span>
+          <input type="range" id="tubeIn" min="-24" max="24" value="0" step="0.5">
+          <span class="slider-val" id="tubeInV">0.0</span>
+        </div>
         <div class="slider-row">
           <span class="slider-label">DRIVE</span>
           <input type="range" id="tubeDrive" min="0" max="100" value="30" step="1">
@@ -1566,6 +1845,11 @@ canvas.tube-vis {
         </div>
       </div>
       <div class="module-body">
+        <div class="slider-row in-gain">
+          <span class="slider-label">INPUT GAIN</span>
+          <input type="range" id="excIn" min="-24" max="24" value="0" step="0.5">
+          <span class="slider-val" id="excInV">0.0</span>
+        </div>
         <div class="slider-row">
           <span class="slider-label">FREQ</span>
           <input type="range" id="excFreq" min="2000" max="12000" value="6000" step="100">
@@ -1595,6 +1879,11 @@ canvas.tube-vis {
         </div>
       </div>
       <div class="module-body">
+        <div class="slider-row in-gain">
+          <span class="slider-label">INPUT GAIN</span>
+          <input type="range" id="sgIn" min="-24" max="24" value="0" step="0.5">
+          <span class="slider-val" id="sgInV">0.0</span>
+        </div>
         <!-- Mode A/B/C/D selector -->
         <div style="display:flex;gap:6px;margin-bottom:12px">
           <button class="sg-mode-btn active" data-mode="A" id="sgModeA">A</button>
@@ -1643,6 +1932,11 @@ canvas.tube-vis {
         </div>
       </div>
       <div class="module-body">
+        <div class="slider-row in-gain">
+          <span class="slider-label">INPUT GAIN</span>
+          <input type="range" id="vinylIn" min="-24" max="24" value="0" step="0.5">
+          <span class="slider-val" id="vinylInV">0.0</span>
+        </div>
         <div class="slider-row">
           <span class="slider-label">CRACKLE</span>
           <input type="range" id="vinylCrackle" min="0" max="100" value="30" step="1">
@@ -1679,6 +1973,11 @@ canvas.tube-vis {
         </div>
       </div>
       <div class="module-body">
+        <div class="slider-row in-gain">
+          <span class="slider-label">INPUT GAIN</span>
+          <input type="range" id="atmosIn" min="-24" max="24" value="0" step="0.5">
+          <span class="slider-val" id="atmosInV">0.0</span>
+        </div>
         <!-- Scene preset buttons -->
         <div style="display:flex;gap:5px;margin-bottom:12px;flex-wrap:wrap">
           <button class="atmos-scene-btn active" style="width:auto;padding:0 10px;font-size:0.5rem;letter-spacing:0.06em" data-scene="cinema" id="atmosCinema">CINEMA</button>
@@ -1731,6 +2030,11 @@ canvas.tube-vis {
         </div>
       </div>
       <div class="module-body">
+        <div class="slider-row in-gain">
+          <span class="slider-label">INPUT GAIN</span>
+          <input type="range" id="masterIn" min="-24" max="24" value="0" step="0.5">
+          <span class="slider-val" id="masterInV">0.0</span>
+        </div>
         <div style="font-family:'Share Tech Mono',monospace;font-size:0.55rem;color:var(--muted);margin-bottom:8px;letter-spacing:0.1em">MULTI-BAND COMP</div>
         <div class="slider-row">
           <span class="slider-label">LOW COMP</span>
@@ -1775,13 +2079,19 @@ canvas.tube-vis {
           <span class="hd-badge uhd">192kHz / 32bit</span>
         </div>
         <div class="module-header-right">
-          <span style="font-family:'Share Tech Mono',monospace;font-size:0.55rem;color:var(--muted)">Export 전용</span>
+          <span id="hdLiveStatus" style="font-family:'Share Tech Mono',monospace;font-size:0.55rem;color:var(--muted)">Export 전용</span>
         </div>
       </div>
       <div class="module-body">
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
           <div>
-            <div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:var(--blue);letter-spacing:0.1em;margin-bottom:10px">▸ HD RESTORE — 96kHz / 24bit</div>
+            <div class="hd-col-head">
+              <div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:var(--blue);letter-spacing:0.1em">▸ HD RESTORE — 96kHz / 24bit</div>
+              <label class="hd-live-toggle" title="실시간 재생에 HD 복원 적용">
+                <span>LIVE</span>
+                <span class="led-toggle"><input type="checkbox" id="hdLiveOn" disabled><span class="led-btn"></span></span>
+              </label>
+            </div>
             <div style="font-family:'Share Tech Mono',monospace;font-size:0.55rem;color:var(--muted);line-height:1.7;margin-bottom:10px">
               • 20kHz~48kHz 대역: 원본 데이터 하모닉 합성으로 채움<br>
               • 오버샘플링 × 2 (OfflineAudioContext 96kHz)<br>
@@ -1799,7 +2109,13 @@ canvas.tube-vis {
             </div>
           </div>
           <div>
-            <div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:var(--purple);letter-spacing:0.1em;margin-bottom:10px">▸ ULTRA HD RESTORE — 192kHz / 32bit</div>
+            <div class="hd-col-head">
+              <div style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:var(--purple);letter-spacing:0.1em">▸ ULTRA HD RESTORE — 192kHz / 32bit</div>
+              <label class="hd-live-toggle" title="실시간 재생에 ULTRA HD 복원 적용">
+                <span>LIVE</span>
+                <span class="led-toggle"><input type="checkbox" id="uhdLiveOn" disabled><span class="led-btn"></span></span>
+              </label>
+            </div>
             <div style="font-family:'Share Tech Mono',monospace;font-size:0.55rem;color:var(--muted);line-height:1.7;margin-bottom:10px">
               • HD 복원 결과를 재차 × 2 업샘플링<br>
               • 20kHz~96kHz 초고역 하모닉 합성<br>
@@ -1811,7 +2127,7 @@ canvas.tube-vis {
               <span class="slider-val" id="uhdHFV">50</span>
             </div>
             <div class="slider-row">
-              <span class="slider-label">AIR MIX</span>
+              <span class="slider-label">SMOOTH</span>
               <input type="range" id="uhdAir" min="0" max="100" value="35" step="1">
               <span class="slider-val" id="uhdAirV">35</span>
             </div>
@@ -1875,15 +2191,29 @@ let isPlaying = false;
 let startedAt = 0;
 let pausedAt = 0;
 let specAnimID = null;  // 스펙트럼 전용
+
+// ---- 시각화 모드 ('bars' | 'spectrogram') ----
+// 캔버스 클릭으로 전환. 두 패널을 함께 전환해야 A/B 비교가 성립한다.
+let specMode = 'bars';
+// 스펙트로그램 워터폴 오프스크린 버퍼 (체인 재빌드에도 이력 유지)
+let sgBufDry = null, sgBufWet = null;
 let progAnimID = null;  // 진행 바 전용
 let originalFile = null;
 
 // Live DSP nodes
 let liveDSP = {}; // rebuilt on each play
+
+// ---- 실시간 HD/UHD 복원 상태 ----
+let liveHDMode = 'off';   // 'off' | 'hd' | 'uhd'
+let hdLiveBuf  = null;    // 복원 완료 버퍼 캐시
+let hdLiveKey  = '';      // 캐시 유효성 키 (모드+파라미터+파일)
+let _hdLiveBusy = false;
+let _defaultSR = 0;       // 장치 기본 샘플레이트
 let eulaAccepted = false; // set to true on file upload or EULA accept
 
 function ctx() {
   if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (!_defaultSR) _defaultSR = audioCtx.sampleRate;
   return audioCtx;
 }
 
@@ -1908,6 +2238,15 @@ async function loadFile(file) {
   }
   originalFile = file;
   setStatus('디코딩 중...', 'warn');
+
+  // 새 파일 → 이전 복원 캐시 무효화. 기본 샘플레이트에서 디코딩해야
+  // sourceBuf.sampleRate가 장치 기본값으로 일정하게 유지된다
+  liveHDMode = 'off';
+  hdLiveBuf = null;
+  hdLiveKey = '';
+  stopPlay();
+  await ensureCtxRate(null);
+
   const ab = await file.arrayBuffer();
   try {
     sourceBuf = await ctx().decodeAudioData(ab);
@@ -1922,11 +2261,17 @@ async function loadFile(file) {
   document.getElementById('timeTot').textContent = fmt(dur);
   document.getElementById('fileInfo').classList.add('show');
   document.getElementById('specWrap').classList.add('show');
+  document.getElementById('specSectionTitle').style.display = '';
   document.getElementById('transportBar').classList.add('show');
   document.getElementById('expWav').disabled = false;
   document.getElementById('expHD').disabled = false;
   document.getElementById('expUHD').disabled = false;
   setStatus(`로드 완료 — ${file.name}`, 'ok');
+  updateHDLiveUI();
+  // 현재 컨텍스트 샘플레이트에 맞춰 주파수 눈금 생성
+  _lastNyq = displayNyq();
+  if (specMode === 'bars') renderFreqAxis(_lastNyq);
+  updateAxisNote();
   drawCrackle();
 }
 
@@ -1998,6 +2343,11 @@ bindSlider('hdHF','hdHFV');
 bindSlider('hdSmooth','hdSmoothV');
 bindSlider('uhdHF','uhdHFV');
 bindSlider('uhdAir','uhdAirV');
+
+// 모듈별 INPUT GAIN — dB 표기 (+는 명시)
+const dbFmt = v => (parseFloat(v) > 0 ? '+' : '') + parseFloat(v).toFixed(1);
+['compIn','bbeIn','tubeIn','excIn','sgIn','vinylIn','atmosIn','masterIn']
+  .forEach(id => bindSlider(id, id + 'V', dbFmt));
 
 function onParamChange() {
   if (isPlaying) applyLiveDSP();
@@ -2344,9 +2694,30 @@ function buildLiveChain() {
   // Output
   nodes.outputGain = ac.createGain();
 
-  // Analyser
+  // 모듈별 INPUT GAIN — 각 이펙트 진입 직전에 삽입된다
+  nodes.inBbe     = ac.createGain();
+  nodes.inTube    = ac.createGain();
+  nodes.inVinyl   = ac.createGain();
+  nodes.inExciter = ac.createGain();
+  nodes.inSg      = ac.createGain();
+  nodes.inAtmos   = ac.createGain();
+  nodes.inComp    = ac.createGain();
+  nodes.inMaster  = ac.createGain();
+
+  // Analyser — 적용본(wet), 체인 최종단에 연결
   nodes.analyser = ac.createAnalyser();
   nodes.analyser.fftSize = 2048;
+  nodes.analyser.smoothingTimeConstant = 0.8;
+  // 컬러맵 범례(SG_MIN_DB/SG_MAX_DB)와 반드시 같은 값이어야 눈금이 맞는다
+  nodes.analyser.minDecibels = SG_MIN_DB;
+  nodes.analyser.maxDecibels = SG_MAX_DB;
+
+  // Analyser — 원음(dry), DSP 이전 inputGain에서 분기 탭
+  nodes.dryAnalyser = ac.createAnalyser();
+  nodes.dryAnalyser.fftSize = 2048;
+  nodes.dryAnalyser.smoothingTimeConstant = 0.8;
+  nodes.dryAnalyser.minDecibels = SG_MIN_DB;
+  nodes.dryAnalyser.maxDecibels = SG_MAX_DB;
 
   liveDSP = nodes;
   return nodes;
@@ -2459,7 +2830,10 @@ function connectLiveChain(nodes, ac) {
   let chain = nodes.inputGain;
 
   // BBE
-  if (bbeEnabled) {
+  function applyBBE() {
+    if (!bbeEnabled) return;
+    // 입력 게인 삽입 — 이펙트 진입 직전 레벨
+    chain.connect(nodes.inBbe); chain = nodes.inBbe;
     // 위상 보정: 저역 allpass 지연 경로와 직통 경로를 합산
     // 직통 경로 (고역은 위상 지연 없이 그대로 통과)
     chain.connect(nodes.bbeDirectGain);
@@ -2477,7 +2851,10 @@ function connectLiveChain(nodes, ac) {
   }
 
   // TUBE
-  if (tubeEnabled) {
+  function applyTube() {
+    if (!tubeEnabled) return;
+    // 입력 게인 삽입 — 이펙트 진입 직전 레벨
+    chain.connect(nodes.inTube); chain = nodes.inTube;
     // 저역 bypass 경로: bass(<120Hz)는 포화 없이 직통
     chain.connect(nodes.tubeLowBPF);
     nodes.tubeLowBPF.connect(nodes.tubeLowBypass);
@@ -2498,7 +2875,10 @@ function connectLiveChain(nodes, ac) {
   }
 
   // VINYL
-  if (vinylEnabled) {
+  function applyVinyl() {
+    if (!vinylEnabled) return;
+    // 입력 게인 삽입 — 이펙트 진입 직전 레벨
+    chain.connect(nodes.inVinyl); chain = nodes.inVinyl;
     chain.connect(nodes.vinylLPF);
     nodes.vinylLPF.connect(nodes.vinylHighRolloff);
     // Add noise
@@ -2508,7 +2888,10 @@ function connectLiveChain(nodes, ac) {
   }
 
   // EXCITER
-  if (excEnabled) {
+  function applyExciter() {
+    if (!excEnabled) return;
+    // 입력 게인 삽입 — 이펙트 진입 직전 레벨
+    chain.connect(nodes.inExciter); chain = nodes.inExciter;
     chain.connect(nodes.excDryGain2);
     chain.connect(nodes.excHPF);
     nodes.excHPF.connect(nodes.excShaper);
@@ -2520,7 +2903,10 @@ function connectLiveChain(nodes, ac) {
   }
 
   // SOUNDGOODIZER
-  if (sgEnabled) {
+  function applySG() {
+    if (!sgEnabled) return;
+    // 입력 게인 삽입 — 이펙트 진입 직전 레벨
+    chain.connect(nodes.inSg); chain = nodes.inSg;
     chain.connect(nodes.sgDry);
 
     // Low band path
@@ -2548,9 +2934,11 @@ function connectLiveChain(nodes, ac) {
     chain = nodes.sgOutputComp;
   }
 
-
   // DOLBY ATMOS SPATIAL
-  if (atmosEnabled) {
+  function applyAtmos() {
+    if (!atmosEnabled) return;
+    // 입력 게인 삽입 — 이펙트 진입 직전 레벨
+    chain.connect(nodes.inAtmos); chain = nodes.inAtmos;
     const spaceAmt  = parseFloat(document.getElementById('atmosSpace').value)  / 100;
     const heightAmt = parseFloat(document.getElementById('atmosHeight').value) / 100;
     const depthAmt  = parseFloat(document.getElementById('atmosDepth').value)  / 100;
@@ -2602,13 +2990,19 @@ function connectLiveChain(nodes, ac) {
   }
 
   // COMPRESSOR
-  if (compEnabled) {
+  function applyComp() {
+    if (!compEnabled) return;
+    // 입력 게인 삽입 — 이펙트 진입 직전 레벨
+    chain.connect(nodes.inComp); chain = nodes.inComp;
     chain.connect(nodes.compressor);
     chain = nodes.compressor;
   }
 
   // MASTERING
-  if (masterEnabled) {
+  function applyMaster() {
+    if (!masterEnabled) return;
+    // 입력 게인 삽입 — 이펙트 진입 직전 레벨
+    chain.connect(nodes.inMaster); chain = nodes.inMaster;
     // 4-band LR 크로스오버 멀티밴드 컴프레서
     // Band 1: Sub/Low ~120Hz (LR LPF 2단)
     chain.connect(nodes.mbLP1a);
@@ -2646,15 +3040,63 @@ function connectLiveChain(nodes, ac) {
     chain = nodes.limiter;
   }
 
+  // ── DOM 순서대로 처리 ───────────────────────────────────────────────
+  // 오프라인 체인(buildOfflineChain)과 동일한 규칙을 쓴다.
+  // 예전에는 여기가 고정 순서였던 탓에, 드래그로 순서를 바꾸면
+  // 듣는 소리와 내보낸 파일이 서로 달랐다.
+  const LIVE_EFFECT_MAP = {
+    'mod-bbe':     applyBBE,
+    'mod-tube':    applyTube,
+    'mod-vinyl':   applyVinyl,
+    'mod-exciter': applyExciter,
+    'mod-sg':      applySG,
+    'mod-atmos':   applyAtmos,
+    'mod-comp':    applyComp,
+  };
+
+  const grid = document.getElementById('dspGrid');
+  const ordered = [];
+  if (grid) {
+    grid.querySelectorAll('.module').forEach(function(mod) {
+      const fn = LIVE_EFFECT_MAP[mod.id];
+      if (fn) ordered.push(fn);
+    });
+  }
+  // DOM을 읽지 못한 경우의 기본 순서
+  if (ordered.length === 0) {
+    ordered.push(applyComp, applyBBE, applyTube, applyExciter, applySG, applyVinyl, applyAtmos);
+  }
+
+  ordered.forEach(function(fn) { fn(); });
+
+  // 마스터링은 항상 마지막
+  applyMaster();
+
+
   chain.connect(nodes.outputGain);
   nodes.outputGain.connect(nodes.analyser);
   nodes.analyser.connect(ac.destination);
+
+  // 원음 탭: DSP 체인 진입 직전 신호를 분기 (destination에는 연결하지 않아 소리 중복 없음)
+  nodes.inputGain.connect(nodes.dryAnalyser);
 }
 
 function applyLiveDSP() {
   const nodes = liveDSP;
   if (!nodes.inputGain) return;
   const ac = ctx();
+
+  // 모듈별 INPUT GAIN — dB 슬라이더를 선형 배율로 반영
+  const _inMap = {
+    inBbe: 'bbeIn', inTube: 'tubeIn', inVinyl: 'vinylIn', inExciter: 'excIn',
+    inSg: 'sgIn', inAtmos: 'atmosIn', inComp: 'compIn', inMaster: 'masterIn',
+  };
+  Object.keys(_inMap).forEach(function(nk) {
+    const el = document.getElementById(_inMap[nk]);
+    if (nodes[nk] && el) {
+      nodes[nk].gain.value = Math.pow(10, parseFloat(el.value) / 20);
+    }
+  });
 
   // BBE
   const bbeLoVal  = parseFloat(document.getElementById('bbeLo').value)      / 100;
@@ -2887,7 +3329,8 @@ function hotswapDSP() {
 }
 
 function startPlay() {
-  if (!sourceBuf) return;
+  const pb = playBuf();
+  if (!pb) return;
   const ac = ctx();
   if (ac.state === 'suspended') ac.resume();
   stopPlay();
@@ -2897,7 +3340,7 @@ function startPlay() {
   applyLiveDSP();
 
   srcNode = ac.createBufferSource();
-  srcNode.buffer = sourceBuf;
+  srcNode.buffer = pb;
   srcNode.connect(nodes.inputGain);
   srcNode.onended = () => { if (isPlaying) { isPlaying = false; document.getElementById('playBtn').textContent = '▶ PLAY'; pausedAt = 0; } };
 
@@ -2933,74 +3376,580 @@ function stopPlay() {
 }
 
 document.getElementById('progOuter').addEventListener('click', e => {
-  if (!sourceBuf) return;
+  const pb = playBuf();
+  if (!pb) return;
   const r = e.currentTarget.getBoundingClientRect();
-  pausedAt = ((e.clientX - r.left) / r.width) * sourceBuf.duration;
+  pausedAt = ((e.clientX - r.left) / r.width) * pb.duration;
   if (isPlaying) startPlay();
 });
 
 function updateProgress() {
-  if (!isPlaying || !sourceBuf) return;
+  const pb = playBuf();
+  if (!isPlaying || !pb) return;
   const elapsed = audioCtx.currentTime - startedAt;
-  const pct = Math.min(100, (elapsed / sourceBuf.duration) * 100);
+  const pct = Math.min(100, (elapsed / pb.duration) * 100);
   document.getElementById('progInner').style.width = pct + '%';
   document.getElementById('timeCur').textContent = fmt(elapsed);
   progAnimID = requestAnimationFrame(updateProgress);
 }
 
 // ---- Spectrum + VU ----
+// ============================================================
+// 시각화 모드 전환 (막대 스펙트럼 ⇄ 스펙트로그램)
+// ============================================================
+
+// 워터폴 버퍼 확보 — 없거나 크기가 바뀌었으면 새로 만든다
+function ensureSgBuf(which, W, H) {
+  let buf = (which === 'dry') ? sgBufDry : sgBufWet;
+  if (!buf || buf.width !== W || buf.height !== H) {
+    buf = document.createElement('canvas');
+    buf.width = W; buf.height = H;
+    const bc = buf.getContext('2d');
+    bc.fillStyle = '#050305';
+    bc.fillRect(0, 0, W, H);
+    if (which === 'dry') sgBufDry = buf; else sgBufWet = buf;
+  }
+  return buf;
+}
+
+// 워터폴 이력 초기화
+function clearSgBufs() {
+  [sgBufDry, sgBufWet].forEach(buf => {
+    if (!buf) return;
+    const bc = buf.getContext('2d');
+    bc.fillStyle = '#050305';
+    bc.fillRect(0, 0, buf.width, buf.height);
+  });
+}
+
+// ============================================================
+// 스펙트로그램 컬러맵 — 음압(dB) → 무지개
+// ------------------------------------------------------------
+// analyser의 minDecibels~maxDecibels 구간이 0~255로 정규화되어
+// 들어오므로, 그 값을 그대로 색 인덱스로 쓴다.
+// 낮은 음압(검정·보라) → 높은 음압(빨강·백색)
+// 두 패널에 같은 맵을 쓴다. 색이 다르면 좌우 음압 비교가 성립하지 않는다.
+// ============================================================
+
+const SG_MIN_DB = -100;  // analyser.minDecibels와 일치시킬 것
+const SG_MAX_DB = -30;   // analyser.maxDecibels와 일치시킬 것
+
+// 컬러맵 제어점 [위치 0~1, R, G, B]
+const SG_STOPS = [
+  [0.00,   5,   3,   8],  // 무음 — 배경
+  [0.06,  26,  11,  74],  // 암보라
+  [0.18,  36,  25, 168],  // 남색
+  [0.32,  10, 111, 216],  // 파랑
+  [0.45,   0, 194, 194],  // 청록
+  [0.58,  36, 209,  58],  // 초록
+  [0.70, 212, 224,  42],  // 연두
+  [0.80, 255, 200,   0],  // 노랑
+  [0.88, 255, 149,   0],  // 주황
+  [0.95, 255,  40,  32],  // 빨강
+  [1.00, 255, 255, 255],  // 최대 음압 — 백색
+];
+
+// 256단계 룩업 테이블 — 픽셀마다 색 계산하지 않도록 미리 구운다
+const SG_LUT = (function buildSgLut() {
+  const lut = new Uint8Array(256 * 3);
+  for (let i = 0; i < 256; i++) {
+    const v = i / 255;
+    let a = SG_STOPS[0], b = SG_STOPS[SG_STOPS.length - 1];
+    for (let k = 0; k < SG_STOPS.length - 1; k++) {
+      if (v >= SG_STOPS[k][0] && v <= SG_STOPS[k + 1][0]) {
+        a = SG_STOPS[k]; b = SG_STOPS[k + 1]; break;
+      }
+    }
+    const span = Math.max(1e-6, b[0] - a[0]);
+    const t = Math.min(1, Math.max(0, (v - a[0]) / span));
+    lut[i * 3]     = Math.round(a[1] + (b[1] - a[1]) * t);
+    lut[i * 3 + 1] = Math.round(a[2] + (b[2] - a[2]) * t);
+    lut[i * 3 + 2] = Math.round(a[3] + (b[3] - a[3]) * t);
+  }
+  return lut;
+})();
+
+// 범례용 CSS 그라데이션 — 컬러맵과 같은 제어점에서 생성
+const SG_GRADIENT_CSS = 'linear-gradient(to right,' + SG_STOPS.map(function(st) {
+  return 'rgb(' + st[1] + ',' + st[2] + ',' + st[3] + ') ' + (st[0] * 100).toFixed(0) + '%';
+}).join(',') + ')';
+
+// ============================================================
+// 주파수 눈금 — 실제 Nyquist에 맞춰 동적 생성
+// ------------------------------------------------------------
+// 표시 범위는 AudioContext의 샘플레이트를 따라간다.
+//   48kHz  → 20Hz ~ 24kHz
+//   96kHz  → 20Hz ~ 48kHz   (HD LIVE)
+//   192kHz → 20Hz ~ 96kHz   (ULTRA HD LIVE)
+// ============================================================
+
+let _lastNyq = 24000;  // 모드 전환 시 축을 다시 그리기 위해 보관
+
+// X축 범위 고정 — 0이면 순응(실제 컨텍스트 Nyquist를 따라감),
+// 아니면 해당 샘플레이트의 Nyquist로 고정한다.
+//   48000  → 20Hz ~ 24kHz
+//   96000  → 20Hz ~ 48kHz
+//   192000 → 20Hz ~ 96kHz
+let specAxisLock = 0;
+const AXIS_LOCK_VALUES = [0, 48000, 96000, 192000];
+
+// 현재 적용해야 할 표시 Nyquist
+function displayNyq() {
+  const real = audioCtx ? audioCtx.sampleRate / 2 : 24000;
+  return specAxisLock ? specAxisLock / 2 : real;
+}
+
+function fmtHz(f) {
+  if (f >= 1000) {
+    const k = f / 1000;
+    return (k >= 10 ? Math.round(k) : k.toFixed(k % 1 ? 1 : 0)) + 'k';
+  }
+  return String(Math.round(f));
+}
+
+// 범위 안에 드는 눈금만 남기고, 마지막에 Nyquist 자체를 붙인다
+// 걸러내는 기준은 비율이 아니라 로그 좌표 거리다.
+// 예) Nyquist 24kHz에서 20k는 화면상 97% 지점이라 24k 라벨과 겹친다.
+function freqTicks(nyq) {
+  const cand = [20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000];
+  const logMin = Math.log10(20);
+  const logRange = Math.log10(nyq) - logMin;
+  const out = cand.filter(function(f) {
+    if (f >= nyq) return false;
+    const pos = (Math.log10(f) - logMin) / logRange;
+    return pos <= 0.94;   // 마지막 눈금과 최소 6% 간격 확보
+  });
+  out.push(Math.round(nyq));
+  return out;
+}
+
+// 캔버스 위에 그릴 세로 그리드 — 라벨보다 성글게
+function gridFreqs(nyq) {
+  return [100, 1000, 10000, 20000, 50000].filter(f => f < nyq);
+}
+
+// 축 DOM 재생성 — 각 눈금을 로그 위치(%)에 절대 배치
+function renderFreqAxis(nyq) {
+  const logMin = Math.log10(20);
+  const logRange = Math.log10(nyq) - logMin;
+  const ticks = freqTicks(nyq);
+  const html = ticks.map(function(f, i) {
+    const pct = (Math.log10(Math.max(f, 20)) - logMin) / logRange * 100;
+    let cls = 'ftick';
+    if (i === 0) cls += ' first';
+    if (i === ticks.length - 1) cls += ' last nyq';
+    const unit = (i === 0) ? 'Hz' : '';
+    return '<span class="' + cls + '" style="left:' + pct.toFixed(2) + '%">'
+         + fmtHz(f) + unit + '</span>';
+  }).join('');
+
+  ['specAxisDry', 'specAxisWet'].forEach(function(id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.classList.remove('flow');
+    el.innerHTML = html;
+  });
+}
+
+// 툴바 우측 안내문 갱신
+function updateAxisNote() {
+  const note = document.getElementById('axisRangeNote');
+  if (!note) return;
+  const real = audioCtx ? audioCtx.sampleRate / 2 : 24000;
+  const disp = displayNyq();
+  let txt = '20Hz ~ ' + fmtHz(disp) + 'Hz';
+  if (!specAxisLock) {
+    txt += '  (순응 · ctx ' + (real * 2 / 1000) + 'kHz)';
+  } else if (real < disp * 0.995) {
+    // 고정 범위가 실제 데이터보다 넓은 경우를 분명히 알린다
+    txt += '  (실제 데이터는 ' + fmtHz(real) + 'Hz까지)';
+  } else {
+    txt += '  (고정)';
+  }
+  note.textContent = txt;
+}
+
+// 스위치 적용
+function applyAxisLock(idx) {
+  specAxisLock = AXIS_LOCK_VALUES[idx] || 0;
+
+  // 눈금 라벨 강조 위치 이동
+  const ticks = document.getElementById('axisLockTicks');
+  if (ticks) {
+    Array.prototype.forEach.call(ticks.children, function(el, i) {
+      el.classList.toggle('on', i === idx);
+    });
+  }
+
+  // 주파수 매핑이 바뀌므로 눈금과 워터폴 이력을 다시 만든다
+  _lastNyq = displayNyq();
+  if (specMode === 'bars') renderFreqAxis(_lastNyq);
+  clearSgBufs();
+  ['spectrumDry', 'spectrumWet'].forEach(function(id) {
+    const cv = document.getElementById(id);
+    if (cv) cv.getContext('2d').clearRect(0, 0, cv.width, cv.height);
+  });
+  updateAxisNote();
+}
+
+{
+  const sw = document.getElementById('axisLock');
+  if (sw) sw.addEventListener('input', function() { applyAxisLock(parseInt(this.value, 10)); });
+}
+
+// 모드 전환 — 두 패널 동시 적용
+function toggleSpecMode() {
+  specMode = (specMode === 'bars') ? 'spectrogram' : 'bars';
+  const isSg = (specMode === 'spectrogram');
+
+  // 배지 갱신
+  [['specModeDry', 'dry'], ['specModeWet', 'wet']].forEach(([id]) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.textContent = (isSg ? 'SPECTROGRAM ⇄' : 'BARS ⇄');
+    el.classList.toggle('active', isSg);
+  });
+
+  // 축 라벨 교체 — 스펙트로그램은 가로축이 시간이다
+  if (isSg) {
+    // 스펙트로그램: 가로축은 시간, 색은 음압 → 컬러 범례를 붙인다
+    const axisTime =
+      '<span>◂ 과거 —— 시간 —— 현재 ▸</span>' +
+      '<span class="sg-legend">' +
+        '<span>' + SG_MIN_DB + 'dB</span>' +
+        '<span class="sg-legend-bar" style="background:' + SG_GRADIENT_CSS + '"></span>' +
+        '<span>' + SG_MAX_DB + 'dB</span>' +
+      '</span>';
+    ['specAxisDry', 'specAxisWet'].forEach(id => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.classList.add('flow');
+      el.innerHTML = axisTime;
+    });
+  } else {
+    // 막대 모드: 현재 Nyquist에 맞춘 주파수 눈금을 다시 그린다
+    renderFreqAxis(_lastNyq);
+  }
+
+  // 툴팁 갱신
+  ['spectrumDry', 'spectrumWet'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.title = isSg ? '클릭하여 막대 스펙트럼으로 복귀' : '클릭하여 스펙트로그램으로 전환';
+  });
+
+  // 전환 시 잔상 제거
+  clearSgBufs();
+  ['spectrumDry', 'spectrumWet'].forEach(id => {
+    const cv = document.getElementById(id);
+    if (cv) cv.getContext('2d').clearRect(0, 0, cv.width, cv.height);
+  });
+}
+
 function drawSpectrum() {
   // 이전 스펙트럼 루프 완전 종료
   cancelAnimationFrame(specAnimID);
   specAnimID = null;
 
-  const analyser = liveDSP.analyser;
-  if (!analyser) return;
+  const wetAn = liveDSP.analyser;
+  const dryAn = liveDSP.dryAnalyser;
+  if (!wetAn) return;
 
-  const canvas = document.getElementById('spectrum');
-  const c = canvas.getContext('2d');
-  const W = canvas.width, H = canvas.height;
-  const data = new Uint8Array(analyser.frequencyBinCount);
-  const sr = analyser.context.sampleRate;
+  const cvWet = document.getElementById('spectrumWet');
+  const cvDry = document.getElementById('spectrumDry');
+  if (!cvWet || !cvDry) return;
+
+  const cWet = cvWet.getContext('2d');
+  const cDry = cvDry.getContext('2d');
+  const W = cvWet.width, H = cvWet.height;
+
+  const dataWet = new Uint8Array(wetAn.frequencyBinCount);
+  const dataDry = new Uint8Array(dryAn ? dryAn.frequencyBinCount : wetAn.frequencyBinCount);
+  const sr = wetAn.context.sampleRate;
+  const nyq = sr / 2;
+  const binHz = nyq / wetAn.frequencyBinCount;
+
+  // 로그 주파수 매핑 (20Hz ~ 표시 Nyquist)
+  // realNyq: 실제로 데이터가 존재하는 상한 (컨텍스트 샘플레이트 기준)
+  // dispNyq: 화면에 그릴 상한. 스위치로 고정하면 realNyq보다 넓을 수 있고,
+  //          그 구간은 데이터가 없으므로 비어 있게 그린다.
+  const realNyq = nyq;
+  const dispNyq = specAxisLock ? specAxisLock / 2 : realNyq;
+
+  const F_MIN = 20;
+  const logMin = Math.log10(F_MIN);
+  const logRange = Math.log10(dispNyq) - logMin;
+  const freqToX = (f) => (Math.log10(Math.max(f, F_MIN)) - logMin) / logRange * W;
+
+  // 범위가 바뀌었으면 눈금을 다시 그린다
+  if (_lastNyq !== dispNyq) {
+    _lastNyq = dispNyq;
+    if (specMode === 'bars') renderFreqAxis(dispNyq);
+    updateAxisNote();
+  }
+
+  // 이 범위에서 그릴 세로 그리드 주파수
+  const GRID_FREQS = gridFreqs(dispNyq);
+
+  // 데이터가 끝나는 지점 — 고정 범위가 더 넓을 때만 표시
+  const showLimit = realNyq < dispNyq * 0.995;
+  const limitX = showLimit ? freqToX(realNyq) : -1;
+
+  // 막대 개수 — 로그 스케일에서 균등 분포
+  const BARS = 128;
+
+  // 피크 홀드 버퍼 (각 채널 독립)
+  const peakWet = new Float32Array(BARS);
+  const peakDry = new Float32Array(BARS);
 
   // 이 루프가 소유한 analyser 스냅샷 — 재빌드 감지용
-  const myAnalyser = analyser;
+  const myAnalyser = wetAn;
+
+  // 로그 구간별로 FFT bin을 묶어 막대 값 산출
+  function binToBars(data, out) {
+    for (let b = 0; b < BARS; b++) {
+      // 이 막대가 담당하는 주파수 구간
+      const f0 = Math.pow(10, logMin + (b / BARS) * logRange);
+      const f1 = Math.pow(10, logMin + ((b + 1) / BARS) * logRange);
+      let i0 = Math.floor(f0 / binHz);
+      let i1 = Math.ceil(f1 / binHz);
+      if (i1 <= i0) i1 = i0 + 1;
+      if (i1 > data.length) i1 = data.length;
+      // 구간 내 최대값 사용 (피크 보존)
+      let max = 0;
+      for (let i = i0; i < i1; i++) if (data[i] > max) max = data[i];
+      out[b] = max / 255;
+    }
+  }
+
+  const barsWet = new Float32Array(BARS);
+  const barsDry = new Float32Array(BARS);
+
+  // 단일 패널 렌더러
+  // ---- dB 눈금 계산 ----
+  // bars[] 값 v는 analyser가 [SG_MIN_DB, SG_MAX_DB]를 0~1로 정규화한 것.
+  // 따라서 dB → y 좌표는 선형 역변환으로 구한다.
+  const DB_SPAN = SG_MAX_DB - SG_MIN_DB;
+  const dbToY = (db) => H * (1 - (db - SG_MIN_DB) / DB_SPAN);
+  // 10dB 간격 눈금 (-100 … -30)
+  const DB_TICKS = [];
+  for (let db = SG_MAX_DB; db >= SG_MIN_DB; db -= 10) DB_TICKS.push(db);
+  // 넓은 캔버스에서 어디서든 읽히도록 숫자를 가로로 반복 배치
+  const DB_LABEL_XS = [0.003, 0.26, 0.51, 0.76];
+
+  function renderPanel(c, bars, peaks, accentHue, isWet) {
+    c.clearRect(0, 0, W, H);
+
+    // 배경 수평 그리드 — 10dB 간격
+    c.lineWidth = 1;
+    DB_TICKS.forEach(db => {
+      const y = Math.round(dbToY(db)) + 0.5;
+      if (y < 0 || y > H) return;
+      // 20dB 배수는 굵게 강조
+      c.strokeStyle = (db % 20 === 0) ? 'rgba(110,90,140,0.34)' : 'rgba(110,90,140,0.16)';
+      c.beginPath(); c.moveTo(0, y); c.lineTo(W, y); c.stroke();
+    });
+
+    // 수직 주파수 그리드
+    c.strokeStyle = 'rgba(80,60,100,0.28)';
+    GRID_FREQS.forEach(f => {
+      const x = freqToX(f);
+      c.beginPath(); c.moveTo(x, 0); c.lineTo(x, H); c.stroke();
+    });
+
+    const bw = W / BARS;
+
+    for (let b = 0; b < BARS; b++) {
+      const v = bars[b];
+      const bh = v * H;
+      const x = b * bw;
+
+      // 피크 홀드 — 천천히 하강
+      if (v > peaks[b]) peaks[b] = v;
+      else peaks[b] = Math.max(0, peaks[b] - 0.012);
+
+      if (bh > 0.5) {
+        // 세로 그라데이션 막대
+        const grad = c.createLinearGradient(0, H - bh, 0, H);
+        if (isWet) {
+          // 적용본: 앰버 → 마젠타 계열 (뜨거운 톤)
+          grad.addColorStop(0, `hsla(${45 - v * 30},95%,${55 + v * 15}%,0.95)`);
+          grad.addColorStop(1, `hsla(${280 - v * 40},80%,40%,0.55)`);
+        } else {
+          // 원음: 시안 → 퍼플 계열 (차가운 톤)
+          grad.addColorStop(0, `hsla(${190 - v * 25},70%,${50 + v * 12}%,0.85)`);
+          grad.addColorStop(1, `hsla(${265 - v * 20},55%,32%,0.45)`);
+        }
+        c.fillStyle = grad;
+        c.fillRect(x, H - bh, Math.max(1, bw - 1), bh);
+      }
+
+      // 피크 홀드 라인
+      if (peaks[b] > 0.02) {
+        const py = H - peaks[b] * H;
+        c.fillStyle = isWet ? 'rgba(255,179,0,0.75)' : 'rgba(120,190,220,0.55)';
+        c.fillRect(x, py, Math.max(1, bw - 1), 1.5);
+      }
+    }
+
+    // 실제 데이터가 끝나는 지점 — 고정 범위가 더 넓을 때만
+    if (showLimit && limitX > 0 && limitX < W) {
+      c.save();
+      c.setLineDash([3, 3]);
+      c.strokeStyle = 'rgba(255,179,0,0.45)';
+      c.lineWidth = 1;
+      c.beginPath(); c.moveTo(limitX, 0); c.lineTo(limitX, H); c.stroke();
+      c.restore();
+      // 우측 빈 구간을 살짝 어둡게 덮어 데이터 없음을 드러낸다
+      c.fillStyle = 'rgba(0,0,0,0.35)';
+      c.fillRect(limitX, 0, W - limitX, H);
+    }
+
+    // ---- dB 숫자 — 막대 위에 덧그려야 가려지지 않는다 ----
+    c.font = '8px "Share Tech Mono", monospace';
+    c.textBaseline = 'middle';
+    c.lineJoin = 'round';
+    c.lineWidth = 3;
+    DB_TICKS.forEach(db => {
+      let y = dbToY(db);
+      if (y < 0 || y > H) return;
+      // 최상단·최하단 눈금은 잘리지 않도록 안쪽으로 당긴다
+      y = Math.min(H - 5, Math.max(5, y));
+      const txt = db + 'dB';
+      DB_LABEL_XS.forEach(fx => {
+        const x = Math.round(W * fx) + 3;
+        c.strokeStyle = 'rgba(0,0,0,0.8)';
+        c.strokeText(txt, x, y);
+        c.fillStyle = (db % 20 === 0) ? 'rgba(215,205,230,0.82)' : 'rgba(160,150,180,0.6)';
+        c.fillText(txt, x, y);
+      });
+    });
+  }
+
+  // ---- 스펙트로그램(워터폴) 렌더 ----
+  // 매 프레임 버퍼를 좌로 COL px 밀고 우측 끝에 새 컬럼을 그린다
+  const COL = 2;
+  // 컬럼용 ImageData 재사용 — 픽셀마다 fillRect 호출하지 않기 위함
+  const colImgs = { dry: null, wet: null };
+
+  function renderSpectrogram(c, data, which) {
+    const buf = ensureSgBuf(which, W, H);
+    const bc = buf.getContext('2d');
+
+    // 좌측 스크롤 — copy 합성으로 알파 누적 방지
+    bc.globalCompositeOperation = 'copy';
+    bc.drawImage(buf, -COL, 0);
+    bc.globalCompositeOperation = 'source-over';
+
+    // 우측 끝 새 컬럼: y축은 로그 주파수(위=고역), 색은 음압
+    let img = colImgs[which];
+    if (!img || img.width !== COL || img.height !== H) {
+      img = bc.createImageData(COL, H);
+      colImgs[which] = img;
+    }
+    const px = img.data;
+
+    for (let y = 0; y < H; y++) {
+      const f = Math.pow(10, logMin + (1 - y / H) * logRange);
+      let o;
+      if (f > realNyq) {
+        o = 0;                         // 데이터 없는 구간 — 최상단 bin을 늘려 칠하지 않는다
+      } else {
+        let i = Math.round(f / binHz);
+        if (i >= data.length) i = data.length - 1;
+        if (i < 0) i = 0;
+        o = data[i] * 3;               // data[i]는 이미 0~255 dB 정규화값
+      }
+      const r = SG_LUT[o], g = SG_LUT[o + 1], b = SG_LUT[o + 2];
+      for (let x = 0; x < COL; x++) {
+        const pIdx = (y * COL + x) * 4;
+        px[pIdx] = r; px[pIdx + 1] = g; px[pIdx + 2] = b; px[pIdx + 3] = 255;
+      }
+    }
+    bc.putImageData(img, W - COL, 0);
+
+    // 화면에 전사 후 주파수 눈금을 위에 덧그린다
+    c.clearRect(0, 0, W, H);
+    c.drawImage(buf, 0, 0);
+
+    c.strokeStyle = 'rgba(255,255,255,0.16)';
+    c.lineWidth = 1;
+    c.font = '9px "Share Tech Mono", monospace';
+    c.textBaseline = 'bottom';
+    c.lineJoin = 'round';
+    GRID_FREQS.forEach(f => {
+      const label = fmtHz(f);
+      const y = H - (Math.log10(f) - logMin) / logRange * H;
+      if (y < 2 || y > H - 2) return;
+      c.strokeStyle = 'rgba(255,255,255,0.16)';
+      c.lineWidth = 1;
+      c.beginPath(); c.moveTo(0, y); c.lineTo(W, y); c.stroke();
+      // 무지개 배경 어디에 놓여도 읽히도록 검은 외곽선 + 흰 글자
+      c.strokeStyle = 'rgba(0,0,0,0.85)';
+      c.lineWidth = 3;
+      c.strokeText(label, 4, y - 1);
+      c.fillStyle = 'rgba(255,255,255,0.9)';
+      c.fillText(label, 4, y - 1);
+    });
+  }
+
+  // 최대 에너지 주파수 산출 → 라벨 표시
+  function peakFreqLabel(data) {
+    let maxI = 0, maxV = 0;
+    for (let i = 1; i < data.length; i++) {
+      if (data[i] > maxV) { maxV = data[i]; maxI = i; }
+    }
+    if (maxV < 8) return '—';
+    const f = maxI * binHz;
+    const dB = (20 * Math.log10(maxV / 255)).toFixed(1);
+    const fStr = f >= 1000 ? (f / 1000).toFixed(2) + 'kHz' : Math.round(f) + 'Hz';
+    return fStr + '  ' + dB + 'dB';
+  }
+
+  let labelTick = 0;
 
   function frame() {
     // 재생 중지 또는 analyser가 교체됐으면 조용히 종료
     if (!isPlaying || liveDSP.analyser !== myAnalyser) {
-      c.clearRect(0, 0, W, H);
+      // 막대 모드에서만 화면을 비운다. 스펙트로그램은 정지 후에도 이력을 남겨 비교할 수 있게 유지
+      if (specMode === 'bars') {
+        cWet.clearRect(0, 0, W, H);
+        cDry.clearRect(0, 0, W, H);
+      }
       document.getElementById('vuL').style.height = '0%';
       document.getElementById('vuR').style.height = '0%';
+      const pd = document.getElementById('specPeakDry');
+      const pw = document.getElementById('specPeakWet');
+      if (pd) pd.textContent = '—';
+      if (pw) pw.textContent = '—';
       specAnimID = null;
       return;
     }
 
-    analyser.getByteFrequencyData(data);
-    c.clearRect(0, 0, W, H);
+    wetAn.getByteFrequencyData(dataWet);
+    if (dryAn) dryAn.getByteFrequencyData(dataDry);
 
-    // Gradient spectrum bars
-    const total = data.length;
-    for (let i = 0; i < total; i++) {
-      const v = data[i] / 255;
-      const x = (i / total) * W;
-      const bw = W / total + 0.5;
-      const bh = v * H;
-      const hue = 270 - v * 150;
-      c.fillStyle = `hsla(${hue},90%,${30 + v*40}%,${0.4+v*0.6})`;
-      c.fillRect(x, H - bh, bw, bh);
+    const srcDry = dryAn ? dataDry : dataWet;
+
+    if (specMode === 'spectrogram') {
+      renderSpectrogram(cDry, srcDry, 'dry');
+      renderSpectrogram(cWet, dataWet, 'wet');
+    } else {
+      binToBars(dataWet, barsWet);
+      binToBars(srcDry, barsDry);
+      renderPanel(cDry, barsDry, peakDry, 190, false);
+      renderPanel(cWet, barsWet, peakWet, 45, true);
     }
 
-    // Frequency grid lines
-    c.strokeStyle = 'rgba(80,60,100,0.3)';
-    c.lineWidth = 1;
-    [100, 1000, 5000, 10000, 16000].forEach(f => {
-      const x = Math.log10(f / 20) / Math.log10(sr / 2 / 20) * W;
-      c.beginPath(); c.moveTo(x, 0); c.lineTo(x, H); c.stroke();
-    });
+    // 피크 라벨은 6프레임마다 갱신 (깜빡임 방지)
+    if ((labelTick++ % 6) === 0) {
+      const pd = document.getElementById('specPeakDry');
+      const pw = document.getElementById('specPeakWet');
+      if (pd) pd.textContent = peakFreqLabel(srcDry);
+      if (pw) pw.textContent = peakFreqLabel(dataWet);
+    }
 
-    // VU meters
-    const rms = Math.sqrt(data.reduce((a, v) => a + v * v, 0) / data.length) / 255;
+    // VU meters — 적용본 기준
+    const rms = Math.sqrt(dataWet.reduce((a, v) => a + v * v, 0) / dataWet.length) / 255;
     const vuPct = Math.min(100, rms * 300);
     document.getElementById('vuL').style.height = vuPct + '%';
     document.getElementById('vuR').style.height = (vuPct * (0.9 + Math.random() * 0.2)) + '%';
@@ -3259,12 +4208,37 @@ async function buildOfflineChain(offCtx, params) {
     'comp':    applyComp,
   };
 
+  // 이펙트별 입력 게인 — 켜져 있을 때만 체인에 삽입한다
+  const EFFECT_IN_GAIN = {
+    'bbe': 'inBbe', 'tube': 'inTube', 'vinyl': 'inVinyl', 'exciter': 'inExciter',
+    'sg': 'inSg', 'atmos': 'inAtmos', 'comp': 'inComp',
+  };
+  const EFFECT_ENABLED = {
+    'bbe': 'bbeEnabled', 'tube': 'tubeEnabled', 'vinyl': 'vinylEnabled',
+    'exciter': 'excEnabled', 'sg': 'sgEnabled', 'atmos': 'atmosEnabled',
+    'comp': 'compEnabled',
+  };
+
+  function insertInGain(key) {
+    if (!params[EFFECT_ENABLED[key]]) return;   // 꺼진 모듈엔 게인도 넣지 않는다
+    const g = ac.createGain();
+    g.gain.value = params[EFFECT_IN_GAIN[key]];
+    chain.connect(g);
+    chain = g;
+  }
+
   // ── DOM 순서대로 처리 (꺼진 이펙트는 자동 건너뜀) ─────────────────────
   for (const key of orderedEffects) {
-    if (EFFECT_FN[key]) EFFECT_FN[key]();
+    if (EFFECT_FN[key]) { insertInGain(key); EFFECT_FN[key](); }
   }
 
   // ── 마스터링은 항상 마지막 ─────────────────────────────────────────────
+  if (params.masterEnabled) {
+    const mg = ac.createGain();
+    mg.gain.value = params.inMaster;
+    chain.connect(mg);
+    chain = mg;
+  }
   applyMaster();
 
   const outG = ac.createGain();
@@ -3275,8 +4249,18 @@ async function buildOfflineChain(offCtx, params) {
 }
 
 function getParams(inputBuffer) {
+  // 모듈별 INPUT GAIN: dB 슬라이더를 선형 배율로 변환
+  const inDb = id => Math.pow(10, parseFloat(document.getElementById(id).value) / 20);
   return {
     inputBuffer,
+    inBbe:     inDb('bbeIn'),
+    inTube:    inDb('tubeIn'),
+    inVinyl:   inDb('vinylIn'),
+    inExciter: inDb('excIn'),
+    inSg:      inDb('sgIn'),
+    inAtmos:   inDb('atmosIn'),
+    inComp:    inDb('compIn'),
+    inMaster:  inDb('masterIn'),
     bbeEnabled: document.getElementById('bbeOn').checked,
     bbeLo: parseFloat(document.getElementById('bbeLo').value)/100,
     bbeProc: parseFloat(document.getElementById('bbeProcess').value)/100,
@@ -3443,6 +4427,18 @@ async function applyHDRestoration(buffer, targetSR, bitDepth, hfStrength, smooth
   const levels    = [0.5, 0.25, 0.125, 0.0625, 0.03125, 0.015625, 0.0078125];
   const lvlScale  = 0.5 + hfStrength;
 
+  // ── SMOOTH: 합성 구간 평활 설정 ──────────────────────────────────────
+  // 예전에는 이 인자가 전달만 되고 쓰이지 않아 노브가 무효했다.
+  // 이제 커널 반경과 적용 강도를 함께 결정한다.
+  const smAmt = Math.max(0, Math.min(1, smooth || 0));
+  const smR   = Math.max(1, Math.round(1 + smAmt * 3));   // 반경 1~4
+  const smSig = 0.6 + smAmt * 1.6;                        // 표준편차
+  const smK   = new Float32Array(smR * 2 + 1);
+  for (let d = -smR; d <= smR; d++) {
+    smK[d + smR] = Math.exp(-(d * d) / (2 * smSig * smSig));
+  }
+  console.log(`[HD] smooth=${smAmt.toFixed(2)} → 반경 ${smR}, sigma ${smSig.toFixed(2)}`);
+
   const origRMS = [];
   for (let c=0;c<ch;c++){
     const d=buffer.getChannelData(c);
@@ -3527,18 +4523,23 @@ async function applyHDRestoration(buffer, targetSR, bitDepth, hfStrength, smooth
       }
 
       // 합성 구간 가우시안 mag 스무딩 (스파이크 제거)
-      {
-        const gauss=[0.0625,0.25,0.375,0.25,0.0625];
+      // 커널 반경과 적용 강도를 SMOOTH 값이 결정한다.
+      //   smooth 0   → 평활 없음. 배음이 또렷하지만 스파이크가 남을 수 있다
+      //   smooth 100 → 반경 4의 넓은 커널을 완전 적용. 매끄럽지만 무뎌진다
+      if (smAmt > 0.001) {
         const sr2=new Float32Array(half+1), si2=new Float32Array(half+1);
         for(let k=1;k<xfStart;k++){sr2[k]=re[k];si2[k]=im[k];}
         for(let k=xfStart;k<half;k++){
           let mSum=0,wSum=0;
-          for(let d=-2;d<=2;d++){
+          for(let d=-smR;d<=smR;d++){
             const kk=k+d; if(kk<1||kk>=half)continue;
-            mSum+=Math.sqrt(re[kk]*re[kk]+im[kk]*im[kk])*gauss[d+2];
-            wSum+=gauss[d+2];
+            mSum+=Math.sqrt(re[kk]*re[kk]+im[kk]*im[kk])*smK[d+smR];
+            wSum+=smK[d+smR];
           }
-          const mag=wSum>0?mSum/wSum:0;
+          const magS = wSum>0 ? mSum/wSum : 0;
+          const magO = Math.sqrt(re[k]*re[k]+im[k]*im[k]);
+          // 원래 크기와 평활된 크기를 smAmt 비율로 섞는다
+          const mag = magO*(1-smAmt) + magS*smAmt;
           const ph=Math.atan2(im[k],re[k]);
           sr2[k]=mag*Math.cos(ph); si2[k]=mag*Math.sin(ph);
         }
@@ -3577,32 +4578,279 @@ async function applyHDRestoration(buffer, targetSR, bitDepth, hfStrength, smooth
   }
 }
 
+// ============================================================
+// 실시간 HD / ULTRA HD 복원
+// ------------------------------------------------------------
+// 복원 알고리즘(applyHDRestoration)은 STFT 전역 분석이 필요해
+// 프레임 단위 실시간 처리가 불가능하다. 따라서 토글 시 원본을
+// 한 번 미리 복원해 캐시하고, 그 버퍼를 재생하면서 DSP 체인은
+// 평소대로 실시간 적용한다.
+// ============================================================
+
+// 복원 버퍼를 담을 빈 버퍼 생성 (applyHDRestoration은 in-place 수정이므로 원본 보호용)
+function cloneAudioBuffer(src) {
+  const tmp = new OfflineAudioContext(src.numberOfChannels, src.length, src.sampleRate);
+  const out = tmp.createBuffer(src.numberOfChannels, src.length, src.sampleRate);
+  for (let c = 0; c < src.numberOfChannels; c++) {
+    out.getChannelData(c).set(src.getChannelData(c));
+  }
+  return out;
+}
+
+// 재생에 사용할 버퍼 — 실시간 복원이 켜져 있으면 복원본
+function playBuf() { return hdLiveBuf || sourceBuf; }
+
+// AudioContext를 목표 샘플레이트로 재생성
+// targetSR이 null이면 장치 기본값으로 되돌린다
+async function ensureCtxRate(targetSR) {
+  if (audioCtx && targetSR && audioCtx.sampleRate === targetSR) return audioCtx.sampleRate;
+  if (audioCtx && !targetSR && audioCtx.sampleRate === _defaultSR) return audioCtx.sampleRate;
+
+  if (audioCtx) { try { await audioCtx.close(); } catch(e) {} }
+  audioCtx = null;
+  liveDSP = {};
+  srcNode = null;
+
+  const AC = window.AudioContext || window.webkitAudioContext;
+  if (targetSR) {
+    // 장치가 해당 레이트를 거부하면 기본값으로 폴백
+    try { audioCtx = new AC({ sampleRate: targetSR }); }
+    catch (e) { audioCtx = new AC(); }
+  } else {
+    audioCtx = new AC();
+  }
+  if (!_defaultSR) _defaultSR = audioCtx.sampleRate;
+  return audioCtx.sampleRate;
+}
+
+// 복원 버퍼 생성 — export의 Step 1~2와 동일한 알고리즘
+async function renderHDLive(mode) {
+  const targetSR = (mode === 'hd') ? 96000 : 192000;
+  const hfStr  = parseFloat(document.getElementById(mode === 'hd' ? 'hdHF'     : 'uhdHF' ).value) / 100;
+  const smooth = parseFloat(document.getElementById(mode === 'hd' ? 'hdSmooth' : 'uhdAir').value) / 100;
+
+  const ch  = sourceBuf.numberOfChannels;
+  const dur = sourceBuf.duration;
+
+  let buf;
+  if (sourceBuf.sampleRate !== targetSR) {
+    setOverlayProg(12, '리샘플링 중...', '▸ 원본 → ' + (targetSR/1000) + 'kHz 변환 중...');
+    await new Promise(r => setTimeout(r, 20));
+    const resCtx = new OfflineAudioContext(ch, Math.ceil(dur * targetSR), targetSR);
+    const rs = resCtx.createBufferSource();
+    rs.buffer = sourceBuf;
+    rs.connect(resCtx.destination);
+    rs.start(0);
+    buf = await resCtx.startRendering();
+  } else {
+    buf = cloneAudioBuffer(sourceBuf);
+  }
+
+  if (hfStr <= 0) return buf;
+
+  const msgs = [
+    '▸ 음원에서 주파수가 잘린 지점 찾는 중...',
+    '▸ 어디서부터 끊겼는지 확인하는 중...',
+    '▸ 잘린 부분 이어붙일 구간 설정 중...',
+    '▸ 끊긴 고음 복원 시작하는 중...',
+    '▸ 2배 고음 채우는 중...',
+    '▸ 4배 고음 덧대는 중...',
+    '▸ 8배 초고음 입히는 중...',
+    '▸ 16~32배 극고음 얹는 중...',
+    '▸ 64~128배 공기층 만드는 중...',
+    '▸ 복원된 고음 경계 매끄럽게 잇는 중...',
+    '▸ 원음 볼륨이랑 맞추는 중...',
+    '▸ 마무리 정리 중...',
+  ];
+  const totalCh = buf.numberOfChannels;
+
+  await applyHDRestoration(buf, targetSR, 32, hfStr, smooth, function(chIdx, frameStart, len) {
+    const prog = (chIdx + frameStart / len) / totalCh;
+    const pct  = Math.round(20 + prog * 75);
+    const mi   = Math.floor(prog * (msgs.length - 1));
+    setOverlayProg(pct,
+      '고해상도 복원 합성 중... ' + Math.min(100, Math.round(prog * 100)) + '%',
+      msgs[Math.min(mi, msgs.length - 1)]);
+  });
+
+  return buf;
+}
+
+// 실시간 복원 모드 전환 — 'off' | 'hd' | 'uhd'
+async function setLiveHDMode(mode) {
+  if (_hdLiveBusy) return;
+  if (!sourceBuf && mode !== 'off') { updateHDLiveUI(); return; }
+
+  const wasPlaying = isPlaying;
+  // 재생 위치 보존
+  const resumeAt = (isPlaying && audioCtx) ? (audioCtx.currentTime - startedAt) : pausedAt;
+
+  _hdLiveBusy = true;
+  try {
+    stopPlay();
+
+    if (mode === 'off') {
+      hdLiveBuf = null;
+      hdLiveKey = '';
+      await ensureCtxRate(null);
+    } else {
+      // 캐시 키 — 해당 모드의 파라미터와 파일이 같으면 재사용
+      const pA = document.getElementById(mode === 'hd' ? 'hdHF'     : 'uhdHF' ).value;
+      const pB = document.getElementById(mode === 'hd' ? 'hdSmooth' : 'uhdAir').value;
+      const fid = originalFile ? (originalFile.name + ':' + originalFile.size) : '';
+      const key = mode + '|' + pA + '|' + pB + '|' + fid;
+
+      if (key !== hdLiveKey || !hdLiveBuf) {
+        showOverlay(
+          mode === 'hd' ? 'HD RESTORE 준비 중...' : 'ULTRA HD RESTORE 준비 중...',
+          '복원 결과를 미리 만들어 재생에 적용합니다',
+          5
+        );
+        await new Promise(r => setTimeout(r, 30));
+        hdLiveBuf = await renderHDLive(mode);
+        hdLiveKey = key;
+        setOverlayProg(100, '완료', '▸ 실시간 재생 준비 완료');
+        await new Promise(r => setTimeout(r, 200));
+        hideOverlay();
+      }
+      await ensureCtxRate(mode === 'hd' ? 96000 : 192000);
+    }
+
+    liveHDMode = mode;
+    updateHDLiveUI();
+
+    // 컨텍스트 샘플레이트가 바뀌었으므로 표시 범위도 갱신
+    _lastNyq = displayNyq();
+    if (specMode === 'bars') renderFreqAxis(_lastNyq);
+    updateAxisNote();
+    clearSgBufs();
+
+    // 위치 복원 후 재생 상태 유지
+    const pb = playBuf();
+    pausedAt = pb ? Math.min(resumeAt, Math.max(0, pb.duration - 0.05)) : 0;
+    if (wasPlaying) startPlay();
+
+  } catch (e) {
+    hideOverlay();
+    hdLiveBuf = null; hdLiveKey = ''; liveHDMode = 'off';
+    updateHDLiveUI();
+    setStatus('실시간 복원 실패: ' + e.message, 'err');
+  } finally {
+    _hdLiveBusy = false;
+  }
+}
+
+// 토글·상태 표시 동기화
+function updateHDLiveUI() {
+  const hdCb  = document.getElementById('hdLiveOn');
+  const uhdCb = document.getElementById('uhdLiveOn');
+  const st    = document.getElementById('hdLiveStatus');
+  const mod   = document.getElementById('mod-hd');
+  if (!hdCb || !uhdCb) return;
+
+  hdCb.checked  = (liveHDMode === 'hd');
+  uhdCb.checked = (liveHDMode === 'uhd');
+  hdCb.disabled  = !sourceBuf;
+  uhdCb.disabled = !sourceBuf;
+
+  if (mod) mod.classList.toggle('live-active', liveHDMode !== 'off');
+
+  if (st) {
+    if (liveHDMode === 'off') {
+      st.textContent = 'Export 전용';
+      st.classList.remove('on');
+    } else {
+      const want = (liveHDMode === 'hd') ? 96000 : 192000;
+      const got  = audioCtx ? audioCtx.sampleRate : 0;
+      const tag  = (liveHDMode === 'hd') ? 'HD' : 'ULTRA HD';
+      st.textContent = (got === want)
+        ? ('실시간 ' + tag + ' — ' + (got / 1000) + 'kHz')
+        : ('실시간 ' + tag + ' — 출력 ' + (got / 1000) + 'kHz (장치 제한)');
+      st.classList.add('on');
+    }
+  }
+}
+
+// 토글 바인딩 — 두 모드는 상호 배타
+document.getElementById('hdLiveOn').addEventListener('change', function() {
+  setLiveHDMode(this.checked ? 'hd' : 'off');
+});
+document.getElementById('uhdLiveOn').addEventListener('change', function() {
+  setLiveHDMode(this.checked ? 'uhd' : 'off');
+});
+
+// 파라미터를 바꾸면 해당 모드가 켜져 있을 때만 다시 복원
+{
+  const HD_SLIDER_MODE = { hdHF: 'hd', hdSmooth: 'hd', uhdHF: 'uhd', uhdAir: 'uhd' };
+  Object.keys(HD_SLIDER_MODE).forEach(function(id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    // 'change'는 슬라이더를 놓았을 때만 발생 — 드래그 중 재렌더 방지
+    el.addEventListener('change', function() {
+      if (liveHDMode !== 'off' && liveHDMode === HD_SLIDER_MODE[id]) {
+        hdLiveKey = '';
+        setLiveHDMode(liveHDMode);
+      }
+    });
+  });
+}
+
 document.getElementById('expWav').addEventListener('click', () => exportAudio('wav'));
 document.getElementById('expHD').addEventListener('click',  () => exportAudio('hd'));
 document.getElementById('expUHD').addEventListener('click', () => exportAudio('uhd'));
 
+// 스펙트럼 캔버스 클릭 → 막대 ⇄ 스펙트로그램 전환 (두 패널 동시)
+['spectrumDry', 'spectrumWet'].forEach(function(id) {
+  var cv = document.getElementById(id);
+  if (cv) cv.addEventListener('click', toggleSpecMode);
+});
+
 var _exporting = false;
 async function exportAudio(mode) {
-  if (!sourceBuf || _exporting) return;
+  if (!sourceBuf || _exporting || _hdLiveBusy) return;
   _exporting = true;
   stopPlay();
 
-  const params = getParams(sourceBuf);
-  const baseName = originalFile ? originalFile.name.replace(/\.[^.]+$/,'') : 'output';
-
-  let targetSR, bitDepth, suffix, hfStr, smooth, uhdHF, uhdAir;
-  if (mode === 'wav') { targetSR = sourceBuf.sampleRate; bitDepth = 16; suffix = '_dsp'; }
-  else if (mode === 'hd') { targetSR = 96000; bitDepth = 24; suffix = '_HD96k24bit'; hfStr = params.hdHF; smooth = params.hdSmooth; }
-  else { targetSR = 192000; bitDepth = 32; suffix = '_UHD192k32bit'; hfStr = params.uhdHF; smooth = params.uhdAir; }
-
-  showOverlay('DSP 렌더링 중...', '잠시만 기다려 주세요', 10);
-
-  // Step 1: render DSP at target sample rate
-  const duration = sourceBuf.duration;
-  const ch = sourceBuf.numberOfChannels;
-  const offCtx = new OfflineAudioContext(ch, Math.ceil(duration * targetSR), targetSR);
-
+  // 함수 전체를 try로 감싼다. 어느 지점에서 예외가 나더라도
+  // finally가 _exporting을 반드시 풀어줘야 이후 export가 막히지 않는다.
   try {
+    const params = getParams(sourceBuf);
+    const baseName = originalFile ? originalFile.name.replace(/\.[^.]+$/,'') : 'output';
+
+    let targetSR, bitDepth, suffix, hfStr, smooth;
+    if (mode === 'wav') { targetSR = sourceBuf.sampleRate; bitDepth = 16; suffix = '_dsp'; }
+    else if (mode === 'hd') { targetSR = 96000; bitDepth = 24; suffix = '_HD96k24bit'; hfStr = params.hdHF; smooth = params.hdSmooth; }
+    else { targetSR = 192000; bitDepth = 32; suffix = '_UHD192k32bit'; hfStr = params.uhdHF; smooth = params.uhdAir; }
+
+    showOverlay('DSP 렌더링 중...', '잠시만 기다려 주세요', 10);
+
+    // Step 1: render DSP at target sample rate
+    const duration = sourceBuf.duration;
+    const ch = sourceBuf.numberOfChannels;
+
+    // 브라우저가 목표 샘플레이트를 지원하는지 먼저 확인한다.
+    // 예전에는 여기서 만든 OfflineAudioContext가 try 밖에 있어서,
+    // 192kHz를 거부하는 브라우저에서 예외가 catch되지 않고 빠져나가
+    // _exporting이 true로 고정되어 이후 모든 export가 막혔다.
+    try {
+      const probe = new OfflineAudioContext(1, 128, targetSR);
+      if (!probe || probe.sampleRate !== targetSR) throw new Error('rate mismatch');
+    } catch (probeErr) {
+      throw new Error(
+        (targetSR / 1000) + 'kHz를 이 브라우저가 지원하지 않습니다. ' +
+        'Chrome을 쓰거나 HD(96kHz)로 내보내 주세요.'
+      );
+    }
+
+    // 대용량 경고 — 192kHz/32bit는 샘플당 8바이트(2ch)라 메모리를 크게 쓴다
+    const estMB = (duration * targetSR * ch * (bitDepth / 8)) / 1048576;
+    if (estMB > 1800) {
+      throw new Error(
+        '예상 파일 크기가 ' + estMB.toFixed(0) + 'MB로 브라우저 한계를 넘습니다. ' +
+        '더 짧은 구간을 쓰거나 HD(96kHz)로 내보내 주세요.'
+      );
+    }
+
     // Resample source buffer if needed
     let inputBuf = sourceBuf;
     if (targetSR !== sourceBuf.sampleRate) {
@@ -3664,6 +4912,11 @@ async function exportAudio(mode) {
     let rendered = await offCtx2.startRendering();
     clearInterval(_dspTimer);
 
+    // 렌더가 끝나면 리샘플 원본은 더 필요 없다.
+    // 192kHz에서는 이 버퍼 하나가 수백 MB라 참조를 끊어 GC 대상이 되게 한다.
+    params.inputBuffer = null;
+    inputBuf = null;
+
     // Step 2: HD restoration
     if (mode !== 'wav' && hfStr > 0) {
       setOverlayProg(65, '고해상도 복원 합성 중...');
@@ -3710,8 +4963,18 @@ async function exportAudio(mode) {
     const blob = new Blob([wavData], { type: 'audio/wav' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
-    a.href = url; a.download = baseName + suffix + '.wav';
-    a.click(); URL.revokeObjectURL(url);
+    a.href = url;
+    a.download = baseName + suffix + '.wav';
+    // 일부 브라우저는 DOM에 붙지 않은 링크의 클릭을 무시한다
+    a.style.display = 'none';
+    document.body.appendChild(a);
+    a.click();
+    // 즉시 revoke하면 대용량 파일은 저장이 시작되기 전에 URL이 사라져
+    // 다운로드가 조용히 취소된다. 넉넉히 지연시킨 뒤 해제한다.
+    setTimeout(function() {
+      URL.revokeObjectURL(url);
+      if (a.parentNode) a.parentNode.removeChild(a);
+    }, 60000);
 
     setOverlayProg(100, '완료!', '▸ 파일 다운로드 준비 완료');
     await new Promise(r => setTimeout(r, 500));
@@ -3750,9 +5013,15 @@ function encodeWAV(buffer, bitDepth) {
   ws(36,'data'); view.setUint32(40,dataSize,true);
 
   let off = 44;
+  // 채널 데이터를 미리 꺼내둔다.
+  // 예전에는 안쪽 루프에서 getChannelData를 호출해 192kHz 기준
+  // 수천만 회가 반복되면서 브라우저가 멈춘 것처럼 보였다.
+  const chans = [];
+  for (let c = 0; c < ch; c++) chans.push(buffer.getChannelData(c));
+
   for (let i = 0; i < len; i++) {
     for (let c = 0; c < ch; c++) {
-      const s = buffer.getChannelData(c)[i];
+      const s = chans[c][i];
       if (bitDepth === 32) {
         view.setFloat32(off, s, true); off += 4;
       } else if (bitDepth === 24) {
@@ -3775,14 +5044,35 @@ function encodeWAV(buffer, bitDepth) {
 document.getElementById('resetBtn').addEventListener('click', () => {
   stopPlay();
   sourceBuf = null; originalFile = null;
+  // 실시간 복원 해제 및 기본 샘플레이트 복귀
+  liveHDMode = 'off'; hdLiveBuf = null; hdLiveKey = '';
+  ensureCtxRate(null).then(updateHDLiveUI);
+  updateHDLiveUI();
   fileInput.value = '';
   document.getElementById('fileInfo').classList.remove('show');
   document.getElementById('specWrap').classList.remove('show');
+  document.getElementById('specSectionTitle').style.display = 'none';
   document.getElementById('transportBar').classList.remove('show');
   document.getElementById('expWav').disabled = true;
   document.getElementById('expHD').disabled = true;
   document.getElementById('expUHD').disabled = true;
-  document.getElementById('spectrum').getContext('2d').clearRect(0,0,1060,90);
+  // 원음/적용본 캔버스 모두 클리어
+  clearSgBufs();
+  ['spectrumDry','spectrumWet'].forEach(function(id){
+    var cv = document.getElementById(id);
+    if (cv) cv.getContext('2d').clearRect(0, 0, cv.width, cv.height);
+  });
+  var _pd = document.getElementById('specPeakDry');
+  var _pw = document.getElementById('specPeakWet');
+  if (_pd) _pd.textContent = '—';
+  if (_pw) _pw.textContent = '—';
+  // 모듈별 INPUT GAIN 0dB 복원
+  ['compIn','bbeIn','tubeIn','excIn','sgIn','vinylIn','atmosIn','masterIn'].forEach(function(id){
+    var el = document.getElementById(id);
+    var vl = document.getElementById(id + 'V');
+    if (el) el.value = 0;
+    if (vl) vl.textContent = '0.0';
+  });
   setStatus('초기화되었습니다.', '');
 });
 
@@ -4126,6 +5416,8 @@ drawTubeViz();
     var master = document.getElementById('mod-master');
     var hd = document.getElementById('mod-hd');
     if(master) grid.insertBefore(master, hd || null);
+    // 바뀐 순서를 재생에 즉시 반영 (체인만 교체, 재생 위치는 유지)
+    if(typeof isPlaying !== 'undefined' && isPlaying) hotswapDSP();
   });
 })();
 </script>

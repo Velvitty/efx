@@ -1,0 +1,1185 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ANALOG SOUL DSP ENGINE — 신호 처리 사양서</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   토큰 — 계측기 화면의 대비. 다크 우선.
+   ============================================================ */
+:root {
+  --bg:      #0E1215;
+  --panel:   #151B20;
+  --panel2:  #1B232A;
+  --ink:     #DDE5EA;
+  --ink-dim: #9DAAB4;
+  --mute:    #6B7883;
+  --line:    #26313A;
+  --line-lo: #1C242B;
+  --trace:   #4FD1C5;
+  --node:    #7FA8D9;
+  --coef:    #E0A85C;
+  --alert:   #E07070;
+  --ok:      #6FCF8F;
+  --measure: 74ch;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --bg:#FAFBFC; --panel:#FFFFFF; --panel2:#F1F4F6;
+    --ink:#121A20; --ink-dim:#3D4A54; --mute:#6B7883;
+    --line:#D2DAE0; --line-lo:#E6EBEF;
+    --trace:#0E8478; --node:#2C5F9E; --coef:#8A5A12;
+    --alert:#A33A3A; --ok:#217A45;
+  }
+}
+:root[data-theme="light"] {
+  --bg:#FAFBFC; --panel:#FFFFFF; --panel2:#F1F4F6;
+  --ink:#121A20; --ink-dim:#3D4A54; --mute:#6B7883;
+  --line:#D2DAE0; --line-lo:#E6EBEF;
+  --trace:#0E8478; --node:#2C5F9E; --coef:#8A5A12;
+  --alert:#A33A3A; --ok:#217A45;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  * { transition: none !important; animation: none !important; }
+}
+body {
+  margin: 0; background: var(--bg); color: var(--ink);
+  font-family: "IBM Plex Sans", -apple-system, "Apple SD Gothic Neo", sans-serif;
+  font-size: 16px; line-height: 1.7; -webkit-font-smoothing: antialiased;
+}
+code, pre, .m, th, .blk { font-family: "IBM Plex Mono", ui-monospace, Menlo, monospace; }
+
+.shell {
+  display: grid; grid-template-columns: 248px minmax(0,1fr);
+  gap: 44px; max-width: 1240px; margin: 0 auto; padding: 0 26px;
+}
+@media (max-width: 1000px) { .shell { grid-template-columns: 1fr; gap: 0; padding: 0 18px; } }
+
+.rail {
+  position: sticky; top: 0; align-self: start; max-height: 100vh; overflow-y: auto;
+  padding: 26px 20px 40px 0; border-right: 1px solid var(--line-lo); font-size: 13.5px;
+}
+@media (max-width: 1000px) {
+  .rail { position: static; max-height: none; border-right: 0; border-bottom: 1px solid var(--line); padding: 16px 0 8px; }
+}
+.rail h2 {
+  font-family: "IBM Plex Mono", monospace; font-size: 10.5px; letter-spacing: .14em;
+  color: var(--mute); margin: 0 0 12px; font-weight: 500;
+}
+.rail ol { list-style: none; margin: 0; padding: 0; counter-reset: r; }
+.rail > ol > li { counter-increment: r; }
+.rail a {
+  display: block; padding: 3px 0 3px 10px; margin-left: -12px; color: var(--ink-dim);
+  text-decoration: none; border-left: 2px solid transparent; line-height: 1.45;
+}
+.rail > ol > li > a::before {
+  content: counter(r, decimal-leading-zero);
+  font-family: "IBM Plex Mono", monospace; font-size: 10.5px; color: var(--mute); margin-right: 8px;
+}
+.rail a:hover { color: var(--trace); }
+.rail a.on { color: var(--trace); border-left-color: var(--trace); }
+.rail ol ol { margin: 2px 0 6px 16px; }
+.rail ol ol a { font-size: 12.5px; color: var(--mute); }
+.rail ol ol a::before { content: none; }
+
+main { padding: 0 0 120px; min-width: 0; }
+.rd { max-width: var(--measure); }
+
+.head { padding: 48px 0 28px; border-bottom: 1px solid var(--line); }
+.head .id {
+  font-family: "IBM Plex Mono", monospace; font-size: 11px;
+  letter-spacing: .16em; color: var(--trace); margin: 0 0 10px;
+}
+.head h1 { font-size: clamp(27px,4.4vw,38px); line-height: 1.16; font-weight: 600; letter-spacing: -.02em; margin: 0 0 14px; }
+.head p { color: var(--ink-dim); max-width: 62ch; margin: 0; }
+.abstract {
+  background: var(--panel); border: 1px solid var(--line); border-radius: 4px;
+  padding: 16px 18px; margin-top: 22px; font-size: 14.5px;
+  color: var(--ink-dim); max-width: var(--measure);
+}
+.abstract p { margin: 0 0 10px; max-width: none; }
+.abstract p:last-child { margin: 0; }
+
+section { padding-top: 52px; }
+section > h2 {
+  font-size: 23px; font-weight: 600; letter-spacing: -.015em; margin: 0 0 14px;
+  padding-bottom: 8px; border-bottom: 1px solid var(--line); max-width: var(--measure);
+}
+section > h2 .n {
+  font-family: "IBM Plex Mono", monospace; font-size: 13px;
+  color: var(--trace); margin-right: 10px; font-weight: 500;
+}
+h3 { font-size: 18px; font-weight: 600; margin: 32px 0 8px; padding-left: 11px; border-left: 3px solid var(--node); }
+h4 { font-size: 15.5px; font-weight: 600; margin: 22px 0 5px; }
+p { margin: 0 0 14px; max-width: var(--measure); }
+ul, ol { max-width: var(--measure); padding-left: 20px; margin: 0 0 14px; }
+li { margin-bottom: 6px; }
+a { color: var(--trace); text-underline-offset: 2px; }
+code { font-size: .88em; background: var(--panel2); color: var(--coef); padding: 1px 5px; border-radius: 3px; }
+
+/* 수식 */
+.eq {
+  background: var(--panel); border: 1px solid var(--line); border-left: 3px solid var(--coef);
+  border-radius: 4px; padding: 13px 16px; margin: 0 0 18px; overflow-x: auto;
+  font-family: "IBM Plex Mono", monospace; font-size: 13px; line-height: 1.75;
+  max-width: var(--measure); color: var(--ink-dim); white-space: pre;
+}
+.eq b { color: var(--coef); font-weight: 500; }
+.eq i { color: var(--mute); font-style: normal; }
+
+/* 블록도 */
+.blk {
+  background: var(--panel); border: 1px solid var(--line); border-radius: 4px;
+  padding: 13px 16px; margin: 0 0 18px; font-size: 12.5px; line-height: 1.95;
+  overflow-x: auto; white-space: pre; max-width: var(--measure); color: var(--ink-dim);
+}
+.blk b { color: var(--node); font-weight: 500; }
+.blk i { color: var(--coef); font-style: normal; }
+
+.tw { overflow-x: auto; margin: 0 0 18px; max-width: var(--measure); }
+table { border-collapse: collapse; width: 100%; min-width: 460px; font-size: 13.5px; }
+th {
+  text-align: left; font-size: 11px; font-weight: 500; letter-spacing: .07em; color: var(--mute);
+  border-bottom: 1px solid var(--line); padding: 0 14px 6px 0; white-space: nowrap;
+}
+td { border-bottom: 1px solid var(--line-lo); padding: 8px 14px 8px 0; vertical-align: top; line-height: 1.55; }
+td.m { font-family: "IBM Plex Mono", monospace; font-size: 12.5px; color: var(--coef); white-space: nowrap; }
+td.n { font-family: "IBM Plex Mono", monospace; font-size: 12.5px; color: var(--node); white-space: nowrap; }
+
+.nb {
+  border-left: 3px solid var(--node); background: var(--panel); padding: 13px 16px;
+  margin: 0 0 18px; max-width: var(--measure); border-radius: 0 4px 4px 0; font-size: 14.5px;
+}
+.nb.warn { border-left-color: var(--alert); }
+.nb.ok { border-left-color: var(--ok); }
+.nb p:last-child { margin-bottom: 0; }
+.nb .t {
+  display: block; font-family: "IBM Plex Mono", monospace; font-size: 11px;
+  letter-spacing: .07em; color: var(--node); margin-bottom: 5px;
+}
+.nb.warn .t { color: var(--alert); }
+.nb.ok .t { color: var(--ok); }
+
+.unit { border-top: 1px solid var(--line); padding-top: 20px; margin-top: 30px; max-width: var(--measure); }
+.unit-h { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 3px; }
+.unit-h h3 { border: 0; padding: 0; margin: 0; font-size: 19px; }
+.unit-h .tag {
+  font-family: "IBM Plex Mono", monospace; font-size: 11px; color: var(--mute);
+  border: 1px solid var(--line); border-radius: 3px; padding: 1px 7px;
+}
+
+footer {
+  border-top: 1px solid var(--line); margin-top: 64px; padding-top: 18px;
+  font-size: 13.5px; color: var(--mute); max-width: var(--measure);
+}
+:focus-visible { outline: 2px solid var(--trace); outline-offset: 2px; border-radius: 2px; }
+
+@media print {
+  .rail { display: none; }
+  .shell { grid-template-columns: 1fr; }
+  body { background: #fff; color: #000; font-size: 10.5pt; }
+  .eq, .blk, table { break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<nav class="rail" aria-label="목차">
+  <h2>CONTENTS</h2>
+  <ol>
+    <li><a href="#chain">신호 체인</a>
+      <ol>
+        <li><a href="#chain-order">배치 순서의 근거</a></li>
+        <li><a href="#chain-gain">게인 스테이징</a></li>
+      </ol>
+    </li>
+    <li><a href="#units">처리 단 사양</a>
+      <ol>
+        <li><a href="#u-comp">COMPRESSOR</a></li>
+        <li><a href="#u-bbe">BBE</a></li>
+        <li><a href="#u-tube">VACUUM TUBE</a></li>
+        <li><a href="#u-exc">EXCITER</a></li>
+        <li><a href="#u-sg">SOUNDGOODIZER</a></li>
+        <li><a href="#u-vinyl">VINYL</a></li>
+        <li><a href="#u-atmos">ATMOS</a></li>
+        <li><a href="#u-master">MASTERING</a></li>
+      </ol>
+    </li>
+    <li><a href="#sbr">대역 확장</a>
+      <ol>
+        <li><a href="#sbr-why">손실 압축의 흔적</a></li>
+        <li><a href="#sbr-detect">컷오프 판정</a></li>
+        <li><a href="#sbr-harm">배음 전사</a></li>
+        <li><a href="#sbr-xf">교차 특성</a></li>
+        <li><a href="#sbr-sm">스펙트럼 평활</a></li>
+        <li><a href="#sbr-lvl">레벨 정합</a></li>
+      </ol>
+    </li>
+    <li><a href="#meter">계측과 판독</a></li>
+    <li><a href="#psycho">청감 한계</a></li>
+    <li><a href="#practice">운용 지침</a></li>
+    <li><a href="#limits">사양상 한계</a></li>
+  </ol>
+</nav>
+
+<main>
+
+<header class="head">
+  <p class="id">SIGNAL PROCESSING SPECIFICATION</p>
+  <h1>ANALOG SOUL DSP ENGINE</h1>
+  <p>
+    여덟 개 처리 단의 필터 특성, 전달 함수, 배음 생성 구조와
+    대역 확장 알고리즘의 판정 기준 및 합성 규칙을 기술한다.
+  </p>
+
+  <div class="abstract">
+    <p>
+      모든 수치는 실제 설정값이며 근사치가 아니다. 파라미터 표기에서 대문자는
+      정규화된 값(0~1)을 뜻하고, 단위가 붙은 값은 원값이다.
+    </p>
+    <p>
+      독자는 필터의 종류와 차수, 압축기의 시정수, 배음 구조에 관한 기본 지식을
+      갖췄다고 가정한다. 개념 수준의 설명은 기술 설명서를 참조하라.
+    </p>
+  </div>
+</header>
+
+<!-- ============ 1 ============ -->
+<section id="chain">
+  <h2><span class="n">01</span>신호 체인</h2>
+  <div class="rd">
+    <p>
+      직렬 8단 구성이다. 앞 단의 출력이 뒤 단의 입력이 되므로 배치 순서가
+      최종 음색을 결정한다. 마스터링 단은 배치와 무관하게 항상 최종단이다.
+    </p>
+    <div class="blk">입력 ─▶ <b>COMP</b> ─▶ <b>BBE</b> ─▶ <b>TUBE</b> ─▶ <b>EXCITER</b> ─▶ <b>SG</b> ─▶ <b>VINYL</b> ─▶ <b>ATMOS</b> ─▶ <b>MASTER</b> ─▶ 출력
+        └─ 각 단 진입 직전 입력 게인 <i>±24 dB</i> ─┘        <i>고정 최종단</i></div>
+  </div>
+
+  <h3 id="chain-order">배치 순서의 근거</h3>
+  <div class="rd">
+    <div class="tw"><table>
+      <thead><tr><th>단</th><th>성격</th><th>배치 근거</th></tr></thead>
+      <tbody>
+        <tr>
+          <td class="n">COMP</td><td>다이내믹스</td>
+          <td>레벨 변동을 먼저 줄여야 뒤따르는 비선형 단의 동작점이 일정해진다. 포화량이 구간마다 달라지는 것을 막는다.</td>
+        </tr>
+        <tr>
+          <td class="n">BBE</td><td>위상 보정</td>
+          <td>군지연 보정은 원음의 위상 관계가 보존된 상태에서 유효하다. 포화로 배음이 추가된 뒤에는 보정 대상이 모호해진다.</td>
+        </tr>
+        <tr>
+          <td class="n">TUBE</td><td>비선형</td>
+          <td>기본 배음 구조를 먼저 형성한다.</td>
+        </tr>
+        <tr>
+          <td class="n">EXCITER</td><td>비선형 · 고역</td>
+          <td>TUBE가 만든 배음까지 재료로 삼아 고역을 확장한다.</td>
+        </tr>
+        <tr>
+          <td class="n">SG</td><td>대역별 비선형</td>
+          <td>앞 단들이 만든 결과를 대역별로 균형 조정한다.</td>
+        </tr>
+        <tr>
+          <td class="n">VINYL</td><td>열화 · 부가 잡음</td>
+          <td>음색 형성이 끝난 뒤 질감을 덮어야 잡음이 뒤쪽 비선형 단에서 증폭되지 않는다.</td>
+        </tr>
+        <tr>
+          <td class="n">ATMOS</td><td>공간</td>
+          <td>잔향은 완성된 직접음에 부가해야 한다. 잔향을 먼저 걸면 뒤 단의 압축이 잔향 성분에 반응한다.</td>
+        </tr>
+        <tr>
+          <td class="n">MASTER</td><td>대역 압축 · 리미팅</td>
+          <td>최종 레벨과 피크 제어. 이후 처리가 있으면 천장이 무의미해진다.</td>
+        </tr>
+      </tbody>
+    </table></div>
+
+    <h4>순서 변경의 음향적 결과</h4>
+    <ul>
+      <li>
+        <strong>TUBE를 COMP 앞으로.</strong> 포화가 먼저 피크를 둥글게 만들어
+        압축기에 들어가는 크레스트 팩터가 낮아진다. 같은 스레숄드에서 리덕션이 줄고
+        결과적으로 더 단단한 어택이 남는다.
+      </li>
+      <li>
+        <strong>VINYL을 선두로.</strong> 부가 잡음이 이후 모든 비선형 단을 통과한다.
+        핑크 노이즈가 포화 단에서 배음을 만들어 잡음 스펙트럼이 고역으로 확장된다.
+      </li>
+      <li>
+        <strong>ATMOS를 MASTER 직전이 아닌 앞쪽으로.</strong> 잔향 성분이 대역 압축의
+        검출 신호에 포함되어, 잔향 꼬리에서 게인이 되돌아오는 펌핑이 생긴다.
+      </li>
+    </ul>
+  </div>
+
+  <h3 id="chain-gain">게인 스테이징</h3>
+  <div class="rd">
+    <p>
+      각 단 진입 직전에 ±24 dB 범위의 입력 게인이 있다. 해당 단이 비활성이면
+      게인도 개입하지 않으므로 토글 상태가 레벨에 영향을 주지 않는다.
+    </p>
+    <div class="eq">선형 배율 = <b>10^(dB/20)</b>
+<i>−6 dB → 0.501   0 dB → 1.000   +6 dB → 1.995</i></div>
+    <p>
+      입력 게인의 의미는 단의 성격에 따라 다르다.
+    </p>
+    <div class="tw"><table>
+      <thead><tr><th>단</th><th>입력 게인의 효과</th></tr></thead>
+      <tbody>
+        <tr><td class="n">TUBE · EXCITER · SG</td><td>비선형 소자의 동작점 이동. 포화 깊이와 배음 차수 분포가 바뀐다. 사실상 드라이브 제어와 등가.</td></tr>
+        <tr><td class="n">COMP</td><td>스레숄드 상대 이동. +3 dB 입력은 스레숄드 −3 dB와 동일한 리덕션을 낳는다.</td></tr>
+        <tr><td class="n">BBE · VINYL · ATMOS</td><td>선형 처리가 지배적이므로 레벨만 변한다.</td></tr>
+        <tr><td class="n">MASTER</td><td>대역 압축기 4개의 스레숄드가 고정값이므로, 입력 게인이 전체 리덕션 깊이를 결정한다.</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+</section>
+
+<!-- ============ 2 ============ -->
+<section id="units">
+  <h2><span class="n">02</span>처리 단 사양</h2>
+  <div class="rd">
+    <p>
+      블록도에서 세로 분기는 병렬 경로를 뜻한다.
+      필터 표기는 <code>종류(주파수, Q, 게인)</code> 형식이다.
+    </p>
+  </div>
+
+  <div class="unit" id="u-comp">
+    <div class="unit-h"><h3>COMPRESSOR</h3><span class="tag">소프트니 피드포워드</span></div>
+    <div class="rd">
+      <div class="blk">in ─▶ <b>압축기</b> ─▶ <b>메이크업</b> ─▶ out
+                 <i>10^(MAKE/20)</i></div>
+      <div class="tw"><table>
+        <thead><tr><th>파라미터</th><th>범위</th><th>기본</th></tr></thead>
+        <tbody>
+          <tr><td>스레숄드</td><td class="m">−60 ~ 0 dB</td><td class="m">−18 dB</td></tr>
+          <tr><td>레시오</td><td class="m">1:1 ~ 20:1</td><td class="m">4:1</td></tr>
+          <tr><td>어택</td><td class="m">0.1 ~ 200 ms</td><td class="m">10 ms</td></tr>
+          <tr><td>릴리즈</td><td class="m">10 ~ 3000 ms</td><td class="m">250 ms</td></tr>
+          <tr><td>니</td><td class="m">0 ~ 40 dB</td><td class="m">10 dB</td></tr>
+          <tr><td>메이크업</td><td class="m">0 ~ +24 dB</td><td class="m">+4 dB</td></tr>
+        </tbody>
+      </table></div>
+      <p>
+        니가 10 dB이면 스레숄드 ±5 dB 구간에서 레시오가 1:1에서 설정값으로 점진 변화한다.
+        저역이 많은 소스에서 니를 좁히면 킥 타격마다 리덕션이 계단식으로 걸려
+        펌핑이 두드러진다.
+      </p>
+      <p>
+        게인 리덕션 표시는 리덕션 dB에 4를 곱한 백분율이다.
+        표시가 가득 찬 상태는 약 25 dB 리덕션에 해당한다.
+        정상 운용에서는 3~6 dB 구간에서 움직이는 것이 적절하다.
+      </p>
+    </div>
+  </div>
+
+  <div class="unit" id="u-bbe">
+    <div class="unit-h"><h3>BBE SONIC MAXIMIZER</h3><span class="tag">군지연 보정 + 셸빙</span></div>
+    <div class="rd">
+      <p>
+        저역을 올패스 2단으로 지연시킨 경로와 직통 경로를 합산한다.
+        올패스는 진폭 응답이 평탄하고 위상만 회전시키므로,
+        합산 시점에서 비로소 진폭 변화가 나타난다.
+        스피커의 저역 군지연을 상쇄하려는 원리다.
+      </p>
+      <div class="blk">in ┬─────────────────────────────────┐ <i>1.0</i>
+   └▶ <b>올패스1</b> ─▶ <b>올패스2</b> ─▶ <i>LO×0.6</i> ─┤
+                                     ▼
+                            <b>합산</b> <i>1/(1+LO×0.6)</i>
+                                     │
+                            <b>피킹</b> ─▶ <b>하이셸프</b> ─▶ out</div>
+      <div class="tw"><table>
+        <thead><tr><th>요소</th><th>사양</th></tr></thead>
+        <tbody>
+          <tr><td>올패스 1단</td><td class="m">f = 80 + LO×200 Hz,  Q = 0.3 + LO×0.8</td></tr>
+          <tr><td>올패스 2단</td><td class="m">f = 40 + LO×100 Hz,  Q = 0.5 + LO×0.5</td></tr>
+          <tr><td>지연 경로 레벨</td><td class="m">LO × 0.6</td></tr>
+          <tr><td>합산 정규화</td><td class="m">1 / (1 + LO×0.6)</td></tr>
+          <tr><td>프레즌스</td><td class="m">피킹 3.2 kHz, Q 0.6, 최대 +9 dB</td></tr>
+          <tr><td>하이 데프</td><td class="m">하이셸프 8 kHz, 최대 +10 dB</td></tr>
+        </tbody>
+      </table></div>
+      <div class="nb">
+        <span class="t">합산 정규화의 의미</span>
+        <p>
+          지연 경로 레벨이 <code>LO×0.6</code>이므로 두 경로 합의 최대 진폭은
+          <code>1 + LO×0.6</code>이 된다. 합산 게인을 그 역수로 두면 LO CONTOUR를
+          올려도 전체 레벨이 변하지 않는다. 이 파라미터는 순수하게 군지연 특성만
+          바꾸도록 설계되었다.
+        </p>
+      </div>
+      <p>
+        프레즌스의 3.2 kHz는 자음 명료도와 악기의 어택이 집중되는 대역이다.
+        Q 0.6은 약 2옥타브 폭이라 광대역으로 걸린다.
+        보컬 소스에서 +6 dB를 넘기면 치찰음이 동반 상승한다.
+      </p>
+    </div>
+  </div>
+
+  <div class="unit" id="u-tube">
+    <div class="unit-h"><h3>VACUUM TUBE</h3><span class="tag">비대칭 포화 + 저역 우회</span></div>
+    <div class="rd">
+      <p>
+        저역을 포화 경로에서 분리하는 병렬 구조다. 저역까지 포화시키면
+        인터모듈레이션 산물이 중역에 집중되어 명료도가 떨어지므로,
+        120 Hz 부근 이하를 따로 빼내 직통시킨다.
+      </p>
+      <div class="blk">in ┬▶ <b>LPF</b> <i>120+D×80</i> ──────────────────────────────────┐
+   │                                                       ▼
+   └▶ <b>HPF</b> <i>100+D×80</i> ─▶ <b>포화</b> ─▶ <b>로우셸프</b> ─▶ <b>하이셸프</b> ─▶ <b>피킹</b> ─▶ <i>0.3+MIX×0.7</i> ─▶ <b>합산</b> ─▶ <i>10^(OUT/20)</i> ─▶ out</div>
+      <div class="tw"><table>
+        <thead><tr><th>요소</th><th>사양</th><th>목적</th></tr></thead>
+        <tbody>
+          <tr><td>저역 분리 LPF</td><td class="m">f = 120 + D×80 Hz, Q 0.5</td><td>우회 경로 확보</td></tr>
+          <tr><td>포화 전 HPF</td><td class="m">f = 100 + D×80 Hz, Q 0.5</td><td>저역 인터모듈레이션 억제</td></tr>
+          <tr><td>포화 후 로우셸프</td><td class="m">6 kHz, −(1 + D×4) dB</td><td>과잉 중고역 배음 억제</td></tr>
+          <tr><td>포화 후 하이셸프</td><td class="m">9 kHz, −(2 + D×6) dB</td><td>고차 배음 억제</td></tr>
+          <tr><td>저역 보상</td><td class="m">피킹 100 Hz, Q 0.8, +(1.5 + D×3) dB</td><td>HPF로 잃은 저역 회복</td></tr>
+          <tr><td>웨트 레벨</td><td class="m">0.3 + MIX×0.7</td><td>MIX 0에서도 30% 유지</td></tr>
+        </tbody>
+      </table></div>
+
+      <h4>전달 함수</h4>
+      <p>
+        삼극관의 비대칭 전달 특성을 근사한다. 음의 반주기에 1.15배 드라이브를 적용해
+        비대칭을 만든다. 대칭 포화는 홀수 배음만 생성하지만, 비대칭이면 짝수 배음이
+        나타난다. 2차 배음은 옥타브 관계라 협화음으로 들려 <em>따뜻함</em>으로 인지된다.
+      </p>
+      <div class="eq">d = 1 + DRIVE×1.2          <i>(1.0 ~ 2.2)</i>
+b = (BIAS−50)/100 × 0.15   <i>(−0.075 ~ +0.075)</i>
+
+          ⎧ tanh((x+b)·d)         (x+b ≥ 0)
+y(x) =  ⎨
+          ⎩ tanh((x+b)·d·<b>1.15</b>)   (x+b &lt; 0)
+
+출력 = y(x) / tanh(d)      <i>평균 게인 보상</i></div>
+      <p>
+        <code>tanh(d)</code>로 나누는 정규화가 없으면 드라이브를 올릴수록 출력이 줄어
+        A/B 비교가 왜곡된다. BIAS가 50에서 멀어질수록 동작점이 한쪽으로 치우쳐
+        짝수 배음 비율이 높아진다.
+      </p>
+      <p>
+        포화는 2배 오버샘플링으로 처리한다. 배음이 나이퀴스트를 넘어 접히는
+        앨리어싱을 줄이기 위함이며, 완전히 제거하지는 못한다.
+        고차 배음을 억제하는 두 셸빙 필터가 그 보완책이다.
+      </p>
+    </div>
+  </div>
+
+  <div class="unit" id="u-exc">
+    <div class="unit-h"><h3>EXCITER</h3><span class="tag">병렬 고역 배음 생성</span></div>
+    <div class="rd">
+      <div class="blk">in ┬────────────────────────────────────────┐ <i>1.0</i>
+   └▶ <b>HPF</b> <i>FREQ</i> ─▶ <b>포화</b> ─▶ <b>BPF</b> <i>FREQ×1.5, Q0.8</i> ─▶ <i>MIX×0.5</i> ─┴▶ out</div>
+      <div class="eq">y(x) = tanh( x · (1 + DRIVE×<b>0.05</b>) · <b>3</b> )</div>
+      <p>
+        고정 계수 3이 기본 드라이브를 결정하고, 사용자 파라미터는 그 위에 최대 5%만
+        더한다. 따라서 DRIVE의 영향은 제한적이고 실효 효과량은 MIX가 지배한다.
+        MIX 최대에서도 웨트 레벨은 0.5이므로 원음 대비 −6 dB로 합산된다.
+      </p>
+      <p>
+        BPF 중심을 하이패스 차단점의 1.5배에 두어 원음 대역과의 중첩을 줄인다.
+        다만 Q 0.6은 광대역이라 차단 특성이 완만하다.
+      </p>
+      <div class="nb">
+        <span class="t">EXCITER와 대역 확장의 차이</span>
+        <p>
+          둘 다 고역을 만들지만 원리가 다르다. EXCITER는 통과 대역 내부 신호를
+          비선형 왜곡시켜 그 배음을 더하는 것이고, 대역 확장은 스펙트럼 영역에서
+          누락된 대역을 식별해 전사하는 것이다. EXCITER는 원본에 고역이 남아 있어야
+          작동하지만, 대역 확장은 고역이 완전히 잘린 소스에서도 작동한다.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="unit" id="u-sg">
+    <div class="unit-h"><h3>SOUNDGOODIZER</h3><span class="tag">3대역 병렬 포화</span></div>
+    <div class="rd">
+      <div class="blk">in ┬──────────────────────────────────────┐ <i>1.0</i>
+   ├▶ <b>LPF</b> <i>loFreq</i> ──▶ <b>포화</b> ─▶ <i>LOW×0.7</i> ┐    │
+   ├▶ <b>BPF</b> <i>중심, loQ</i> ▶ <b>포화</b> ─▶ <i>MID×0.5</i> ┼─▶ <i>AMT×0.6</i> ┤
+   └▶ <b>HPF</b> <i>hiFreq</i> ──▶ <b>포화</b> ─▶ <i>HI×0.4</i>  ┘    │
+                                              ▼
+                              <b>합산</b> <i>1/(1+AMT×0.3)</i>
+                                              │
+                              <b>피킹 2.5kHz</b> ─▶ <b>압축기</b> ─▶ out</div>
+      <div class="tw"><table>
+        <thead><tr><th>프리셋</th><th>성격</th><th>분할점</th><th>대역 Q</th><th>드라이브</th></tr></thead>
+        <tbody>
+          <tr><td class="n">A</td><td>Warm &amp; Punchy</td><td class="m">250 Hz / 4 kHz</td><td class="m">0.7 / 0.8</td><td class="m">0.40</td></tr>
+          <tr><td class="n">B</td><td>Bright &amp; Airy</td><td class="m">180 Hz / 6 kHz</td><td class="m">0.6 / 1.0</td><td class="m">0.55</td></tr>
+          <tr><td class="n">C</td><td>Full &amp; Rich</td><td class="m">300 Hz / 3.5 kHz</td><td class="m">0.8 / 0.7</td><td class="m">0.50</td></tr>
+          <tr><td class="n">D</td><td>Crispy &amp; Detailed</td><td class="m">200 Hz / 8 kHz</td><td class="m">0.6 / 1.2</td><td class="m">0.60</td></tr>
+        </tbody>
+      </table></div>
+
+      <h4>포화 전달 함수</h4>
+      <p>
+        소프트클립과 3차 다항식을 블렌딩한다. 소프트클립은 짝수 배음이 우세하고
+        3차항은 홀수 배음을 만든다. saturation이 높을수록 홀수 성분 비율이 올라가
+        공격적인 성격이 된다.
+      </p>
+      <div class="eq">k = 1 + SAT×2.5      d = 1 + DRIVE×1.5      xd = x·d
+
+soft  = xd / (1 + |xd|·k)        <i>짝수 배음 우세</i>
+cubic = xd − xd³/(3k)            <i>홀수 배음 우세</i>
+
+y = soft·(1 − SAT×0.3) + cubic·(SAT×0.3)
+출력 = clamp(y, −1, +1)</div>
+      <div class="tw"><table>
+        <thead><tr><th>후단</th><th>사양</th></tr></thead>
+        <tbody>
+          <tr><td>다이내믹 EQ</td><td class="m">피킹 2.5 kHz, Q 0.7, +AMOUNT×3 dB</td></tr>
+          <tr><td>출력 압축</td><td class="m">스레숄드 −10 − AMOUNT×8 dB, 레시오 2:1</td></tr>
+          <tr><td></td><td class="m">어택 3 ms, 릴리즈 80 + STEREO×220 ms, 니 6 dB</td></tr>
+        </tbody>
+      </table></div>
+      <div class="nb warn">
+        <span class="t">대역 분할이 상보적이지 않음</span>
+        <p>
+          LPF + BPF + HPF 구성이라 세 대역의 합이 평탄한 응답을 이루지 않는다.
+          BPF 중심이 두 분할점의 산술 평균에 놓이고 Q도 낮아,
+          저역·중역 경계와 중역·고역 경계에서 에너지가 중복 가산된다.
+          AMOUNT를 올릴수록 이 중첩 구간이 상대적으로 강조된다.
+          상보 분할이 필요하면 Linkwitz-Riley 구성으로 바꿔야 한다.
+        </p>
+      </div>
+      <div class="nb warn">
+        <span class="t">STEREO 파라미터의 실제 동작</span>
+        <p>
+          명칭과 달리 스테레오 폭에 관여하지 않는다.
+          출력 압축기의 릴리즈 타임만 <code>80 ~ 300 ms</code> 범위에서 바꾼다.
+          릴리즈가 길어지면 게인 회복이 느려져 밀도감이 올라가는데,
+          이것이 폭이 넓어진 것처럼 오인될 수는 있다.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="unit" id="u-vinyl">
+    <div class="unit-h"><h3>VINYL RECORD</h3><span class="tag">고역 감쇠 + 부가 잡음</span></div>
+    <div class="rd">
+      <div class="blk">in ─▶ <b>LPF</b> <i>20000−WEAR×8000</i> ─▶ <b>하이셸프</b> <i>8kHz, −WEAR×4dB</i> ─▶ out
+                                            ▲
+          핑크 노이즈 ─▶ <i>CRACKLE×0.03</i> ────┘</div>
+      <div class="tw"><table>
+        <thead><tr><th>요소</th><th>사양</th></tr></thead>
+        <tbody>
+          <tr><td>대역 제한</td><td class="m">LPF 20 kHz → 12 kHz (WEAR 0 → 1)</td></tr>
+          <tr><td>고역 감쇠</td><td class="m">하이셸프 8 kHz, 0 ~ −4 dB</td></tr>
+          <tr><td>잡음 레벨</td><td class="m">CRACKLE × 0.03 (최대 −30.5 dB)</td></tr>
+          <tr><td>잡음 스펙트럼</td><td class="m">핑크 (−3 dB/oct)</td></tr>
+        </tbody>
+      </table></div>
+      <p>
+        잡음은 Voss-McCartney 방식의 핑크 노이즈 근사다. 서로 다른 시정수를 가진
+        6개의 1차 저역 통과 성분을 백색 잡음에 걸어 합산해
+        −3 dB/oct 기울기를 만든다. 백색 잡음을 그대로 쓰면 고역이 과도해
+        먼지·흠집 잡음의 스펙트럼과 맞지 않는다.
+      </p>
+      <p>
+        WEAR는 LPF 차단점과 셸빙 감쇠를 동시에 움직인다.
+        차단점 이동은 12 kHz까지이므로 가청 대역 상단에 직접 작용한다.
+      </p>
+      <div class="nb warn">
+        <span class="t">미구현 파라미터</span>
+        <p>
+          WOBBLE(회전 불균일에 의한 피치 변조)과 CROSSTALK(채널 간 누화)은
+          값이 존재하나 신호 경로에 반영되지 않는다.
+          WOBBLE은 가변 지연의 저주파 변조로, CROSSTALK은 채널 간 교차 합산으로
+          구현해야 한다.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="unit" id="u-atmos">
+    <div class="unit-h"><h3>DOLBY ATMOS</h3><span class="tag">합성 임펄스 응답 + 선행음</span></div>
+    <div class="rd">
+      <p>
+        4갈래 병렬 구조다. 직접음, 초기 반사, 후기 잔향, 선행음 경로가 각각
+        레벨을 거쳐 합산된다. 2채널 내에서의 공간 시뮬레이션이며
+        객체 기반 다채널 규격과는 무관하다.
+      </p>
+      <div class="blk">in ┬▶ <i>1−MIX</i> ─────────────────────────────────┐
+   ├▶ <b>컨볼루션</b> ─▶ <b>하이셸프</b> <i>8k, H×6dB</i> ─▶ <i>MIX·REV·0.50</i> ┤
+   ├▶ <b>컨볼루션</b> ─▶ <i>MIX·REV·0.25</i> ─────────────────┼─▶ out
+   └▶ L <i>0 ms</i> ┐
+      R <i>1+OBJ×4 ms</i> ┴▶ <i>MIX·OBJ·0.25</i> ─────────────┘</div>
+
+      <h4>임펄스 응답 구성</h4>
+      <div class="eq">RT60 = 프리셋값 × (0.4 + SPACE×0.8)
+IR 길이 = RT60 + 0.5 초</div>
+      <div class="tw"><table>
+        <thead><tr><th>씬</th><th>기준 RT60</th><th>SPACE 0 ~ 1 실효</th><th>초기 반사 대표값</th></tr></thead>
+        <tbody>
+          <tr><td class="n">STUDIO</td><td class="m">0.4 s</td><td class="m">0.16 ~ 0.48 s</td><td class="m">8 ms</td></tr>
+          <tr><td class="n">CLUB</td><td class="m">0.9 s</td><td class="m">0.36 ~ 1.08 s</td><td class="m">15 ms</td></tr>
+          <tr><td class="n">CINEMA</td><td class="m">1.8 s</td><td class="m">0.72 ~ 2.16 s</td><td class="m">22 ms</td></tr>
+          <tr><td class="n">CONCERT</td><td class="m">2.4 s</td><td class="m">0.96 ~ 2.88 s</td><td class="m">35 ms</td></tr>
+          <tr><td class="n">STADIUM</td><td class="m">3.2 s</td><td class="m">1.28 ~ 3.84 s</td><td class="m">55 ms</td></tr>
+        </tbody>
+      </table></div>
+      <div class="tw"><table>
+        <thead><tr><th>성분</th><th>지연</th><th>레벨</th></tr></thead>
+        <tbody>
+          <tr><td>직접음</td><td class="m">0 ms</td><td class="m">1.00</td></tr>
+          <tr><td>초기 반사 10개</td><td class="m">7, 13, 17, 23, 31, 41, 53, 67, 79, 97 ms</td><td class="m">0.85 → 0.24</td></tr>
+          <tr><td>좌우 편차</td><td class="m">—</td><td class="m">L 1.1−0.01i,  R 0.9+0.01i</td></tr>
+          <tr><td>천장 반사</td><td class="m">6 + HEIGHT×12 ms</td><td class="m">HEIGHT × 0.55</td></tr>
+          <tr><td>후방 반사</td><td class="m">40 + DEPTH×60 ms</td><td class="m">DEPTH × 0.45</td></tr>
+        </tbody>
+      </table></div>
+      <p>
+        초기 반사 지연값이 모두 소수인 것은 의도된 설계다.
+        지연값 사이에 정수배 관계가 있으면 특정 주파수에서 반사음이 동상으로 합산되어
+        콤 필터링이 발생한다. 소수로 구성하면 그 공진이 분산된다.
+      </p>
+      <p>
+        천장 반사 지연 6~18 ms는 2~6 m 높이의 천장에서 오는 1차 반사에 해당한다.
+        후방 반사 40~100 ms는 7~34 m 거리의 뒷벽에 대응하며,
+        50 ms를 넘어서면 선행음 융합 한계를 벗어나 별개의 반향으로 인지되기 시작한다.
+      </p>
+      <div class="nb">
+        <span class="t">선행음 경로</span>
+        <p>
+          우측 채널만 1~5 ms 지연시킨다. 이 범위는 선행음 효과가 작동하는 구간이라
+          에코가 아닌 정위 이동으로 인지된다. 다만 모노 합산 시 이 지연이
+          <code>1/(2τ)</code> 간격의 콤 필터를 만든다. τ = 3 ms이면 약 167 Hz 간격으로
+          딥이 생긴다. OBJECT MIX를 올린 상태에서는 모노 호환성 확인이 필요하다.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="unit" id="u-master">
+    <div class="unit-h"><h3>MASTERING CHAIN</h3><span class="tag">4대역 압축 + 리미팅</span></div>
+    <div class="rd">
+      <p>
+        Linkwitz-Riley 4차 특성으로 4대역 분할한다.
+        버터워스 2차(Q = 0.707)를 직렬 2단으로 구성해 −24 dB/oct 기울기를 얻고,
+        분할점에서 −6 dB로 만나 합산 시 평탄한 응답이 된다.
+      </p>
+      <div class="tw"><table>
+        <thead><tr><th>대역</th><th>범위</th><th>스레숄드</th><th>레시오</th><th>어택</th><th>릴리즈</th><th>니</th></tr></thead>
+        <tbody>
+          <tr><td class="n">1</td><td class="m">~120 Hz</td><td class="m">−24 dB</td><td class="m">min(LOW, 4)</td><td class="m">30 ms</td><td class="m">80 ms</td><td class="m">10</td></tr>
+          <tr><td class="n">2</td><td class="m">120~500</td><td class="m">−22 dB</td><td class="m">LOW</td><td class="m">15 ms</td><td class="m">120 ms</td><td class="m">8</td></tr>
+          <tr><td class="n">3</td><td class="m">500~5k</td><td class="m">−20 dB</td><td class="m">MID</td><td class="m">5 ms</td><td class="m">180 ms</td><td class="m">6</td></tr>
+          <tr><td class="n">4</td><td class="m">5k~</td><td class="m">−22 dB</td><td class="m">min(HIGH, 3)</td><td class="m">2 ms</td><td class="m">150 ms</td><td class="m">5</td></tr>
+        </tbody>
+      </table></div>
+      <p>
+        어택이 저역에서 길고 고역으로 갈수록 짧다(30 → 15 → 5 → 2 ms).
+        저역은 주기가 길어 빠른 게인 변화가 파형을 변형시키고 왜곡으로 들린다.
+        120 Hz의 한 주기는 8.3 ms이므로 30 ms 어택은 약 3.6주기에 해당해
+        파형 왜곡 없이 포락선에만 반응한다.
+        반대로 고역은 트랜지언트가 짧아 2 ms로도 충분히 포착한다.
+      </p>
+      <p>
+        밴드 1과 4는 레시오에 상한이 걸려 있다. 저역을 4:1 넘게 압축하면
+        펀치가 사라지고, 고역을 3:1 넘게 압축하면 심벌 감쇠 구간에서
+        게인 회복이 들리기 시작한다. 슬라이더를 10까지 올려도 실제 적용은
+        각각 4:1, 3:1에서 멈춘다.
+      </p>
+      <p>
+        밴드 1 출력에만 0.95 배율이 걸려 있다. 저역이 합산 후 과도해지는 것을
+        미리 −0.45 dB 낮춰 보정하는 값이다.
+      </p>
+      <h4>리미터</h4>
+      <div class="tw"><table>
+        <thead><tr><th>항목</th><th>값</th></tr></thead>
+        <tbody>
+          <tr><td>스레숄드</td><td class="m">CEILING (−6 ~ 0 dB, 기본 −0.3)</td></tr>
+          <tr><td>레시오</td><td class="m">20:1</td></tr>
+          <tr><td>어택 / 릴리즈</td><td class="m">1 ms / 50 ms</td></tr>
+          <tr><td>니</td><td class="m">0 dB (하드)</td></tr>
+        </tbody>
+      </table></div>
+      <div class="nb warn">
+        <span class="t">브릭월이 아님</span>
+        <p>
+          룩어헤드가 없고 어택이 1 ms이므로, 그보다 짧은 순간 피크는 억제되기 전에
+          통과한다. 레시오도 20:1이라 무한대가 아니다.
+          결과적으로 출력 피크가 CEILING을 수 dB 초과할 수 있다.
+        </p>
+        <p>
+          손실 압축으로 재인코딩하면 파형 재구성 과정에서 피크가 추가로
+          0.5~1.5 dB 상승한다. CEILING을 0 dB에 두면 안 되는 이유다.
+          배포용은 −1.0 dB를 권한다.
+        </p>
+      </div>
+      <div class="nb warn">
+        <span class="t">STEREO WIDTH 미구현</span>
+        <p>
+          파라미터가 존재하나 신호 경로에 M/S 처리가 없어 결과에 반영되지 않는다.
+          구현하려면 M = (L+R)/2, S = (L−R)/2로 분해해 S에 폭 계수를 곱한 뒤
+          재합성해야 한다.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 3 ============ -->
+<section id="sbr">
+  <h2><span class="n">03</span>대역 확장</h2>
+  <div class="rd">
+    <p>
+      손실 압축으로 제거된 고역을 하모닉 전사로 합성한다.
+      단시간 푸리에 변환 영역에서 동작하며, 프레임 길이 4096,
+      홉 1024(75% 중첩), 한 창을 사용한다.
+    </p>
+    <div class="tw"><table>
+      <thead><tr><th>항목</th><th>96 kHz</th><th>192 kHz</th></tr></thead>
+      <tbody>
+        <tr><td>주파수 분해능</td><td class="m">23.4 Hz</td><td class="m">46.9 Hz</td></tr>
+        <tr><td>프레임 시간 길이</td><td class="m">42.7 ms</td><td class="m">21.3 ms</td></tr>
+        <tr><td>홉 시간 간격</td><td class="m">10.7 ms</td><td class="m">5.3 ms</td></tr>
+        <tr><td>표현 가능 상한</td><td class="m">48 kHz</td><td class="m">96 kHz</td></tr>
+      </tbody>
+    </table></div>
+    <p>
+      192 kHz에서는 같은 프레임 길이가 시간상 절반이 되므로 시간 분해능이 높아지는
+      대신 주파수 분해능이 절반으로 떨어진다. 저역 배음 구조의 식별력이 낮아지지만,
+      대역 확장이 관심을 두는 영역은 고역이라 실무상 문제가 되지 않는다.
+    </p>
+  </div>
+
+  <h3 id="sbr-why">손실 압축의 흔적</h3>
+  <div class="rd">
+    <p>
+      지각 부호화기는 마스킹 임계 아래의 성분을 제거하고,
+      비트 예산이 부족하면 고역 전체를 대역 제한한다.
+      결과적으로 스펙트럼에 수직에 가까운 절벽이 남는다.
+    </p>
+    <div class="tw"><table>
+      <thead><tr><th>소스</th><th>전형적 차단</th><th>확장 여지</th></tr></thead>
+      <tbody>
+        <tr><td>MP3 128 kbps</td><td class="m">15 ~ 16 kHz</td><td>가청 대역 내 여지가 크다</td></tr>
+        <tr><td>MP3 192 kbps</td><td class="m">17 ~ 18 kHz</td><td>일부 가청</td></tr>
+        <tr><td>MP3 320 kbps</td><td class="m">19 ~ 20 kHz</td><td>거의 가청 한계 밖</td></tr>
+        <tr><td>AAC 256 kbps</td><td class="m">18 ~ 20 kHz</td><td>거의 가청 한계 밖</td></tr>
+        <tr><td>무손실</td><td class="m">없음</td><td>나이퀴스트 위에만 작용</td></tr>
+      </tbody>
+    </table></div>
+    <p>
+      자연 음원의 스펙트럼은 고역으로 갈수록 완만하게 감쇠한다.
+      악기의 배음 포락선은 대체로 −6 ~ −12 dB/oct 기울기를 가진다.
+      부호화가 만든 절벽은 이보다 훨씬 가파르며, 이 불연속이
+      가청 대역 밖에 있더라도 경계 부근의 인접 대역 인지에 영향을 준다.
+    </p>
+  </div>
+
+  <h3 id="sbr-detect">컷오프 판정</h3>
+  <div class="rd">
+    <p>
+      프레임 단위가 아니라 파일 전역에서 1회 수행한다.
+      한 프레임만 관측하면 고역이 없는 조용한 구간을 차단으로 오판할 수 있다.
+    </p>
+    <ol>
+      <li>
+        <strong>평균 스펙트럼 수집.</strong> 파일 전체에서 최소 20개 지점을 표본
+        추출해 진폭 스펙트럼을 평균한다.
+      </li>
+      <li>
+        <strong>평활과 dB 변환.</strong> 9빈 이동 평균 후 dB로 변환한다.
+        인접 빈의 변동을 줄여 판정을 안정화한다.
+      </li>
+      <li>
+        <strong>기준 레벨 산출.</strong> 1 ~ 4 kHz 구간의 평균 dB를 기준으로 삼는다.
+        대부분의 음악에서 에너지가 집중되고 부호화기가 가장 보존하는 대역이다.
+      </li>
+      <li>
+        <strong>1차 탐색.</strong> 상한은 샘플레이트의 1/4이다.
+        업샘플링으로 생긴 빈 영역을 탐색 대상에서 제외한다.
+        여기서 하강하며 연속 12빈 평균이 <code>기준 − 30 dB</code>를 넘는
+        최초 지점을 차단점으로 본다.
+      </li>
+      <li>
+        <strong>절벽 검증.</strong> 차단점 위 12빈이 아래보다 15 dB 이상 낮지 않으면
+        절벽이 아니라고 판단하고, 인접 12빈 평균차가 20 dB를 넘는 지점을 재탐색한다.
+      </li>
+    </ol>
+    <div class="tw"><table>
+      <thead><tr><th>임계</th><th>진폭비</th><th>판정 의미</th></tr></thead>
+      <tbody>
+        <tr><td class="m">−30 dB</td><td class="m">1/31.6</td><td>실질 신호 유무 판정. 이 아래는 누설·잡음 수준</td></tr>
+        <tr><td class="m">−15 dB</td><td class="m">1/5.6</td><td>절벽 여부 검증</td></tr>
+        <tr><td class="m">−20 dB</td><td class="m">1/10</td><td>재탐색 시 급락 기준</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+
+  <h3 id="sbr-harm">배음 전사</h3>
+  <div class="rd">
+    <p>
+      차단점 아래의 잔존 성분을 정수배 주파수 위치로 복사한다.
+      차수별 레벨은 고정 비율을 따르고 사용자 파라미터가 전체를 스케일링한다.
+    </p>
+    <div class="tw"><table>
+      <thead><tr><th>차수</th><th>2</th><th>4</th><th>8</th><th>16</th><th>32</th><th>64</th><th>128</th></tr></thead>
+      <tbody>
+        <tr><td>레벨</td><td class="m">1/2</td><td class="m">1/4</td><td class="m">1/8</td><td class="m">1/16</td><td class="m">1/32</td><td class="m">1/64</td><td class="m">1/128</td></tr>
+        <tr><td>dB</td><td class="m">−6</td><td class="m">−12</td><td class="m">−18</td><td class="m">−24</td><td class="m">−30</td><td class="m">−36</td><td class="m">−42</td></tr>
+      </tbody>
+    </table></div>
+    <p>
+      차수가 2배 될 때마다 −6 dB다. 주파수 축 로그 스케일에서 옥타브당 −6 dB 기울기에
+      해당하며, 현악기·관악기 배음 포락선의 전형적인 감쇠율과 일치한다.
+      이 때문에 합성된 고역이 원본 배음 구조의 연장선처럼 들린다.
+    </p>
+    <div class="eq">전체 스케일 = <b>0.5 + HF_SYNTH</b>     <i>(0.5 ~ 1.5, 최대 9.5 dB 범위)</i>
+
+차수 n의 유효 구간 = [ 차단점 × n/2 ,  차단점 × n ]</div>
+    <p>
+      구간이 연속되도록 설계되어 있다. 차수 2는 차단점부터 그 2배까지,
+      차수 4는 2배부터 4배까지를 담당한다. 슬라이더를 0으로 내려도
+      스케일이 0.5이므로 합성이 완전히 꺼지지는 않는다.
+    </p>
+    <div class="nb warn">
+      <span class="t">위상 처리의 근사</span>
+      <p>
+        전사 시 원본 빈의 위상을 그대로 사용한다. 엄밀하게는 주파수가 n배가 되면
+        위상도 n배가 되어야 시간 영역에서 배음 관계가 유지된다.
+        이 보정을 하지 않으므로 합성 성분은 원음과 위상이 정합되지 않는다.
+        해당 대역이 위상 인지 한계(약 1.5 kHz 이상에서는 파형 위상 감지 불가) 밖이라
+        청감상 문제로 드러나지 않지만, 원리적으로는 근사다.
+      </p>
+    </div>
+  </div>
+
+  <h3 id="sbr-xf">교차 특성</h3>
+  <div class="rd">
+    <p>
+      원음과 합성음의 경계를 코사인 곡선으로 교차시킨다.
+      교차 시작점은 차단점의 75% 지점이다.
+    </p>
+    <div class="eq">t  = (k − 시작점) / (차단점 − 시작점)
+원음 가중 = 0.5 + 0.5·cos(π·t)     <i>1 → 0</i>
+합성 가중 = 1 − 원음 가중          <i>0 → 1</i></div>
+    <p>
+      가중치의 합이 1인 진폭 보존 교차다. 상관관계가 없는 두 신호를 섞을 때는
+      제곱합이 1인 전력 보존 교차가 적절하지만, 여기서는 합성음이 원음에서
+      파생되어 상관관계가 있으므로 진폭 보존이 맞다.
+      전력 보존을 쓰면 교차 중앙에서 약 3 dB 융기가 발생한다.
+    </p>
+    <p>
+      배음 차수 사이의 경계도 각 구간을 25% 침범하며 교차한다.
+      중첩 없이 이어 붙이면 경계마다 진폭 딥이 생기고,
+      주기적인 딥은 금속성 착색으로 들린다.
+    </p>
+  </div>
+
+  <h3 id="sbr-sm">스펙트럼 평활</h3>
+  <div class="rd">
+    <p>
+      합성 구간의 진폭에 가우시안 커널을 적용한다.
+      전사 과정에서 원본의 협대역 피크가 그대로 복사되면
+      고역에 고립된 정현파 성분으로 남아 금속성 울림을 만든다.
+    </p>
+    <div class="tw"><table>
+      <thead><tr><th>SMOOTH</th><th>커널 반경</th><th>표준편차</th><th>탭 수</th><th>적용률</th><th>청감</th></tr></thead>
+      <tbody>
+        <tr><td class="m">0</td><td class="m">—</td><td class="m">—</td><td class="m">—</td><td class="m">0%</td><td>평활 없음. 또렷하나 피크 잔존</td></tr>
+        <tr><td class="m">20</td><td class="m">2</td><td class="m">0.92</td><td class="m">5</td><td class="m">20%</td><td>경미</td></tr>
+        <tr><td class="m">40</td><td class="m">2</td><td class="m">1.24</td><td class="m">5</td><td class="m">40%</td><td>기본. 대부분의 소스에 적정</td></tr>
+        <tr><td class="m">60</td><td class="m">3</td><td class="m">1.56</td><td class="m">7</td><td class="m">60%</td><td>거친 합성음 정돈</td></tr>
+        <tr><td class="m">80</td><td class="m">3</td><td class="m">1.88</td><td class="m">7</td><td class="m">80%</td><td>상당히 매끈</td></tr>
+        <tr><td class="m">100</td><td class="m">4</td><td class="m">2.20</td><td class="m">9</td><td class="m">100%</td><td>최대. 고역 질감이 무뎌짐</td></tr>
+      </tbody>
+    </table></div>
+    <p>
+      평활은 진폭에만 적용하고 위상은 보존한다.
+      위상까지 평활하면 시간 영역에서 임펄스가 퍼져 트랜지언트가 뭉개진다.
+    </p>
+    <p>
+      합성량이 클수록 돌출 피크도 많아지므로 SMOOTH를 함께 올리는 것이 일반적이다.
+      SYNTH 70 이상에서 심벌에 금속성이 들리면 SYNTH를 내리기 전에
+      SMOOTH를 먼저 올려 볼 가치가 있다.
+    </p>
+  </div>
+
+  <h3 id="sbr-lvl">레벨 정합</h3>
+  <div class="rd">
+    <p>
+      고역 성분을 추가하면 전체 에너지가 증가한다.
+      처리 전후 RMS를 비교해 증가분만 되돌린다.
+    </p>
+    <div class="eq">처리 후 RMS &gt; 원본 RMS × 1.01  인 경우에만
+    전체에 (원본 RMS / 처리 후 RMS) 적용
+
+이후 |x| &gt; 0.99 인 표본을 ±0.99로 클램프</div>
+    <p>
+      1% 여유를 둔 단방향 보정이다. 커진 경우만 줄이고 작아진 경우는 두므로,
+      기능을 켜고 끌 때 음량 차이가 최소화되어 A/B 비교가 공정해진다.
+      레벨을 맞추지 않으면 단순히 커진 소리를 개선으로 오인하게 된다.
+    </p>
+    <p>
+      클램프는 0.99에서 하드 클리핑이다. 정합 후에도 피크가 남는 경우를 대비한
+      최종 보호이며, 정상 동작에서는 거의 개입하지 않는다.
+    </p>
+  </div>
+</section>
+
+<!-- ============ 4 ============ -->
+<section id="meter">
+  <h2><span class="n">04</span>계측과 판독</h2>
+  <div class="rd">
+    <p>
+      처리 전후를 동시에 표시한다. 원음 신호는 모든 처리 단 진입 이전에서 분기한다.
+    </p>
+    <div class="tw"><table>
+      <thead><tr><th>항목</th><th>값</th></tr></thead>
+      <tbody>
+        <tr><td>변환 길이</td><td class="m">2048 (1024 빈)</td></tr>
+        <tr><td>시간 평활 계수</td><td class="m">0.8</td></tr>
+        <tr><td>표시 하한 / 상한</td><td class="m">−100 dB / −30 dB</td></tr>
+        <tr><td>주파수 축</td><td class="m">로그, 20 Hz ~ 나이퀴스트</td></tr>
+      </tbody>
+    </table></div>
+    <p>
+      표시 범위 70 dB를 0~255로 정규화한다. 색상 눈금과 dB 격자가 동일한 상한·하한을
+      참조하므로 두 표시가 항상 일치한다.
+      시간 평활 0.8은 프레임 간 급변을 억제해 판독성을 높이지만,
+      짧은 트랜지언트의 순간 피크는 과소 표시된다.
+    </p>
+
+    <h3>막대 표시</h3>
+    <p>
+      128개 구간을 로그 간격으로 나누고 각 구간의 <strong>최대값</strong>을 취한다.
+      평균을 쓰면 협대역 피크가 인접 빈에 희석되어 사라진다.
+      피크 홀드 지시는 프레임당 일정 비율로 하강한다.
+    </p>
+
+    <h3>시간-주파수 표시</h3>
+    <p>
+      가로축 시간, 세로축 로그 주파수, 색상이 음압이다.
+      약 8.7초의 이력이 유지된다. 차단점 식별에는 이 표시가 유리하다.
+      정지 스펙트럼은 순간값만 보여주므로, 곡 전체에 걸친 대역 제한을
+      판단하려면 시간 축이 필요하다.
+    </p>
+
+    <h3>표시 범위 고정</h3>
+    <p>
+      표시 상한을 24 kHz, 48 kHz, 96 kHz 중에서 고정할 수 있다.
+      대역 확장을 켜고 끄면 실제 나이퀴스트가 바뀌어 축이 재조정되는데,
+      그 상태로는 같은 성분이 화면상 다른 위치에 나타나 비교가 성립하지 않는다.
+      축을 고정하면 위치가 유지되어 새로 채워진 영역만 식별된다.
+    </p>
+    <p>
+      고정 범위가 실제 나이퀴스트보다 넓으면 데이터가 없는 구간이 생긴다.
+      이 구간은 경계선 표시와 함께 어둡게 처리한다.
+      경계에서 값을 유지하면 없는 신호가 존재하는 것처럼 보인다.
+    </p>
+  </div>
+</section>
+
+<!-- ============ 5 ============ -->
+<section id="psycho">
+  <h2><span class="n">05</span>청감 한계</h2>
+  <div class="rd">
+    <p>
+      대역 확장의 효과를 평가할 때 반드시 고려해야 할 제약이다.
+    </p>
+
+    <h3>가청 상한</h3>
+    <div class="tw"><table>
+      <thead><tr><th>연령대</th><th>전형적 상한</th></tr></thead>
+      <tbody>
+        <tr><td>10대 후반</td><td class="m">17 ~ 20 kHz</td></tr>
+        <tr><td>30대</td><td class="m">15 ~ 17 kHz</td></tr>
+        <tr><td>50대</td><td class="m">12 ~ 14 kHz</td></tr>
+      </tbody>
+    </table></div>
+    <p>
+      96 kHz 확장이 채우는 20 ~ 48 kHz, 192 kHz 확장이 추가로 채우는 48 ~ 96 kHz는
+      어느 연령에서도 직접 지각되지 않는다.
+      실효 이득은 <strong>차단점과 가청 상한 사이의 중첩 구간</strong>에서만 발생한다.
+    </p>
+    <div class="eq">실효 이득 구간 = [ 차단 주파수 ,  청자의 가청 상한 ]
+
+MP3 128k, 20대 청자 → [16 kHz, 18 kHz] = 약 2 kHz 구간
+MP3 320k, 40대 청자 → [20 kHz, 15 kHz] = 없음</div>
+
+    <h3>재생계 제약</h3>
+    <p>
+      출력 장치가 48 kHz로 동작하면 24 kHz 이상은 변환 단계에서 제거된다.
+      96 kHz 대응 변환기가 있어야 48 kHz까지 전달되고, 192 kHz 대응은 더 드물다.
+      다만 실효 이득 구간이 가청 대역 내에 있으므로, 장치 대역폭과 무관하게
+      그 부분은 전달된다.
+    </p>
+
+    <h3>초음파 성분의 간접 영향</h3>
+    <p>
+      가청 상한 이상의 성분이 증폭단의 비선형성과 상호작용해
+      가청 대역 내에 상호변조 산물을 만들 수 있다.
+      이는 개선이 아니라 왜곡이다. 고차 배음을 과도하게 넣는 설정이
+      역효과를 낼 수 있는 물리적 근거이기도 하다.
+    </p>
+
+    <div class="nb">
+      <span class="t">평가 결론</span>
+      <p>
+        저비트레이트 소스에서는 실효 이득 구간이 넓어 차이가 명확하다.
+        고비트레이트 소스에서는 구간이 좁거나 존재하지 않아 차이가 미미하다.
+        무손실 소스에서는 차단점 자체가 없으므로 나이퀴스트 위에만 성분이 추가되며
+        가청 이득은 없다.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 6 ============ -->
+<section id="practice">
+  <h2><span class="n">06</span>운용 지침</h2>
+  <div class="rd">
+    <h3>소스별 대역 확장 설정</h3>
+    <div class="tw"><table>
+      <thead><tr><th>소스</th><th>SYNTH</th><th>SMOOTH</th><th>근거</th></tr></thead>
+      <tbody>
+        <tr><td>MP3 128 kbps</td><td class="m">60 ~ 75</td><td class="m">40 ~ 55</td><td>확장 구간이 넓고 상당 부분이 가청 영역</td></tr>
+        <tr><td>MP3 320 kbps</td><td class="m">40 ~ 55</td><td class="m">35 ~ 45</td><td>구간이 좁아 과도하면 이질감만 증가</td></tr>
+        <tr><td>AAC 256 kbps</td><td class="m">40 ~ 50</td><td class="m">40</td><td>차단이 완만해 절벽 판정이 불안정할 수 있음</td></tr>
+        <tr><td>오래된 아날로그 녹음</td><td class="m">50 ~ 65</td><td class="m">55 ~ 70</td><td>원본에 고역이 없던 것이라 평활을 높여 자연스럽게</td></tr>
+        <tr><td>무손실</td><td class="m">0 ~ 30</td><td class="m">—</td><td>가청 이득 없음. 보관 포맷 변환 목적일 때만</td></tr>
+      </tbody>
+    </table></div>
+
+    <h3>평가 절차</h3>
+    <ol>
+      <li>시간-주파수 표시로 전환하고 표시 범위를 96 kHz로 고정한다.</li>
+      <li>확장을 끈 상태로 차단점을 확인한다. 절벽이 없으면 확장 대상이 아니다.</li>
+      <li>확장을 켜고 채워진 영역의 질감을 관찰한다. 하부 무늬와 연속되면 정상이고, 무관한 균일 대역이면 SYNTH가 과도하다.</li>
+      <li>레벨을 정합한 상태에서 청감 비교한다. 심벌·하이햇·치찰음 구간을 중점적으로 듣는다.</li>
+      <li>차이가 식별되지 않으면 해당 소스에 확장이 불필요하다고 판단한다.</li>
+    </ol>
+
+    <h3>과도 설정의 징후</h3>
+    <ul>
+      <li><strong>심벌의 금속성 착색.</strong> 합성 배음이 원본과 조화하지 못하는 상태. SMOOTH를 올리거나 SYNTH를 내린다.</li>
+      <li><strong>치찰음의 경직.</strong> 6~10 kHz 대역에 합성 성분이 과다. 차단점 판정이 낮게 잡혔을 가능성.</li>
+      <li><strong>무음 구간의 배경 잡음.</strong> 잔존 잡음 성분까지 전사된 상태. SYNTH를 내린다.</li>
+    </ul>
+
+    <h3>다른 단과의 상호작용</h3>
+    <p>
+      대역 확장과 EXCITER를 동시에 강하게 걸면 고역이 중복 강조된다.
+      두 처리가 같은 대역을 다르게 만들어내므로 합산 시 예측이 어렵다.
+      확장 효과를 판정할 때는 EXCITER를 포함한 다른 단을 모두 끄는 것이 좋다.
+    </p>
+    <p>
+      BBE의 HI DEF는 8 kHz 이상을 셸빙으로 들어올린다.
+      확장으로 새로 만든 성분까지 함께 증폭하므로, 확장을 켠 상태에서는
+      평소보다 낮은 값이 적절하다.
+    </p>
+  </div>
+</section>
+
+<!-- ============ 7 ============ -->
+<section id="limits">
+  <h2><span class="n">07</span>사양상 한계</h2>
+  <div class="rd">
+    <h3>미구현 파라미터</h3>
+    <div class="tw"><table>
+      <thead><tr><th>파라미터</th><th>현재</th><th>구현 방향</th></tr></thead>
+      <tbody>
+        <tr><td class="n">MASTER<br>STEREO WIDTH</td><td>신호 경로에 반영되지 않음</td><td>M/S 분해 후 사이드 성분에 폭 계수 적용</td></tr>
+        <tr><td class="n">VINYL<br>WOBBLE</td><td>반영되지 않음</td><td>가변 지연의 저주파 변조 (0.5~2 Hz)</td></tr>
+        <tr><td class="n">VINYL<br>CROSSTALK</td><td>반영되지 않음</td><td>채널 간 교차 합산 게인</td></tr>
+        <tr><td class="n">SG<br>STEREO</td><td>압축기 릴리즈만 제어</td><td>명칭과 동작 불일치. 개명 또는 폭 처리 추가</td></tr>
+      </tbody>
+    </table></div>
+
+    <h3>설계상 타협</h3>
+    <ul>
+      <li>
+        <strong>배음 전사의 위상 근사.</strong> 주파수 배수에 따른 위상 배수 보정이 없다.
+        가청 위상 감지 한계 밖이라 실용상 문제는 없으나 이론적으로는 부정확하다.
+      </li>
+      <li>
+        <strong>SG의 비상보 대역 분할.</strong> LPF + BPF + HPF 구성이라 합산 응답이
+        평탄하지 않다. 중첩 구간에서 에너지가 누적된다.
+      </li>
+      <li>
+        <strong>리미터의 룩어헤드 부재.</strong> 1 ms 이내의 순간 피크가 통과한다.
+        천장 설정에 여유가 필요하다.
+      </li>
+      <li>
+        <strong>ATMOS의 임펄스 응답 중복.</strong> 초기 반사와 후기 잔향이 동일한
+        응답을 레벨만 달리해 두 번 적용한다. 결과는 단일 적용에 게인 합을 곱한 것과
+        같으므로, 초기 반사와 후기 잔향을 분리한 응답을 각각 쓰는 것이 설계 의도에 맞다.
+      </li>
+      <li>
+        <strong>포화 단의 앨리어싱.</strong> 2배 또는 4배 오버샘플링으로 완화하지만
+        완전 제거되지 않는다. 드라이브를 높이면 나이퀴스트 근처 배음이 접혀
+        비조화 성분으로 남는다.
+      </li>
+    </ul>
+
+    <h3>원본 샘플레이트</h3>
+    <p>
+      입력 파일의 원래 샘플레이트가 보존되지 않는다.
+      디코딩 시점에 재생 장치의 기준 레이트로 변환되므로,
+      표준 출력의 <em>원본 SR</em> 표기는 실제로는 그 값이다.
+      원본 레이트를 유지하려면 별도의 디코딩 경로가 필요하다.
+    </p>
+  </div>
+</section>
+
+<footer>
+  <p>
+    본 문서의 수치는 실제 설정값에서 직접 옮긴 것이다.
+    개념 수준의 설명은 기술 설명서를, 비전문가용 설명은 쉬운 말 설명서를 참조하라.
+  </p>
+</footer>
+
+</main>
+</div>
+
+<script>
+(function () {
+  var links = Array.prototype.slice.call(document.querySelectorAll('.rail a[href^="#"]'));
+  var targets = links.map(function (a) {
+    var el = document.getElementById(a.getAttribute('href').slice(1));
+    return el ? { a: a, el: el } : null;
+  }).filter(Boolean);
+  if (!targets.length || !('IntersectionObserver' in window)) return;
+
+  var visible = [];
+  var io = new IntersectionObserver(function (ents) {
+    ents.forEach(function (e) {
+      var i = visible.indexOf(e.target);
+      if (e.isIntersecting) { if (i < 0) visible.push(e.target); }
+      else if (i >= 0) visible.splice(i, 1);
+    });
+    var best = null;
+    targets.forEach(function (t) {
+      if (visible.indexOf(t.el) < 0) return;
+      if (!best || t.el.getBoundingClientRect().top < best.el.getBoundingClientRect().top) best = t;
+    });
+    if (best) {
+      links.forEach(function (a) { a.classList.remove('on'); });
+      best.a.classList.add('on');
+    }
+  }, { rootMargin: '-8% 0px -72% 0px', threshold: 0 });
+
+  targets.forEach(function (t) { io.observe(t.el); });
+})();
+</script>
+
+</body>
+</html>

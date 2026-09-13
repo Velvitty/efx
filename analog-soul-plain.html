@@ -1,0 +1,1104 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ANALOG SOUL DSP ENGINE — 쉬운 말 설명서</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   토큰 — 라이트 기본, 다크는 세 곳에서 재정의
+   ============================================================ */
+:root {
+  --paper:    #F4F5F3;
+  --card:     #FFFFFF;
+  --sunk:     #EAECE8;
+  --ink:      #1B1E1C;
+  --ink-soft: #3E4642;
+  --mute:     #67706B;
+  --line:     #CFD5D0;
+  --line-soft:#E1E5E2;
+
+  --teal:     #1E6B62;
+  --teal-bg:  #E3EFEC;
+  --brick:    #8B3A3A;
+  --brick-bg: #F5E7E6;
+  --ochre:    #8A6017;
+  --ochre-bg: #F5EEDF;
+
+  --measure: 62ch;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper:#141715; --card:#1C201E; --sunk:#101312;
+    --ink:#E9EDEA; --ink-soft:#BCC4BF; --mute:#8B958F;
+    --line:#2E3632; --line-soft:#232A27;
+    --teal:#6FC4B8;  --teal-bg:#152A27;
+    --brick:#DE9090; --brick-bg:#2C1B1B;
+    --ochre:#DCB05F; --ochre-bg:#2A2315;
+  }
+}
+:root[data-theme="dark"] {
+  --paper:#141715; --card:#1C201E; --sunk:#101312;
+  --ink:#E9EDEA; --ink-soft:#BCC4BF; --mute:#8B958F;
+  --line:#2E3632; --line-soft:#232A27;
+  --teal:#6FC4B8;  --teal-bg:#152A27;
+  --brick:#DE9090; --brick-bg:#2C1B1B;
+  --ochre:#DCB05F; --ochre-bg:#2A2315;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  * { animation: none !important; transition: none !important; }
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  font-weight: 400;
+  font-size: 18px;
+  line-height: 1.88;
+  letter-spacing: -0.003em;
+  -webkit-font-smoothing: antialiased;
+}
+
+.wrap { max-width: 720px; margin: 0 auto; padding: 0 24px 110px; }
+
+/* ---------- 표제 ---------- */
+.masthead { padding: 62px 0 34px; border-bottom: 2px solid var(--ink); }
+.masthead .kicker {
+  font-size: 14px; font-weight: 500; color: var(--teal);
+  letter-spacing: .02em; margin: 0 0 12px;
+}
+.masthead h1 {
+  font-size: clamp(30px, 5.5vw, 42px);
+  line-height: 1.24; font-weight: 600; letter-spacing: -.02em;
+  margin: 0 0 16px;
+}
+.masthead .lede {
+  font-size: 19px; color: var(--ink-soft); margin: 0; max-width: 52ch;
+}
+
+/* ---------- 안내 ---------- */
+.readme {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 20px 22px;
+  margin-top: 28px;
+  font-size: 16.5px;
+  color: var(--ink-soft);
+}
+.readme p { margin: 0; max-width: none; }
+
+/* ---------- 목차 ---------- */
+.toc { margin-top: 24px; }
+.toc h2 { font-size: 15px; font-weight: 600; color: var(--mute); margin: 0 0 10px; letter-spacing: .02em; }
+.toc ol { list-style: none; margin: 0; padding: 0; counter-reset: t; }
+.toc li { counter-increment: t; border-bottom: 1px solid var(--line-soft); }
+.toc a {
+  display: flex; gap: 12px; padding: 9px 2px;
+  color: var(--ink); text-decoration: none; font-size: 16.5px;
+}
+.toc a::before { content: counter(t); color: var(--teal); font-weight: 500; min-width: 20px; }
+.toc a:hover { color: var(--teal); }
+
+/* ---------- 섹션 ---------- */
+section { padding-top: 58px; }
+section > h2 {
+  font-size: 25px; font-weight: 600; line-height: 1.32;
+  letter-spacing: -.015em; margin: 0 0 18px;
+  padding-bottom: 10px; border-bottom: 1px solid var(--line);
+}
+section > h2 .n {
+  color: var(--teal); font-weight: 500; margin-right: 9px;
+}
+h3 { font-size: 19.5px; font-weight: 600; margin: 34px 0 8px; letter-spacing: -.01em; }
+h4 { font-size: 17px; font-weight: 600; margin: 24px 0 5px; }
+p  { margin: 0 0 17px; max-width: var(--measure); }
+ul, ol { max-width: var(--measure); padding-left: 21px; margin: 0 0 17px; }
+li { margin-bottom: 9px; }
+strong { font-weight: 600; }
+a { color: var(--teal); text-underline-offset: 2px; }
+
+/* ---------- 상자 ---------- */
+.box {
+  border-left: 3px solid var(--teal);
+  background: var(--teal-bg);
+  padding: 16px 18px;
+  margin: 0 0 20px;
+  max-width: var(--measure);
+  border-radius: 0 6px 6px 0;
+}
+.box.warn  { border-left-color: var(--brick); background: var(--brick-bg); }
+.box.point { border-left-color: var(--ochre); background: var(--ochre-bg); }
+.box p:last-child { margin-bottom: 0; }
+.box .t {
+  display: block; font-weight: 600; font-size: 16px;
+  color: var(--teal); margin-bottom: 5px;
+}
+.box.warn  .t { color: var(--brick); }
+.box.point .t { color: var(--ochre); }
+
+/* ---------- 단계 ---------- */
+.steps { list-style: none; padding-left: 0; counter-reset: s; }
+.steps > li {
+  counter-increment: s; position: relative;
+  padding-left: 38px; margin-bottom: 20px;
+}
+.steps > li::before {
+  content: counter(s);
+  position: absolute; left: 0; top: 4px;
+  width: 24px; height: 24px; border-radius: 50%;
+  background: var(--teal); color: var(--card);
+  font-size: 13px; font-weight: 600;
+  display: grid; place-items: center;
+}
+.steps h4 { margin: 0 0 3px; }
+.steps p  { margin: 0; }
+
+/* ---------- 모듈 ---------- */
+.mod {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 22px 24px;
+  margin-bottom: 16px;
+  max-width: var(--measure);
+}
+.mod h3 { margin: 0 0 2px; font-size: 19px; letter-spacing: .01em; }
+.mod .sub { font-size: 15.5px; color: var(--mute); margin: 0 0 14px; }
+.mod dl { margin: 0; }
+.mod dt { font-weight: 600; font-size: 16px; color: var(--teal); margin-top: 15px; }
+.mod dd { margin: 1px 0 0; }
+.mod dd:first-of-type { margin-top: 0; }
+
+/* ---------- 표 ---------- */
+.tw { overflow-x: auto; margin: 0 0 20px; max-width: var(--measure); }
+table { border-collapse: collapse; width: 100%; min-width: 400px; font-size: 16px; }
+th {
+  text-align: left; font-weight: 600; font-size: 14.5px; color: var(--mute);
+  border-bottom: 1px solid var(--line); padding: 0 14px 7px 0; white-space: nowrap;
+}
+td { border-bottom: 1px solid var(--line-soft); padding: 10px 14px 10px 0; vertical-align: top; line-height: 1.62; }
+td.num { white-space: nowrap; color: var(--ink-soft); }
+
+/* ---------- 그림 ---------- */
+figure { margin: 0 0 22px; max-width: var(--measure); }
+figure svg { width: 100%; height: auto; display: block; }
+figcaption { font-size: 15.5px; color: var(--mute); margin-top: 8px; line-height: 1.6; }
+
+/* 색 띠 */
+.band {
+  height: 20px; border-radius: 4px; border: 1px solid var(--line);
+  max-width: var(--measure);
+  background: linear-gradient(to right,
+    #0b0716 0%, #2a1370 12%, #1450c4 30%, #00b8c0 46%,
+    #34c94a 60%, #e2dd2c 72%, #ffb300 82%, #ff5a24 92%, #ffffff 100%);
+}
+.band-label {
+  display: flex; justify-content: space-between; max-width: var(--measure);
+  font-size: 15px; color: var(--mute); margin: 6px 0 20px;
+}
+
+footer {
+  margin-top: 66px; padding-top: 22px; border-top: 1px solid var(--line);
+  font-size: 16px; color: var(--mute); max-width: var(--measure);
+}
+:focus-visible { outline: 2px solid var(--teal); outline-offset: 3px; border-radius: 4px; }
+
+@media print {
+  body { background: #fff; font-size: 11.5pt; }
+  .mod, .steps > li, figure { break-inside: avoid; }
+  h2, h3 { break-after: avoid; }
+}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+<header class="masthead">
+  <p class="kicker">쉬운 말 설명서</p>
+  <h1>ANALOG SOUL DSP ENGINE</h1>
+  <p class="lede">
+    음악 파일의 소리를 다듬고, 압축 과정에서 잘려나간 높은 소리를 다시 만들어
+    채워주는 프로그램입니다.
+  </p>
+</header>
+
+<div class="readme">
+  <p>
+    이 문서는 오디오를 처음 다루는 분도 읽을 수 있도록 전문용어를 쓰지 않고 썼습니다.
+    기능은 하나도 빠뜨리지 않았습니다. 더 깊은 내용이 필요하시면 기술 설명서를 함께 보세요.
+  </p>
+</div>
+
+<nav class="toc">
+  <h2>차례</h2>
+  <ol>
+    <li><a href="#what">이 프로그램이 하는 일</a></li>
+    <li><a href="#start">시작하기</a></li>
+    <li><a href="#screen">화면 살펴보기</a></li>
+    <li><a href="#order">처리 순서가 중요한 이유</a></li>
+    <li><a href="#modules">여덟 개의 기능</a></li>
+    <li><a href="#restore">잘려나간 소리 되살리기</a></li>
+    <li><a href="#graph">소리를 그림으로 확인하기</a></li>
+    <li><a href="#save">파일로 저장하기</a></li>
+    <li><a href="#recipe">상황별 설정 예시</a></li>
+    <li><a href="#trouble">문제가 생기면</a></li>
+    <li><a href="#words">용어 풀이</a></li>
+  </ol>
+</nav>
+
+<!-- 1 -->
+<section id="what">
+  <h2><span class="n">1</span>이 프로그램이 하는 일</h2>
+  <p>
+    음악 파일을 넣으면 소리를 여러 방식으로 바꿔줍니다.
+    바꾸는 장치가 여덟 개 있고, 소리는 이 장치들을 차례로 지나갑니다.
+    공장의 컨베이어 벨트를 떠올리시면 됩니다.
+  </p>
+  <p>
+    어떤 장치는 소리를 따뜻하게 만들고, 어떤 장치는 선명하게 만듭니다.
+    넓은 공간에서 울리는 느낌을 주는 장치도 있습니다.
+    필요한 것만 켜서 쓰시면 됩니다.
+  </p>
+  <p>
+    여기에 더해 이 프로그램에는 특별한 기능이 하나 있습니다.
+    mp3 같은 파일은 용량을 줄이려고 높은 소리를 잘라서 버립니다.
+    그 빈 자리를 계산해서 다시 채워주는 기능입니다. 6장에서 자세히 다룹니다.
+  </p>
+  <div class="box">
+    <span class="t">먼저 알아두실 점</span>
+    <p>
+      음악 파일은 어디로도 전송되지 않습니다. 컴퓨터 안에서만 처리됩니다.
+      원본 파일은 변경되지 않고, 저장할 때마다 새 파일이 따로 만들어집니다.
+      무엇을 눌러도 원본이 망가질 일은 없습니다.
+    </p>
+  </div>
+</section>
+
+<!-- 2 -->
+<section id="start">
+  <h2><span class="n">2</span>시작하기</h2>
+  <p>
+    따로 설치할 것은 없습니다. 파일 하나를 인터넷 브라우저로 열면 그것이 프로그램 전체입니다.
+    Chrome을 권합니다. 뒤에 나오는 가장 높은 품질의 저장 기능이 다른 브라우저에서는
+    막히는 경우가 있습니다.
+  </p>
+
+  <ol class="steps">
+    <li>
+      <h4>음악 파일을 넣습니다</h4>
+      <p>
+        화면 위쪽 칸에 파일을 끌어다 놓거나, 칸을 눌러서 고릅니다.
+        mp3, wav, flac 등 대부분의 음악 파일을 읽습니다.
+      </p>
+    </li>
+    <li>
+      <h4>손대기 전에 먼저 들어봅니다</h4>
+      <p>
+        모든 장치를 끈 상태로 한 번 들어보세요. 원래 소리를 알아야
+        나중에 무엇이 달라졌는지 판단할 수 있습니다. 이 단계를 건너뛰면
+        이후 모든 판단이 흔들립니다.
+      </p>
+    </li>
+    <li>
+      <h4>장치를 하나만 켭니다</h4>
+      <p>
+        각 장치의 오른쪽 위에 켜고 끄는 스위치가 있습니다.
+        하나만 켜고 들어본 뒤 다시 꺼서 비교해보세요.
+      </p>
+    </li>
+    <li>
+      <h4>나머지도 하나씩 확인합니다</h4>
+      <p>
+        여러 개를 한꺼번에 켜면 어느 장치가 무슨 일을 했는지 알 수 없습니다.
+        반드시 하나씩 확인하세요.
+      </p>
+    </li>
+    <li>
+      <h4>마음에 들면 저장합니다</h4>
+      <p>화면 아래쪽에서 저장 형식을 고르면 새 파일이 만들어집니다.</p>
+    </li>
+  </ol>
+
+  <div class="box point">
+    <span class="t">가장 흔한 착각</span>
+    <p>
+      장치를 켜면 대체로 소리가 조금 커집니다. 그런데 사람의 귀는
+      커진 소리를 무조건 더 좋다고 느낍니다. 그래서 실제로 좋아진 것인지,
+      단지 커진 것인지 구분하기 어렵습니다.
+    </p>
+    <p>
+      켠 상태와 끈 상태의 소리 크기를 비슷하게 맞춰놓고 비교하세요.
+      각 장치의 INPUT GAIN이나 MASTER의 OUTPUT GAIN으로 맞출 수 있습니다.
+      이 습관 하나가 다른 어떤 조언보다 중요합니다.
+    </p>
+  </div>
+
+  <div class="box warn">
+    <span class="t">귀 보호</span>
+    <p>
+      장치를 켜는 순간 소리가 갑자기 커질 수 있습니다.
+      이어폰을 쓰신다면 볼륨을 낮춘 상태로 시작하세요.
+      한 시간 정도 집중해서 들었다면 잠시 쉬는 것이 좋습니다.
+      귀가 피로해지면 판단력도 함께 떨어집니다.
+    </p>
+  </div>
+</section>
+
+<!-- 3 -->
+<section id="screen">
+  <h2><span class="n">3</span>화면 살펴보기</h2>
+  <p>화면은 위에서 아래로 다섯 부분입니다.</p>
+  <div class="tw"><table>
+    <thead><tr><th>위치</th><th>내용</th></tr></thead>
+    <tbody>
+      <tr><td class="num">맨 위</td><td>넣은 파일의 이름, 길이, 용량</td></tr>
+      <tr><td class="num">그 아래</td><td>소리를 그림으로 보여주는 그래프 두 개. 왼쪽은 원래 소리, 오른쪽은 바뀐 소리입니다.</td></tr>
+      <tr><td class="num">가운데</td><td>재생과 정지 버튼, 진행 막대. 막대를 누르면 그 지점으로 이동합니다.</td></tr>
+      <tr><td class="num">본문</td><td>여덟 개의 장치가 세로로 놓여 있습니다.</td></tr>
+      <tr><td class="num">맨 아래</td><td>저장 버튼과 초기화 버튼</td></tr>
+    </tbody>
+  </table></div>
+  <p>
+    장치는 모두 같은 모양입니다. 맨 위에 이름과 켜는 스위치가 있고,
+    그 아래에 조절 막대들이 줄지어 있습니다. 막대를 좌우로 끌면 숫자가 바뀝니다.
+    켜진 장치는 테두리에 표시가 나타납니다.
+  </p>
+</section>
+
+<!-- 4 -->
+<section id="order">
+  <h2><span class="n">4</span>처리 순서가 중요한 이유</h2>
+  <p>
+    소리는 위에 있는 장치부터 차례대로 지나갑니다. 앞 장치가 만든 결과가
+    뒤 장치의 재료가 되기 때문에, <strong>순서만 바꿔도 결과가 달라집니다</strong>.
+  </p>
+  <p>
+    빵에 잼을 바르고 굽는 것과, 구운 다음 잼을 바르는 것을 생각해보세요.
+    재료는 똑같지만 전혀 다른 빵이 나옵니다. 소리도 마찬가지입니다.
+  </p>
+
+  <h3>기본 순서와 그 이유</h3>
+  <div class="tw"><table>
+    <thead><tr><th>순서</th><th>장치</th><th>그 자리인 이유</th></tr></thead>
+    <tbody>
+      <tr><td class="num">1</td><td><strong>COMPRESSOR</strong><br>소리 크기 고르기</td><td>크기를 먼저 정리해두면 뒤에서 색을 입힐 때 들쭉날쭉하지 않습니다.</td></tr>
+      <tr><td class="num">2</td><td><strong>BBE</strong><br>또렷하게 만들기</td><td>손대지 않은 깨끗한 소리에서 해야 의도대로 걸립니다.</td></tr>
+      <tr><td class="num">3</td><td><strong>TUBE</strong><br>따뜻하게 만들기</td><td>정돈된 소리 위에 두께를 더합니다.</td></tr>
+      <tr><td class="num">4</td><td><strong>EXCITER</strong><br>높은 소리 살리기</td><td>앞에서 더한 두께 위에 밝기를 얹습니다.</td></tr>
+      <tr><td class="num">5</td><td><strong>SOUNDGOODIZER</strong><br>세 대역 다듬기</td><td>전체 균형을 마지막으로 정리합니다.</td></tr>
+      <tr><td class="num">6</td><td><strong>VINYL</strong><br>LP 느낌 내기</td><td>음색 작업이 끝난 뒤 질감을 덮어야 자연스럽습니다.</td></tr>
+      <tr><td class="num">7</td><td><strong>ATMOS</strong><br>공간감 주기</td><td>완성된 소리를 공간에 놓는 단계라 뒤쪽입니다.</td></tr>
+      <tr><td class="num">8</td><td><strong>MASTER</strong><br>마무리 정리</td><td>항상 맨 마지막입니다.</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>순서 바꾸기</h3>
+  <p>
+    장치 이름 왼쪽의 손잡이를 잡고 위아래로 끌면 순서가 바뀝니다.
+    재생 중에 바꾸면 재생 위치를 유지한 채 바로 반영되므로 차이를 즉시 들을 수 있습니다.
+  </p>
+  <p>
+    딱 하나 예외가 있습니다. <strong>MASTER는 어디에 놓아도 항상 맨 마지막</strong>에
+    처리됩니다. 전체를 정리하는 역할이라 그렇습니다.
+  </p>
+  <p>바꿔볼 만한 조합을 들면 이렇습니다.</p>
+  <ul>
+    <li><strong>TUBE를 맨 앞으로.</strong> 두꺼워진 소리를 COMPRESSOR가 정리하면서 더 단단해집니다.</li>
+    <li><strong>VINYL을 맨 앞으로.</strong> 지직거리는 소리까지 뒤쪽 장치들이 함께 처리해 훨씬 거칠어집니다.</li>
+  </ul>
+
+  <h3>INPUT GAIN</h3>
+  <p>
+    장치마다 맨 위에 INPUT GAIN이라는 조절 막대가 있습니다.
+    <strong>그 장치에 소리를 얼마나 세게 넣을지</strong> 정하는 값입니다.
+  </p>
+  <p>
+    단순한 음량 조절이 아닙니다. 어떤 장치는 들어오는 소리의 세기에 따라 동작이 달라집니다.
+    물뿌리개를 세게 틀면 더 멀리 뿌려지는 것과 비슷합니다.
+  </p>
+  <ul>
+    <li>
+      <strong>TUBE와 EXCITER.</strong> 소리를 일부러 찌그러뜨려 효과를 내는
+      장치라, 세게 넣을수록 효과가 깊어집니다. 다른 값을 건드리지 않고 이것만 올려도 달라집니다.
+    </li>
+    <li>
+      <strong>COMPRESSOR.</strong> 세게 넣으면 더 많이 눌리게 됩니다. 미세하게 조정할 때 편합니다.
+    </li>
+    <li>
+      <strong>나머지 장치.</strong> 대체로 음량만 달라집니다.
+    </li>
+  </ul>
+  <p>
+    값은 dB라는 단위로 표시됩니다. 0이 원래 크기이고, 6를 올리면 두 배,
+    6를 내리면 절반이 됩니다.
+  </p>
+</section>
+
+<!-- 5 -->
+<section id="modules">
+  <h2><span class="n">5</span>여덟 개의 기능</h2>
+  <p>
+    각 장치가 무엇을 하는지, 어떤 값을 먼저 만져보면 좋은지 정리했습니다.
+    모든 장치에 INPUT GAIN이 공통으로 있으므로 아래에서는 생략했습니다.
+  </p>
+
+  <div class="mod">
+    <h3>COMPRESSOR</h3>
+    <p class="sub">소리 크기를 고르게 만듭니다</p>
+    <dl>
+      <dt>하는 일</dt>
+      <dd>
+        너무 큰 소리만 골라서 눌러줍니다. 큰 소리와 작은 소리의 차이가 줄어들어
+        전체가 고르게 들립니다. 결과적으로 전체 음량을 더 올릴 여유도 생깁니다.
+      </dd>
+      <dt>비유</dt>
+      <dd>
+        여럿이 이야기하는 자리에서 목소리 큰 사람에게만 조금 낮춰달라고 하는 것과 같습니다.
+        그러면 목소리 작은 사람의 말도 들립니다.
+      </dd>
+      <dt>먼저 만질 값</dt>
+      <dd>
+        <strong>THRESHOLD</strong>는 어느 크기부터 누를지 정합니다. 내릴수록 더 많이 걸립니다.
+        <strong>RATIO</strong>는 얼마나 세게 누를지입니다. 나머지는 처음에는 그대로 두셔도 됩니다.
+      </dd>
+      <dt>확인하는 법</dt>
+      <dd>
+        장치 위쪽 막대가 지금 얼마나 눌리고 있는지 보여줍니다.
+        평소에는 조금만 움직이고 가장 센 대목에서만 크게 움직이면 적당합니다.
+        막대가 늘 끝까지 차 있다면 너무 많이 건 것입니다.
+      </dd>
+    </dl>
+  </div>
+
+  <div class="mod">
+    <h3>BBE SONIC MAXIMIZER</h3>
+    <p class="sub">소리를 또렷하고 선명하게 만듭니다</p>
+    <dl>
+      <dt>하는 일</dt>
+      <dd>소리를 선명하게 만듭니다. 뿌옇던 것이 걷히는 느낌입니다.</dd>
+      <dt>비유</dt>
+      <dd>
+        스피커에서는 낮은 소리가 높은 소리보다 아주 조금 늦게 나옵니다.
+        이 장치는 빠른 쪽을 살짝 늦춰서 도착 시각을 맞춰줍니다.
+        타이밍이 맞으면 소리가 또렷해집니다.
+        단순히 특정 음역을 키우는 것과는 다른 방식입니다.
+      </dd>
+      <dt>먼저 만질 값</dt>
+      <dd>
+        <strong>PROCESS</strong>가 가장 효과가 큽니다. 목소리가 앞으로 나옵니다.
+        <strong>HI DEF</strong>는 높은 쪽을 여는 값입니다.
+      </dd>
+      <dt>주의</dt>
+      <dd>
+        PROCESS를 많이 올리면 "스", "치" 같은 발음이 날카로워집니다.
+        노래에 목소리가 있다면 60을 넘기지 않는 편이 안전합니다.
+      </dd>
+    </dl>
+  </div>
+
+  <div class="mod">
+    <h3>VACUUM TUBE</h3>
+    <p class="sub">소리를 따뜻하고 두껍게 만듭니다</p>
+    <dl>
+      <dt>하는 일</dt>
+      <dd>
+        소리를 포근하고 두껍게 만듭니다. 옛날 진공관 장비를 거친 듯한 소리가 납니다.
+      </dd>
+      <dt>비유</dt>
+      <dd>
+        빵에 버터를 바르는 것과 비슷합니다. 원래 빵에 없던 고소함이 더해지는 것처럼,
+        원래 소리에 없던 성분이 살짝 더해지면서 풍부해집니다.
+      </dd>
+      <dt>먼저 만질 값</dt>
+      <dd>
+        <strong>DRIVE</strong>가 버터의 양입니다. 많이 바를수록 거칠어집니다.
+        <strong>MIX</strong>는 원래 소리와 섞는 비율입니다.
+      </dd>
+      <dt>요령</dt>
+      <dd>
+        MIX는 절반 정도에 두시는 것을 권합니다. 전부 바꿔버리면 풍부해지는 대신
+        원래의 또렷함이 사라집니다. 절반을 남겨두면 두께와 또렷함을 함께 가질 수 있습니다.
+      </dd>
+    </dl>
+  </div>
+
+  <div class="mod">
+    <h3>EXCITER</h3>
+    <p class="sub">높은 쪽에 밝은 성분을 더합니다</p>
+    <dl>
+      <dt>하는 일</dt>
+      <dd>
+        높은 쪽에 밝은 성분을 더합니다. 심벌이나 하이햇 같은 소리가 또렷해집니다.
+      </dd>
+      <dt>비유</dt>
+      <dd>
+        사진의 선명도를 올리는 것과 비슷합니다. 조금 올리면 또렷해지는데
+        많이 올리면 눈이 아파집니다.
+      </dd>
+      <dt>먼저 만질 값</dt>
+      <dd>
+        <strong>FREQ</strong>는 어느 높이부터 손댈지 정합니다.
+        <strong>MIX</strong>는 얼마나 섞을지입니다.
+      </dd>
+      <dt>주의</dt>
+      <dd>
+        이 장치는 처음에 멋있게 들리다가 몇 분 뒤 귀가 피로해지는 것이 특징입니다.
+        설정한 뒤 잠시 쉬었다가 다시 들어보세요. 대개 처음 정한 값이 과합니다.
+      </dd>
+    </dl>
+  </div>
+
+  <div class="mod">
+    <h3>SOUNDGOODIZER</h3>
+    <p class="sub">소리를 세 덩어리로 나눠 각각 다듬습니다</p>
+    <dl>
+      <dt>하는 일</dt>
+      <dd>
+        소리를 낮은 쪽, 가운데, 높은 쪽 세 덩어리로 나눠 각각 따로 다듬은 뒤 다시 합칩니다.
+      </dd>
+      <dt>비유</dt>
+      <dd>
+        케이크를 세 조각으로 잘라 조각마다 다른 크림을 바른 뒤 다시 붙이는 것과 같습니다.
+        전체에 한 가지만 바르는 것보다 세밀하게 조절할 수 있습니다.
+      </dd>
+      <dt>가장 쉬운 사용법</dt>
+      <dd>
+        A, B, C, D 네 개의 버튼이 있습니다. 미리 잘 맞춰둔 설정 묶음입니다.
+        A는 따뜻하고 단단하게, B는 밝고 시원하게, C는 꽉 차고 풍성하게,
+        D는 또렷하고 섬세하게 만듭니다. 눌러보고 마음에 드는 것을 고르신 뒤
+        <strong>AMOUNT</strong>로 세기만 조절하시면 됩니다.
+      </dd>
+    </dl>
+  </div>
+
+  <div class="mod">
+    <h3>VINYL RECORD</h3>
+    <p class="sub">LP판으로 듣는 듯한 질감을 더합니다</p>
+    <dl>
+      <dt>하는 일</dt>
+      <dd>
+        옛날 LP판으로 들을 때 따라오던 소리를 더합니다.
+        지직거리는 잡음, 판이 미세하게 흔들려 생기는 음정 출렁임 같은 것들입니다.
+      </dd>
+      <dt>알아두실 점</dt>
+      <dd>
+        이 장치는 음질을 좋게 만드는 것이 아니라 <strong>일부러 흠집을 넣는</strong> 장치입니다.
+        낡은 느낌을 의도적으로 만드는 용도입니다.
+      </dd>
+      <dt>먼저 만질 값</dt>
+      <dd>
+        <strong>CRACKLE</strong>은 지직거리는 양,
+        <strong>WOBBLE</strong>은 음정이 흔들리는 정도입니다.
+        장치 안의 작은 그림이 지금 설정된 잡음 양을 보여줍니다.
+      </dd>
+    </dl>
+  </div>
+
+  <div class="mod">
+    <h3>DOLBY ATMOS</h3>
+    <p class="sub">넓은 공간에서 울리는 느낌을 만듭니다</p>
+    <dl>
+      <dt>하는 일</dt>
+      <dd>소리가 넓은 공간에서 울리는 것처럼 만듭니다.</dd>
+      <dt>비유</dt>
+      <dd>
+        욕실에서 노래하면 소리가 울리고, 체육관에서는 더 크게 울립니다.
+        그 느낌을 만들어내는 장치입니다.
+      </dd>
+      <dt>가장 쉬운 사용법</dt>
+      <dd>
+        영화관, 공연장, 경기장, 녹음실, 클럽 다섯 개의 버튼이 있습니다.
+        경기장이 가장 넓고 녹음실이 가장 좁습니다. 눌러보면 바로 차이를 알 수 있습니다.
+      </dd>
+      <dt>주의</dt>
+      <dd>
+        스피커에서 좋게 들려도 이어폰에서는 어지럽거나 가운데가 빈 소리가 되기 쉽습니다.
+        이어폰으로도 한 번 확인해보시고, <strong>DRY/WET</strong>을 60보다 낮게 두면
+        대체로 안전합니다.
+      </dd>
+    </dl>
+  </div>
+
+  <div class="mod">
+    <h3>MASTERING CHAIN</h3>
+    <p class="sub">전체를 마지막으로 정리합니다</p>
+    <dl>
+      <dt>하는 일</dt>
+      <dd>
+        다른 장치들이 모두 일한 뒤 전체를 마지막으로 정리합니다.
+        소리를 네 구간으로 나눠 각각 다듬고, 좌우 폭을 정하고,
+        소리가 일정 크기를 넘지 못하도록 막습니다.
+      </dd>
+      <dt>비유</dt>
+      <dd>선물 포장과 비슷합니다. 안에 무엇을 넣든 마지막에는 단정하게 싸서 마무리합니다.</dd>
+      <dt>가장 중요한 값</dt>
+      <dd>
+        <strong>CEILING</strong>은 소리의 천장입니다. 이 값을 <strong>0으로 두지 마세요</strong>.
+        나중에 mp3 등으로 다시 변환할 때 소리가 천장을 넘어 깨질 수 있습니다.
+        기본값인 −0.3을 그대로 두시거나 −1.0까지 내리셔도 좋습니다.
+      </dd>
+      <dt>주의</dt>
+      <dd>
+        <strong>STEREO WIDTH</strong>를 많이 올렸다면 한 번은 모노로 들어보세요.
+        좌우를 넓히는 처리는 좌우를 합쳤을 때 특정 악기가 사라지게 만들 수 있습니다.
+      </dd>
+    </dl>
+  </div>
+</section>
+
+<!-- 6 -->
+<section id="restore">
+  <h2><span class="n">6</span>잘려나간 소리 되살리기</h2>
+  <p>
+    이 프로그램에서 가장 특별한 기능이자 가장 오해받기 쉬운 기능입니다.
+    앞의 여덟 장치가 있는 소리를 다듬는 일을 한다면,
+    이 기능은 <strong>없어진 소리를 새로 만들어 넣습니다</strong>.
+  </p>
+
+  <h3>소리가 왜 잘렸을까</h3>
+  <p>
+    mp3 같은 파일은 용량을 줄이려고 만들어졌습니다.
+    줄이려면 무언가를 버려야 하는데, 버리기로 선택한 것이 <strong>높은 소리</strong>입니다.
+    사람 귀에 잘 안 들리는 부분부터 통째로 잘라냅니다.
+  </p>
+  <p>
+    용량이 작은 파일일수록 더 많이 잘라냅니다.
+    소리를 그림으로 그려보면 어느 높이에서 절벽처럼 뚝 끊기고 그 위는 텅 비어 있습니다.
+  </p>
+
+  <figure>
+    <svg viewBox="0 0 560 186" role="img"
+         aria-label="왼쪽 그림은 소리가 위로 갈수록 부드럽게 줄어드는 모습이고, 오른쪽 그림은 중간에서 수직으로 끊겨 위쪽이 비어 있는 모습입니다.">
+      <text x="118" y="18" text-anchor="middle" font-size="15" font-weight="600" fill="var(--ink)">원래 소리</text>
+      <rect x="28" y="30" width="180" height="124" rx="6" fill="var(--card)" stroke="var(--line)"/>
+      <path d="M38,146 L58,84 L78,102 L98,72 L118,94 L138,108 L158,124 L178,138 L198,146"
+            fill="none" stroke="var(--teal)" stroke-width="2.6" stroke-linejoin="round"/>
+      <text x="118" y="176" text-anchor="middle" font-size="14" fill="var(--mute)">위로 갈수록 서서히 줄어듭니다</text>
+
+      <text x="422" y="18" text-anchor="middle" font-size="15" font-weight="600" fill="var(--ink)">압축된 파일</text>
+      <rect x="332" y="30" width="180" height="124" rx="6" fill="var(--card)" stroke="var(--line)"/>
+      <path d="M342,146 L362,84 L382,102 L402,72 L422,94 L434,102"
+            fill="none" stroke="var(--teal)" stroke-width="2.6" stroke-linejoin="round"/>
+      <line x1="434" y1="102" x2="434" y2="146" stroke="var(--brick)" stroke-width="2.6"/>
+      <line x1="434" y1="146" x2="502" y2="146" stroke="var(--brick)" stroke-width="2" stroke-dasharray="4 4"/>
+      <text x="470" y="88" text-anchor="middle" font-size="13" fill="var(--brick)">이 위가</text>
+      <text x="470" y="106" text-anchor="middle" font-size="13" fill="var(--brick)">비어 있습니다</text>
+      <text x="422" y="176" text-anchor="middle" font-size="14" fill="var(--mute)">절벽처럼 끊깁니다</text>
+    </svg>
+    <figcaption>
+      왼쪽이 손대지 않은 소리, 오른쪽이 압축된 파일입니다. 오른쪽은 어느 높이부터 아무것도 없습니다.
+    </figcaption>
+  </figure>
+
+  <h3>이 기능이 하는 일</h3>
+  <p>
+    잘린 지점을 스스로 찾아냅니다. 그리고 남아 있는 아래쪽 소리를 분석해서,
+    그 위에 어울릴 만한 소리를 계산해 채워 넣습니다.
+  </p>
+  <p>
+    책의 한 장이 윗부분만 찢어졌다고 생각해보세요.
+    아래에 나무 기둥이 보이면 위에는 나뭇잎이 있었으리라 짐작할 수 있습니다.
+    그걸 보고 나뭇잎을 그려 넣는 것과 같은 일입니다.
+  </p>
+
+  <div class="box point">
+    <span class="t">분명히 말씀드릴 점</span>
+    <p>
+      그려 넣은 나뭇잎은 원래 있던 나뭇잎이 아닙니다. 비슷하게 그린 새 그림입니다.
+      원래 것은 찢어져 없어졌고 되찾을 방법은 없습니다.
+    </p>
+    <p>
+      소리도 똑같습니다. 이 기능은 잘린 소리를 <strong>되찾아오는 것이 아니라
+      새로 만들어내는 것</strong>입니다. 버려진 데이터는 어디에도 남아 있지 않습니다.
+      mp3를 넣는다고 원본 음질이 되지는 않으며, 그렇게 할 수 있는 프로그램은 없습니다.
+    </p>
+  </div>
+
+  <h3>그런데 왜 하는가</h3>
+  <p>원본을 되찾지 못한다면 왜 하는지 궁금하실 겁니다. 이유는 두 가지입니다.</p>
+  <p>
+    <strong>첫째, 끊긴 모양 자체가 부자연스럽습니다.</strong>
+    실제 소리 중에 특정 높이에서 칼로 자른 듯 끊기는 것은 없습니다.
+    악기 소리는 위로 갈수록 서서히 잦아듭니다.
+    압축이 만든 수직 절벽은 귀로 직접 알아채기는 어렵지만 전체 인상을 답답하게 만듭니다.
+    그 경계를 부드럽게 이어주면 막힌 느낌이 줄어듭니다.
+  </p>
+  <p>
+    <strong>둘째, 잘린 구간의 아랫부분은 실제로 들리는 영역입니다.</strong>
+    많이 압축된 파일일수록 낮은 높이에서 잘려 있는데,
+    그 바로 위는 사람이 들을 수 있는 범위입니다. 여기가 채워지면 차이를 느낄 수 있습니다.
+  </p>
+
+  <h3>두 가지 방식의 차이</h3>
+  <p>
+    <strong>HD RESTORE</strong>와 <strong>ULTRA HD RESTORE</strong> 두 가지가 있습니다.
+    하는 일은 같고 얼마나 넓게 채우느냐만 다릅니다.
+  </p>
+  <div class="tw"><table>
+    <thead><tr><th></th><th>HD RESTORE</th><th>ULTRA HD RESTORE</th></tr></thead>
+    <tbody>
+      <tr><td>채우는 범위</td><td>넓음</td><td>아주 넓음</td></tr>
+      <tr><td>1분당 용량</td><td class="num">약 33MB</td><td class="num">약 92MB</td></tr>
+      <tr><td>걸리는 시간</td><td>보통</td><td>두 배 이상</td></tr>
+    </tbody>
+  </table></div>
+  <p>
+    그런데 ULTRA HD가 더 채우는 부분은 <strong>사람이 들을 수 없는 영역</strong>입니다.
+    파일은 세 배 가까이 커지고 시간도 두 배 넘게 걸리는데 귀로는 차이를 알기 어렵습니다.
+  </p>
+  <p>
+    듣기 위한 용도라면 <strong>HD로 충분합니다.</strong>
+    ULTRA HD는 오래 보관할 파일을 만들거나, 나중에 다른 프로그램에서 추가 작업을 할 예정이라
+    여유를 남겨두고 싶을 때 쓰시면 됩니다.
+  </p>
+
+  <h3>두 개의 조절 막대</h3>
+  <div class="tw"><table>
+    <thead><tr><th>이름</th><th>하는 일</th><th>시작값</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>HF SYNTH<br>UHF SYNTH</td>
+        <td>새로 만든 소리를 얼마나 세게 넣을지 정합니다. 올릴수록 많이 들어갑니다.</td>
+        <td class="num">60 ~ 65</td>
+      </tr>
+      <tr>
+        <td>SMOOTH</td>
+        <td>
+          새로 만든 소리를 얼마나 부드럽게 다듬을지 정합니다.
+          올리면 매끄러워지고, 내리면 또렷하지만 가끔 뾰족한 소리가 섞입니다.
+        </td>
+        <td class="num">40</td>
+      </tr>
+    </tbody>
+  </table></div>
+  <p>
+    소리가 쇳소리처럼 따갑게 들리면 먼저 HF SYNTH를 10씩 내려보세요.
+    세기는 유지하고 싶은데 따갑기만 하다면 SMOOTH를 올리는 것이 답입니다.
+  </p>
+  <p>
+    많이 압축된 파일일수록 높은 값이 어울리고, 원래 좋은 파일일수록 낮춰야 합니다.
+    채울 것이 없는데 많이 넣으면 없던 소리만 얹히기 때문입니다.
+  </p>
+
+  <h3>미리 들어보기</h3>
+  <p>
+    HD와 ULTRA HD 칸에 각각 <strong>LIVE</strong> 스위치가 있습니다.
+    켜면 저장하기 전에 결과를 미리 들을 수 있습니다. 둘은 동시에 켜지지 않습니다.
+  </p>
+  <p>
+    누르면 잠시 기다려야 합니다. 이 기능은 어디가 잘렸는지 판단하려면
+    <strong>파일 전체를 먼저 훑어봐야</strong> 하기 때문입니다.
+    지금 흘러나오는 한 순간만 보고는 알 수 없습니다.
+    그래서 미리 전부 만들어둔 뒤 들려주는 방식으로 동작합니다.
+  </p>
+  <p>
+    한 번 만든 결과는 보관됩니다. 껐다 켜는 것은 즉시 되고,
+    조절 막대를 움직였을 때만 다시 만듭니다.
+  </p>
+
+  <div class="box warn">
+    <span class="t">저장할 때 주의</span>
+    <p>
+      LIVE를 켜고 듣다가 <strong>WAV</strong>로 저장하면 되살린 소리는 파일에 들어가지 않습니다.
+      되살린 소리까지 저장하시려면 HD나 ULTRA HD 버튼으로 저장하셔야 합니다.
+    </p>
+    <p>
+      반대로 LIVE를 켜둔 채 HD로 저장해도 효과가 두 번 겹치지는 않습니다.
+      저장은 언제나 원본에서 새로 시작합니다.
+    </p>
+  </div>
+
+  <h3>효과가 있는지 직접 확인하는 법</h3>
+  <p>귀만으로 판단하기 어려우니 눈으로 확인하시는 것을 권합니다.</p>
+  <ol class="steps">
+    <li>
+      <h4>그래프를 눌러 그림을 바꿉니다</h4>
+      <p>색이 들어간 그림으로 바뀝니다. 시간에 따라 소리가 어떻게 변하는지 보여줍니다.</p>
+    </li>
+    <li>
+      <h4>그래프 위 스위치를 192에 놓습니다</h4>
+      <p>이러면 LIVE를 켜고 꺼도 그림의 기준이 바뀌지 않아 같은 자리끼리 비교할 수 있습니다.</p>
+    </li>
+    <li>
+      <h4>LIVE를 끈 채로 재생합니다</h4>
+      <p>
+        왼쪽 그래프에서 어느 높이 위가 까맣게 비어 있다면 거기가 잘린 지점입니다.
+        비어 있지 않다면 이 기능으로 얻을 것이 거의 없다는 뜻입니다.
+      </p>
+    </li>
+    <li>
+      <h4>LIVE를 켜고 같은 구간을 다시 재생합니다</h4>
+      <p>
+        비어 있던 자리에 색이 들어차면 제대로 동작한 것입니다.
+        아래쪽 무늬와 비슷한 결로 이어지면 잘 된 것이고,
+        아래와 상관없는 균일한 띠가 생겼다면 세기가 과한 것입니다.
+      </p>
+    </li>
+    <li>
+      <h4>음량을 맞추고 귀로 확인합니다</h4>
+      <p>
+        마지막 판단은 귀로 하세요. 차이를 모르겠다면
+        그 파일에는 이 기능이 필요하지 않다는 뜻입니다. 그것도 유효한 결론입니다.
+      </p>
+    </li>
+  </ol>
+
+  <div class="box">
+    <span class="t">한 줄로 정리하면</span>
+    <p>
+      많이 압축된 파일에는 쓸 만하고, 좋은 품질의 압축 파일에는 미묘하며,
+      원본 그대로인 파일에는 의미가 없습니다.
+    </p>
+  </div>
+</section>
+
+<!-- 7 -->
+<section id="graph">
+  <h2><span class="n">7</span>소리를 그림으로 확인하기</h2>
+  <p>
+    화면 위쪽의 그래프 두 개는 <strong>왼쪽이 손대지 않은 소리, 오른쪽이 바뀐 소리</strong>입니다.
+    귀로 애매한 변화도 그림에서는 분명하게 드러납니다.
+  </p>
+
+  <h3>두 가지 보기 방식</h3>
+  <p>그래프를 누르면 방식이 바뀝니다. 두 그래프는 항상 함께 바뀝니다.</p>
+  <ul>
+    <li>
+      <strong>막대 보기.</strong> 지금 이 순간의 소리를 보여줍니다.
+      왼쪽이 낮은 소리, 오른쪽이 높은 소리이고, 막대가 높을수록 큰 소리입니다.
+    </li>
+    <li>
+      <strong>색 보기.</strong> 시간이 쌓이는 모습을 보여줍니다.
+      오른쪽 끝이 현재이고 왼쪽으로 갈수록 조금 전입니다.
+      위로 갈수록 높은 소리입니다. 어디가 잘렸는지 확인할 때는 이쪽이 훨씬 분명합니다.
+    </li>
+  </ul>
+
+  <h3>색이 뜻하는 것</h3>
+  <div class="band" role="img" aria-label="왼쪽 검정에서 파랑, 초록, 노랑, 빨강을 거쳐 오른쪽 흰색으로 가는 색 띠"></div>
+  <div class="band-label"><span>조용함</span><span>시끄러움</span></div>
+  <p>
+    까만색이 조용하다는 뜻이고, 파랑과 초록과 노랑을 지나 빨강과 흰색이 가장 큽니다.
+    무지개 순서라 기억하기 쉽습니다. 두 그래프가 같은 기준을 쓰기 때문에
+    같은 색이면 같은 크기입니다.
+  </p>
+
+  <h3>그래프 위의 스위치</h3>
+  <p>
+    <strong>순응 · 48 · 96 · 192</strong> 네 칸짜리 스위치가 있습니다.
+    그래프를 얼마나 넓은 범위까지 보여줄지 정합니다. 숫자가 클수록 넓게 봅니다.
+  </p>
+  <p>
+    평소에는 <strong>순응</strong>에 두시면 알아서 맞춰줍니다.
+    되살리기 효과를 확인할 때만 <strong>192</strong>로 옮기세요.
+    순응 상태에서는 LIVE를 켜는 순간 그래프의 기준이 바뀌어 같은 소리가 다른 자리로 옮겨 보이지만,
+    192로 고정해두면 기준이 그대로여서 무엇이 새로 채워졌는지만 보입니다.
+  </p>
+  <p>
+    고정한 범위가 실제 소리보다 넓으면, 소리가 끝나는 자리에 점선이 그어지고
+    그 오른쪽이 어둡게 표시됩니다. 없는 소리를 있는 것처럼 보이지 않게 하기 위한 표시입니다.
+  </p>
+</section>
+
+<!-- 8 -->
+<section id="save">
+  <h2><span class="n">8</span>파일로 저장하기</h2>
+  <div class="tw"><table>
+    <thead><tr><th>버튼</th><th>특징</th><th>1분당 용량</th></tr></thead>
+    <tbody>
+      <tr><td>WAV</td><td>가장 빠릅니다. 되살리기는 들어가지 않습니다.</td><td class="num">약 10MB</td></tr>
+      <tr><td>HD RESTORE</td><td>되살리기가 들어갑니다. 일상적인 용도에 권합니다.</td><td class="num">약 33MB</td></tr>
+      <tr><td>ULTRA HD</td><td>가장 크고 가장 오래 걸립니다. 보관용입니다.</td><td class="num">약 92MB</td></tr>
+    </tbody>
+  </table></div>
+  <p>
+    버튼을 누르면 진행 막대가 나타나 지금 무슨 작업을 하는지 알려줍니다.
+    ULTRA HD는 곡 길이에 따라 몇 분이 걸릴 수 있습니다.
+  </p>
+  <p>
+    저장되는 파일은 모두 WAV 형식입니다.
+    ULTRA HD로 만든 파일은 일부 오래된 재생 프로그램에서 열리지 않을 수 있습니다.
+  </p>
+  <div class="box">
+    <span class="t">용량을 미리 가늠하세요</span>
+    <p>
+      5분짜리 곡을 ULTRA HD로 저장하면 파일 하나가 460MB 정도 됩니다.
+      만드는 동안에는 그보다 더 많은 메모리를 씁니다.
+      너무 클 것 같으면 프로그램이 시작 전에 알려주고 멈춥니다.
+    </p>
+  </div>
+</section>
+
+<!-- 9 -->
+<section id="recipe">
+  <h2><span class="n">9</span>상황별 설정 예시</h2>
+  <p>출발점으로 삼으시고, 반드시 귀로 확인한 뒤 조정하세요.</p>
+
+  <h3>오래된 mp3를 살리고 싶을 때</h3>
+  <p>
+    이 프로그램이 가장 잘하는 일입니다. HD의 LIVE를 켜고 HF SYNTH를 65 정도에 둡니다.
+    나머지 장치는 전부 끄세요. 되살리기 효과를 판단하는 데 다른 처리가 끼면 방해가 됩니다.
+    판단이 끝난 뒤에 색을 입히시면 됩니다.
+  </p>
+
+  <h3>밋밋한 녹음에 온기를 더하고 싶을 때</h3>
+  <p>
+    TUBE를 켜고 DRIVE를 35, MIX를 45에 둡니다.
+    SOUNDGOODIZER를 A 설정으로 함께 켜면 두께가 더해집니다.
+    더 진하게 하고 싶으면 DRIVE 대신 INPUT GAIN을 올려보세요.
+  </p>
+
+  <h3>목소리를 앞으로 내고 싶을 때</h3>
+  <p>
+    BBE의 PROCESS를 55 정도로 올립니다.
+    발음이 날카로워지면 EXCITER의 FREQ를 더 높은 쪽으로 옮기고
+    MIX를 25 아래로 낮추세요.
+  </p>
+
+  <h3>LP처럼 듣고 싶을 때</h3>
+  <p>
+    VINYL을 켜고 CRACKLE 25, WOBBLE 20에 둡니다.
+    TUBE를 함께 켜면 훨씬 그럴듯해집니다.
+    MASTER의 STEREO WIDTH는 95 정도로 살짝 좁히세요. 실제 LP도 좌우가 넓지 않습니다.
+  </p>
+
+  <h3>오래 보관할 파일을 만들고 싶을 때</h3>
+  <p>
+    장치를 모두 끄거나 최소한만 켜고 ULTRA HD로 저장합니다.
+    UHF SYNTH는 40 이하로 절제하세요.
+    나중에 다른 프로그램에서 작업하실 파일이라면 지금 색을 많이 입히지 않는 편이 낫습니다.
+    CEILING은 −1.0으로 여유를 크게 두세요.
+  </p>
+</section>
+
+<!-- 10 -->
+<section id="trouble">
+  <h2><span class="n">10</span>문제가 생기면</h2>
+
+  <h3>저장 버튼을 눌러도 아무 일이 없습니다</h3>
+  <p>브라우저 화면을 새로 고쳐보세요. 대부분 해결됩니다.</p>
+
+  <h3>ULTRA HD만 실패합니다</h3>
+  <p>
+    쓰고 계신 브라우저가 지원하지 않거나 메모리가 부족한 경우입니다.
+    Chrome을 쓰시거나, 더 짧은 파일로 시도하시거나, HD로 저장하세요.
+  </p>
+
+  <h3>저장이 시작되다 멈춥니다</h3>
+  <p>디스크 여유 공간을 확인하세요. ULTRA HD 파일은 생각보다 훨씬 큽니다.</p>
+
+  <h3>LIVE를 켜니 소리가 끊깁니다</h3>
+  <p>컴퓨터가 버거워하는 상태입니다. 다른 창을 닫거나 HD 쪽으로 낮춰보세요.</p>
+
+  <h3>되살리기를 켜도 그래프가 그대로입니다</h3>
+  <p>
+    원본에 잘린 부분이 없는 경우입니다. 품질이 좋은 파일이라는 뜻이니 정상입니다.
+    또한 그래프 위 스위치를 96이나 192로 옮겨야 채워진 부분이 화면에 들어옵니다.
+  </p>
+
+  <h3>SMOOTH를 움직여도 차이를 모르겠습니다</h3>
+  <p>
+    새로 만든 소리가 적으면 다듬을 대상도 적어 차이가 작습니다.
+    HF SYNTH를 70 이상으로 올린 뒤 심벌이 나오는 구간에서 SMOOTH를 0과 100으로
+    번갈아 두고 비교해보세요.
+  </p>
+
+  <h3>바꿨더니 오히려 나빠졌습니다</h3>
+  <p>
+    대개 너무 많이 걸었기 때문입니다. 모든 값을 절반으로 줄이고 다시 들어보세요.
+    그래도 나쁘면 장치를 전부 끄고 하나씩 다시 쌓아 올리세요.
+  </p>
+
+  <div class="box">
+    <span class="t">기억해두세요</span>
+    <p>
+      무엇을 눌러도 원본 파일은 변하지 않습니다.
+      언제든 초기화 버튼으로 처음 상태로 돌아갈 수 있으니
+      부담 없이 여러 가지를 시도해보세요. 그것이 가장 빨리 익히는 방법입니다.
+    </p>
+  </div>
+</section>
+
+<!-- 11 -->
+<section id="words">
+  <h2><span class="n">11</span>용어 풀이</h2>
+  <div class="tw"><table>
+    <thead><tr><th>말</th><th>뜻</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>주파수</td>
+        <td>소리의 높낮이입니다. 숫자가 크면 높은 소리, 작으면 낮은 소리입니다.</td>
+      </tr>
+      <tr>
+        <td>Hz · kHz</td>
+        <td>
+          주파수를 세는 단위입니다. 1kHz는 1000Hz입니다.
+          사람은 대략 20Hz부터 20kHz까지 들을 수 있고, 나이가 들면 위쪽부터 좁아집니다.
+        </td>
+      </tr>
+      <tr>
+        <td>dB</td>
+        <td>
+          소리 크기를 재는 단위입니다. 0이 기준이고 마이너스는 그보다 작다는 뜻입니다.
+          6가 차이 나면 크기가 두 배 또는 절반입니다.
+        </td>
+      </tr>
+      <tr>
+        <td>샘플레이트</td>
+        <td>
+          1초 동안 소리를 몇 번 기록하는지를 뜻합니다.
+          영화가 사진을 빠르게 이어 붙여 만들어지는 것과 비슷합니다.
+          많이 기록할수록 높은 소리까지 담을 수 있습니다.
+        </td>
+      </tr>
+      <tr>
+        <td>손실 압축</td>
+        <td>
+          용량을 줄이려고 일부를 버리는 방식입니다. mp3와 AAC가 여기 속합니다.
+          버린 것은 되돌릴 수 없습니다.
+        </td>
+      </tr>
+      <tr>
+        <td>WAV</td>
+        <td>아무것도 버리지 않고 저장하는 형식입니다. 그래서 용량이 큽니다.</td>
+      </tr>
+      <tr>
+        <td>배음</td>
+        <td>
+          어떤 소리를 낼 때 함께 따라 나오는 작은 소리들입니다.
+          피아노와 기타가 같은 음을 내도 다르게 들리는 이유입니다.
+        </td>
+      </tr>
+      <tr>
+        <td>모노 · 스테레오</td>
+        <td>
+          모노는 좌우가 같은 소리, 스테레오는 좌우가 다른 소리입니다.
+          스테레오라야 넓이가 느껴집니다.
+        </td>
+      </tr>
+    </tbody>
+  </table></div>
+</section>
+
+<footer>
+  <p>
+    이 문서는 ANALOG SOUL DSP ENGINE의 모든 기능을 전문용어 없이 설명한 것입니다.
+    처리 방식의 원리나 수치가 필요하시면 기술 설명서를 함께 보세요.
+  </p>
+  <p>개인적, 비상업적 용도로만 사용하세요.</p>
+</footer>
+
+</div>
+</body>
+</html>
