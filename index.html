@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ANALOG SOUL DSP ENGINE — 문서 색인</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Share+Tech+Mono&family=Noto+Sans+KR:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:       #06050a;
+  --bg2:      #0d0b14;
+  --panel:    #11101a;
+  --panel2:   #181625;
+  --border:   #24203a;
+  --border-hi:#3d3560;
+  --amber:    #ffb300;
+  --amber2:   #ff8c00;
+  --amber-dim:#6b4800;
+  --green:    #39ff14;
+  --blue:     #00cfff;
+  --purple:   #c77dff;
+  --red:      #ff3355;
+  --text:     #d4c9e8;
+  --muted:    #5a4f6e;
+  --muted2:   #3a3350;
+}
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Noto Sans KR', sans-serif;
+  font-weight: 300;
+  line-height: 1.7;
+  overflow-x: hidden;
+}
+/* ── 스캔라인 오버레이 ── */
+body::after {
+  content:'';
+  position:fixed; inset:0;
+  background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.055) 2px, rgba(0,0,0,0.055) 4px);
+  pointer-events:none; z-index:9999;
+}
+/* ── CRT 글로우 ── */
+body::before {
+  content:'';
+  position:fixed; inset:0;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% 0%,  rgba(199,125,255,0.05) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 80% at 5%  80%,  rgba(255,179,0,0.04)   0%, transparent 50%),
+    radial-gradient(ellipse 40% 60% at 95% 20%,  rgba(0,207,255,0.03)   0%, transparent 50%);
+  pointer-events:none; z-index:0;
+}
+.cover-eyebrow {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.35em;
+  color: var(--amber);
+  text-transform: uppercase;
+  margin-bottom: 28px;
+  opacity: 0;
+  animation: fadeUp 0.8s 0.2s forwards;
+}
+.cover-title {
+  font-family: 'Orbitron', monospace;
+  font-size: clamp(2.8rem, 7vw, 5.4rem);
+  font-weight: 900;
+  line-height: 1.05;
+  letter-spacing: 0.04em;
+  color: var(--amber);
+  text-shadow: 0 0 60px rgba(255,179,0,0.25), 0 0 120px rgba(255,179,0,0.1);
+  opacity: 0;
+  animation: fadeUp 0.9s 0.35s forwards;
+}
+.cover-sub {
+  font-family: 'Orbitron', monospace;
+  font-size: clamp(1rem, 2.5vw, 1.4rem);
+  font-weight: 400;
+  color: var(--muted);
+  letter-spacing: 0.1em;
+  margin-top: 8px;
+  opacity: 0;
+  animation: fadeUp 0.9s 0.45s forwards;
+}
+.cover-desc {
+  margin-top: 36px;
+  max-width: 540px;
+  font-size: 1.05rem;
+  font-weight: 400;
+  color: var(--text);
+  line-height: 1.9;
+  opacity: 0;
+  animation: fadeUp 0.9s 0.6s forwards;
+}
+.cover-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 36px;
+  opacity: 0;
+  animation: fadeUp 0.9s 0.75s forwards;
+}
+.badge {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.12em;
+  padding: 6px 14px;
+  border: 1px solid var(--border-hi);
+  border-radius: 2px;
+  color: var(--muted);
+  background: var(--panel);
+}
+.badge.amber { border-color: var(--amber-dim); color: var(--amber); background: rgba(255,179,0,0.06); }
+.badge.blue  { border-color: rgba(0,207,255,0.3); color: var(--blue); background: rgba(0,207,255,0.05); }
+.badge.purple{ border-color: rgba(199,125,255,0.3); color: var(--purple); background: rgba(199,125,255,0.05); }
+.badge.green { border-color: rgba(57,255,20,0.3); color: var(--green); background: rgba(57,255,20,0.05); }
+.cover-scroll {
+  margin-top: 60px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.2em;
+  color: var(--muted2);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  opacity: 0;
+  animation: fadeUp 0.9s 1s forwards;
+}
+.cover-scroll::before {
+  content:'';
+  display:block; width:40px; height:1px;
+  background: var(--border);
+}
+.cover-rule {
+  position: absolute;
+  right: 28px; top: 80px;
+  height: calc(100% - 160px);
+  width: 1px;
+  background: linear-gradient(to bottom, transparent, var(--border) 20%, var(--border) 80%, transparent);
+  opacity: 0;
+  animation: fadeIn 1.5s 1.2s forwards;
+}
+.cover-rule-label {
+  position: absolute;
+  right: 0; top: 50%;
+  transform: translateX(calc(100% + 12px)) translateY(-50%) rotate(90deg);
+  transform-origin: left center;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.5rem;
+  letter-spacing: 0.25em;
+  color: var(--muted2);
+  white-space: nowrap;
+}
+.section-num {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.58rem;
+  letter-spacing: 0.3em;
+  color: var(--amber-dim);
+  margin-bottom: 10px;
+}
+.section-title {
+  font-family: 'Orbitron', monospace;
+  font-size: clamp(1.1rem, 2.5vw, 1.55rem);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--amber);
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 32px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.section-title::before {
+  content:'▸';
+  font-size: 0.7em;
+  color: var(--amber-dim);
+}
+.section-lead {
+  font-size: 1.0rem;
+  font-weight: 400;
+  color: var(--text);
+  max-width: 680px;
+  line-height: 1.9;
+  margin-bottom: 40px;
+}
+.feat-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 20px 18px;
+  transition: border-color 0.2s;
+}
+.feat-card:hover { border-color: var(--border-hi); }
+.feat-icon {
+  font-size: 1.5rem;
+  margin-bottom: 12px;
+  display:block;
+}
+.feat-name {
+  font-family: 'Orbitron', monospace;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--amber);
+  margin-bottom: 8px;
+}
+.feat-desc {
+  font-size: 0.82rem;
+  color: var(--muted);
+  line-height: 1.75;
+}
+.mc-body {
+  padding: 22px 20px 24px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+@media (max-width:640px) { .mc-body { grid-template-columns: 1fr; } }
+.spec-table th {
+  text-align: left;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border-hi);
+  color: var(--amber);
+  letter-spacing: 0.12em;
+  font-weight: 400;
+  background: var(--panel2);
+}
+.spec-table td {
+  padding: 11px 16px;
+  border-bottom: 1px solid var(--border);
+  color: var(--muted);
+  vertical-align: top;
+  line-height: 1.7;
+}
+.spec-table tr:last-child td { border-bottom: none; }
+.spec-table td:first-child { color: var(--text); }
+.spec-table .hi { color: var(--amber); }
+.spec-table .blue { color: var(--blue); }
+.spec-table .purple { color: var(--purple); }
+.spec-table .green { color: var(--green); }
+.callout p {
+  font-size: 0.9rem;
+  color: var(--text);
+  line-height: 1.85;
+}
+.callout strong { color: var(--amber); font-weight: 500; }
+.callout.blue {
+  border-color: var(--blue);
+  background: rgba(0,207,255,0.04);
+}
+.callout.blue strong { color: var(--blue); }
+.callout.purple {
+  border-color: var(--purple);
+  background: rgba(199,125,255,0.04);
+}
+.callout.purple strong { color: var(--purple); }
+.callout.ok {
+  border-color: rgba(57,255,20,.32);
+  background: linear-gradient(90deg, rgba(57,255,20,.07), transparent);
+}
+.callout.ok strong { color: var(--green); }
+.toc-title {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.25em;
+  color: var(--muted);
+  margin-bottom: 18px;
+}
+.toc-list {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 4px 24px;
+}
+.toc-list li a {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 0;
+  border-bottom: 1px solid var(--border);
+  transition: color 0.15s;
+}
+.toc-list li a::before {
+  content: '→';
+  color: var(--amber-dim);
+  font-size: 0.7em;
+}
+.toc-list li a:hover { color: var(--amber); }
+.footer-copy {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.6rem;
+  color: var(--muted2);
+  letter-spacing: 0.06em;
+}
+.footer-name {
+  color: var(--amber);
+}
+@keyframes fadeUp {
+  from { opacity:0; transform: translateY(18px); }
+  to   { opacity:1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity:0; }
+  to   { opacity:1; }
+}
+.inline-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65em;
+  padding: 1px 6px;
+  border-radius: 2px;
+  background: var(--panel2);
+  border: 1px solid var(--border-hi);
+  color: var(--amber);
+  vertical-align: middle;
+  white-space: nowrap;
+}
+@media (max-width: 600px) {
+  .feat-grid { grid-template-columns: 1fr; }
+  .flow { gap: 4px; }
+  .flow-arrow { display:none; }
+}
+/* ══════════ 문서 허브 (통합 진입) ══════════ */
+/* v2.3 소제목 */
+.sub-title{
+  font-family:'Orbitron',sans-serif; font-weight:600;
+  font-size:15px; color:var(--amber); letter-spacing:.02em;
+  margin:34px 0 12px; padding-left:11px;
+  border-left:2px solid var(--amber-dim);
+}
+/* v2.3 신규 표시 배지 */
+.badge-new{
+  display:inline-block; vertical-align:middle; margin-left:6px;
+  font-family:'Share Tech Mono',monospace; font-size:9.5px; letter-spacing:.1em;
+  color:var(--green); border:1px solid var(--green); border-radius:2px;
+  padding:1px 5px; text-shadow:none;
+}
+/* ===== 색인 전용 컴포넌트 ===== */
+.doc-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:16px; margin-top:22px; }
+.doc-card{
+  display:block; text-decoration:none; color:inherit; position:relative;
+  background:var(--panel); border:1px solid var(--border);
+  border-left:3px solid var(--dc,var(--amber)); border-radius:3px;
+  padding:20px 22px; transition:border-color .18s ease, transform .18s ease, box-shadow .18s ease;
+}
+.doc-card:hover{ border-color:var(--dc,var(--amber)); transform:translateY(-3px); box-shadow:0 6px 24px rgba(0,0,0,.5); }
+.doc-lv{ font-family:'Share Tech Mono',monospace; font-size:10px; letter-spacing:.16em; color:var(--dc,var(--amber)); margin-bottom:10px; }
+.doc-name{ font-family:'Orbitron',sans-serif; font-weight:700; font-size:17px; color:var(--text); margin-bottom:4px; letter-spacing:.01em; }
+.doc-who{ font-family:'Share Tech Mono',monospace; font-size:11.5px; color:var(--muted); margin-bottom:12px; }
+.doc-desc{ font-size:13.5px; line-height:1.72; color:#9a8fb5; margin-bottom:13px; }
+.doc-meta{ font-family:'Share Tech Mono',monospace; font-size:10.5px; color:var(--muted2); line-height:1.8; margin-bottom:13px; }
+.doc-go{ font-family:'Share Tech Mono',monospace; font-size:11px; color:var(--dc,var(--amber)); letter-spacing:.1em; border-top:1px solid var(--border); padding-top:11px; }
+
+.run-card{
+  display:block; text-decoration:none; color:inherit; margin-top:22px;
+  background:linear-gradient(100deg, rgba(57,255,20,.08), rgba(6,5,10,0) 60%);
+  border:1px solid rgba(57,255,20,.35); border-left:3px solid var(--green);
+  border-radius:3px; padding:22px 24px; transition:border-color .18s ease, transform .18s ease;
+}
+.run-card:hover{ border-color:var(--green); transform:translateY(-2px); }
+.run-name{ font-family:'Orbitron',sans-serif; font-weight:700; font-size:19px; color:var(--green); margin-bottom:6px; }
+.run-desc{ font-size:13.5px; line-height:1.72; color:#9a8fb5; }
+
+.path-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(290px,1fr)); gap:14px; margin-top:20px; }
+.path-card{ background:var(--panel); border:1px solid var(--border); border-radius:3px; padding:18px 20px; }
+.path-h{ font-family:'Orbitron',sans-serif; font-weight:600; font-size:15px; color:var(--amber); margin-bottom:3px; }
+.path-w{ font-family:'Share Tech Mono',monospace; font-size:11px; color:var(--muted); margin-bottom:13px; }
+.path-card ol{ list-style:none; counter-reset:ps; }
+.path-card li{
+  counter-increment:ps; position:relative; padding-left:26px;
+  margin-bottom:9px; font-size:13.5px; line-height:1.6; color:#9a8fb5;
+}
+.path-card li::before{
+  content:counter(ps); position:absolute; left:0; top:1px;
+  width:17px; height:17px; border:1px solid var(--border-hi); border-radius:50%;
+  font-family:'Share Tech Mono',monospace; font-size:9.5px; line-height:15px;
+  text-align:center; color:var(--muted);
+}
+.path-card a{ color:var(--text); border-bottom:1px solid var(--muted2); text-decoration:none; }
+.path-card a:hover{ color:var(--amber); border-bottom-color:var(--amber-dim); }
+
+.matrix-wrap{ overflow-x:auto; border:1px solid var(--border); border-radius:3px; margin-top:20px; }
+.matrix{ border-collapse:collapse; width:100%; min-width:800px; font-size:13px; }
+.matrix thead th{
+  position:sticky; top:0; background:var(--panel2);
+  font-family:'Share Tech Mono',monospace; font-size:10px; font-weight:400;
+  letter-spacing:.12em; text-align:left; padding:11px 14px;
+  border-bottom:1px solid var(--border-hi); white-space:nowrap;
+}
+.matrix tbody td{ padding:9px 14px; border-bottom:1px solid var(--border); vertical-align:top; }
+.matrix tbody tr:hover{ background:rgba(255,179,0,.04); }
+.matrix tbody td:first-child{ color:var(--text); white-space:nowrap; font-weight:500; }
+.matrix a{ font-family:'Share Tech Mono',monospace; font-size:11px; text-decoration:none; border-bottom:1px dotted; white-space:nowrap; }
+.matrix .nil{ color:var(--muted2); font-family:'Share Tech Mono',monospace; font-size:11px; }
+.c-a{ color:var(--green)  !important; } thead th.c-a{ color:var(--green); }
+.c-b{ color:var(--blue)   !important; } thead th.c-b{ color:var(--blue); }
+.c-c{ color:var(--amber)  !important; } thead th.c-c{ color:var(--amber); }
+.c-d{ color:var(--purple) !important; } thead th.c-d{ color:var(--purple); }
+.c-m{ color:var(--red)    !important; } thead th.c-m{ color:var(--red); }
+
+.legend{ display:flex; gap:20px; flex-wrap:wrap; margin-top:14px; font-family:'Share Tech Mono',monospace; font-size:11px; color:var(--muted); }
+.legend span::before{ content:"\25A0 "; }
+
+/* 이동 바 */
+
+
+/* ===== 공통 상단 툴바 — 전 문서 동일 ===== */
+.hub-nav{
+  position:sticky; top:0; z-index:9000;
+  display:flex; align-items:center; gap:2px; flex-wrap:wrap;
+  padding:7px 16px; min-height:34px;
+  background:rgba(10,8,12,.95); border-bottom:1px solid #2a2535;
+  font-family:'IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+  font-size:11px; line-height:1.5;
+  backdrop-filter:saturate(150%) blur(8px);
+  -webkit-backdrop-filter:saturate(150%) blur(8px);
+}
+.hub-nav .home{ color:#ffb300; text-decoration:none; letter-spacing:.12em; margin-right:12px; white-space:nowrap; }
+.hub-nav .home:hover{ color:#ffd166; }
+.hub-nav a.hn{ color:#7d7291; text-decoration:none; padding:3px 9px; border-radius:2px; white-space:nowrap; }
+.hub-nav a.hn:hover{ color:#e4dcf0; background:#1c1825; }
+.hub-nav a.hn[aria-current]{ color:#ffb300; background:#1c1825; }
+.hub-nav .sep{ color:#3a3350; }
+@media print{ .hub-nav{ display:none; } }
+
+/* 앵커 이동 시 sticky 툴바에 가리지 않도록 여백 확보 */
+[id]{ scroll-margin-top: 46px; }
+</style>
+</head>
+<body>
+
+<nav class="hub-nav" aria-label="문서 간 이동">
+  <a class="home" href="#">◂ 통합 색인</a><a class="hn" href="https://claude.ai/code/artifact/ce8a5d5b-3489-480d-8e39-011fd4c05084">메인 어플리케이션 실행하기</a><span class="sep">/</span><a class="hn" href="https://claude.ai/code/artifact/bc046e44-cc26-4a89-ab65-54755e588746">공식 매뉴얼</a><span class="sep">/</span><a class="hn" href="https://claude.ai/code/artifact/0a44a83c-82a8-4893-9a74-6e67f83fadd4">쉬운 말</a><span class="sep">/</span><a class="hn" href="https://claude.ai/code/artifact/addfcd64-f934-4e44-b1e2-e9d9635b3912">기술 설명서</a><span class="sep">/</span><a class="hn" href="https://claude.ai/code/artifact/d28fb51f-1860-4e0b-b4ea-79a015d86e60">사양서</a><span class="sep">/</span><a class="hn" href="https://claude.ai/code/artifact/7592ce90-adce-4f29-8532-777a382f9004">논고</a>
+</nav>
+
+<div class="cover">
+  <div class="cover-rule">
+    <span class="cover-rule-label">ANALOG SOUL DSP ENGINE — DOCUMENTATION INDEX</span>
+  </div>
+  <div class="cover-eyebrow">통합 색인 · Documentation Index · v2.4</div>
+  <div class="cover-title">ANALOG SOUL<br>DSP ENGINE</div>
+  <div class="cover-sub">다섯 문서와 프로그램으로 가는 단일 진입점</div>
+  <div class="cover-desc">
+    같은 엔진을 다섯 가지 깊이로 기술한 문서 묶음.<br>
+    어느 문서에서 출발하든 상호 참조 표로 같은 주제의 다른 깊이를 오갈 수 있습니다.
+  </div>
+  <div class="cover-badges">
+    <span class="badge">5 DOCUMENTS</span>
+    <span class="badge">24 TOPICS CROSS-LINKED</span>
+    <span class="badge">LEVEL 1 → 4</span>
+  </div>
+</div>
+
+<div class="section" id="run">
+  <div class="section-num">RUN</div>
+  <div class="section-title">프로그램 실행</div>
+  <div class="deco-bar"></div>
+
+  <a class="run-card" href="https://claude.ai/code/artifact/ce8a5d5b-3489-480d-8e39-011fd4c05084">
+    <div class="run-name">▶ ANALOG SOUL DSP ENGINE 실행하기</div>
+    <div class="run-desc">
+      브라우저에서 바로 구동됩니다. 내보내기도 동작하며, 저장 시 파일은 무압축 <code>.zip</code>으로
+      전달됩니다. wav가 저장 허용 확장자가 아니기 때문이며 압축은 하지 않으므로 풀면 원본 그대로입니다.
+      <code>analog-soul-dsp.html</code>을 내려받아 로컬에서 열면 <code>.wav</code>로 바로 저장됩니다.
+      Chrome을 권합니다. 192kHz 경로가 다른 브라우저에서 막히는 경우가 있습니다.
+    </div>
+  </a>
+
+  <div class="callout" id="localNote" style="display:none">
+    <p>
+      <strong>로컬 폴더에서 실행 중입니다 —</strong>
+      문서 간 링크가 같은 폴더의 파일을 가리키도록 자동 전환되었습니다.
+      일곱 개 파일을 한 폴더에 두면 인터넷 없이도 전부 열람할 수 있습니다.
+      이 환경에서는 내보내기가 <code>.wav</code>로 바로 저장됩니다.
+    </p>
+  </div>
+</div>
+
+<hr class="divider">
+
+<div class="section" id="docs">
+  <div class="section-num">SECTION 01</div>
+  <div class="section-title">문서 다섯 종</div>
+  <div class="deco-bar"></div>
+  <p class="section-lead">아래로 갈수록 전제 지식이 늘어납니다. 다루는 대상은 모두 같습니다.</p>
+
+  <div class="doc-grid">
+      <a class="doc-card" style="--dc:var(--red)" href="https://claude.ai/code/artifact/bc046e44-cc26-4a89-ab65-54755e588746">
+        <div class="doc-lv">ENTRY · v2.3</div>
+        <div class="doc-name">공식 사용 설명서</div>
+        <div class="doc-who">제품 전반 · 전 모듈 레퍼런스</div>
+        <div class="doc-desc">제품 전체를 한 문서로 훑는 원본 매뉴얼. 모듈별 파라미터 카드, 신호 흐름도, 모니터링 도구, 활용 팁까지 담겨 있다. v2.3에서 LIVE·INPUT GAIN·스펙트로그램 등 신규 기능을 모두 반영했다.</div>
+        <div class="doc-meta">SECTION 01~11 · MODULE 01~09<br>개정 내역 · 활용 팁</div>
+        <div class="doc-go">OPEN →</div>
+      </a>
+      <a class="doc-card" style="--dc:var(--green)" href="https://claude.ai/code/artifact/0a44a83c-82a8-4893-9a74-6e67f83fadd4">
+        <div class="doc-lv">LEVEL 1 · 전제 없음</div>
+        <div class="doc-name">쉬운 말 설명서</div>
+        <div class="doc-who">오디오를 처음 다루는 사람</div>
+        <div class="doc-desc">전문용어를 쓰지 않고 모든 기능을 설명한다. 수치 대신 무엇이 달라지는지와 어디서부터 만지면 되는지를 적었다. 모듈 이름은 화면 표기 그대로 두고 뜻을 옆에 붙였다.</div>
+        <div class="doc-meta">11장 · 비유 중심<br>복원 원리 그림 · 용어 풀이</div>
+        <div class="doc-go">OPEN →</div>
+      </a>
+      <a class="doc-card" style="--dc:var(--blue)" href="https://claude.ai/code/artifact/addfcd64-f934-4e44-b1e2-e9d9635b3912">
+        <div class="doc-lv">LEVEL 2 · 오디오 기초</div>
+        <div class="doc-name">기술 설명서</div>
+        <div class="doc-who">직접 소리를 만지는 사람</div>
+        <div class="doc-desc">모든 파라미터의 범위·기본값과 그 값을 고른 근거를 담았다. 초급·중급·고급 배지가 붙어 순서대로 읽으면 독학이 된다. 상황별 설정과 문제 해결을 포함한다.</div>
+        <div class="doc-meta">11장 · 난이도 표시<br>HD/UHD 8개 절 · 검증 5단계</div>
+        <div class="doc-go">OPEN →</div>
+      </a>
+      <a class="doc-card" style="--dc:var(--amber)" href="https://claude.ai/code/artifact/d28fb51f-1860-4e0b-b4ea-79a015d86e60">
+        <div class="doc-lv">LEVEL 3 · 신호 처리</div>
+        <div class="doc-name">신호 처리 사양서</div>
+        <div class="doc-who">설계 의도를 확인하려는 사람</div>
+        <div class="doc-desc">필터 종류·차단점·Q·시정수를 블록도와 함께 명시하고, 그 값이 왜 그래야 하는지를 음향학으로 정당화한다. 구현 코드와 플랫폼 이야기는 의도적으로 제외했다.</div>
+        <div class="doc-meta">7장 · 블록도와 계수표<br>배음 실측 · 잔류 앨리어싱 −80dBFS</div>
+        <div class="doc-go">OPEN →</div>
+      </a>
+      <a class="doc-card" style="--dc:var(--purple)" href="https://claude.ai/code/artifact/7592ce90-adce-4f29-8532-777a382f9004">
+        <div class="doc-lv">LEVEL 4 · 박사급 전제</div>
+        <div class="doc-name">개발자 논고</div>
+        <div class="doc-who">구현을 고치거나 이식하려는 사람</div>
+        <div class="doc-desc">구현 코드가 축이고 그 위에 유도가 얹힌다. STFT 합성 이론, 체비쇼프 전개, Bregman의 융합 단서, BS.1770 라우드니스까지 동원해 코드 한 줄의 근거를 따진다.</div>
+        <div class="doc-meta">12장 · 코드 23블록 · 명제 10개<br>인용 104줄 대조 완료 · 참고문헌 15편</div>
+        <div class="doc-go">OPEN →</div>
+      </a>
+  </div>
+</div>
+
+<hr class="divider">
+
+<div class="section" id="paths">
+  <div class="section-num">SECTION 02</div>
+  <div class="section-title">목적별 독서 경로</div>
+  <div class="deco-bar"></div>
+  <p class="section-lead">전부 읽을 필요는 없습니다. 무엇을 하려는지에 따라 갈라집니다.</p>
+
+  <div class="path-grid">
+    <div class="path-card">
+      <div class="path-h">처음 써본다</div>
+      <div class="path-w">일단 소리가 나게 하고 싶다</div>
+      <ol>
+        <li><a href="https://claude.ai/code/artifact/0a44a83c-82a8-4893-9a74-6e67f83fadd4#start">쉬운 말 · 시작하기</a>로 파일을 올리고 재생</li>
+        <li><a href="https://claude.ai/code/artifact/0a44a83c-82a8-4893-9a74-6e67f83fadd4#modules">쉬운 말 · 여덟 개의 기능</a>에서 하나씩 켜보기</li>
+        <li><a href="https://claude.ai/code/artifact/0a44a83c-82a8-4893-9a74-6e67f83fadd4#save">쉬운 말 · 파일로 저장하기</a>로 내보내기</li>
+      </ol>
+    </div>
+
+    <div class="path-card">
+      <div class="path-h">음원을 손보려 한다</div>
+      <div class="path-w">mp3를 되살리거나 음색을 바꾸고 싶다</div>
+      <ol>
+        <li><a href="https://claude.ai/code/artifact/addfcd64-f934-4e44-b1e2-e9d9635b3912#hd">기술 설명서 · 고해상도 복원</a> 전체</li>
+        <li><a href="https://claude.ai/code/artifact/addfcd64-f934-4e44-b1e2-e9d9635b3912#hd-verify">직접 검증하기</a>로 효과를 눈으로 확인</li>
+        <li><a href="https://claude.ai/code/artifact/addfcd64-f934-4e44-b1e2-e9d9635b3912#recipes">상황별 설정</a>에서 출발점 고르기</li>
+      </ol>
+    </div>
+
+    <div class="path-card">
+      <div class="path-h">설정값의 근거가 궁금하다</div>
+      <div class="path-w">왜 어택이 30ms인지 알고 싶다</div>
+      <ol>
+        <li><a href="https://claude.ai/code/artifact/d28fb51f-1860-4e0b-b4ea-79a015d86e60#chain-order">사양서 · 배치 순서의 근거</a></li>
+        <li><a href="https://claude.ai/code/artifact/d28fb51f-1860-4e0b-b4ea-79a015d86e60#units">사양서 · 처리 단 사양</a>에서 해당 모듈</li>
+        <li><a href="https://claude.ai/code/artifact/7592ce90-adce-4f29-8532-777a382f9004#dyn">논고 · 동적 처리</a>에서 시정수 하한 유도</li>
+      </ol>
+    </div>
+
+    <div class="path-card">
+      <div class="path-h">코드를 고치거나 이식한다</div>
+      <div class="path-w">다른 플랫폼으로 옮기거나 결함을 찾는다</div>
+      <ol>
+        <li><a href="https://claude.ai/code/artifact/7592ce90-adce-4f29-8532-777a382f9004#frame">논고 · 해석 틀</a>에서 이중 체인 구조</li>
+        <li><a href="https://claude.ai/code/artifact/7592ce90-adce-4f29-8532-777a382f9004#graph">논고 · 그래프 수명주기</a>의 해제 규칙</li>
+        <li><a href="https://claude.ai/code/artifact/7592ce90-adce-4f29-8532-777a382f9004#num">논고 · 수치적 고려</a>의 이식 주의점</li>
+      </ol>
+    </div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<div class="section" id="matrix">
+  <div class="section-num">SECTION 03</div>
+  <div class="section-title">주제별 상호 참조</div>
+  <div class="deco-bar"></div>
+  <p class="section-lead">같은 주제를 다섯 깊이로 오가는 표입니다. 한 칸을 누르면 해당 절로 바로 이동합니다.</p>
+
+  <div class="matrix-wrap">
+    <table class="matrix">
+      <thead>
+        <tr>
+          <th>주제</th>
+          <th class="c-m">공식 매뉴얼</th>
+          <th class="c-a">쉬운 말</th>
+          <th class="c-b">기술 설명서</th>
+          <th class="c-c">사양서</th>
+          <th class="c-d">논고</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>시작·기본 조작</td>
+          <td><a class="c-m" href="https://claude.ai/code/artifact/bc046e44-cc26-4a89-ab65-54755e588746#howto">사용 5단계</a></td>
+          <td><a class="c-a" href="https://claude.ai/code/artifact/0a44a83c-82a8-4893-9a74-6e67f83fadd4#start">시작하기</a></td>
+          <td><a class="c-b" href="https://claude.ai/code/artifact/addfcd64-f934-4e44-b1e2-e9d9635b3912#start">처음 10분</a></td>
+          <td><span class="nil">—</span></td>
+          <td><span class="nil">—</span></td>
+        </tr>
+        <tr>
+          <td>화면 구성</td>
+          <td><a class="c-m" href="https://claude.ai/code/artifact/bc046e44-cc26-4a89-ab65-54755e588746#monitor">모니터링 도구</a></td>
+          <td><a class="c-a" href="https://claude.ai/code/artifact/0a44a83c-82a8-4893-9a74-6e67f83fadd4#screen">화면 살펴보기</a></td>
+          <td><a class="c-b" href="https://claude.ai/code/artifact/addfcd64-f934-4e44-b1e2-e9d9635b3912#screen">화면 읽는 법</a></td>
+          <td><span class="nil">—</span></td>
+          <td><span class="nil">—</span></td>
+        </tr>
+        <tr>
+          <td>처리 순서</td>
+          <td><a class="c-m" href="https://claude.ai/code/artifact/bc046e44-cc26-4a89-ab65-54755e588746#chain">처리 체인</a></td>
+          <td><a class="c-a" href="https://claude.ai/code/artifact/0a44a83c-82a8-4893-9a74-6e67f83fadd4#order">순서의 이유</a></td>
+          <td><a class="c-b" href="https://claude.ai/code/artifact/addfcd64-f934-4e44-b1e2-e9d9635b3912#flow">신호가 흐르는 길</a></td>
+          <td><a class="c-c" href="https://claude.ai/code/artifact/d28fb51f-1860-4e0b-b4ea-79a015d86e60#chain-order">배치 근거</a></td>
+          <td><a class="c-d" href="https://claude.ai/code/artifact/7592ce90-adce-4f29-8532-777a382f9004#frame">해석 틀</a></td>
+        </tr>
+        <tr>
+          <td>입력 게인</td>
+          <td><a class="c-m" href="https://claude.ai/code/artifact/bc046e44-cc26-4a89-ab65-54755e588746#chain">INPUT GAIN</a></td>
+          <td><a class="c-a" href="https://claude.ai/code/artifact/0a44a83c-82a8-4893-9a74-6e67f83fadd4#order">INPUT GAIN</a></td>
+          <td><a class="c-b" href="https://claude.ai/code/artifact/addfcd64-f934-4e44-b1e2-e9d9635b3912#flow-ingain">입력 게인</a></td>
+          <td><a class="c-c" href="https://claude.ai/code/artifact/d28fb51f-1860-4e0b-b4ea-79a015d86e60#chain-gain">게인 스테이징</a></td>
+          <td><span class="nil">—</span></td>
+        </tr>
+        <tr>
+          <td>모듈 전반</td>
+          <td><a class="c-m" href="https://claude.ai/code/artifact/bc046e44-cc26-4a89-ab65-54755e588746#comp">MODULE 01~</a></td>
+          <td><a class="c-a" href="https://claude.ai/code/artifact/0a44a83c-82a8-4893-9a74-6e67f83fadd4#modules">여덟 기능</a></td>
+          <td><a class="c-b" href="https://claude.ai/code/artifact/addfcd64-f934-4e44-b1e2-e9d9635b3912#modules">모듈 하나하나</a></td>
+          <td><a class="c-c" href="https://claude.ai/code/artifact/d28fb51f-1860-4e0b-b4ea-79a015d86e60#units">처리 단 사양</a></td>
+          <td><span class="nil">—</span></td>
+        </tr>
+        <tr>
+          <td>포화·왜곡</td>
+          <td><a class="c-m" href="https://claude.ai/code/artifact/bc046e44-cc26-4a89-ab65-54755e588746#tube">VACUUM TUBE</a></td>
+          <td><span class="nil">—</span></td>
+          <td><a class="c-b" href="https://claude.ai/code/artifact/addfcd64-f934-4e44-b1e2-e9d9635b3912#m-tube">VACUUM TUBE</a></td>
+          <td><a class="c-c" href="https://claude.ai/code/artifact/d28fb51f-1860-4e0b-b4ea-79a015d86e60#u-tube">전달 함수</a></td>
+          <td><a class="c-d" href="https://claude.ai/code/artifact/7592ce90-adce-4f29-8532-777a382f9004#nl-cheb">체비쇼프 전개</a></td>
+        </tr>
+        <tr>
+          <td>대역 분할</td>
+          <td><a class="c-m" href="https://claude.ai/code/artifact/bc046e44-cc26-4a89-ab65-54755e588746#sg">SOUNDGOODIZER</a></td>
+          <td><span class="nil">—</span></td>
+          <td><a class="c-b" href="https://claude.ai/code/artifact/addfcd64-f934-4e44-b1e2-e9d9635b3912#m-sg">SOUNDGOODIZER</a></td>
+          <td><a class="c-c" href="https://claude.ai/code/artifact/d28fb51f-1860-4e0b-b4ea-79a015d86e60#u-sg">LR4 구성</a></td>
+          <td><a class="c-d" href="https://claude.ai/code/artifact/7592ce90-adce-4f29-8532-777a382f9004#split">전역통과 정리</a></td>
+        </tr>
+        <tr>
+          <td>다이내믹스</td>
+          <td><a class="c-m" href="https://claude.ai/code/artifact/bc046e44-cc26-4a89-ab65-54755e588746#master">MASTERING</a></td>
+          <td><span class="nil">—</span></td>
+          <td><a class="c-b" href="https://claude.ai/code/artifact/addfcd64-f934-4e44-b1e2-e9d9635b3912#m-master">MASTERING</a></td>
+          <td><a class="c-c" href="https://claude.ai/code/artifact/d28fb51f-1860-4e0b-b4ea-79a015d86e60#u-master">4대역 압축</a></td>
+          <td><a class="c-d" href="https://claude.ai/code/artifact/7592ce90-adce-4f29-8532-777a382f9004#dyn">시정수 하한</a></td>
+        </tr>
+        <tr>
+          <td>공간·잔향</td>
+          <td><a class="c-m" href="https://claude.ai/code/artifact/bc046e44-cc26-4a89-ab65-54755e588746#atmos">DOLBY ATMOS</a></td>
+          <td><span class="nil">—</span></td>
+          <td><a class="c-b" href="https://claude.ai/code/artifact/addfcd64-f934-4e44-b1e2-e9d9635b3912#m-atmos">DOLBY ATMOS</a></td>
+          <td><a class="c-c" href="https://claude.ai/code/artifact/d28fb51f-1860-4e0b-b4ea-79a015d86e60#u-atmos">IR 구성</a></td>
+          <td><a class="c-d" href="https://claude.ai/code/artifact/7592ce90-adce-4f29-8532-777a382f9004#space">에코 밀도</a></td>
+        </tr>
+        <tr>
+          <td>스테레오 폭</td>
+          <td><a class="c-m" href="https://claude.ai/code/artifact/bc046e44-cc26-4a89-ab65-54755e588746#master">STEREO WIDTH</a></td>
+          <td><span class="nil">—</span></td>
+          <td><a class="c-b" href="https://claude.ai/code/artifact/addfcd64-f934-4e44-b1e2-e9d9635b3912#m-master">STEREO WIDTH</a></td>
+          <td><a class="c-c" href="https://claude.ai/code/artifact/d28fb51f-1860-4e0b-b4ea-79a015d86e60#u-master">M/S 처리</a></td>
+          <td><a class="c-d" href="https://claude.ai/code/artifact/7592ce90-adce-4f29-8532-777a382f9004#stereo">양이 상관도</a></td>
+        </tr>
+        <tr>
+          <td>복원 개요</td>
+          <td><a class="c-m" href="https://claude.ai/code/artifact/bc046e44-cc26-4a89-ab65-54755e588746#hd">HD RESTORATION</a></td>
+          <td><a class="c-a" href="https://claude.ai/code/artifact/0a44a83c-82a8-4893-9a74-6e67f83fadd4#restore">잘려나간 소리</a></td>
+          <td><a class="c-b" href="https://claude.ai/code/artifact/addfcd64-f934-4e44-b1e2-e9d9635b3912#hd-what">무엇을 하는가</a></td>
+          <td><a class="c-c" href="https://claude.ai/code/artifact/d28fb51f-1860-4e0b-b4ea-79a015d86e60#sbr-why">압축의 흔적</a></td>
+          <td><a class="c-d" href="https://claude.ai/code/artifact/7592ce90-adce-4f29-8532-777a382f9004#sbr">SBR 비교</a></td>
+        </tr>
+        <tr>
+          <td>컷오프 탐지</td>
+          <td><span class="nil">—</span></td>
+          <td><span class="nil">—</span></td>
+          <td><a class="c-b" href="https://claude.ai/code/artifact/addfcd64-f934-4e44-b1e2-e9d9635b3912#hd-how">알고리즘 해부</a></td>
+          <td><a class="c-c" href="https://claude.ai/code/artifact/d28fb51f-1860-4e0b-b4ea-79a015d86e60#sbr-detect">판정 임계</a></td>
+          <td><a class="c-d" href="https://claude.ai/code/artifact/7592ce90-adce-4f29-8532-777a382f9004#sbr-est">추정량</a></td>
+        </tr>
+        <tr>
+          <td>배음 전사·위상</td>
+          <td><a class="c-m" href="https://claude.ai/code/artifact/bc046e44-cc26-4a89-ab65-54755e588746#hd">동작 원리</a></td>
+          <td><span class="nil">—</span></td>
+          <td><a class="c-b" href="https://claude.ai/code/artifact/addfcd64-f934-4e44-b1e2-e9d9635b3912#hd-how">배음 옮겨쓰기</a></td>
+          <td><a class="c-c" href="https://claude.ai/code/artifact/d28fb51f-1860-4e0b-b4ea-79a015d86e60#sbr-harm">차수별 레벨</a></td>
+          <td><a class="c-d" href="https://claude.ai/code/artifact/7592ce90-adce-4f29-8532-777a382f9004#sbr-phase">위상 배수 사상</a></td>
+        </tr>
+        <tr>
+          <td>평활·교차</td>
+          <td><a class="c-m" href="https://claude.ai/code/artifact/bc046e44-cc26-4a89-ab65-54755e588746#hd">SMOOTH</a></td>
+          <td><span class="nil">—</span></td>
+          <td><a class="c-b" href="https://claude.ai/code/artifact/addfcd64-f934-4e44-b1e2-e9d9635b3912#hd-knobs">SMOOTH</a></td>
+          <td><a class="c-c" href="https://claude.ai/code/artifact/d28fb51f-1860-4e0b-b4ea-79a015d86e60#sbr-sm">가우시안 커널</a></td>
+          <td><a class="c-d" href="https://claude.ai/code/artifact/7592ce90-adce-4f29-8532-777a382f9004#sbr-xfade">교차 규칙</a></td>
+        </tr>
+        <tr>
+          <td>LIVE 모드</td>
+          <td><a class="c-m" href="https://claude.ai/code/artifact/bc046e44-cc26-4a89-ab65-54755e588746#hd">LIVE 미리듣기</a></td>
+          <td><a class="c-a" href="https://claude.ai/code/artifact/0a44a83c-82a8-4893-9a74-6e67f83fadd4#restore">미리 들어보기</a></td>
+          <td><a class="c-b" href="https://claude.ai/code/artifact/addfcd64-f934-4e44-b1e2-e9d9635b3912#hd-live">LIVE 모드</a></td>
+          <td><span class="nil">—</span></td>
+          <td><a class="c-d" href="https://claude.ai/code/artifact/7592ce90-adce-4f29-8532-777a382f9004#frame">추정 가능성</a></td>
+        </tr>
+        <tr>
+          <td>청감 한계</td>
+          <td><span class="nil">—</span></td>
+          <td><a class="c-a" href="https://claude.ai/code/artifact/0a44a83c-82a8-4893-9a74-6e67f83fadd4#restore">솔직하게</a></td>
+          <td><a class="c-b" href="https://claude.ai/code/artifact/addfcd64-f934-4e44-b1e2-e9d9635b3912#hd-truth">정말 들리는가</a></td>
+          <td><a class="c-c" href="https://claude.ai/code/artifact/d28fb51f-1860-4e0b-b4ea-79a015d86e60#psycho">가청 상한</a></td>
+          <td><a class="c-d" href="https://claude.ai/code/artifact/7592ce90-adce-4f29-8532-777a382f9004#sbr-asa">융합과 분리</a></td>
+        </tr>
+        <tr>
+          <td>스펙트럼 분석기</td>
+          <td><a class="c-m" href="https://claude.ai/code/artifact/bc046e44-cc26-4a89-ab65-54755e588746#monitor">A/B·스펙트로그램</a></td>
+          <td><a class="c-a" href="https://claude.ai/code/artifact/0a44a83c-82a8-4893-9a74-6e67f83fadd4#graph">그림으로 보기</a></td>
+          <td><a class="c-b" href="https://claude.ai/code/artifact/addfcd64-f934-4e44-b1e2-e9d9635b3912#spectrum">분석기</a></td>
+          <td><a class="c-c" href="https://claude.ai/code/artifact/d28fb51f-1860-4e0b-b4ea-79a015d86e60#meter">계측과 판독</a></td>
+          <td><a class="c-d" href="https://claude.ai/code/artifact/7592ce90-adce-4f29-8532-777a382f9004#num">표시 양자화</a></td>
+        </tr>
+        <tr>
+          <td><strong>프리셋</strong></td>
+          <td><a class="c-m" href="https://claude.ai/code/artifact/bc046e44-cc26-4a89-ab65-54755e588746#preset">설정 보관</a></td>
+          <td><span class="nil">—</span></td>
+          <td><span class="nil">—</span></td>
+          <td><span class="nil">—</span></td>
+          <td><span class="nil">—</span></td>
+        </tr>
+        <tr>
+          <td>내보내기</td>
+          <td><a class="c-m" href="https://claude.ai/code/artifact/bc046e44-cc26-4a89-ab65-54755e588746#export">3가지 포맷</a></td>
+          <td><a class="c-a" href="https://claude.ai/code/artifact/0a44a83c-82a8-4893-9a74-6e67f83fadd4#save">파일로 저장</a></td>
+          <td><a class="c-b" href="https://claude.ai/code/artifact/addfcd64-f934-4e44-b1e2-e9d9635b3912#export">내보내기</a></td>
+          <td><a class="c-c" href="https://claude.ai/code/artifact/d28fb51f-1860-4e0b-b4ea-79a015d86e60#practice">운용 지침</a></td>
+          <td><span class="nil">—</span></td>
+        </tr>
+        <tr>
+          <td>앨리어싱</td>
+          <td><span class="nil">—</span></td>
+          <td><span class="nil">—</span></td>
+          <td><span class="nil">—</span></td>
+          <td><a class="c-c" href="https://claude.ai/code/artifact/d28fb51f-1860-4e0b-b4ea-79a015d86e60#alias-budget">잔류량 산정</a></td>
+          <td><a class="c-d" href="https://claude.ai/code/artifact/7592ce90-adce-4f29-8532-777a382f9004#nl-alias">임계 차수</a></td>
+        </tr>
+        <tr>
+          <td>레벨 정합</td>
+          <td><span class="nil">—</span></td>
+          <td><span class="nil">—</span></td>
+          <td><span class="nil">—</span></td>
+          <td><a class="c-c" href="https://claude.ai/code/artifact/d28fb51f-1860-4e0b-b4ea-79a015d86e60#sbr-lvl">RMS 매칭</a></td>
+          <td><a class="c-d" href="https://claude.ai/code/artifact/7592ce90-adce-4f29-8532-777a382f9004#level">K-가중 편향</a></td>
+        </tr>
+        <tr>
+          <td>문제 해결</td>
+          <td><a class="c-m" href="https://claude.ai/code/artifact/bc046e44-cc26-4a89-ab65-54755e588746#tips">활용 팁</a></td>
+          <td><a class="c-a" href="https://claude.ai/code/artifact/0a44a83c-82a8-4893-9a74-6e67f83fadd4#trouble">문제가 생기면</a></td>
+          <td><a class="c-b" href="https://claude.ai/code/artifact/addfcd64-f934-4e44-b1e2-e9d9635b3912#trouble">문제 해결</a></td>
+          <td><span class="nil">—</span></td>
+          <td><a class="c-d" href="https://claude.ai/code/artifact/7592ce90-adce-4f29-8532-777a382f9004#graph">그래프 수명주기</a></td>
+        </tr>
+        <tr>
+          <td>알려진 한계</td>
+          <td><a class="c-m" href="https://claude.ai/code/artifact/bc046e44-cc26-4a89-ab65-54755e588746#whatsnew">개정 내역</a></td>
+          <td><span class="nil">—</span></td>
+          <td><a class="c-b" href="https://claude.ai/code/artifact/addfcd64-f934-4e44-b1e2-e9d9635b3912#limits">알려진 제한</a></td>
+          <td><a class="c-c" href="https://claude.ai/code/artifact/d28fb51f-1860-4e0b-b4ea-79a015d86e60#limits">사양상 한계</a></td>
+          <td><a class="c-d" href="https://claude.ai/code/artifact/7592ce90-adce-4f29-8532-777a382f9004#num">수치적 고려</a></td>
+        </tr>
+        <tr>
+          <td>용어</td>
+          <td><span class="nil">—</span></td>
+          <td><a class="c-a" href="https://claude.ai/code/artifact/0a44a83c-82a8-4893-9a74-6e67f83fadd4#words">용어 풀이</a></td>
+          <td><a class="c-b" href="https://claude.ai/code/artifact/addfcd64-f934-4e44-b1e2-e9d9635b3912#glossary">용어 사전</a></td>
+          <td><span class="nil">—</span></td>
+          <td><a class="c-d" href="https://claude.ai/code/artifact/7592ce90-adce-4f29-8532-777a382f9004#bib">참고문헌</a></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="legend">
+    <span class="c-m">공식 매뉴얼 — 전 모듈 레퍼런스</span>
+    <span class="c-a">쉬운 말 — 전제 없음</span>
+    <span class="c-b">기술 설명서 — 오디오 기초</span>
+    <span class="c-c">사양서 — 신호 처리</span>
+    <span class="c-d">논고 — 박사급</span>
+  </div>
+</div>
+
+<hr class="divider">
+
+<div class="section" id="log">
+  <div class="section-num">SECTION 04</div>
+  <div class="section-title">개정 기록</div>
+  <div class="deco-bar"></div>
+  <p class="section-lead">판별 변경 내역입니다. 각 항목의 근거는 사양서 또는 논고의 해당 절에 있습니다.</p>
+
+  <h3 class="sub-title">v2.4 — 현재 판</h3>
+  <p style="color:#9a8fb5;font-size:14px;margin-bottom:16px">
+    설정을 보관하고 다시 불러오는 경로를 만든 판입니다.
+    문서 묶음의 이동 구조와 이탈 보호도 함께 정리했습니다.
+  </p>
+
+  <table class="spec-table">
+    <tr><th>항목</th><th>내용</th></tr>
+
+    <tr><td>프리셋 저장·불러오기</td><td>화면 설정 전체를 <code>.json</code> 파일로 내보내고 되돌립니다. 슬라이더 50개, 토글 10개, 모듈 순서, SG 모드, ATMOS 씬이 담기며 음원은 포함하지 않습니다.</td></tr>
+    <tr><td>빠른 슬롯 4개</td><td>브라우저에 남는 즉석 보관함. 짧게 누르면 불러오고 0.6초 길게 누르면 현재 설정을 덮어씁니다. 내용이 있는 슬롯은 초록으로 표시됩니다.</td></tr>
+    <tr><td>빈 슬롯 → 기본값</td><td>비어 있는 슬롯을 누르면 모든 값이 기본값으로 돌아갑니다. 마크업의 default 속성을 기준으로 삼아 초기 상태를 정확히 복원하며, 음원은 그대로 남습니다.</td></tr>
+    <tr><td>슬롯 복사</td><td>복사를 누른 뒤 원본과 대상 슬롯을 차례로 누르면 옮겨집니다. 대상에 내용이 있으면 덮어썼다고 결과에 명시합니다.</td></tr>
+    <tr><td>한 슬롯 비우기</td><td>버튼을 누른 뒤 슬롯을 고르면 그 슬롯만 지워집니다. 복사·비우기·저장 모드는 항상 하나만 켜집니다.</td></tr>
+    <tr><td>모든 슬롯 비우기</td><td>되돌릴 수 없는 동작이라 두 단계로 나눴습니다. 처음 누르면 버튼이 <em>정말 지울까요?</em>로 바뀌고, 6초 안에 다시 누르면 실행됩니다.</td></tr>
+    <tr><td>슬롯 일괄 백업</td><td>네 슬롯을 한 파일로 묶어 내보냅니다. 빈 슬롯은 <code>null</code>로 기록해 위치까지 그대로 복원됩니다.</td></tr>
+    <tr><td>불러오기 자동 판별</td><td>파일의 <code>format</code> 필드를 읽어 설정 파일이면 지금 값에 적용하고 슬롯 백업이면 슬롯을 되돌립니다. 사용자가 종류를 고를 필요가 없습니다.</td></tr>
+    <tr><td>드래그 앤 드롭</td><td>프리셋 패널에 파일을 끌어다 놓아도 같은 경로로 처리됩니다. 드래그가 올라오면 테두리 색으로 놓을 자리를 알립니다.</td></tr>
+    <tr><td>패널 내 피드백</td><td>상태바가 EXPORT 아래에 있어 프리셋 조작 결과가 화면 밖이었습니다. 패널 안에도 같은 메시지를 띄우고 성공·주의·오류를 색으로 구분합니다.</td></tr>
+    <tr><td>이탈 확인</td><td>값을 바꾼 뒤 다른 문서로 나가려 하면 확인 창이 뜹니다. 새로고침·탭 닫기는 브라우저 기본 경고로 처리합니다.</td></tr>
+
+    <tr><td>공통 상단 툴바</td><td>문서마다 다른 클래스와 색을 쓰던 이동 바를 하나로 통일했습니다. 문서 테마와 무관한 고정 팔레트를 써서 어디서나 같은 모습입니다. 프로그램에도 추가해 문서로 돌아올 수 있습니다.</td></tr>
+    <tr><td>목차 겹침 보정</td><td>사양서·논고·기술 설명서의 좌측 목차가 툴바 아래로 파고들던 문제. 레일 위치와 높이를 툴바 높이만큼 보정했습니다.</td></tr>
+    <tr><td>탭 전환 스크롤</td><td>브라우저의 스크롤 자동 복원 때문에 문서를 옮기면 중간 위치에 떨어졌습니다. 복원을 끄고 맨 위에서 시작하도록 했으며, <code>scroll-behavior:smooth</code>가 이동을 취소하던 문제도 함께 잡았습니다.</td></tr>
+    <tr><td>앵커 여백</td><td>딥링크로 이동하면 목표 지점이 툴바에 가려 첫 줄이 안 보였습니다. <code>scroll-margin-top</code>으로 툴바 높이만큼 띄웁니다.</td></tr>
+    <tr><td>로컬 진입점</td><td><code>index.html</code>을 만들어 폴더에서 바로 열 수 있게 했습니다. <code>file:</code>로 열리면 문서 간 링크가 같은 폴더 파일을 가리키도록 자동 전환됩니다.</td></tr>
+    <tr><td>중복 색인 제거</td><td>내용이 같은 색인이 두 벌이라 어느 쪽에서 들어왔느냐에 따라 다른 파일에 도착했습니다. <code>index.html</code> 하나로 합쳤습니다.</td></tr>
+    <tr><td>색인 UI 통일</td><td>색인의 디자인 언어를 공식 매뉴얼과 같게 맞췄습니다. 폰트·색 토큰·컴포넌트를 공유합니다.</td></tr>
+    <tr><td>매뉴얼 v2.3 갱신</td><td>공식 매뉴얼 본문에 LIVE 미리듣기, 모듈별 입력 게인, A/B 스펙트럼과 스펙트로그램, X-AXIS 고정, 구현된 세 파라미터를 반영했습니다.</td></tr>
+    <tr><td>버튼 라벨 정리</td><td>화면 설정 저장 · 모든 슬롯을 백업 · 불러오기 · 한 슬롯 비우기 · 모든 슬롯 비우기로 이름을 명확히 했습니다.</td></tr>
+  </table>
+
+  <h3 class="sub-title">v2.3</h3>
+  <p style="color:#9a8fb5;font-size:14px;margin-bottom:16px">
+    문서를 쓰면서 구현 코드를 읽다 발견해 고친 것과, 그 과정에서 새로 넣은 것들입니다.
+  </p>
+
+  <table class="spec-table">
+    <tr><th>항목</th><th>내용</th></tr>
+
+    <tr><td>모듈별 INPUT GAIN</td><td>여덟 모듈 전부에 −24~+24dB 입력 게인 추가. 모듈이 꺼지면 게인도 체인에서 빠집니다.</td></tr>
+    <tr><td>HD/UHD LIVE 미리듣기</td><td>내보내기 전에 복원 결과를 재생. 전체를 미리 복원해 캐시하고 그 버퍼를 재생합니다.</td></tr>
+    <tr><td>A/B 좌우 스펙트럼</td><td>원음과 적용본을 나란히 표시. 원음은 모든 모듈 진입 직전에서 분기합니다.</td></tr>
+    <tr><td>스펙트럼 dB 눈금</td><td>세로축에 10dB 간격 −30~−100dB 눈금. 넓은 화면에서 읽기 쉽도록 숫자를 가로로 네 번 반복.</td></tr>
+    <tr><td>스펙트로그램 전환</td><td>그래프 클릭으로 시간–주파수 표시 전환. 약 8.7초 이력, 무지개 음압 컬러맵.</td></tr>
+    <tr><td>X-AXIS 범위 고정</td><td>순응·48·96·192 4단 스위치. 고정하면 LIVE를 켜고 꺼도 같은 자리끼리 비교됩니다.</td></tr>
+    <tr><td>데이터 없는 구간 표시</td><td>고정 범위가 실제 나이퀴스트보다 넓으면 경계에 점선을 긋고 그 오른쪽을 어둡게 덮습니다.</td></tr>
+    <tr><td>브릭월 세이프티 클리퍼</td><td>체인 최종단 추가. 천장의 85% 아래는 완전 선형, 그 위는 1.0에 점근해 천장을 넘지 않습니다.</td></tr>
+
+    <tr><td>MASTER STEREO WIDTH</td><td>값만 있고 처리가 없었습니다. M/S 분해 후 사이드에 폭 계수를 곱해 재합성. 배치는 리미터 뒤.</td></tr>
+    <tr><td>VINYL WOBBLE</td><td>미구현이었습니다. 가변 지연을 와우 0.556Hz와 플러터 4.2Hz로 변조. 최대 피치 편차 ±0.31%.</td></tr>
+    <tr><td>VINYL CROSSTALK</td><td>미구현이었습니다. 채널 교차 합산으로 최대 −9.1dB 누설. 합산 보정으로 레벨은 불변.</td></tr>
+    <tr><td>SMOOTH</td><td>복원 함수에 전달만 되고 쓰이지 않았습니다. 가우시안 커널 반경 1~4와 적용 비율을 제어하도록 연결.</td></tr>
+    <tr><td>AIR MIX 개명</td><td>실제로는 평활을 제어하므로 UHD 쪽 라벨을 SMOOTH로 변경.</td></tr>
+    <tr><td>SG STEREO</td><td>스테레오 폭이 아니라 압축기 릴리즈만 바꾸고 있었습니다. 실제 M/S 폭 조절로 교체, 릴리즈는 200ms 고정.</td></tr>
+
+    <tr><td>재생·내보내기 순서 불일치</td><td>드래그 순서가 내보내기에만 반영되고 재생은 고정 순서였습니다. 양쪽 모두 DOM 순서를 읽도록 통일.</td></tr>
+    <tr><td>재생 중 순서 변경</td><td>순서를 바꾸면 재생 위치를 유지한 채 체인만 교체되도록 연결.</td></tr>
+    <tr><td>배음 전사 위상 누락</td><td>원본 위상을 그대로 복사해 프레임 간 정합이 깨져 있었습니다. 차수만큼 배수하도록 수정.</td></tr>
+    <tr><td>SG 커브가 순수 기함수</td><td>짝수 배음이 풍부하다는 주석과 달리 2차가 −68.6dB. 동작점 이동을 넣어 −28.9dB로 조정.</td></tr>
+    <tr><td>직류 오프셋 누출</td><td>비대칭 포화의 직류를 막는 고역 통과가 없었고 마스터 저역 밴드가 저역 통과라 출력까지 도달. 12Hz 차단기 삽입.</td></tr>
+    <tr><td>SG 비상보 대역 분할</td><td>LPF+BPF+HPF 병렬이라 합이 0.906~1.568로 흔들렸습니다. Linkwitz-Riley 4차로 교체해 전 대역 1.000.</td></tr>
+    <tr><td>포화 앨리어싱</td><td>웨이브셰이퍼 전부 4배 오버샘플링, 포화 전 sr/3 대역 제한 추가. 시작 차수 7차→10.5차, 잔류 약 −80dBFS.</td></tr>
+    <tr><td>ATMOS IR 중복</td><td>초기 반사와 후기 잔향이 같은 IR을 두 번 컨볼브했습니다. 각각 다른 응답으로 분리해 연산량도 감소.</td></tr>
+    <tr><td>LFO 누적</td><td>재생마다 새로 만든 와우 오실레이터가 정지되지 않고 쌓였습니다. 정지 시 함께 정리.</td></tr>
+    <tr><td>복합 블록 연결 해제</td><td>체인 재구성 시 블록 내부 배선까지 끊어 망가지던 문제. 바깥으로 나가는 출력만 끊도록 수정.</td></tr>
+
+    <tr><td>192kHz 내보내기 실패</td><td>미사용 컨텍스트 생성이 try 밖에 있어 예외 시 잠금이 풀리지 않았습니다. 구조 재정비 + 사전 점검 추가.</td></tr>
+    <tr><td>WAV 인코딩 지연</td><td>샘플마다 getChannelData를 호출해 192kHz에서 9200만 회. 채널 배열을 루프 밖으로 이동.</td></tr>
+    <tr><td>대용량 다운로드 취소</td><td>revokeObjectURL을 즉시 호출해 저장 시작 전에 URL이 사라졌습니다. DOM 부착 후 해제를 지연.</td></tr>
+    <tr><td>메모리 피크</td><td>렌더 완료 후 리샘플 버퍼 참조를 끊어 GC 대상이 되게 하고, 예상 용량이 한계를 넘으면 사전에 차단.</td></tr>
+    <tr><td>원본 샘플레이트 미보존</td><td>디코딩이 장치 기준으로 리샘플했습니다. WAV·FLAC·OGG·MP3·MP4 헤더를 직접 읽어 그 레이트로 디코딩.</td></tr>
+    <tr><td>게시 환경 저장</td><td>온라인 페이지에서도 내보내기 동작. wav가 허용 확장자가 아니라 무압축 zip으로 감싸 전달합니다.</td></tr>
+
+    <tr><td>기본 모듈 순서</td><td>COMP → BBE → TUBE → EXCITER → SG → VINYL → ATMOS → MASTER로 재배치. 레벨 정리 후 색을 입히는 순서.</td></tr>
+    <tr><td>진행 로그 표시</td><td>내보내기 오버레이 로그를 4.5줄로 조정하고 마지막 줄이 그라데이션으로 사라지도록 수정.</td></tr>
+    <tr><td>죽은 데이터 정리</td><td>SG 프리셋의 loQ·hiQ와 ATMOS 씬의 roomSize가 한 번도 읽히지 않아 제거.</td></tr>
+
+    <tr><td>문서 다섯 종</td><td>쉬운 말 설명서·기술 설명서·신호 처리 사양서·개발자 논고를 새로 작성하고 공식 매뉴얼을 v2.3으로 갱신.</td></tr>
+    <tr><td>통합 색인</td><td>23개 주제를 다섯 문서의 해당 절로 연결하는 상호 참조 표와 목적별 독서 경로를 신설.</td></tr>
+    <tr><td>공통 상단 툴바</td><td>전 문서에 동일한 툴바를 넣어 어디서나 오갈 수 있게 하고, 로컬 폴더에서는 상대 경로로 자동 전환.</td></tr>
+  </table>
+
+  <h3 class="sub-title">v2.2 — 최초 판</h3>
+  <p style="color:#9a8fb5;font-size:14px">
+    여덟 개 처리 모듈과 HD/ULTRA HD 복원, 드래그 순서 변경, 기본 스펙트럼 표시를 갖춘 판입니다.
+    v2.3에서 고친 항목들은 이 판에 존재하던 것입니다.
+  </p>
+</div>
+
+<div class="footer">
+  <div class="footer-name">ANALOG SOUL DSP ENGINE</div>
+  <div class="footer-copy">
+    DOCUMENTATION INDEX v2.4<br>
+    모든 수치는 구현 코드에서 추출하거나 실측·유도한 값이며, 검증되지 않은 주장은 각 문서에 그렇게 표시했습니다.<br>
+    개인적, 비상업적 용도로만 사용하세요.
+  </div>
+</div>
+
+<script>
+/* 로컬 폴더에서 열렸을 때(file:) 문서 간 링크를 상대 경로로 바꾼다.
+   게시본과 로컬본이 같은 파일이므로 한 벌로 두 환경을 모두 지원한다. */
+(function () {
+  if (location.protocol !== 'file:') return;
+  var MAP = {
+    'ce8a5d5b-3489-480d-8e39-011fd4c05084': 'analog-soul-dsp.html',
+    'bc046e44-cc26-4a89-ab65-54755e588746': 'analog-soul-manual.html',
+    '0a44a83c-82a8-4893-9a74-6e67f83fadd4': 'analog-soul-plain.html',
+    'addfcd64-f934-4e44-b1e2-e9d9635b3912': 'analog-soul-guide.html',
+    'd28fb51f-1860-4e0b-b4ea-79a015d86e60': 'analog-soul-engineering.html',
+    '7592ce90-adce-4f29-8532-777a382f9004': 'analog-soul-internals.html',
+    'bee5f232-9716-432c-bafd-31255f222978': 'index.html'
+  };
+  var RE = /https:\/\/claude\.ai\/code\/artifact\/([\w-]+)/;
+  Array.prototype.forEach.call(document.querySelectorAll('a[href]'), function (a) {
+    var m = RE.exec(a.getAttribute('href'));
+    if (!m) return;
+    var f = MAP[m[1]];
+    if (!f) return;
+    a.setAttribute('href', a.getAttribute('href').replace(RE, f));
+  });
+  var note = document.getElementById('localNote');
+  if (note) note.style.display = '';
+})();
+</script>
+<script>
+/* 문서를 옮기면 항상 맨 위에서 시작하도록 강제한다.
+   - 브라우저의 스크롤 자동 복원(history.scrollRestoration)을 끈다.
+   - html에 scroll-behavior:smooth가 걸려 있어 scrollTo가 애니메이션으로 처리되면
+     로딩 중 리플로우에 취소될 수 있다. 이동하는 순간만 auto로 내렸다 되돌린다.
+   - 폰트·이미지 로드로 레이아웃이 늦게 확정되므로 여러 시점에 반복 적용한다. */
+(function () {
+  if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+
+  var root = document.documentElement;
+
+  function jump(fn) {
+    var prev = root.style.scrollBehavior;
+    root.style.scrollBehavior = 'auto';   // 애니메이션 없이 즉시 이동
+    fn();
+    // 다음 프레임에 원복해야 이동이 확정된 뒤에 smooth가 돌아온다
+    requestAnimationFrame(function () { root.style.scrollBehavior = prev; });
+  }
+
+  function toTop() {
+    jump(function () {
+      window.scrollTo(0, 0);
+      if (document.scrollingElement) document.scrollingElement.scrollTop = 0;
+      root.scrollTop = 0;
+      if (document.body) document.body.scrollTop = 0;
+    });
+  }
+
+  function toHash(h) {
+    var el = document.getElementById(h);
+    if (!el) { toTop(); return; }
+    jump(function () { el.scrollIntoView(); });
+  }
+
+  function place() {
+    var h = location.hash ? decodeURIComponent(location.hash.slice(1)) : '';
+    if (h) toHash(h); else toTop();
+  }
+
+  // 스크립트 실행 시점에 한 번
+  place();
+
+  // 레이아웃이 확정되는 여러 시점에 다시 (해시 없을 때만 — 앵커는 한 번이면 충분)
+  function replaceIfTop() { if (!location.hash) toTop(); }
+  document.addEventListener('DOMContentLoaded', replaceIfTop);
+  window.addEventListener('load', function () {
+    place();
+    requestAnimationFrame(replaceIfTop);
+    setTimeout(replaceIfTop, 120);
+  });
+  window.addEventListener('pageshow', function (e) { if (e.persisted) place(); });
+
+  // 현재 문서를 가리키는 툴바 항목(href="#")은 기본 동작이 아무것도 하지 않으므로
+  // 직접 맨 위로 보낸다. 다른 문서로 가는 항목은 이동 후 위 place()가 처리한다.
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest ? e.target.closest('.hub-nav a') : null;
+    if (!a) return;
+    var href = a.getAttribute('href');
+    if (href === '#') { e.preventDefault(); toTop(); }
+  });
+})();
+</script>
+</body>
+</html>

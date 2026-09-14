@@ -64,7 +64,7 @@ code, pre, .m, th, .blk { font-family: "IBM Plex Mono", ui-monospace, Menlo, mon
 @media (max-width: 1000px) { .shell { grid-template-columns: 1fr; gap: 0; padding: 0 18px; } }
 
 .rail {
-  position: sticky; top: 0; align-self: start; max-height: 100vh; overflow-y: auto;
+  position: sticky; top: 34px; align-self: start; max-height: calc(100vh - 34px); overflow-y: auto;
   padding: 26px 20px 40px 0; border-right: 1px solid var(--line-lo); font-size: 13.5px;
 }
 @media (max-width: 1000px) {
@@ -188,9 +188,36 @@ footer {
   body { background: #fff; color: #000; font-size: 10.5pt; }
   .eq, .blk, table { break-inside: avoid; }
 }
+
+
+
+/* ===== 공통 상단 툴바 — 전 문서 동일 ===== */
+.hub-nav{
+  position:sticky; top:0; z-index:9000;
+  display:flex; align-items:center; gap:2px; flex-wrap:wrap;
+  padding:7px 16px; min-height:34px;
+  background:rgba(10,8,12,.95); border-bottom:1px solid #2a2535;
+  font-family:'IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+  font-size:11px; line-height:1.5;
+  backdrop-filter:saturate(150%) blur(8px);
+  -webkit-backdrop-filter:saturate(150%) blur(8px);
+}
+.hub-nav .home{ color:#ffb300; text-decoration:none; letter-spacing:.12em; margin-right:12px; white-space:nowrap; }
+.hub-nav .home:hover{ color:#ffd166; }
+.hub-nav a.hn{ color:#7d7291; text-decoration:none; padding:3px 9px; border-radius:2px; white-space:nowrap; }
+.hub-nav a.hn:hover{ color:#e4dcf0; background:#1c1825; }
+.hub-nav a.hn[aria-current]{ color:#ffb300; background:#1c1825; }
+.hub-nav .sep{ color:#3a3350; }
+@media print{ .hub-nav{ display:none; } }
+
+/* 앵커 이동 시 sticky 툴바에 가리지 않도록 여백 확보 */
+[id]{ scroll-margin-top: 46px; }
 </style>
 </head>
 <body>
+<nav class="hub-nav" aria-label="문서 간 이동">
+  <a class="home" href="https://claude.ai/code/artifact/bee5f232-9716-432c-bafd-31255f222978">◂ 통합 색인</a><a class="hn" href="https://claude.ai/code/artifact/ce8a5d5b-3489-480d-8e39-011fd4c05084">메인 어플리케이션 실행하기</a><span class="sep">/</span><a class="hn" href="https://claude.ai/code/artifact/bc046e44-cc26-4a89-ab65-54755e588746">공식 매뉴얼</a><span class="sep">/</span><a class="hn" href="https://claude.ai/code/artifact/0a44a83c-82a8-4893-9a74-6e67f83fadd4">쉬운 말</a><span class="sep">/</span><a class="hn" href="https://claude.ai/code/artifact/addfcd64-f934-4e44-b1e2-e9d9635b3912">기술 설명서</a><span class="sep">/</span><a class="hn" href="#" aria-current="page">사양서</a><span class="sep">/</span><a class="hn" href="https://claude.ai/code/artifact/7592ce90-adce-4f29-8532-777a382f9004">논고</a>
+</nav>
 <div class="shell">
 
 <nav class="rail" aria-label="목차">
@@ -467,13 +494,46 @@ y(x) =  ⎨
 출력 = y(x) / tanh(d)      <i>평균 게인 보상</i></div>
       <p>
         <code>tanh(d)</code>로 나누는 정규화가 없으면 드라이브를 올릴수록 출력이 줄어
-        A/B 비교가 왜곡된다. BIAS가 50에서 멀어질수록 동작점이 한쪽으로 치우쳐
-        짝수 배음 비율이 높아진다.
+        A/B 비교가 왜곡된다.
+      </p>
+      <div class="tw"><table>
+        <thead><tr><th>BIAS</th><th>2차</th><th>3차</th><th>성격</th></tr></thead>
+        <tbody>
+          <tr><td class="m">0</td><td class="m">−30.7 dB</td><td class="m">−22.8 dB</td><td>짝수 배음이 뚜렷</td></tr>
+          <tr><td class="m">50</td><td class="m">−39.9 dB</td><td class="m">−23.1 dB</td><td>3차가 17 dB 우세</td></tr>
+          <tr><td class="m">100</td><td class="m">−26.3 dB</td><td class="m">−23.9 dB</td><td>짝·홀이 비슷</td></tr>
+        </tbody>
+      </table></div>
+      <p>
+        실측값이다(입력 진폭 0.7, DRIVE 30). 짝수 배음의 실질적 제어자는 BIAS이며,
+        비대칭 계수 1.15는 BIAS 중앙에서도 짝수가 완전히 사라지지 않게 하는 보조다.
+        따뜻함을 원한다면 DRIVE보다 BIAS를 중앙에서 밀어내는 편이 직접적이다.
+        여기서 생기는 직류는 포화 직후 12 Hz 고역 통과가 차단한다.
+      </p>
+      <h4>앨리어싱 억제</h4>
+      <p>
+        포화는 4배 오버샘플링으로 처리하고, 그 앞에 <code>sr/3</code> 차단의
+        대역 제한 필터를 둔다. 두 조치의 근거는 이렇다.
+      </p>
+      <div class="eq">4배 오버샘플링 → 내부 레이트 4·sr, 내부 나이퀴스트 2·sr
+내부 나이퀴스트를 넘은 성분 f 는 4·sr − f 로 접힌다.
+다운샘플 후에도 남으려면  4·sr − f &lt; sr/2  →  <b>f &gt; 3.5·sr</b>
+
+입력 상한 fc 일 때 가청 앨리어싱 시작 차수 = 3.5·sr / fc
+
+fc = sr/2 (제한 없음) →  7.0차
+fc = sr/3 (대역 제한) → 10.5차</div>
+      <p>
+        입력 상한이 나이퀴스트인 한 시작 차수는 샘플레이트와 무관하게 항상 7차다.
+        <code>sr/3</code>으로 묶으면 10.5차로 밀려나며, 이 관계 역시 샘플레이트에
+        의존하지 않는다. tanh 포화에서 7차와 11차의 레벨 차는 약 9 dB이므로
+        잔류 앨리어싱이 그만큼 낮아진다.
       </p>
       <p>
-        포화는 2배 오버샘플링으로 처리한다. 배음이 나이퀴스트를 넘어 접히는
-        앨리어싱을 줄이기 위함이며, 완전히 제거하지는 못한다.
-        고차 배음을 억제하는 두 셸빙 필터가 그 보완책이다.
+        차단점은 48 kHz에서 16 kHz, 96 kHz에서 32 kHz, 192 kHz에서 64 kHz가 된다.
+        TUBE는 포화 후 6 kHz와 9 kHz 셸빙으로 고역을 이미 크게 깎으므로
+        음색 변화가 거의 없다. EXCITER와 SOUNDGOODIZER 고역 밴드는 대역이
+        사라지지 않도록 차단점에 하한(각 대역 하단의 1.4배)을 둔다.
       </p>
     </div>
   </div>
@@ -528,9 +588,22 @@ y(x) =  ⎨
 
       <h4>포화 전달 함수</h4>
       <p>
-        소프트클립과 3차 다항식을 블렌딩한다. 소프트클립은 짝수 배음이 우세하고
-        3차항은 홀수 배음을 만든다. saturation이 높을수록 홀수 성분 비율이 올라가
-        공격적인 성격이 된다.
+        소프트클립과 3차 다항식을 블렌딩하고, 여기에 동작점 이동을 더한다.
+        두 함수 모두 기함수라 블렌딩만으로는 홀수 배음만 나온다.
+        짝수 배음은 <code>b = 0.08 × SAT</code>의 바이어스가 만든다.
+      </p>
+      <div class="tw"><table>
+        <thead><tr><th>SAT</th><th>2차</th><th>3차</th><th>4차</th></tr></thead>
+        <tbody>
+          <tr><td class="m">0.2</td><td class="m">−38.0 dB</td><td class="m">−17.2 dB</td><td class="m">−44.7 dB</td></tr>
+          <tr><td class="m">0.6</td><td class="m">−28.9 dB</td><td class="m">−17.8 dB</td><td class="m">−35.3 dB</td></tr>
+          <tr><td class="m">1.0</td><td class="m">−26.7 dB</td><td class="m">−20.4 dB</td><td class="m">−33.6 dB</td></tr>
+        </tbody>
+      </table></div>
+      <p>
+        실측값이다(8192점 DFT, 입력 진폭 0.7, DRIVE 0.4).
+        SAT를 올리면 짝수 배음이 따라 올라와 두께가 생긴다.
+        바이어스가 만드는 직류는 저역 밴드 포화 직후의 12 Hz 고역 통과가 제거한다.
       </p>
       <div class="eq">k = 1 + SAT×2.5      d = 1 + DRIVE×1.5      xd = x·d
 
@@ -547,23 +620,31 @@ y = soft·(1 − SAT×0.3) + cubic·(SAT×0.3)
           <tr><td></td><td class="m">어택 3 ms, 릴리즈 80 + STEREO×220 ms, 니 6 dB</td></tr>
         </tbody>
       </table></div>
-      <div class="nb warn">
-        <span class="t">대역 분할이 상보적이지 않음</span>
+      <h4>대역 분할</h4>
+      <p>
+        Linkwitz-Riley 4차 상보 분할이다. 버터워스 2차(Q 0.707)를 2단으로 쌓아
+        분할점에서 −6 dB로 만나게 한다. 세 대역의 진폭 합이 전 대역에서 1이 된다.
+      </p>
+      <div class="eq">저역 = LR-LP(loFreq)
+중역 = LR-HP(loFreq) → LR-LP(hiFreq)
+고역 = LR-HP(hiFreq)
+
+|LP| = 1/(1+w⁴)    |HP| = w⁴/(1+w⁴)    w = f/fc
+|LP| + |HP| = 1    <i>모든 주파수에서</i></div>
+      <div class="nb ok">
+        <span class="t">이전 구성과의 차이</span>
         <p>
-          LPF + BPF + HPF 구성이라 세 대역의 합이 평탄한 응답을 이루지 않는다.
-          BPF 중심이 두 분할점의 산술 평균에 놓이고 Q도 낮아,
-          저역·중역 경계와 중역·고역 경계에서 에너지가 중복 가산된다.
-          AMOUNT를 올릴수록 이 중첩 구간이 상대적으로 강조된다.
-          상보 분할이 필요하면 Linkwitz-Riley 구성으로 바꿔야 한다.
+          예전에는 LPF + BPF + HPF 병렬이라 합산 응답이 평탄하지 않았다.
+          프리셋 A 기준으로 합이 0.91에서 1.57까지 흔들렸고,
+          2 kHz 부근이 약 +4 dB 부풀어 있었다. 지금은 전 대역에서 1.000이다.
         </p>
       </div>
-      <div class="nb warn">
-        <span class="t">STEREO 파라미터의 실제 동작</span>
+      <div class="nb ok">
+        <span class="t">STEREO 파라미터</span>
         <p>
-          명칭과 달리 스테레오 폭에 관여하지 않는다.
-          출력 압축기의 릴리즈 타임만 <code>80 ~ 300 ms</code> 범위에서 바꾼다.
-          릴리즈가 길어지면 게인 회복이 느려져 밀도감이 올라가는데,
-          이것이 폭이 넓어진 것처럼 오인될 수는 있다.
+          출력 압축기 뒤에서 M/S 폭을 조절한다. 0이면 모노, 50에서 원본,
+          100이면 사이드 성분이 2배가 된다. 압축기 릴리즈는 200 ms로 고정되어
+          폭 조절과 분리되어 있다.
         </p>
       </div>
     </div>
@@ -594,15 +675,39 @@ y = soft·(1 − SAT×0.3) + cubic·(SAT×0.3)
         WEAR는 LPF 차단점과 셸빙 감쇠를 동시에 움직인다.
         차단점 이동은 12 kHz까지이므로 가청 대역 상단에 직접 작용한다.
       </p>
-      <div class="nb warn">
-        <span class="t">미구현 파라미터</span>
-        <p>
-          WOBBLE(회전 불균일에 의한 피치 변조)과 CROSSTALK(채널 간 누화)은
-          값이 존재하나 신호 경로에 반영되지 않는다.
-          WOBBLE은 가변 지연의 저주파 변조로, CROSSTALK은 채널 간 교차 합산으로
-          구현해야 한다.
-        </p>
-      </div>
+      <h4>피치 변조 (WOBBLE)</h4>
+      <p>
+        중심 지연 6 ms의 가변 지연을 두 개의 정현파로 변조한다.
+        와우는 33⅓ rpm의 회전 주기인 0.556 Hz, 플러터는 4.2 Hz다.
+      </p>
+      <div class="eq">피치 편차 = 변조 진폭 A × 2πf
+
+와우   f = 0.556 Hz,  A = WOBBLE × 0.9 ms  → 최대 ±0.31%
+플러터 f = 4.2 Hz,    A = WOBBLE × 0.06 ms → 최대 ±0.16%</div>
+      <p>
+        실측 LP 플레이어의 와우·플러터는 대체로 ±0.1 ~ ±0.3% 범위이므로
+        최대 설정이 상태가 나쁜 기기에 해당한다.
+      </p>
+
+      <h4>채널 누화 (CROSSTALK)</h4>
+      <div class="eq">교차 게인 x = CROSSTALK × 0.35
+합산 보정 n = 1/(1+x)
+
+출력 L = n·L + n·x·R
+출력 R = n·R + n·x·L</div>
+      <div class="tw"><table>
+        <thead><tr><th>CROSSTALK</th><th>누설량</th><th>비고</th></tr></thead>
+        <tbody>
+          <tr><td class="m">0</td><td class="m">완전 분리</td><td>디지털 소스</td></tr>
+          <tr><td class="m">25</td><td class="m">−21.2 dB</td><td>양호한 카트리지</td></tr>
+          <tr><td class="m">50</td><td class="m">−15.1 dB</td><td>일반적 수준</td></tr>
+          <tr><td class="m">100</td><td class="m">−9.1 dB</td><td>분리도가 나쁜 상태</td></tr>
+        </tbody>
+      </table></div>
+      <p>
+        합산 보정으로 누화를 올려도 전체 레벨이 커지지 않는다.
+        누화가 증가하면 사이드 성분이 상쇄되어 스테레오 폭이 좁아진다.
+      </p>
     </div>
   </div>
 
@@ -709,25 +814,51 @@ IR 길이 = RT60 + 0.5 초</div>
           <tr><td>니</td><td class="m">0 dB (하드)</td></tr>
         </tbody>
       </table></div>
-      <div class="nb warn">
-        <span class="t">브릭월이 아님</span>
+      <h4>브릭월 세이프티</h4>
+      <p>
+        압축기 기반 리미터는 룩어헤드가 없어 어택(1 ms)보다 짧은 피크를 놓치고,
+        레시오도 20:1이라 무한대가 아니다. 그래서 체인 최종단에 천장 기준으로
+        정규화한 소프트 클리퍼를 둔다.
+      </p>
+      <div class="eq">정규화 x = 입력 / 10^(CEILING/20)
+
+       ⎧ |x|                             (|x| ≤ 0.85)
+|y| =  ⎨
+       ⎩ 0.85 + 0.15·tanh((|x|−0.85)/0.15)   (|x| &gt; 0.85)
+
+출력 = y × 10^(CEILING/20)</div>
+      <p>
+        0.85 아래는 완전 선형이라 착색이 없고, 그 위는 1.0에 점근하므로
+        아무리 큰 입력이 들어와도 출력이 천장을 넘지 않는다.
+        4배 오버샘플링으로 클리핑 앨리어싱을 억제한다.
+      </p>
+      <p>
+        배치는 스테레오 폭 조절 <strong>뒤</strong>다. 폭을 넓히면 사이드 성분이
+        더해져 피크가 다시 상승하므로, 그 앞에 두면 천장 보장이 깨진다.
+      </p>
+      <div class="nb">
+        <span class="t">천장 설정</span>
         <p>
-          룩어헤드가 없고 어택이 1 ms이므로, 그보다 짧은 순간 피크는 억제되기 전에
-          통과한다. 레시오도 20:1이라 무한대가 아니다.
-          결과적으로 출력 피크가 CEILING을 수 dB 초과할 수 있다.
-        </p>
-        <p>
-          손실 압축으로 재인코딩하면 파형 재구성 과정에서 피크가 추가로
-          0.5~1.5 dB 상승한다. CEILING을 0 dB에 두면 안 되는 이유다.
-          배포용은 −1.0 dB를 권한다.
+          손실 압축으로 재인코딩하면 파형 재구성 과정에서 피크가
+          0.5~1.5 dB 상승할 수 있다. 클리퍼가 이 프로그램의 출력은 보장하지만
+          재인코딩 이후까지 보장하지는 않으므로, 배포용은 −1.0 dB를 권한다.
         </p>
       </div>
+      <h4>스테레오 폭</h4>
+      <div class="eq">M = (L+R)/2      S = (L−R)/2
+출력 L = M + S·w      출력 R = M − S·w
+
+w = STEREO WIDTH / 100     <i>(0 = 모노, 1 = 원본, 2 = 사이드 2배)</i></div>
+      <p>
+        리미터 <strong>뒤</strong>에 배치한다. 앞에 두면 폭을 넓혀 커진 피크를
+        리미터가 다시 눌러 설정값과 결과가 어긋난다.
+      </p>
       <div class="nb warn">
-        <span class="t">STEREO WIDTH 미구현</span>
+        <span class="t">모노 호환성</span>
         <p>
-          파라미터가 존재하나 신호 경로에 M/S 처리가 없어 결과에 반영되지 않는다.
-          구현하려면 M = (L+R)/2, S = (L−R)/2로 분해해 S에 폭 계수를 곱한 뒤
-          재합성해야 한다.
+          w를 1보다 크게 하면 사이드 성분이 증폭된다. 모노 합산 시 사이드는
+          완전히 상쇄되므로, 중앙에서 벗어난 악기가 사라지거나 크게 줄어든다.
+          w &gt; 1.3 설정에서는 모노 확인이 필요하다.
         </p>
       </div>
     </div>
@@ -1093,49 +1224,108 @@ MP3 320k, 40대 청자 → [20 kHz, 15 kHz] = 없음</div>
 <section id="limits">
   <h2><span class="n">07</span>사양상 한계</h2>
   <div class="rd">
-    <h3>미구현 파라미터</h3>
-    <div class="tw"><table>
-      <thead><tr><th>파라미터</th><th>현재</th><th>구현 방향</th></tr></thead>
-      <tbody>
-        <tr><td class="n">MASTER<br>STEREO WIDTH</td><td>신호 경로에 반영되지 않음</td><td>M/S 분해 후 사이드 성분에 폭 계수 적용</td></tr>
-        <tr><td class="n">VINYL<br>WOBBLE</td><td>반영되지 않음</td><td>가변 지연의 저주파 변조 (0.5~2 Hz)</td></tr>
-        <tr><td class="n">VINYL<br>CROSSTALK</td><td>반영되지 않음</td><td>채널 간 교차 합산 게인</td></tr>
-        <tr><td class="n">SG<br>STEREO</td><td>압축기 릴리즈만 제어</td><td>명칭과 동작 불일치. 개명 또는 폭 처리 추가</td></tr>
-      </tbody>
-    </table></div>
-
     <h3>설계상 타협</h3>
     <ul>
       <li>
-        <strong>배음 전사의 위상 근사.</strong> 주파수 배수에 따른 위상 배수 보정이 없다.
-        가청 위상 감지 한계 밖이라 실용상 문제는 없으나 이론적으로는 부정확하다.
-      </li>
-      <li>
-        <strong>SG의 비상보 대역 분할.</strong> LPF + BPF + HPF 구성이라 합산 응답이
-        평탄하지 않다. 중첩 구간에서 에너지가 누적된다.
-      </li>
-      <li>
-        <strong>리미터의 룩어헤드 부재.</strong> 1 ms 이내의 순간 피크가 통과한다.
-        천장 설정에 여유가 필요하다.
-      </li>
-      <li>
-        <strong>ATMOS의 임펄스 응답 중복.</strong> 초기 반사와 후기 잔향이 동일한
-        응답을 레벨만 달리해 두 번 적용한다. 결과는 단일 적용에 게인 합을 곱한 것과
-        같으므로, 초기 반사와 후기 잔향을 분리한 응답을 각각 쓰는 것이 설계 의도에 맞다.
-      </li>
-      <li>
-        <strong>포화 단의 앨리어싱.</strong> 2배 또는 4배 오버샘플링으로 완화하지만
-        완전 제거되지 않는다. 드라이브를 높이면 나이퀴스트 근처 배음이 접혀
-        비조화 성분으로 남는다.
+        <strong>포화 단의 잔류 앨리어싱 — 약 −80 dBFS.</strong>
+        4배 오버샘플링과 입력 대역 제한으로 발생 차수를 10.5차까지 밀어냈다.
+        아래 <a href="#alias-budget">잔류량 산정</a>에 수치를 명시했다.
+        더 줄일 수단은 있으나 채택하지 않았으며, 그 판단 근거도 함께 적었다.
       </li>
     </ul>
 
-    <h3>원본 샘플레이트</h3>
+    <h3 id="alias-budget">잔류 앨리어싱 산정</h3>
     <p>
-      입력 파일의 원래 샘플레이트가 보존되지 않는다.
-      디코딩 시점에 재생 장치의 기준 레이트로 변환되므로,
-      표준 출력의 <em>원본 SR</em> 표기는 실제로는 그 값이다.
-      원본 레이트를 유지하려면 별도의 디코딩 경로가 필요하다.
+      "완전 제거 불가"로만 적으면 쓸모가 없으므로 실제 크기를 계산해 둔다.
+      기준은 중간 드라이브의 tanh 포화와 일반적인 음악 스펙트럼이다.
+    </p>
+    <div class="eq">가청 앨리어싱 시작 차수 n = 3.5·sr / fc = 10.5   <i>(fc = sr/3)</i>
+
+16 kHz 성분의 중역 대비 레벨          −35 dB   <i>일반적 음악 스펙트럼</i>
+그 성분의 10.5차 배음 레벨            −45 dB   <i>tanh 포화</i>
+────────────────────────────────────────────
+접혀 들어오는 산물의 절대 레벨        <b>약 −80 dBFS</b></div>
+    <div class="tw"><table>
+      <thead><tr><th>비교 대상</th><th>레벨</th></tr></thead>
+      <tbody>
+        <tr><td>잔류 앨리어싱</td><td class="m">−80 dBFS</td></tr>
+        <tr><td>16비트 양자화 잡음 바닥</td><td class="m">−96 dBFS</td></tr>
+        <tr><td>조용한 청취 환경의 암소음</td><td class="m">−60 ~ −70 dBFS 상당</td></tr>
+      </tbody>
+    </table></div>
+    <p>
+      양자화 바닥보다는 위지만 실제 청취 환경의 암소음보다 10 dB 이상 아래다.
+      드라이브를 최대로 올리고 16 kHz 부근에 에너지가 몰린 소스를 쓰는
+      극단적 조건에서만 측정에 잡히는 수준이다.
+    </p>
+
+    <h4>더 줄이는 수단과 채택하지 않은 이유</h4>
+    <p>
+      체인 전체를 목표 레이트의 배수에서 렌더한 뒤 내리면 시작 차수가
+      배수만큼 밀린다. 구현해서 측정한 결과는 이렇다.
+    </p>
+    <div class="tw"><table>
+      <thead><tr><th>내부 렌더</th><th>시작 차수</th><th>잔류량</th><th>렌더 시간</th><th>피크 메모리</th></tr></thead>
+      <tbody>
+        <tr><td class="m">1배 (현재)</td><td class="m">10.5차</td><td class="m">−80 dBFS</td><td class="m">기준</td><td class="m">220 MB</td></tr>
+        <tr><td class="m">2배</td><td class="m">21차</td><td class="m">−93 dBFS</td><td class="m">2배</td><td class="m">439 MB</td></tr>
+        <tr><td class="m">4배</td><td class="m">42차</td><td class="m">−106 dBFS</td><td class="m">4배</td><td class="m">879 MB</td></tr>
+      </tbody>
+    </table></div>
+    <p>5분 스테레오 48 kHz 기준. 채택하지 않은 이유는 세 가지다.</p>
+    <ul>
+      <li>
+        <strong>이득이 가장 필요 없는 곳에만 적용된다.</strong>
+        HD는 96 kHz, ULTRA HD는 192 kHz라 배수를 곱하면 브라우저 상한인
+        192 kHz를 넘는다. 실제로 배수를 쓸 수 있는 것은 16비트 표준 출력뿐인데,
+        그쪽은 양자화 바닥이 −96 dBFS라 −80을 −93으로 내려봐야 바닥에 묻힌다.
+        정작 정밀도가 높은 HD·UHD 경로에는 적용할 수 없다.
+      </li>
+      <li>
+        <strong>리샘플 단계가 1회에서 2회로 늘어난다.</strong>
+        올리고 내리는 두 변환이 각각 통과대역 리플과 트랜지언트 전후 링잉을 남긴다.
+        들리지 않는 앨리어싱을 줄이려고 들릴 수 있는 리샘플 아티팩트를
+        새로 들이는 거래가 된다. 브라우저 리샘플러의 품질은 명세에 규정되어 있지 않다.
+      </li>
+      <li>
+        <strong>실시간 경로와의 차이가 다시 벌어진다.</strong>
+        오버샘플 렌더는 내보내기에만 적용된다. 처리 순서를 맞춰 없앤 불일치가
+        하필 같은 축에서 되살아난다.
+      </li>
+    </ul>
+    <div class="nb">
+      <span class="t">설계 방침</span>
+      <p>
+        측정에 잡히는 수치를 명시하고 그대로 두는 편이,
+        들리지 않는 값을 더 깎으려고 새 아티팩트와 비용을 들이는 것보다 낫다고 판단했다.
+        더 낮은 잔류량이 필요한 작업이라면 HD 또는 ULTRA HD로 내보내면 된다.
+        그쪽은 나이퀴스트가 멀어 같은 조건에서 시작 차수가 훨씬 높다.
+      </p>
+    </div>
+
+    <h3>원본 샘플레이트 보존</h3>
+    <p>
+      디코딩은 대상 컨텍스트의 레이트로 리샘플하므로, 원본 레이트를 유지하려면
+      디코딩 전에 그 값을 알아야 한다. 컨테이너 헤더를 직접 읽어 해결한다.
+    </p>
+    <div class="tw"><table>
+      <thead><tr><th>포맷</th><th>판독 위치</th></tr></thead>
+      <tbody>
+        <tr><td>WAV / RIFF</td><td>fmt 청크를 순회 탐색해 표본화 주파수 필드</td></tr>
+        <tr><td>FLAC</td><td>STREAMINFO 블록의 20비트 필드</td></tr>
+        <tr><td>OGG Vorbis</td><td>식별 헤더 패킷의 32비트 필드</td></tr>
+        <tr><td>MP3</td><td>ID3v2 태그를 건너뛴 뒤 첫 프레임 헤더의 버전·인덱스 조합</td></tr>
+        <tr><td>MP4 / M4A / AAC</td><td>상자 구조를 따라가 stsd 안 AudioSampleEntry의 16.16 고정소수 필드</td></tr>
+      </tbody>
+    </table></div>
+    <p>
+      MP4는 <code>moov → trak → mdia → minf → stbl → stsd</code> 경로를 재귀 탐색한다.
+      <code>mdhd</code>의 타임스케일도 같은 값을 담는 경우가 많지만, SBR 계열에서는
+      출력 레이트의 절반으로 적히는 일이 있어 <code>stsd</code>를 우선하고
+      실패했을 때만 보조 수단으로 쓴다.
+    </p>
+    <p>
+      판독에 실패하거나 8 ~ 192 kHz 범위를 벗어나면 장치 기본값으로 되돌아간다.
     </p>
   </div>
 </section>
@@ -1181,5 +1371,91 @@ MP3 320k, 40대 청자 → [20 kHz, 15 kHz] = 없음</div>
 })();
 </script>
 
+<script>
+/* 로컬 폴더에서 열렸을 때(file:) 문서 간 링크를 상대 경로로 바꾼다.
+   게시본과 로컬본이 같은 파일이므로 한 벌로 두 환경을 모두 지원한다. */
+(function () {
+  if (location.protocol !== 'file:') return;
+  var MAP = {
+    'ce8a5d5b-3489-480d-8e39-011fd4c05084': 'analog-soul-dsp.html',
+    'bc046e44-cc26-4a89-ab65-54755e588746': 'analog-soul-manual.html',
+    '0a44a83c-82a8-4893-9a74-6e67f83fadd4': 'analog-soul-plain.html',
+    'addfcd64-f934-4e44-b1e2-e9d9635b3912': 'analog-soul-guide.html',
+    'd28fb51f-1860-4e0b-b4ea-79a015d86e60': 'analog-soul-engineering.html',
+    '7592ce90-adce-4f29-8532-777a382f9004': 'analog-soul-internals.html',
+    'bee5f232-9716-432c-bafd-31255f222978': 'index.html'
+  };
+  var RE = /https:\/\/claude\.ai\/code\/artifact\/([\w-]+)/;
+  Array.prototype.forEach.call(document.querySelectorAll('a[href]'), function (a) {
+    var m = RE.exec(a.getAttribute('href'));
+    if (!m) return;
+    var f = MAP[m[1]];
+    if (!f) return;
+    a.setAttribute('href', a.getAttribute('href').replace(RE, f));
+  });
+})();
+</script>
+<script>
+/* 문서를 옮기면 항상 맨 위에서 시작하도록 강제한다.
+   - 브라우저의 스크롤 자동 복원(history.scrollRestoration)을 끈다.
+   - html에 scroll-behavior:smooth가 걸려 있어 scrollTo가 애니메이션으로 처리되면
+     로딩 중 리플로우에 취소될 수 있다. 이동하는 순간만 auto로 내렸다 되돌린다.
+   - 폰트·이미지 로드로 레이아웃이 늦게 확정되므로 여러 시점에 반복 적용한다. */
+(function () {
+  if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+
+  var root = document.documentElement;
+
+  function jump(fn) {
+    var prev = root.style.scrollBehavior;
+    root.style.scrollBehavior = 'auto';   // 애니메이션 없이 즉시 이동
+    fn();
+    // 다음 프레임에 원복해야 이동이 확정된 뒤에 smooth가 돌아온다
+    requestAnimationFrame(function () { root.style.scrollBehavior = prev; });
+  }
+
+  function toTop() {
+    jump(function () {
+      window.scrollTo(0, 0);
+      if (document.scrollingElement) document.scrollingElement.scrollTop = 0;
+      root.scrollTop = 0;
+      if (document.body) document.body.scrollTop = 0;
+    });
+  }
+
+  function toHash(h) {
+    var el = document.getElementById(h);
+    if (!el) { toTop(); return; }
+    jump(function () { el.scrollIntoView(); });
+  }
+
+  function place() {
+    var h = location.hash ? decodeURIComponent(location.hash.slice(1)) : '';
+    if (h) toHash(h); else toTop();
+  }
+
+  // 스크립트 실행 시점에 한 번
+  place();
+
+  // 레이아웃이 확정되는 여러 시점에 다시 (해시 없을 때만 — 앵커는 한 번이면 충분)
+  function replaceIfTop() { if (!location.hash) toTop(); }
+  document.addEventListener('DOMContentLoaded', replaceIfTop);
+  window.addEventListener('load', function () {
+    place();
+    requestAnimationFrame(replaceIfTop);
+    setTimeout(replaceIfTop, 120);
+  });
+  window.addEventListener('pageshow', function (e) { if (e.persisted) place(); });
+
+  // 현재 문서를 가리키는 툴바 항목(href="#")은 기본 동작이 아무것도 하지 않으므로
+  // 직접 맨 위로 보낸다. 다른 문서로 가는 항목은 이동 후 위 place()가 처리한다.
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest ? e.target.closest('.hub-nav a') : null;
+    if (!a) return;
+    var href = a.getAttribute('href');
+    if (href === '#') { e.preventDefault(); toTop(); }
+  });
+})();
+</script>
 </body>
 </html>

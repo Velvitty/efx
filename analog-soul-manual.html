@@ -567,6 +567,11 @@ body::before {
   background: rgba(199,125,255,0.04);
 }
 .callout.purple strong { color: var(--purple); }
+.callout.ok {
+  border-color: rgba(57,255,20,.32);
+  background: linear-gradient(90deg, rgba(57,255,20,.07), transparent);
+}
+.callout.ok strong { color: var(--green); }
 
 /* ══════════════════════════════════════════
    DIVIDER
@@ -686,16 +691,71 @@ body::before {
   .flow { gap: 4px; }
   .flow-arrow { display:none; }
 }
+
+/* ══════════ 문서 허브 (통합 진입) ══════════ */
+
+
+
+
+
+/* v2.3 소제목 */
+.sub-title{
+  font-family:'Orbitron',sans-serif; font-weight:600;
+  font-size:15px; color:var(--amber); letter-spacing:.02em;
+  margin:34px 0 12px; padding-left:11px;
+  border-left:2px solid var(--amber-dim);
+}
+
+/* v2.3 신규 표시 배지 */
+.badge-new.v23{ color:var(--blue); border-color:var(--blue); }
+.badge-new{
+  display:inline-block; vertical-align:middle; margin-left:6px;
+  font-family:'Share Tech Mono',monospace; font-size:9.5px; letter-spacing:.1em;
+  color:var(--green); border:1px solid var(--green); border-radius:2px;
+  padding:1px 5px; text-shadow:none;
+}
+/* 문장 맨 앞에 올 때는 왼쪽 여백 대신 오른쪽 여백을 준다 */
+.callout p > .badge-new:first-child,
+.feat-desc > .badge-new:first-child{ margin-left:0; margin-right:7px; }
+
+/* ===== 공통 상단 툴바 — 전 문서 동일 ===== */
+.hub-nav{
+  position:sticky; top:0; z-index:9000;
+  display:flex; align-items:center; gap:2px; flex-wrap:wrap;
+  padding:7px 16px; min-height:34px;
+  background:rgba(10,8,12,.95); border-bottom:1px solid #2a2535;
+  font-family:'IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+  font-size:11px; line-height:1.5;
+  backdrop-filter:saturate(150%) blur(8px);
+  -webkit-backdrop-filter:saturate(150%) blur(8px);
+}
+.hub-nav .home{ color:#ffb300; text-decoration:none; letter-spacing:.12em; margin-right:12px; white-space:nowrap; }
+.hub-nav .home:hover{ color:#ffd166; }
+.hub-nav a.hn{ color:#7d7291; text-decoration:none; padding:3px 9px; border-radius:2px; white-space:nowrap; }
+.hub-nav a.hn:hover{ color:#e4dcf0; background:#1c1825; }
+.hub-nav a.hn[aria-current]{ color:#ffb300; background:#1c1825; }
+.hub-nav .sep{ color:#3a3350; }
+@media print{ .hub-nav{ display:none; } }
+
+/* 앵커 이동 시 sticky 툴바에 가리지 않도록 여백 확보 */
+[id]{ scroll-margin-top: 46px; }
 </style>
 </head>
 <body>
+<nav class="hub-nav" aria-label="문서 간 이동">
+  <a class="home" href="https://claude.ai/code/artifact/bee5f232-9716-432c-bafd-31255f222978">◂ 통합 색인</a><a class="hn" href="https://claude.ai/code/artifact/ce8a5d5b-3489-480d-8e39-011fd4c05084">메인 어플리케이션 실행하기</a><span class="sep">/</span><a class="hn" href="#" aria-current="page">공식 매뉴얼</a><span class="sep">/</span><a class="hn" href="https://claude.ai/code/artifact/0a44a83c-82a8-4893-9a74-6e67f83fadd4">쉬운 말</a><span class="sep">/</span><a class="hn" href="https://claude.ai/code/artifact/addfcd64-f934-4e44-b1e2-e9d9635b3912">기술 설명서</a><span class="sep">/</span><a class="hn" href="https://claude.ai/code/artifact/d28fb51f-1860-4e0b-b4ea-79a015d86e60">사양서</a><span class="sep">/</span><a class="hn" href="https://claude.ai/code/artifact/7592ce90-adce-4f29-8532-777a382f9004">논고</a>
+</nav>
+
+
+
+
 
 <!-- ══════════ COVER ══════════ -->
 <div class="cover">
   <div class="cover-rule">
-    <span class="cover-rule-label">ANALOG SOUL DSP ENGINE — USER MANUAL v2.2</span>
+    <span class="cover-rule-label">ANALOG SOUL DSP ENGINE — USER MANUAL v2.4</span>
   </div>
-  <div class="cover-eyebrow">공식 사용 설명서 · Official User Manual · v2.2</div>
+  <div class="cover-eyebrow">공식 사용 설명서 · Official User Manual · v2.4</div>
   <div class="cover-title">ANALOG SOUL<br>DSP ENGINE</div>
   <div class="cover-sub">브라우저 기반 풀스택 오디오 마스터링 스위트</div>
   <div class="cover-desc">
@@ -734,7 +794,7 @@ body::before {
            style="display:block; width:100%; height:auto; border-radius:2px;">
     </div>
     <div style="margin-top:12px; font-family:'Share Tech Mono',monospace; font-size:0.58rem; color:var(--muted); letter-spacing:0.1em; text-align:right;">
-      ANALOG SOUL DSP ENGINE v2.2 — 실제 구동 화면
+      ANALOG SOUL DSP ENGINE v2.4 — 실제 구동 화면
     </div>
   </div>
 
@@ -745,6 +805,7 @@ body::before {
     <div class="toc">
       <div class="toc-title">CONTENTS</div>
       <ul class="toc-list">
+        <li><a href="#whatsnew">v2.3 개정 내역</a></li>
         <li><a href="#overview">개요 및 핵심 특징</a></li>
         <li><a href="#howto">사용 방법 — 5단계</a></li>
         <li><a href="#input">입력 & 파일 지원</a></li>
@@ -759,6 +820,7 @@ body::before {
         <li><a href="#atmos">모듈 07 — 돌비 애트모스</a></li>
         <li><a href="#master">모듈 08 — 마스터링 체인</a></li>
         <li><a href="#hd">모듈 09 — HD 업스케일링</a></li>
+        <li><a href="#preset">프리셋 — 설정 보관</a> <span class="badge-new">v2.4</span></li>
         <li><a href="#export">내보내기 — 3가지 포맷</a></li>
         <li><a href="#tips">활용 팁</a></li>
       </ul>
@@ -767,6 +829,48 @@ body::before {
 
   <!-- ══════════ 01. OVERVIEW ══════════ -->
   <hr class="divider">
+  <div class="section" id="whatsnew">
+    <div class="section-num">RELEASE NOTES</div>
+    <div class="section-title">개정 내역</div>
+    <div class="deco-bar"></div>
+    <p class="section-lead">이 매뉴얼은 v2.4 기준입니다. 판별로 달라진 항목은 다음과 같습니다.</p>
+
+    <div class="callout">
+      <p>
+        본문 곳곳에 <span class="badge-new">v2.4</span> <span class="badge-new v23">v2.3</span>
+        배지를 달아 어느 판에서 들어온 기능인지 표시했습니다.
+        배지가 없는 내용은 최초 판부터 있던 것입니다.
+      </p>
+    </div>
+
+    <h3 class="sub-title">v2.4 — 현재 판</h3>
+    <table class="spec-table">
+      <tr><th>구분</th><th>항목</th></tr>
+      <tr><td>신규</td><td>프리셋 저장·불러오기 · 빠른 슬롯 4개 · 슬롯 복사 · 한 슬롯 비우기 · 모든 슬롯 일괄 백업 · 불러오기 파일 종류 자동 판별 · 드래그 앤 드롭</td></tr>
+      <tr><td>편의</td><td>빈 슬롯을 누르면 기본값 복원 · 저장하지 않은 변경이 있을 때 이탈 확인 · 프리셋 패널 내 결과 표시</td></tr>
+      <tr><td>문서</td><td>전 문서 공통 상단 툴바 · 탭 전환 시 스크롤 초기화 · 목차 겹침 보정 · 로컬 폴더 진입점(index.html)</td></tr>
+    </table>
+
+    <h3 class="sub-title">v2.3</h3>
+    <table class="spec-table">
+      <tr><th>구분</th><th>항목</th></tr>
+      <tr><td>신규</td><td>모듈별 INPUT GAIN · HD/UHD LIVE 미리듣기 · A/B 좌우 스펙트럼 · 스펙트로그램 전환 · X-AXIS 범위 고정 · 최종단 소프트 클리퍼</td></tr>
+      <tr><td>구현</td><td>STEREO WIDTH (M/S) · VINYL WOBBLE · CROSSTALK · SMOOTH (이전 이름 AIR MIX) — 모두 이전 판에서 슬라이더만 있고 동작하지 않던 것</td></tr>
+      <tr><td>수정</td><td>재생·내보내기 순서 일치 · 배음 전사 위상 배수 보정 · 비대칭 포화 직류 차단 · 원본 샘플레이트 보존 · 192kHz 내보내기 실패 · 대용량 다운로드 취소</td></tr>
+    </table>
+
+    <div class="callout ok">
+      <p>
+        <strong>각 항목의 수치와 근거</strong>는
+        <a href="https://claude.ai/code/artifact/d28fb51f-1860-4e0b-b4ea-79a015d86e60">신호 처리 사양서</a>와
+        <a href="https://claude.ai/code/artifact/7592ce90-adce-4f29-8532-777a382f9004">개발자 논고</a>에 있습니다.
+        문서 전체 지도는 <a href="https://claude.ai/code/artifact/bee5f232-9716-432c-bafd-31255f222978">통합 색인</a>을 보세요.
+      </p>
+    </div>
+  </div>
+
+  <hr class="divider">
+
   <div class="section" id="overview">
     <div class="section-num">SECTION 01</div>
     <div class="section-title">개요 및 핵심 특징</div>
@@ -777,6 +881,14 @@ body::before {
     </p>
 
     <div class="feat-grid">
+      <div class="feat-card">
+        <span class="feat-icon">💾</span>
+        <div class="feat-name">PRESET SYSTEM <span class="badge-new">v2.4</span></div>
+        <div class="feat-desc">
+          화면의 모든 값과 모듈 순서를 통째로 보관합니다. 브라우저에 남는 빠른 슬롯 네 개와
+          기기 간에 주고받는 파일 저장, 두 경로가 있습니다. 불러오기는 파일 종류를 알아서 판별합니다.
+        </div>
+      </div>
       <div class="feat-card">
         <span class="feat-icon">🌐</span>
         <div class="feat-name">ZERO INSTALL</div>
@@ -857,7 +969,19 @@ body::before {
         <div class="wf-desc">EXPORT 섹션에서 원하는 포맷 버튼을 클릭합니다. WAV (16bit), HD 96kHz (24bit), ULTRA HD 192kHz (32bit Float) 중 선택할 수 있습니다. 처리 완료 후 파일이 자동으로 다운로드됩니다.</div>
       </div>
     </div>
-  </div>
+  
+    <div class="callout ok">
+      <p>
+        <span class="badge-new">v2.4</span> 마음에 드는 설정이 나왔다면 그 자리에서 붙잡아 두세요.
+        <a href="#preset">프리셋</a> 영역의 빠른 슬롯을 <strong>0.6초 길게 누르면</strong> 현재 설정이 그대로 들어갑니다.
+        다른 설정을 시도하다 되돌아오고 싶을 때 짧게 누르면 그 상태로 복귀합니다.
+      </p>
+      <p>
+        여러 곡에 같은 처리를 하거나 다른 기기에서 이어 작업하려면
+        <strong>화면 설정 저장</strong>으로 파일을 만들어 두면 됩니다.
+      </p>
+    </div>
+</div>
 
   <!-- ══════════ 03. INPUT ══════════ -->
   <hr class="divider">
@@ -877,7 +1001,27 @@ body::before {
     <div class="callout blue">
       <p><strong>개인정보 보호:</strong> 업로드된 음원은 서버로 전송되지 않습니다. 파일은 브라우저 메모리에서만 처리되며, 탭을 닫으면 완전히 삭제됩니다.</p>
     </div>
-  </div>
+  
+    <div class="callout ok">
+      <p>
+        <span class="badge-new">v2.4</span> <a href="#preset">프리셋</a>에는 <strong>음원이 담기지 않습니다.</strong>
+        설정만 오가므로 파일 크기는 1KB 남짓이고, 같은 설정을 여러 곡에 돌려쓰기 좋습니다.
+        반대로 프리셋을 불러와도 올려둔 곡은 바뀌지 않으니,
+        곡을 바꾸려면 파일을 다시 올려야 합니다.
+      </p>
+    </div>
+
+    <div class="callout ok">
+      <p>
+        <strong>원본 샘플레이트 보존 <span class="badge-new v23">v2.3</span></strong> —
+        이전 판은 디코딩 시점에 재생 장치의 기준 레이트로 변환해버려 파일의 원래 값이 사라졌습니다.
+        이제 컨테이너 헤더를 직접 읽어 그 레이트로 디코딩합니다.
+        WAV의 fmt 청크, FLAC의 STREAMINFO, OGG Vorbis 식별 헤더,
+        MP3 프레임 헤더, MP4/M4A의 stsd 상자를 각각 해석합니다.
+        판독에 실패하거나 8~192kHz 범위를 벗어나면 장치 기본값으로 되돌아갑니다.
+      </p>
+    </div>
+</div>
 
   <!-- ══════════ 04. MONITOR ══════════ -->
   <hr class="divider">
@@ -890,9 +1034,23 @@ body::before {
     <div class="feat-grid">
       <div class="feat-card">
         <span class="feat-icon">📊</span>
-        <div class="feat-name">스펙트럼 애널라이저</div>
+        <div class="feat-name">A/B 스펙트럼 애널라이저 <span class="badge-new v23">v2.3</span></div>
         <div class="feat-desc">
-          20Hz~20kHz 전 대역을 로그 스케일로 실시간 표시. 100Hz / 1kHz / 5kHz / 10kHz / 16kHz 주파수 그리드 라인이 표시되어 어느 대역이 어떻게 변화하는지 한눈에 파악할 수 있습니다. 재생 중에만 활성화됩니다.
+          그래프가 <strong>좌우 두 개</strong>로 나뉩니다. 왼쪽은 모든 모듈에 들어가기 직전에서 분기한 <strong>원음</strong>, 오른쪽은 처리를 마친 <strong>적용본</strong>입니다. 같은 순간을 나란히 보여주므로 무엇이 달라졌는지 즉시 확인됩니다. 세로축은 10dB 간격으로 −30dB에서 −100dB까지 눈금이 붙고, 넓은 화면에서도 읽기 쉽도록 숫자가 가로로 네 번 반복됩니다.
+        </div>
+      </div>
+      <div class="feat-card">
+        <span class="feat-icon">🌈</span>
+        <div class="feat-name">스펙트로그램 전환 <span class="badge-new v23">v2.3</span></div>
+        <div class="feat-desc">
+          그래프를 <strong>클릭</strong>하면 막대 표시가 시간–주파수 스펙트로그램으로 바뀝니다. 가로가 시간(오른쪽이 현재), 세로가 로그 주파수, 색이 음압입니다. 약 8.7초의 이력이 흘러가며, 검정에서 파랑·초록·노랑을 거쳐 빨강·흰색으로 가는 무지개 눈금을 씁니다. 좌우 두 그래프가 같은 색 눈금을 쓰므로 같은 색이면 같은 음압입니다. 손실 압축이 고역을 어디서 잘랐는지 확인할 때는 이 표시가 훨씬 분명합니다.
+        </div>
+      </div>
+      <div class="feat-card">
+        <span class="feat-icon">📏</span>
+        <div class="feat-name">X-AXIS 범위 고정 <span class="badge-new v23">v2.3</span></div>
+        <div class="feat-desc">
+          그래프 위의 <strong>순응 · 48 · 96 · 192</strong> 4단 스위치로 가로축 상한을 고정합니다. 숫자는 샘플레이트이고 표시 상한은 그 절반입니다. 순응은 현재 엔진에 맞춰 자동으로 움직입니다. LIVE 복원을 켜고 끌 때 축이 재조정되면 같은 성분이 화면상 다른 자리로 옮겨가 비교가 어려워지는데, <strong>192로 고정</strong>하면 축이 멈춰 새로 채워진 영역만 보입니다. 고정 범위가 실제 데이터보다 넓으면 경계에 점선이 그어지고 그 오른쪽이 어둡게 덮입니다.
         </div>
       </div>
       <div class="feat-card">
@@ -932,6 +1090,14 @@ body::before {
       </div>
     </div>
 
+    <div class="callout ok">
+      <p>
+        <span class="badge-new">v2.4</span> X-AXIS 범위 고정값도 <a href="#preset">프리셋</a>에 담깁니다.
+        192로 고정해 두고 작업하던 상태를 슬롯에 넣어두면,
+        다음에 불러왔을 때 비교 기준이 되는 축이 그대로 따라옵니다.
+      </p>
+    </div>
+
     <div class="callout">
       <p><strong>재생바 스크러빙:</strong> 재생 중 프로그레스 바를 클릭하면 해당 위치로 즉시 이동합니다. 이동 후에도 재생이 끊김 없이 계속됩니다.</p>
     </div>
@@ -945,8 +1111,17 @@ body::before {
     <div class="deco-bar"></div>
     <p class="section-lead">
       신호는 화면에 배치된 모듈 순서 그대로 흘러갑니다. 모듈 순서를 바꾸면 소리의 색이 달라집니다.
-      내보내기 시에도 화면의 순서와 켜짐 상태가 완벽하게 반영됩니다.
+      <strong>재생과 내보내기 모두</strong> 화면의 순서와 켜짐 상태를 그대로 따릅니다.
     </p>
+
+    <div class="callout ok">
+      <p>
+        <span class="badge-new v23">v2.3</span> 이전 판에서는 드래그로 바꾼 순서가
+        내보내기에만 반영되고 실시간 재생은 고정 순서로 돌았습니다.
+        이제 양쪽이 같은 규칙을 씁니다. <strong>재생 중에 순서를 바꾸면 재생 위치를 유지한 채
+        체인만 교체</strong>되므로 변화를 즉시 들을 수 있습니다.
+      </p>
+    </div>
 
     <div class="flow">
       <div class="flow-node">
@@ -1007,7 +1182,45 @@ body::before {
       <tr><td>내보내기 시 순서 반영</td><td>화면에 보이는 순서 그대로 OfflineAudioContext로 렌더링됩니다.</td></tr>
       <tr><td>마스터링 모듈 위치</td><td>항상 마지막에 고정. 드래그 이동 불가.</td></tr>
       <tr><td>실시간 핫스왑</td><td>재생 중 파라미터/순서 변경 시 오디오 체인이 즉시 재빌드됩니다. 재생이 끊기지 않습니다.</td></tr>
+      <tr><td>재생 순서 반영 <span class="badge-new v23">v2.3</span></td><td>실시간 재생도 화면 순서를 그대로 따릅니다. 내보낸 파일과 듣는 소리가 일치합니다.</td></tr>
     </table>
+
+    <div class="callout ok">
+      <p>
+        <span class="badge-new">v2.4</span> 힘들게 맞춘 순서를 매번 다시 짤 필요가 없습니다.
+        모듈 배치 순서가 <a href="#preset">프리셋</a>에 그대로 담겨,
+        불러오면 화면의 카드가 저장 당시 자리로 되돌아갑니다.
+        재생 중에 불러와도 재생 위치를 유지한 채 체인만 교체됩니다.
+      </p>
+    </div>
+
+    <h3 class="sub-title">모듈별 INPUT GAIN <span class="badge-new v23">v2.3</span></h3>
+    <p>
+      모든 모듈의 본문 첫 줄에 <strong>INPUT GAIN</strong> 슬라이더가 생겼습니다.
+      범위는 −24 ~ +24 dB이고 기본값은 0입니다. 그 모듈에 <strong>들어가기 직전</strong>의
+      레벨을 조절합니다. 모듈이 꺼져 있으면 게인도 체인에 끼지 않으므로,
+      스위치를 껐는데 음량만 달라지는 일은 없습니다.
+    </p>
+    <p>
+      단순한 볼륨 조절이 아닙니다. 들어오는 레벨에 따라 동작이 달라지는 모듈에서는
+      사실상 성격 조절 노브로 쓰입니다.
+    </p>
+    <table class="spec-table">
+      <tr><th>모듈</th><th>INPUT GAIN의 효과</th></tr>
+      <tr><td>TUBE · EXCITER · SG</td><td>파형을 찌그러뜨려 효과를 내므로 세게 넣을수록 포화가 깊어집니다. DRIVE를 건드리지 않고 이것만 올려도 성격이 달라집니다.</td></tr>
+      <tr><td>COMPRESSOR</td><td>입력을 3 dB 올리는 것은 THRESHOLD를 3 dB 내리는 것과 사실상 같습니다. 압축량을 미세하게 손볼 때 편합니다.</td></tr>
+      <tr><td>BBE · VINYL · ATMOS</td><td>선형 처리가 지배적이라 대체로 음량만 변합니다.</td></tr>
+      <tr><td>MASTERING</td><td>4대역 압축기의 스레숄드가 고정값이므로 입력 게인이 전체 리덕션 깊이를 결정합니다.</td></tr>
+    </table>
+
+    <div class="callout">
+      <p>
+        <strong>A/B 비교의 기준점 —</strong> 모듈을 켜면 대개 소리가 커지고,
+        사람의 귀는 커진 소리를 무조건 더 좋다고 느낍니다.
+        켠 상태와 끈 상태의 음량을 INPUT GAIN이나 MASTER의 OUTPUT GAIN으로 맞춘 뒤 비교하세요.
+        이 습관 하나가 다른 어떤 조언보다 중요합니다.
+      </p>
+    </div>
   </div>
 
   <!-- ══════════ MOD 01: COMP ══════════ -->
@@ -1198,6 +1411,15 @@ body::before {
     </div>
   </div>
 
+  <div class="callout ok" style="max-width:none;margin:0 26px 26px">
+    <p>
+      <span class="badge-new">v2.4</span> A~D 모드 선택이 <a href="#preset">프리셋</a>에 함께 담깁니다.
+      모드 버튼은 누르는 순간 아래 네 슬라이더를 그 모드의 기본값으로 덮어쓰기 때문에,
+      프리셋을 불러올 때는 <strong>모드를 먼저 적용하고 그다음 저장된 슬라이더 값</strong>을 씌웁니다.
+      순서가 반대였다면 직접 조정한 값이 모드 기본값에 지워졌을 것입니다.
+    </p>
+  </div>
+
   <!-- ══════════ MOD 06: VINYL ══════════ -->
   <hr class="divider">
   <div class="section" id="vinyl">
@@ -1220,9 +1442,9 @@ body::before {
         </div>
         <div class="mc-params">
           <div class="param-row"><span class="param-name">CRACKLE</span><span class="param-range">0~100</span><span class="param-desc">표면 크랙클 노이즈 양. 핑크 노이즈 기반</span></div>
-          <div class="param-row"><span class="param-name">WOBBLE</span><span class="param-range">0~100</span><span class="param-desc">턴테이블 플래터 흔들림 (피치 변동)</span></div>
+          <div class="param-row"><span class="param-name">WOBBLE</span><span class="param-range">0~100</span><span class="param-desc">회전 불균일에 의한 피치 변조. 와우 0.556Hz(33⅓rpm) + 플러터 4.2Hz, 최대 ±0.31%</span></div>
           <div class="param-row"><span class="param-name">WEAR</span><span class="param-range">0~100</span><span class="param-desc">레코드 마모도. 높을수록 고역이 롤오프됨</span></div>
-          <div class="param-row"><span class="param-name">CROSSTALK</span><span class="param-range">0~100</span><span class="param-desc">L/R 채널 간 크로스토크 양</span></div>
+          <div class="param-row"><span class="param-name">CROSSTALK</span><span class="param-range">0~100</span><span class="param-desc">채널 간 누화. 최대 −9.1dB 누설. 합산 보정이 있어 레벨은 변하지 않음</span></div>
         </div>
         <div class="mc-badge-row">
           <span class="mc-badge amber">실시간 크랙클 파형 시각화</span>
@@ -1232,7 +1454,16 @@ body::before {
         </div>
       </div>
     </div>
-  </div>
+  
+    <div class="callout ok">
+      <p>
+        <span class="badge-new v23">v2.3</span> WOBBLE과 CROSSTALK은 이전 판에서 슬라이더만 있고
+        신호 경로에 반영되지 않았습니다. 이제 WOBBLE은 가변 지연을 두 개의 저주파 정현파로
+        변조해 실제 피치 흔들림을 만들고, CROSSTALK은 좌우 채널을 교차 합산해
+        스테레오 폭이 좁아지는 LP 특유의 느낌을 냅니다.
+      </p>
+    </div>
+</div>
 
   <!-- ══════════ MOD 07: ATMOS ══════════ -->
   <hr class="divider">
@@ -1279,6 +1510,14 @@ body::before {
     </div>
   </div>
 
+  <div class="callout ok" style="max-width:none;margin:0 26px 26px">
+    <p>
+      <span class="badge-new">v2.4</span> 선택한 씬이 <a href="#preset">프리셋</a>에 담깁니다.
+      씬 버튼도 SOUNDGOODIZER 모드와 같은 이유로 복원 시 먼저 적용되므로,
+      씬을 고른 뒤 SPACE나 REVERB를 따로 손봤더라도 그 값이 그대로 돌아옵니다.
+    </p>
+  </div>
+
   <!-- ══════════ MOD 08: MASTER ══════════ -->
   <hr class="divider">
   <div class="section" id="master">
@@ -1303,8 +1542,8 @@ body::before {
           <div class="param-row"><span class="param-name">LOW COMP</span><span class="param-range">1:1~10:1</span><span class="param-desc">120Hz 이하 서브/킥 대역 압축 비율</span></div>
           <div class="param-row"><span class="param-name">MID COMP</span><span class="param-range">1:1~10:1</span><span class="param-desc">500Hz~5kHz 보컬/악기 대역 압축 비율</span></div>
           <div class="param-row"><span class="param-name">HIGH COMP</span><span class="param-range">1:1~10:1</span><span class="param-desc">5kHz 이상 에어/심벌즈 대역 압축 비율</span></div>
-          <div class="param-row"><span class="param-name">STEREO WIDTH</span><span class="param-range">0~200</span><span class="param-desc">스테레오 폭. 100=원본, 200=최대 확장</span></div>
-          <div class="param-row"><span class="param-name">CEILING dB</span><span class="param-range">-6~0 dB</span><span class="param-desc">브릭월 리미터 천장. 기본값 -0.3dB</span></div>
+          <div class="param-row"><span class="param-name">STEREO WIDTH</span><span class="param-range">0~200</span><span class="param-desc">M/S 방식 폭 조절. 100=원본, 0=모노, 200=사이드 2배. 리미터 뒤에서 동작</span></div>
+          <div class="param-row"><span class="param-name">CEILING dB</span><span class="param-range">-6~0 dB</span><span class="param-desc">천장. 리미터 뒤 소프트 클리퍼가 이 값을 넘지 않도록 보장</span></div>
           <div class="param-row"><span class="param-name">OUTPUT GAIN</span><span class="param-range">-12~+12 dB</span><span class="param-desc">최종 출력 레벨 조정</span></div>
         </div>
         <div class="mc-badge-row">
@@ -1316,7 +1555,27 @@ body::before {
         </div>
       </div>
     </div>
-  </div>
+  
+    <div class="callout ok">
+      <p>
+        <span class="badge-new v23">v2.3</span> STEREO WIDTH는 이전 판에서 값만 있고 처리가 없었습니다.
+        이제 M = (L+R)/2, S = (L−R)/2로 분해해 사이드 성분에 폭 계수를 곱하고 재합성합니다.
+        배치는 <strong>리미터 뒤</strong>입니다. 앞에 두면 폭으로 커진 피크를 리미터가 다시 눌러
+        설정값과 결과가 어긋나기 때문입니다.
+      </p>
+      <p>
+        그 뒤에 <strong>소프트 클리퍼</strong>가 최종단으로 붙었습니다. 압축기 기반 리미터는
+        룩어헤드가 없어 어택(1ms)보다 짧은 피크를 놓치는데, 천장 기준으로 정규화한 곡선이
+        1.0에 점근하므로 어떤 입력에도 출력이 천장을 넘지 않습니다.
+        천장의 85% 아래는 완전 선형이라 통상 신호에는 착색이 없습니다.
+      </p>
+      <p>
+        폭을 1보다 크게 하면 사이드 성분이 증폭됩니다. 모노로 합치면 사이드는 완전히 상쇄되므로,
+        150 이상으로 올렸다면 <strong>한 번은 모노로 확인</strong>하세요.
+        중앙에서 벗어난 악기가 사라질 수 있습니다.
+      </p>
+    </div>
+</div>
 
   <!-- ══════════ MOD 09: HD ══════════ -->
   <hr class="divider">
@@ -1328,22 +1587,22 @@ body::before {
       <div class="mc-header">
         <span class="mc-num">MOD-09</span>
         <span class="mc-name">HIGH-RESOLUTION RESTORATION</span>
-        <span class="mc-sub">생성형 고역 합성 업스케일링 · Export 전용</span>
+        <span class="mc-sub">생성형 고역 합성 업스케일링 · LIVE 미리듣기 지원</span>
       </div>
       <div class="mc-body">
         <div>
           <div class="mc-what">
             단순 리샘플링이 아닌 <strong>FFT 스펙트럼 분석 기반 하모닉 합성</strong>으로 잘린 고역을 새롭게 만들어내는 생성형 업스케일링 모듈입니다. 내보내기(Export) 시에만 적용됩니다.<br><br>
-            <strong>동작 원리:</strong> ① 원본 음원을 FFT(4096 포인트) 분석하여 주파수가 잘린 지점(cutHz)을 자동 탐지합니다. ② cutHz 기준으로 2×, 4×, 8×, 16×, 32×, 64×, 128× 배음 성분을 원본 스펙트럼의 위상 정보를 기반으로 합성합니다. ③ 경계 구간을 코사인 크로스페이드로 매끄럽게 이어붙입니다. ④ 가우시안 스무딩으로 스파이크를 제거합니다. ⑤ 원본 RMS에 맞게 레벨을 맞추고 피크 리밋을 적용합니다.<br><br>
+            <strong>동작 원리:</strong> ① 원본 음원을 FFT(4096 포인트) 분석하여 주파수가 잘린 지점(cutHz)을 자동 탐지합니다. ② cutHz 기준으로 2×, 4×, 8×, 16×, 32×, 64×, 128× 배음 성분을 합성합니다. 이때 위상은 원본 값을 <strong>차수만큼 배수</strong>하여 주파수 배수 관계가 유지되도록 보정합니다. ③ 경계 구간을 코사인 크로스페이드로 매끄럽게 이어붙입니다. ④ 가우시안 스무딩으로 스파이크를 제거합니다. ⑤ 원본 RMS에 맞게 레벨을 맞추고 피크 리밋을 적용합니다.<br><br>
             <strong>HD (96kHz / 24bit):</strong> 20kHz~48kHz 대역 복원. 16bit → 24bit 업변환.<br>
             <strong>ULTRA HD (192kHz / 32bit):</strong> 20kHz~96kHz 초고역 복원. 32bit Float 출력.
           </div>
         </div>
         <div class="mc-params">
           <div class="param-row"><span class="param-name">HF SYNTH</span><span class="param-range">0~100</span><span class="param-desc">HD: 복원 고역 배음 합성 강도</span></div>
-          <div class="param-row"><span class="param-name">SMOOTH</span><span class="param-range">0~100</span><span class="param-desc">HD: 복원 경계 스무딩 강도</span></div>
+          <div class="param-row"><span class="param-name">SMOOTH</span><span class="param-range">0~100</span><span class="param-desc">HD: 합성 구간 평활. 커널 반경 1~4와 적용 비율을 함께 결정</span></div>
           <div class="param-row"><span class="param-name">UHF SYNTH</span><span class="param-range">0~100</span><span class="param-desc">UHD: 초고역 배음 합성 강도</span></div>
-          <div class="param-row"><span class="param-name">AIR MIX</span><span class="param-range">0~100</span><span class="param-desc">UHD: 공기층 에어 믹스 비율</span></div>
+          <div class="param-row"><span class="param-name">SMOOTH (UHD)</span><span class="param-range">0~100</span><span class="param-desc">UHD 쪽 평활 강도. 이전 이름은 AIR MIX</span></div>
         </div>
         <div class="mc-badge-row">
           <span class="mc-badge blue">96kHz / 24bit HD</span>
@@ -1353,8 +1612,73 @@ body::before {
           <span class="mc-badge">코사인 크로스페이드</span>
           <span class="mc-badge">가우시안 스펙트럼 스무딩</span>
           <span class="mc-badge">RMS 레벨 매칭</span>
+          <span class="mc-badge green">LIVE 미리듣기</span>
+          <span class="mc-badge">위상 배수 보정</span>
         </div>
       </div>
+    </div>
+
+    <h3 class="sub-title">LIVE 미리듣기 <span class="badge-new v23">v2.3</span></h3>
+    <p>
+      HD 칸과 ULTRA HD 칸에 각각 <strong>LIVE</strong> 스위치가 생겼습니다.
+      켜면 내보내기 전에 복원된 소리를 바로 들을 수 있습니다. 두 스위치는 동시에 켜지지 않습니다.
+    </p>
+    <p>
+      누르면 잠시 기다려야 합니다. 이 알고리즘은 어디가 잘렸는지 판단하기 위해
+      <strong>파일 전체를 먼저 훑어야</strong> 하므로 프레임 단위 스트리밍이 원리적으로 불가능합니다.
+      대신 스위치를 켜는 순간 전체를 미리 복원해 저장해두고 그 결과를 재생합니다.
+      한 번 만든 결과는 보관되므로 껐다 켜는 것은 즉시 전환되고,
+      SYNTH나 SMOOTH를 바꿨을 때만 다시 만듭니다.
+      슬라이더는 손을 뗐을 때 반응하므로 끄는 동안 계속 재계산되지는 않습니다.
+    </p>
+    <p>
+      LIVE를 켜면 오디오 엔진 자체가 96kHz 또는 192kHz로 다시 만들어집니다.
+      모듈 머리줄에 실제 적용된 값이 표시되며, 기기가 그 속도를 받아주지 못하면
+      <em>장치 제한</em>이라고 뜨고 가능한 값으로 내려갑니다.
+    </p>
+
+    <div class="callout">
+      <p>
+        <strong>듣는 소리와 파일의 차이 —</strong>
+        내보내기는 DSP를 먼저 걸고 그 결과에 복원을 적용합니다.
+        LIVE는 원음을 먼저 복원하고 그 위에 DSP를 얹습니다.
+        노브를 돌릴 때마다 전체를 다시 복원해야 한다면 실시간이라 부를 수 없어
+        순서를 뒤집은 설계상 타협입니다. 차이가 크지는 않지만 최종 판단은 내보낸 파일로 하세요.
+      </p>
+      <p>
+        또한 내보내기는 LIVE 스위치를 무시합니다. LIVE를 켜고 듣다가
+        <strong>WAV</strong>로 내보내면 복원이 들어가지 않습니다. 반대로 LIVE를 켠 채
+        HD로 내보내도 복원이 두 번 걸리지는 않습니다. 내보내기는 언제나 원본에서 새로 시작합니다.
+      </p>
+    </div>
+
+    <h3 class="sub-title">SMOOTH가 실제로 동작합니다 <span class="badge-new v23">v2.3</span></h3>
+    <p>
+      이전 판에서 SMOOTH와 AIR MIX는 복원 함수에 전달만 되고 사용되지 않아
+      어떤 값을 두든 결과가 같았습니다. 이제 가우시안 커널의
+      <strong>반경과 적용 비율</strong>을 함께 결정합니다.
+      UHD 쪽 슬라이더는 실제 동작에 맞춰 이름을 AIR MIX에서 <strong>SMOOTH</strong>로 바꿨습니다.
+    </p>
+    <table class="spec-table">
+      <tr><th>SMOOTH</th><th>커널 반경</th><th>적용 비율</th><th>성격</th></tr>
+      <tr><td>0</td><td>—</td><td>0%</td><td>평활 없음. 또렷하지만 뾰족한 성분이 남을 수 있음</td></tr>
+      <tr><td>40</td><td>2</td><td>40%</td><td>기본값. 대부분의 소스에 적정</td></tr>
+      <tr><td>60~80</td><td>3</td><td>60~80%</td><td>거친 합성음을 정돈</td></tr>
+      <tr><td>100</td><td>4</td><td>100%</td><td>가장 매끄럽지만 고역 질감이 무뎌짐</td></tr>
+    </table>
+    <p>
+      SYNTH를 높게 쓸수록 튀는 지점도 많아지므로 SMOOTH를 함께 올리는 것이 보통입니다.
+      심벌에서 쇳소리가 들리는데 SYNTH를 내리고 싶지 않다면 SMOOTH를 먼저 올려보세요.
+    </p>
+
+    <div class="callout ok">
+      <p>
+        <span class="badge-new">v2.4</span> HF SYNTH와 SMOOTH는 물론
+        <strong>LIVE 스위치 상태까지</strong> <a href="#preset">프리셋</a>에 담깁니다.
+        다만 LIVE는 켜지는 순간 전체를 다시 복원하는 무거운 작업을 시작하므로,
+        프리셋을 불러올 때 <strong>가장 마지막에 적용</strong>합니다.
+        다른 값이 모두 자리를 잡은 뒤에 걸어야 복원이 한 번만 돌아갑니다.
+      </p>
     </div>
 
     <div class="callout purple">
@@ -1364,8 +1688,73 @@ body::before {
 
   <!-- ══════════ EXPORT ══════════ -->
   <hr class="divider">
-  <div class="section" id="export">
+  <div class="section" id="preset">
     <div class="section-num">SECTION 10</div>
+    <div class="section-title">프리셋 — 설정 보관 <span class="badge-new">v2.4</span></div>
+    <div class="deco-bar"></div>
+    <p class="section-lead">
+      화면의 모든 노브 값과 모듈 순서를 통째로 보관하고 되돌립니다.
+      음원은 포함되지 않으므로 파일을 주고받아도 설정만 전달됩니다.
+    </p>
+
+    <h3 class="sub-title">담기는 것 <span class="badge-new">v2.4</span></h3>
+    <table class="spec-table">
+      <tr><th>항목</th><th>내용</th></tr>
+      <tr><td>노브 값</td><td>입력 게인을 포함한 슬라이더 전부</td></tr>
+      <tr><td>켜짐 상태</td><td>여덟 모듈의 on/off와 HD·UHD LIVE 스위치</td></tr>
+      <tr><td>모듈 순서</td><td>화면에 배치된 순서 그대로</td></tr>
+      <tr><td>프리셋 선택</td><td>SOUNDGOODIZER 모드(A~D)와 DOLBY ATMOS 씬</td></tr>
+      <tr><td>제외</td><td>음원 파일. 프리셋을 불러와도 올려둔 곡은 바뀌지 않습니다.</td></tr>
+    </table>
+
+    <h3 class="sub-title">파일로 주고받기 <span class="badge-new">v2.4</span></h3>
+    <table class="spec-table">
+      <tr><th>버튼</th><th>동작</th></tr>
+      <tr><td>⬇ 화면 설정 저장 <span class="badge-new">v2.4</span></td><td>지금 화면의 설정을 <code>.json</code> 파일 하나로 내보냅니다.</td></tr>
+      <tr><td>⬇ 모든 슬롯을 백업 <span class="badge-new">v2.4</span></td><td>빠른 슬롯 네 개를 한 파일로 묶습니다. 빈 슬롯은 빈 자리로 기록되어 위치까지 복원됩니다.</td></tr>
+      <tr><td>⬆ 불러오기 <span class="badge-new">v2.4</span></td><td>파일 종류를 <strong>알아서 판별</strong>합니다. 설정 파일이면 지금 값에 적용하고, 슬롯 백업이면 슬롯을 되돌립니다.</td></tr>
+    </table>
+    <div class="callout">
+      <p>
+        <strong>드래그 앤 드롭 —</strong> 프리셋 영역에 파일을 끌어다 놓아도 같은 경로로 처리됩니다.
+        드래그가 올라오면 테두리가 파랗게 바뀌어 놓을 자리를 알려줍니다.
+      </p>
+    </div>
+
+    <h3 class="sub-title">빠른 슬롯 <span class="badge-new">v2.4</span></h3>
+    <p>
+      네 개의 즉석 보관함입니다. 파일을 거치지 않고 A/B 비교를 할 때 씁니다.
+      <strong>이 브라우저에만 남으므로</strong> 다른 기기로 옮기려면 백업 파일을 쓰세요.
+    </p>
+    <table class="spec-table">
+      <tr><th>조작</th><th>동작</th></tr>
+      <tr><td>짧게 누르기 <span class="badge-new">v2.4</span></td><td>그 슬롯을 불러옵니다.</td></tr>
+      <tr><td>길게 누르기 (0.6초) <span class="badge-new">v2.4</span></td><td>현재 설정을 그 슬롯에 덮어씁니다.</td></tr>
+      <tr><td>빈 슬롯 누르기 <span class="badge-new">v2.4</span></td><td>모든 값이 기본값으로 돌아갑니다. 음원은 남습니다.</td></tr>
+      <tr><td>복사 <span class="badge-new">v2.4</span></td><td>누른 뒤 원본 슬롯과 대상 슬롯을 차례로 누릅니다.</td></tr>
+      <tr><td>한 슬롯 비우기 <span class="badge-new">v2.4</span></td><td>누른 뒤 슬롯을 누르면 그 슬롯만 지워집니다.</td></tr>
+      <tr><td>모든 슬롯 비우기 <span class="badge-new">v2.4</span></td><td>되돌릴 수 없어 두 단계입니다. 처음 누르면 확인 문구로 바뀌고 6초 안에 다시 눌러야 실행됩니다.</td></tr>
+    </table>
+    <div class="callout">
+      <p>
+        복사·비우기·저장 모드는 <strong>하나만 켜집니다.</strong> 다른 것을 누르면 앞의 모드가 자동으로 풀립니다.
+        모드 중에는 슬롯의 기본 동작인 불러오기와 저장이 멈추며,
+        버튼을 다시 누르거나 <code>Esc</code>로 취소할 수 있습니다.
+      </p>
+    </div>
+
+    <div class="callout ok">
+      <p>
+        <strong>나가기 전 확인 —</strong> 값을 바꾼 뒤 상단 툴바로 다른 문서에 가려 하면 확인 창이 뜹니다.
+        설정은 자동으로 저장되지 않으므로, 이어서 쓸 작업이라면 슬롯에 먼저 담아두세요.
+      </p>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <div class="section" id="export">
+    <div class="section-num">SECTION 11</div>
     <div class="section-title">내보내기 — 3가지 포맷</div>
     <div class="deco-bar"></div>
     <p class="section-lead">모든 내보내기는 화면에 보이는 모듈 순서와 켜짐 상태를 그대로 반영하여 OfflineAudioContext로 오프라인 렌더링됩니다.</p>
@@ -1413,16 +1802,63 @@ body::before {
       <tr><td>④ WAV 인코딩</td><td>PCM 샘플 비트 변환 및 RIFF WAV 헤더 작성</td></tr>
       <tr><td>⑤ 파일 다운로드</td><td>브라우저 다운로드로 자동 저장. 파일명에 _dsp / _HD96k24bit / _UHD192k32bit 접미사 자동 추가</td></tr>
     </table>
-  </div>
+  
+    <div class="callout ok">
+      <p>
+        <span class="badge-new">v2.4</span> 내보낸 WAV에는 소리만 들어갑니다.
+        <strong>어떤 설정으로 만들었는지는 남지 않습니다.</strong>
+        나중에 같은 음색을 재현하거나 조금만 손보려면
+        내보내기 직전에 <a href="#preset">프리셋</a>을 슬롯이나 파일로 함께 남겨두세요.
+      </p>
+      <p>
+        값을 바꾼 뒤 상단 툴바로 다른 문서에 가려 하면 확인 창이 뜹니다.
+        설정은 자동 저장되지 않으므로 실수로 잃는 것을 막기 위한 장치입니다.
+      </p>
+    </div>
+
+    <div class="callout ok">
+      <p>
+        <strong>저장 경로 <span class="badge-new v23">v2.3</span></strong> —
+        HTML 파일을 내려받아 <strong>로컬에서 열면</strong> <code>.wav</code>로 바로 저장됩니다.
+        <strong>온라인 페이지</strong>로 실행하면 플랫폼의 저장 기능을 쓰는데,
+        허용 확장자 목록에 wav가 없어 무압축 <code>.zip</code>으로 감싸 전달합니다.
+        압축은 하지 않으므로 풀면 원본 그대로입니다.
+      </p>
+      <p>
+        대용량 파일의 저장이 시작되기 전에 URL이 해제되어 다운로드가 조용히 취소되던 문제,
+        그리고 192kHz 내보내기 실패 후 잠금이 풀리지 않아 이후 모든 내보내기가 막히던 문제도
+        함께 고쳤습니다. 이제 시작 전에 브라우저의 샘플레이트 지원 여부와
+        예상 용량을 점검하고 안내합니다.
+      </p>
+    </div>
+</div>
 
   <!-- ══════════ TIPS ══════════ -->
   <hr class="divider">
   <div class="section" id="tips">
-    <div class="section-num">SECTION 11</div>
+    <div class="section-num">SECTION 12</div>
     <div class="section-title">활용 팁</div>
     <div class="deco-bar"></div>
 
     <div class="feat-grid">
+      <div class="feat-card">
+        <span class="feat-icon">💾</span>
+        <div class="feat-name">A/B 비교는 슬롯으로 <span class="badge-new">v2.4</span></div>
+        <div class="feat-desc">
+          두 가지 방향을 두고 고민될 때는 각각을 슬롯 1과 2에 넣어두고 번갈아 눌러보세요.
+          귀는 직전에 들은 소리를 금방 잊기 때문에, 즉시 전환하며 듣는 것이 기억에 의존한 비교보다 훨씬 정확합니다.
+          이때 <strong>음량을 맞춰두는 것</strong>이 중요합니다. 커진 소리는 무조건 좋게 들립니다.
+        </div>
+      </div>
+      <div class="feat-card">
+        <span class="feat-icon">📤</span>
+        <div class="feat-name">내보내기 전 설정 남기기 <span class="badge-new">v2.4</span></div>
+        <div class="feat-desc">
+          WAV에는 소리만 담기고 설정은 남지 않습니다.
+          나중에 같은 음색을 재현하거나 조금만 고치려면 내보내기 직전에 프리셋을 함께 저장하세요.
+          파일 이름을 음원과 맞춰두면 나중에 짝을 찾기 쉽습니다.
+        </div>
+      </div>
       <div class="feat-card">
         <span class="feat-icon">🎸</span>
         <div class="feat-name">따뜻한 아날로그 음색</div>
@@ -1468,7 +1904,7 @@ body::before {
     </div>
     <div style="font-family:'Share Tech Mono',monospace;font-size:0.55rem;color:var(--muted2);letter-spacing:0.12em;text-align:right">
       ANALOG SOUL DSP ENGINE<br>
-      USER MANUAL v2.2
+      USER MANUAL v2.4
     </div>
   </div>
 
@@ -1973,6 +2409,92 @@ document.querySelectorAll('.module-name').forEach(function(el){
   io.observe(el);
 });
 
+})();
+</script>
+<script>
+/* 로컬 폴더에서 열렸을 때(file:) 문서 간 링크를 상대 경로로 바꾼다.
+   게시본과 로컬본이 같은 파일이므로 한 벌로 두 환경을 모두 지원한다. */
+(function () {
+  if (location.protocol !== 'file:') return;
+  var MAP = {
+    'ce8a5d5b-3489-480d-8e39-011fd4c05084': 'analog-soul-dsp.html',
+    'bc046e44-cc26-4a89-ab65-54755e588746': 'analog-soul-manual.html',
+    '0a44a83c-82a8-4893-9a74-6e67f83fadd4': 'analog-soul-plain.html',
+    'addfcd64-f934-4e44-b1e2-e9d9635b3912': 'analog-soul-guide.html',
+    'd28fb51f-1860-4e0b-b4ea-79a015d86e60': 'analog-soul-engineering.html',
+    '7592ce90-adce-4f29-8532-777a382f9004': 'analog-soul-internals.html',
+    'bee5f232-9716-432c-bafd-31255f222978': 'index.html'
+  };
+  var RE = /https:\/\/claude\.ai\/code\/artifact\/([\w-]+)/;
+  Array.prototype.forEach.call(document.querySelectorAll('a[href]'), function (a) {
+    var m = RE.exec(a.getAttribute('href'));
+    if (!m) return;
+    var f = MAP[m[1]];
+    if (!f) return;
+    a.setAttribute('href', a.getAttribute('href').replace(RE, f));
+  });
+})();
+</script>
+<script>
+/* 문서를 옮기면 항상 맨 위에서 시작하도록 강제한다.
+   - 브라우저의 스크롤 자동 복원(history.scrollRestoration)을 끈다.
+   - html에 scroll-behavior:smooth가 걸려 있어 scrollTo가 애니메이션으로 처리되면
+     로딩 중 리플로우에 취소될 수 있다. 이동하는 순간만 auto로 내렸다 되돌린다.
+   - 폰트·이미지 로드로 레이아웃이 늦게 확정되므로 여러 시점에 반복 적용한다. */
+(function () {
+  if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+
+  var root = document.documentElement;
+
+  function jump(fn) {
+    var prev = root.style.scrollBehavior;
+    root.style.scrollBehavior = 'auto';   // 애니메이션 없이 즉시 이동
+    fn();
+    // 다음 프레임에 원복해야 이동이 확정된 뒤에 smooth가 돌아온다
+    requestAnimationFrame(function () { root.style.scrollBehavior = prev; });
+  }
+
+  function toTop() {
+    jump(function () {
+      window.scrollTo(0, 0);
+      if (document.scrollingElement) document.scrollingElement.scrollTop = 0;
+      root.scrollTop = 0;
+      if (document.body) document.body.scrollTop = 0;
+    });
+  }
+
+  function toHash(h) {
+    var el = document.getElementById(h);
+    if (!el) { toTop(); return; }
+    jump(function () { el.scrollIntoView(); });
+  }
+
+  function place() {
+    var h = location.hash ? decodeURIComponent(location.hash.slice(1)) : '';
+    if (h) toHash(h); else toTop();
+  }
+
+  // 스크립트 실행 시점에 한 번
+  place();
+
+  // 레이아웃이 확정되는 여러 시점에 다시 (해시 없을 때만 — 앵커는 한 번이면 충분)
+  function replaceIfTop() { if (!location.hash) toTop(); }
+  document.addEventListener('DOMContentLoaded', replaceIfTop);
+  window.addEventListener('load', function () {
+    place();
+    requestAnimationFrame(replaceIfTop);
+    setTimeout(replaceIfTop, 120);
+  });
+  window.addEventListener('pageshow', function (e) { if (e.persisted) place(); });
+
+  // 현재 문서를 가리키는 툴바 항목(href="#")은 기본 동작이 아무것도 하지 않으므로
+  // 직접 맨 위로 보낸다. 다른 문서로 가는 항목은 이동 후 위 place()가 처리한다.
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest ? e.target.closest('.hub-nav a') : null;
+    if (!a) return;
+    var href = a.getAttribute('href');
+    if (href === '#') { e.preventDefault(); toTop(); }
+  });
 })();
 </script>
 </body>

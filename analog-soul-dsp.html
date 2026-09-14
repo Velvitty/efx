@@ -1443,9 +1443,123 @@ canvas.tube-vis {
   pointer-events: none;
   flex-shrink: 0;
 }
+
+/* 문서로 나가는 이동 바 */
+
+/* ===== 공통 상단 툴바 — 전 문서 동일 ===== */
+.hub-nav{
+  position:sticky; top:0; z-index:9000;
+  display:flex; align-items:center; gap:2px; flex-wrap:wrap;
+  padding:7px 16px; min-height:34px;
+  background:rgba(10,8,12,.95); border-bottom:1px solid #2a2535;
+  font-family:'IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+  font-size:11px; line-height:1.5;
+  backdrop-filter:saturate(150%) blur(8px);
+  -webkit-backdrop-filter:saturate(150%) blur(8px);
+}
+.hub-nav .home{ color:#ffb300; text-decoration:none; letter-spacing:.12em; margin-right:12px; white-space:nowrap; }
+.hub-nav .home:hover{ color:#ffd166; }
+.hub-nav a.hn{ color:#7d7291; text-decoration:none; padding:3px 9px; border-radius:2px; white-space:nowrap; }
+.hub-nav a.hn:hover{ color:#e4dcf0; background:#1c1825; }
+.hub-nav a.hn[aria-current]{ color:#ffb300; background:#1c1825; }
+.hub-nav .sep{ color:#3a3350; }
+@media print{ .hub-nav{ display:none; } }
+
+/* 앵커 이동 시 sticky 툴바에 가리지 않도록 여백 확보 */
+[id]{ scroll-margin-top: 46px; }
+
+/* ===== 이탈 확인 모달 ===== */
+.leave-overlay{
+  position:fixed; inset:0; z-index:9500;
+  background:rgba(4,3,8,.9);
+  display:none; align-items:center; justify-content:center; padding:20px;
+  backdrop-filter:blur(3px);
+}
+.leave-overlay.show{ display:flex; }
+.leave-box{
+  width:100%; max-width:460px;
+  background:var(--panel); border:1px solid var(--border-hi); border-radius:4px;
+  box-shadow:0 0 60px rgba(255,179,0,.07), 0 0 120px rgba(0,0,0,.8);
+  overflow:hidden;
+}
+.leave-head{
+  padding:16px 22px; border-bottom:1px solid var(--border);
+  background:linear-gradient(90deg, rgba(255,179,0,.07), transparent);
+  font-family:'Orbitron',sans-serif; font-weight:700; font-size:14px;
+  color:var(--amber); letter-spacing:.05em;
+}
+.leave-body{ padding:20px 22px; font-size:14px; line-height:1.75; color:var(--text); }
+.leave-body .sub{ margin-top:10px; font-size:12.5px; color:var(--muted); }
+.leave-body .dest{
+  margin-top:12px; font-family:'Share Tech Mono',monospace; font-size:12px;
+  color:var(--blue); word-break:break-all;
+}
+.leave-foot{
+  display:flex; gap:10px; justify-content:flex-end;
+  padding:14px 22px; border-top:1px solid var(--border); background:var(--bg2);
+}
+.leave-btn{
+  font-family:'Share Tech Mono',monospace; font-size:12px; letter-spacing:.06em;
+  padding:8px 18px; border-radius:3px; cursor:pointer;
+  background:transparent; border:1px solid var(--border-hi); color:var(--text);
+  transition:border-color .15s ease, color .15s ease, background .15s ease;
+}
+.leave-btn:hover{ border-color:var(--muted); }
+.leave-btn.go{ border-color:var(--amber-dim); color:var(--amber); }
+.leave-btn.go:hover{ background:rgba(255,179,0,.1); border-color:var(--amber); }
+
+/* ===== 프리셋 ===== */
+.preset-section{
+  background:var(--panel); border:1px solid var(--border);
+  border-radius:4px; padding:16px 18px; margin-bottom:22px;
+}
+.preset-row{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+.preset-row + .preset-row{ margin-top:12px; padding-top:12px; border-top:1px dashed var(--border); }
+.preset-label{
+  font-family:'Share Tech Mono',monospace; font-size:0.55rem; letter-spacing:0.14em;
+  color:var(--muted); min-width:72px;
+}
+.btn.preset{
+  font-size:0.6rem; padding:7px 14px;
+  border-color:var(--border-hi); color:var(--text); background:transparent;
+}
+.btn.preset:hover:not(:disabled){ border-color:var(--blue); color:var(--blue); }
+.slot-btn{
+  font-family:'Share Tech Mono',monospace; font-size:0.55rem; letter-spacing:0.06em;
+  padding:6px 12px; border:1px solid var(--border); border-radius:3px;
+  background:transparent; color:var(--muted); cursor:pointer;
+  transition:border-color .15s, color .15s;
+}
+.slot-btn:hover{ border-color:var(--amber); color:var(--amber); }
+.slot-btn.filled{ border-color:var(--green-dim); color:var(--green); }
+.slot-btn.filled:hover{ border-color:var(--green); }
+/* 복사 모드 */
+.slot-btn.copying{ border-color:var(--blue); color:var(--blue); background:rgba(0,207,255,.08); }
+.slot-btn.src{ border-color:var(--amber); color:var(--amber); background:rgba(255,179,0,.12); }
+.slot-btn.erasing{ border-color:var(--red); color:var(--red); background:rgba(255,51,85,.08); }
+.slot-btn.armed{ border-color:var(--red); color:var(--red); }
+.preset-section.copy-mode .slot-btn[data-slot],
+.preset-section.erase-mode .slot-btn[data-slot]{ border-style:dashed; }
+.preset-msg{
+  font-family:'Share Tech Mono',monospace; font-size:0.58rem; letter-spacing:0.04em;
+  min-height:18px; margin-top:12px; padding-top:10px;
+  border-top:1px dashed var(--border); color:var(--muted);
+  transition:color .15s;
+}
+.preset-msg.ok{ color:var(--green); }
+.preset-msg.warn{ color:var(--amber); }
+.preset-msg.err{ color:var(--red); }
+.preset-hint{
+  font-family:'Share Tech Mono',monospace; font-size:0.5rem;
+  color:var(--muted); margin-top:10px; line-height:1.8;
+}
 </style>
 </head>
 <body>
+<nav class="hub-nav" aria-label="문서 간 이동">
+  <a class="home" href="https://claude.ai/code/artifact/bee5f232-9716-432c-bafd-31255f222978">◂ 통합 색인</a><a class="hn" href="#" aria-current="page">메인 어플리케이션 실행하기</a><span class="sep">/</span><a class="hn" href="https://claude.ai/code/artifact/bc046e44-cc26-4a89-ab65-54755e588746">공식 매뉴얼</a><span class="sep">/</span><a class="hn" href="https://claude.ai/code/artifact/0a44a83c-82a8-4893-9a74-6e67f83fadd4">쉬운 말</a><span class="sep">/</span><a class="hn" href="https://claude.ai/code/artifact/addfcd64-f934-4e44-b1e2-e9d9635b3912">기술 설명서</a><span class="sep">/</span><a class="hn" href="https://claude.ai/code/artifact/d28fb51f-1860-4e0b-b4ea-79a015d86e60">사양서</a><span class="sep">/</span><a class="hn" href="https://claude.ai/code/artifact/7592ce90-adce-4f29-8532-777a382f9004">논고</a>
+</nav>
+
 <!-- EULA Modal -->
 <div class="eula-overlay" id="eulaOverlay">
   <div class="eula-box">
@@ -1598,7 +1712,7 @@ canvas.tube-vis {
   <div class="header">
     <div class="logo">
       <h1>ANALOG SOUL</h1>
-      <sub>DSP ENGINE v2.2</sub>
+      <sub>DSP ENGINE v2.4</sub>
     </div>
     <div class="header-meters">
       <div>
@@ -2139,6 +2253,38 @@ canvas.tube-vis {
   </div><!-- /dsp-grid -->
 
   <!-- Export Section -->
+  <div class="dsp-section-title">PRESET</div>
+  <div class="preset-section" id="presetPanel">
+    <div class="preset-row">
+      <span class="preset-label">파일</span>
+      <button class="btn preset" id="presetSave">⬇ 화면 설정 저장</button>
+      <button class="btn preset" id="slotsBackup">⬇ 모든 슬롯을 백업</button>
+      <button class="btn preset" id="presetLoad">⬆ 불러오기</button>
+      <input type="file" id="presetFile" accept=".json,application/json" style="display:none">
+      <span class="preset-label" id="slotsCount" style="min-width:auto;margin-left:auto"></span>
+    </div>
+    <div class="preset-row">
+      <span class="preset-label">빠른 슬롯</span>
+      <button class="slot-btn" data-slot="1">SLOT 1</button>
+      <button class="slot-btn" data-slot="2">SLOT 2</button>
+      <button class="slot-btn" data-slot="3">SLOT 3</button>
+      <button class="slot-btn" data-slot="4">SLOT 4</button>
+      <button class="slot-btn" id="slotCopy">복사</button>
+      <button class="slot-btn" id="slotErase">한 슬롯 비우기</button>
+      <button class="slot-btn" id="slotClear" style="margin-left:auto">모든 슬롯 비우기</button>
+    </div>
+    <div class="preset-msg" id="presetMsg"></div>
+
+    <div class="preset-hint">
+      슬롯을 짧게 누르면 불러오고, 길게(0.6초) 누르면 현재 설정을 덮어씁니다.<br>
+      비어 있는 슬롯을 누르면 모든 값이 기본값으로 돌아갑니다. 음원은 그대로 남습니다.<br>
+      복사를 누른 뒤 원본 슬롯과 대상 슬롯을 차례로 누르면 그대로 옮겨집니다.<br>
+      한 슬롯 비우기를 누른 뒤 슬롯을 누르면 그 슬롯만 지워집니다.<br>
+      불러오기는 파일 종류를 알아서 판별합니다. 설정 파일이면 지금 값에 적용하고, 슬롯 백업이면 슬롯을 되돌립니다.<br>
+      이 영역에 파일을 끌어다 놓아도 됩니다. 음원은 프리셋에 포함되지 않습니다.
+    </div>
+  </div>
+
   <div class="dsp-section-title">EXPORT</div>
   <div class="export-section">
     <div class="export-grid">
@@ -2227,6 +2373,126 @@ dropZone.addEventListener('dragleave', () => dropZone.classList.remove('over'));
 dropZone.addEventListener('drop', e => { e.preventDefault(); dropZone.classList.remove('over'); loadFile(e.dataTransfer.files[0]); });
 fileInput.addEventListener('change', () => fileInput.files[0] && loadFile(fileInput.files[0]));
 
+// ============================================================
+// 컨테이너 헤더에서 원본 샘플레이트 읽기
+// ------------------------------------------------------------
+// decodeAudioData는 항상 컨텍스트의 샘플레이트로 리샘플한다.
+// 원본 레이트를 유지하려면 디코딩 전에 헤더를 직접 읽어
+// 그 레이트의 컨텍스트를 만들어야 한다.
+// ============================================================
+function sniffSampleRate(ab) {
+  const b = new Uint8Array(ab);
+  const dv = new DataView(ab);
+  const tag = (o, str) => {
+    for (let i = 0; i < str.length; i++) if (b[o + i] !== str.charCodeAt(i)) return false;
+    return true;
+  };
+
+  try {
+    // ---- WAV / RIFF ----
+    if (tag(0, 'RIFF') && tag(8, 'WAVE')) {
+      let o = 12;
+      while (o + 8 < b.length) {
+        const id = String.fromCharCode(b[o], b[o+1], b[o+2], b[o+3]);
+        const sz = dv.getUint32(o + 4, true);
+        if (id === 'fmt ') return dv.getUint32(o + 12, true);
+        o += 8 + sz + (sz & 1);
+      }
+    }
+
+    // ---- FLAC ----
+    if (tag(0, 'fLaC')) {
+      // 첫 메타데이터 블록이 STREAMINFO. 헤더 4바이트 뒤 10바이트 지점부터
+      // 20비트가 샘플레이트다.
+      const o = 8 + 10;
+      return (b[o] << 12) | (b[o+1] << 4) | (b[o+2] >> 4);
+    }
+
+    // ---- OGG (Vorbis) ----
+    if (tag(0, 'OggS')) {
+      for (let o = 0; o <= Math.min(b.length - 16, 4096); o++) {
+        if (b[o] === 0x01 && tag(o + 1, 'vorbis')) {
+          return dv.getUint32(o + 12, true);
+        }
+      }
+    }
+
+    // ---- MP4 / M4A / AAC ----
+    // 상자(box) 구조를 따라가 moov > trak > mdia > minf > stbl > stsd 안의
+    // AudioSampleEntry에서 16.16 고정소수 표본화 주파수를 읽는다.
+    if (b.length > 12 && tag(4, 'ftyp')) {
+      const CONTAINERS = ['moov', 'trak', 'mdia', 'minf', 'stbl'];
+      // want = 'stsd' 우선. mdhd 타임스케일은 SBR 계열에서 출력 레이트의
+      // 절반으로 적힐 수 있어 보조 수단으로만 쓴다.
+      const walk = (start, end, depth, want) => {
+        let o = start;
+        while (o + 8 <= end && depth < 8) {
+          let size = dv.getUint32(o, false);
+          const type = String.fromCharCode(b[o+4], b[o+5], b[o+6], b[o+7]);
+          let head = 8;
+          if (size === 1) {                       // 64비트 largesize
+            if (o + 16 > end) break;
+            const hi = dv.getUint32(o + 8, false);
+            const lo = dv.getUint32(o + 12, false);
+            size = hi * 4294967296 + lo;
+            head = 16;
+          } else if (size === 0) {
+            size = end - o;                       // 끝까지
+          }
+          if (size < head || o + size > end) break;
+
+          if (CONTAINERS.indexOf(type) >= 0) {
+            const r = walk(o + head, o + size, depth + 1, want);
+            if (r) return r;
+          } else if (type === 'stsd' && want === 'stsd') {
+            // version/flags 4 + entry_count 4 이후가 첫 엔트리 상자
+            const eo = o + head + 8;
+            if (eo + 36 <= end) {
+              // 엔트리 상자 헤더 8바이트를 건너뛰고 AudioSampleEntry 내부 오프셋 24
+              const rate = dv.getUint16(eo + 8 + 24, false);
+              if (rate >= 8000) return rate;
+            }
+          } else if (type === 'mdhd' && want === 'mdhd') {
+            // 대안 경로: 미디어 타임스케일이 오디오 표본화 주파수와 같다
+            const ver = b[o + head];
+            const to  = o + head + (ver === 1 ? 20 : 12);
+            if (to + 4 <= end) {
+              const ts = dv.getUint32(to, false);
+              if (ts >= 8000 && ts <= 192000) return ts;
+            }
+          }
+          o += size;
+        }
+        return null;
+      };
+      const r = walk(0, b.length, 0, 'stsd') || walk(0, b.length, 0, 'mdhd');
+      if (r) return r;
+    }
+
+    // ---- MP3 ----
+    let start = 0;
+    if (tag(0, 'ID3')) {
+      // ID3v2 태그 크기는 싱크세이프 정수 (각 바이트 하위 7비트)
+      start = 10 + ((b[6] & 0x7f) << 21 | (b[7] & 0x7f) << 14 | (b[8] & 0x7f) << 7 | (b[9] & 0x7f));
+    }
+    const MPEG_RATES = {
+      3: [44100, 48000, 32000],   // MPEG1
+      2: [22050, 24000, 16000],   // MPEG2
+      0: [11025, 12000,  8000],   // MPEG2.5
+    };
+    for (let o = start; o < Math.min(b.length - 4, start + 200000); o++) {
+      if (b[o] === 0xFF && (b[o+1] & 0xE0) === 0xE0) {
+        const ver  = (b[o+1] >> 3) & 0x03;   // 3=MPEG1, 2=MPEG2, 0=MPEG2.5
+        const rIdx = (b[o+2] >> 2) & 0x03;
+        const tbl  = MPEG_RATES[ver];
+        if (tbl && rIdx < 3) return tbl[rIdx];
+      }
+    }
+  } catch (e) { /* 헤더 해석 실패 시 무시 */ }
+
+  return null;   // 알 수 없으면 장치 기본값 사용
+}
+
 async function loadFile(file) {
   if (!file.type.startsWith('audio/') && !file.name.match(/\.(wav|mp3|flac|ogg|aac|m4a)$/i)) {
     setStatus('오디오 파일만 지원됩니다.', 'err'); return;
@@ -2239,8 +2505,7 @@ async function loadFile(file) {
   originalFile = file;
   setStatus('디코딩 중...', 'warn');
 
-  // 새 파일 → 이전 복원 캐시 무효화. 기본 샘플레이트에서 디코딩해야
-  // sourceBuf.sampleRate가 장치 기본값으로 일정하게 유지된다
+  // 새 파일 → 이전 복원 캐시 무효화. 컨텍스트도 기본 레이트로 되돌린다.
   liveHDMode = 'off';
   hdLiveBuf = null;
   hdLiveKey = '';
@@ -2249,8 +2514,23 @@ async function loadFile(file) {
 
   const ab = await file.arrayBuffer();
   try {
-    sourceBuf = await ctx().decodeAudioData(ab);
-  } catch(e) { setStatus('디코딩 실패: ' + e.message, 'err'); return; }
+    // 헤더에서 원본 샘플레이트를 읽어 그 레이트로 디코딩한다.
+    // 그래야 sourceBuf.sampleRate가 파일의 실제 값이 되고,
+    // WAV 내보내기의 '원본 SR'이 이름대로 동작한다.
+    const nativeSR = sniffSampleRate(ab.slice(0));
+    if (nativeSR && nativeSR >= 8000 && nativeSR <= 192000) {
+      const decCtx = new OfflineAudioContext(2, 1, nativeSR);
+      sourceBuf = await decCtx.decodeAudioData(ab);
+    } else {
+      sourceBuf = await ctx().decodeAudioData(ab);
+    }
+  } catch(e) {
+    // 원본 레이트 디코딩이 실패하면 장치 기본값으로 재시도
+    try {
+      const ab2 = await file.arrayBuffer();
+      sourceBuf = await ctx().decodeAudioData(ab2);
+    } catch(e2) { setStatus('디코딩 실패: ' + e2.message, 'err'); return; }
+  }
 
   const dur = sourceBuf.duration;
   const sr = sourceBuf.sampleRate;
@@ -2355,10 +2635,10 @@ function onParamChange() {
 
 // ---- Soundgoodizer Mode Presets ----
 const SG_MODES = {
-  A: { desc: 'Warm & Punchy',       lowSat:60, midSat:50, hiSat:35, stereo:55, loFreq:250,  hiFreq:4000,  loQ:0.7, hiQ:0.8, drive:0.4 },
-  B: { desc: 'Bright & Airy',       lowSat:35, midSat:45, hiSat:70, stereo:70, loFreq:180,  hiFreq:6000,  loQ:0.6, hiQ:1.0, drive:0.55 },
-  C: { desc: 'Full & Rich',         lowSat:75, midSat:60, hiSat:45, stereo:45, loFreq:300,  hiFreq:3500,  loQ:0.8, hiQ:0.7, drive:0.5  },
-  D: { desc: 'Crispy & Detailed',   lowSat:40, midSat:65, hiSat:80, stereo:65, loFreq:200,  hiFreq:8000,  loQ:0.6, hiQ:1.2, drive:0.6  },
+  A: { desc: 'Warm & Punchy',       lowSat:60, midSat:50, hiSat:35, stereo:55, loFreq:250,  hiFreq:4000,  drive:0.4 },
+  B: { desc: 'Bright & Airy',       lowSat:35, midSat:45, hiSat:70, stereo:70, loFreq:180,  hiFreq:6000,  drive:0.55 },
+  C: { desc: 'Full & Rich',         lowSat:75, midSat:60, hiSat:45, stereo:45, loFreq:300,  hiFreq:3500,  drive:0.5  },
+  D: { desc: 'Crispy & Detailed',   lowSat:40, midSat:65, hiSat:80, stereo:65, loFreq:200,  hiFreq:8000,  drive:0.6  },
 };
 let sgMode = 'A';
 
@@ -2388,11 +2668,11 @@ document.querySelectorAll('.sg-mode-btn').forEach(btn => {
 
 // ---- Dolby Atmos Scene Presets ----
 const ATMOS_SCENES = {
-  cinema:  { space:75, height:55, depth:65, reverb:40, object:50, rt60:1.8, earlyMs:22, roomSize:0.85 },
-  concert: { space:85, height:50, depth:70, reverb:55, object:45, rt60:2.4, earlyMs:35, roomSize:0.95 },
-  stadium: { space:95, height:40, depth:80, reverb:70, object:35, rt60:3.2, earlyMs:55, roomSize:1.0  },
-  studio:  { space:25, height:20, depth:30, reverb:12, object:30, rt60:0.4, earlyMs:8,  roomSize:0.4  },
-  club:    { space:55, height:35, depth:45, reverb:30, object:60, rt60:0.9, earlyMs:15, roomSize:0.65 },
+  cinema:  { space:75, height:55, depth:65, reverb:40, object:50, rt60:1.8, earlyMs:22 },
+  concert: { space:85, height:50, depth:70, reverb:55, object:45, rt60:2.4, earlyMs:35 },
+  stadium: { space:95, height:40, depth:80, reverb:70, object:35, rt60:3.2, earlyMs:55 },
+  studio:  { space:25, height:20, depth:30, reverb:12, object:30, rt60:0.4, earlyMs:8 },
+  club:    { space:55, height:35, depth:45, reverb:30, object:60, rt60:0.9, earlyMs:15 },
 };
 let atmosScene = 'cinema';
 
@@ -2417,66 +2697,204 @@ document.querySelectorAll('.atmos-scene-btn').forEach(btn => {
 
 // Dolby Atmos impulse response generator
 // Creates a synthetic reverb IR with early reflections + late reverb tail
-function makeAtmosIR(ac, scene, spaceAmt, heightAmt, depthAmt) {
-  const p     = ATMOS_SCENES[scene] || ATMOS_SCENES.cinema;
-  const rt60  = p.rt60 * (0.4 + spaceAmt * 0.8);   // 공간 크기에 따라 잔향 시간 조절
-  const sr    = ac.sampleRate;
-  const len   = Math.ceil(sr * (rt60 + 0.5));
-  const ir    = ac.createBuffer(2, len, sr);
+// ============================================================
+// 브릭월 세이프티 클리퍼
+// ------------------------------------------------------------
+// DynamicsCompressor는 룩어헤드가 없어 어택(1ms)보다 짧은 순간 피크가
+// 그대로 통과한다. 레시오도 20:1이라 무한대가 아니다.
+// 천장 기준으로 정규화한 뒤 1.0에 점근하는 커브를 통과시키면
+// 출력이 천장을 넘는 일이 원천적으로 없어진다.
+// ============================================================
+function makeClipCurve() {
+  const n = 8192;
+  const c = new Float32Array(n);
+  const t = 0.85;                       // 이 아래는 완전 선형 — 착색 없음
+  for (let i = 0; i < n; i++) {
+    const x = (i * 2 / (n - 1)) - 1;
+    const a = Math.abs(x);
+    let y;
+    if (a <= t) {
+      y = a;                            // 선형 구간
+    } else {
+      // t 위는 1.0에 점근하는 소프트 니. 하드 클리핑보다 고차 배음이 적다
+      y = t + (1 - t) * Math.tanh((a - t) / (1 - t));
+    }
+    c[i] = (x < 0 ? -y : y);
+  }
+  return c;
+}
+const CLIP_CURVE = makeClipCurve();
 
-  // Early reflections: 여러 지연시간에 감쇠된 반사음 추가
+// 천장(dB)을 받아 입력 정규화 → 소프트 클립 → 원복 3단을 만든다
+function buildCeilingClip(ac) {
+  const pre  = ac.createGain();
+  const ws   = ac.createWaveShaper();
+  const post = ac.createGain();
+  ws.curve = CLIP_CURVE;
+  ws.oversample = '4x';                 // 클리핑으로 생기는 앨리어싱 억제
+  pre.connect(ws); ws.connect(post);
+  return { in: pre, out: post, pre: pre, post: post };
+}
+function setCeilingClip(cc, ceilDb) {
+  if (!cc) return;
+  const lin = Math.pow(10, ceilDb / 20);
+  cc.pre.gain.value  = 1 / lin;         // 천장이 1.0에 오도록 정규화
+  cc.post.gain.value = lin;             // 다시 천장 레벨로
+}
+
+// ============================================================
+// 공용 스테레오 처리 블록
+// ============================================================
+
+// M/S 폭 조절 — M=(L+R)/2, S=(L−R)/2, 출력 L=M+S·w, R=M−S·w
+// w=1이 원본, 0이면 모노, 2면 사이드 성분 2배
+function buildStereoWidth(ac) {
+  const sp   = ac.createChannelSplitter(2);
+  const mg   = ac.createChannelMerger(2);
+  const midL = ac.createGain(); midL.gain.value =  0.5;
+  const midR = ac.createGain(); midR.gain.value =  0.5;
+  const sidL = ac.createGain(); sidL.gain.value =  0.5;
+  const sidR = ac.createGain(); sidR.gain.value = -0.5;
+  const mid  = ac.createGain();
+  const side = ac.createGain();
+  const wPos = ac.createGain();   // +S·w → L
+  const wNeg = ac.createGain();   // −S·w → R
+
+  sp.connect(midL, 0); sp.connect(midR, 1);
+  midL.connect(mid);   midR.connect(mid);
+  sp.connect(sidL, 0); sp.connect(sidR, 1);
+  sidL.connect(side);  sidR.connect(side);
+  side.connect(wPos);  side.connect(wNeg);
+
+  // 같은 머저 입력에 들어온 연결은 합산된다
+  mid.connect(mg, 0, 0); wPos.connect(mg, 0, 0);
+  mid.connect(mg, 0, 1); wNeg.connect(mg, 0, 1);
+
+  return { in: sp, out: mg, wPos: wPos, wNeg: wNeg };
+}
+function setStereoWidth(sw, w) {
+  if (!sw) return;
+  sw.wPos.gain.value =  w;
+  sw.wNeg.gain.value = -w;
+}
+
+// 채널 간 누화 — LP 카트리지의 좌우 분리도 한계를 흉내낸다
+// x=0이면 완전 분리, 올릴수록 반대 채널이 섞여 스테레오가 좁아진다
+function buildCrosstalk(ac) {
+  const sp  = ac.createChannelSplitter(2);
+  const mg  = ac.createChannelMerger(2);
+  const dL  = ac.createGain();   // L 직결
+  const dR  = ac.createGain();   // R 직결
+  const xLR = ac.createGain();   // L → R 누설
+  const xRL = ac.createGain();   // R → L 누설
+
+  sp.connect(dL, 0);  sp.connect(xLR, 0);
+  sp.connect(dR, 1);  sp.connect(xRL, 1);
+  dL.connect(mg, 0, 0);  xRL.connect(mg, 0, 0);
+  dR.connect(mg, 0, 1);  xLR.connect(mg, 0, 1);
+
+  return { in: sp, out: mg, dL: dL, dR: dR, xLR: xLR, xRL: xRL };
+}
+function setCrosstalk(ct, amount) {
+  if (!ct) return;
+  const x = amount * 0.35;          // 최대 −9.1dB 누설
+  const n = 1 / (1 + x);            // 합산 레벨 보정
+  ct.dL.gain.value  = n;
+  ct.dR.gain.value  = n;
+  ct.xLR.gain.value = x * n;
+  ct.xRL.gain.value = x * n;
+}
+
+// 회전 불균일에 의한 피치 변조 (와우 + 플러터)
+// 와우는 회전 주기(33⅓rpm = 0.556Hz), 플러터는 그보다 빠른 성분
+function buildWobble(ac) {
+  const dly  = ac.createDelay(0.05);
+  dly.delayTime.value = 0.006;                 // 중심 지연 6ms
+
+  const wow  = ac.createOscillator(); wow.type = 'sine'; wow.frequency.value = 0.556;
+  const wowG = ac.createGain();       wowG.gain.value = 0;
+  const flt  = ac.createOscillator(); flt.type = 'sine'; flt.frequency.value = 4.2;
+  const fltG = ac.createGain();       fltG.gain.value = 0;
+
+  wow.connect(wowG); wowG.connect(dly.delayTime);
+  flt.connect(fltG); fltG.connect(dly.delayTime);
+  try { wow.start(0); flt.start(0); } catch(e) {}
+
+  return { in: dly, out: dly, wowG: wowG, fltG: fltG, wow: wow, flt: flt };
+}
+function setWobble(wb, amount) {
+  if (!wb) return;
+  // 지연 변조 진폭 A에서 피치 편차는 A·2πf.
+  // 와우 0.556Hz에서 A=0.9ms면 약 ±0.31% 편차가 된다.
+  wb.wowG.gain.value = amount * 0.0009;
+  wb.fltG.gain.value = amount * 0.00006;
+}
+
+function makeAtmosIR(ac, scene, spaceAmt, heightAmt, depthAmt, part) {
+  // part: 'early' = 직접음 + 초기 반사만, 'late' = 확산 잔향 꼬리만
+  // 예전에는 동일한 IR을 두 번 컨볼브했다. 게인만 다르므로 결과는
+  // 단일 컨볼루션에 게인 합을 곱한 것과 같았고 연산량만 두 배였다.
+  const p     = ATMOS_SCENES[scene] || ATMOS_SCENES.cinema;
+  const rt60  = p.rt60 * (0.4 + spaceAmt * 0.8);
+  const sr    = ac.sampleRate;
+  const isEarly = (part === 'early');
+
   const earlyDelays = [0.007, 0.013, 0.017, 0.023, 0.031, 0.041, 0.053, 0.067, 0.079, 0.097];
   const earlyGains  = [0.85,  0.72,  0.68,  0.61,  0.54,  0.48,  0.42,  0.36,  0.30,  0.24 ];
 
-  // Height channel contribution: 위에서 오는 반사음 시뮬레이션
-  const heightDelay = 0.006 + heightAmt * 0.012; // 6~18ms (천장 거리에 따라)
+  const heightDelay = 0.006 + heightAmt * 0.012;   // 6~18ms, 천장 거리
   const heightGain  = heightAmt * 0.55;
+  const depthDelay  = 0.04 + depthAmt * 0.06;      // 40~100ms, 뒷벽 거리
+  const depthGain   = depthAmt * 0.45;
 
-  // Depth cue: 뒤에서 오는 늦은 반사음
-  const depthDelay = 0.04 + depthAmt * 0.06;
-  const depthGain  = depthAmt * 0.45;
+  // 초기 반사 IR은 마지막 반사까지만 담으면 되므로 훨씬 짧다
+  const len = isEarly
+    ? Math.ceil(sr * (Math.max(0.097, depthDelay, heightDelay * 1.6) + 0.02))
+    : Math.ceil(sr * (rt60 + 0.2));
+
+  const ir = ac.createBuffer(2, len, sr);
 
   for (let ch = 0; ch < 2; ch++) {
     const data = ir.getChannelData(ch);
     const isRight = ch === 1;
 
-    // Dirac impulse at start
-    data[0] = 1.0;
+    if (isEarly) {
+      data[0] = 1.0;                               // 직접음
 
-    // Early reflections (L/R slightly different for HRTF-like width)
-    earlyDelays.forEach((d, i) => {
-      const idx = Math.floor(d * sr);
-      if (idx < len) {
-        const pan = isRight ? (0.9 + i * 0.01) : (1.1 - i * 0.01);
-        data[idx] += earlyGains[i] * pan * 0.6;
+      earlyDelays.forEach((d, i) => {
+        const idx = Math.floor(d * sr);
+        if (idx < len) {
+          const pan = isRight ? (0.9 + i * 0.01) : (1.1 - i * 0.01);
+          data[idx] += earlyGains[i] * pan * 0.6;
+        }
+      });
+
+      const hIdx = Math.floor(heightDelay * sr);
+      if (hIdx < len) data[hIdx] += heightGain * 0.5;
+      const hIdx2 = Math.floor(heightDelay * 1.6 * sr);
+      if (hIdx2 < len) data[hIdx2] += heightGain * 0.3;
+
+      const dIdx = Math.floor(depthDelay * sr);
+      if (dIdx < len) data[dIdx] += depthGain * (isRight ? 0.6 : 0.5);
+
+    } else {
+      // 확산 잔향만. 직접음과 초기 반사는 담지 않는다.
+      let b0 = 0, b1 = 0, b2 = 0;
+      for (let i = 0; i < len; i++) {
+        const t   = i / sr;
+        const env = Math.exp(-t * 6.91 / rt60);    // rt60초에 −60dB
+        const raw = Math.random() * 2 - 1;
+        b0 = 0.98 * b0 + 0.02 * raw;
+        b1 = 0.95 * b1 + 0.05 * b0;
+        b2 = 0.90 * b2 + 0.10 * b1;
+        const dec = isRight ? 0.03 : -0.03;        // 좌우 탈상관
+        data[i] = (b2 + dec * raw) * env * 0.35 * spaceAmt;
       }
-    });
-
-    // Height channel (ceiling reflection)
-    const hIdx = Math.floor(heightDelay * sr);
-    if (hIdx < len) data[hIdx] += heightGain * 0.5;
-    const hIdx2 = Math.floor((heightDelay * 1.6) * sr);
-    if (hIdx2 < len) data[hIdx2] += heightGain * 0.3;
-
-    // Depth reflection
-    const dIdx = Math.floor(depthDelay * sr);
-    if (dIdx < len) {
-      data[dIdx] += depthGain * (isRight ? 0.6 : 0.5);
-    }
-
-    // Late reverb tail: exponential decay noise
-    const onset = Math.floor(p.earlyMs / 1000 * sr);
-    let b0 = 0, b1 = 0, b2 = 0; // diffusion filtering
-    for (let i = onset; i < len; i++) {
-      const t    = (i - onset) / sr;
-      const env  = Math.exp(-t * 6.91 / rt60); // -60dB in rt60 seconds
-      const raw  = (Math.random() * 2 - 1);
-      // Lowpass-filter the noise for more natural tail
-      b0 = 0.98 * b0 + 0.02 * raw;
-      b1 = 0.95 * b1 + 0.05 * b0;
-      b2 = 0.90 * b2 + 0.10 * b1;
-      const side = isRight ? 0.03 : -0.03; // slight L/R decorrelation
-      data[i] += (b2 + side * raw) * env * 0.35 * spaceAmt;
+      // 초기 구간을 페이드인해 직접음 자리와 겹치지 않게 한다
+      const onset = Math.floor(p.earlyMs / 1000 * sr);
+      for (let i = 0; i < onset && i < len; i++) {
+        data[i] *= i / onset;
+      }
     }
   }
   return ir;
@@ -2533,8 +2951,19 @@ function buildLiveChain() {
   nodes.tubeInputHPF.frequency.value = 150;
   nodes.tubeInputHPF.Q.value = 0.5;
 
+  // 포화 전 대역 제한. 가청 앨리어싱은 3.5·sr 위 성분이 접혀 생기므로,
+  // 입력을 sr/3으로 묶으면 발생 차수가 7차에서 10.5차로 밀려난다.
+  nodes.tubeAALPF = ac.createBiquadFilter();
+  nodes.tubeAALPF.type = 'lowpass';
+  nodes.tubeAALPF.frequency.value = ac.sampleRate / 3;
+  nodes.tubeAALPF.Q.value = 0.707;
   nodes.tubeWaveShaper = ac.createWaveShaper();
-  nodes.tubeWaveShaper.oversample = '2x';        // 4x는 고역 하모닉 과잉 → 2x로
+  nodes.tubeWaveShaper.oversample = '4x';
+  // DC 차단 — 비대칭 포화가 만든 직류 오프셋 제거
+  nodes.tubeDCBlock = ac.createBiquadFilter();
+  nodes.tubeDCBlock.type = 'highpass';
+  nodes.tubeDCBlock.frequency.value = 12;
+  nodes.tubeDCBlock.Q.value = 0.707;
 
   nodes.tubeOutputLPF = ac.createBiquadFilter(); // 포화 후 고역 쨍함 완화 롤오프
   nodes.tubeOutputLPF.type = 'lowshelf';
@@ -2582,8 +3011,11 @@ function buildLiveChain() {
   // --- Exciter ---
   nodes.excHPF = ac.createBiquadFilter();
   nodes.excHPF.type = 'highpass';
+  nodes.excAALPF = ac.createBiquadFilter();
+  nodes.excAALPF.type = 'lowpass';
+  nodes.excAALPF.Q.value = 0.707;
   nodes.excShaper = ac.createWaveShaper();
-  nodes.excShaper.oversample = '2x';
+  nodes.excShaper.oversample = '4x';
   nodes.excBPF = ac.createBiquadFilter();
   nodes.excBPF.type = 'bandpass';
   nodes.excDryGain2 = ac.createGain();
@@ -2592,17 +3024,28 @@ function buildLiveChain() {
 
   // --- Soundgoodizer ---
   // 3-band parallel saturation + stereo enhancer
-  // Low band saturator
-  nodes.sgLPF = ac.createBiquadFilter(); nodes.sgLPF.type = 'lowpass';
+  // 대역 분할은 Linkwitz-Riley 4차(버터워스 2단)로 상보 구성한다.
+  const _lrq = 0.707;
+  function _mkLR(type) {
+    const a = ac.createBiquadFilter(); a.type = type; a.Q.value = _lrq;
+    const b = ac.createBiquadFilter(); b.type = type; b.Q.value = _lrq;
+    a.connect(b); return { a: a, b: b, out: b };
+  }
+  // Low band: LR-LP(loFreq)
+  nodes.sgLoLP = _mkLR('lowpass');
   nodes.sgLowShaper = ac.createWaveShaper(); nodes.sgLowShaper.oversample = '4x';
+  nodes.sgLowDC = ac.createBiquadFilter(); nodes.sgLowDC.type = 'highpass';
+  nodes.sgLowDC.frequency.value = 12; nodes.sgLowDC.Q.value = 0.707;
   nodes.sgLowGain = ac.createGain();
-  // Mid band saturator
-  nodes.sgBPF = ac.createBiquadFilter(); nodes.sgBPF.type = 'bandpass';
+  // Mid band: LR-HP(loFreq) → LR-LP(hiFreq)
+  nodes.sgMidHP = _mkLR('highpass');
+  nodes.sgMidLP = _mkLR('lowpass');
   nodes.sgMidShaper = ac.createWaveShaper(); nodes.sgMidShaper.oversample = '4x';
   nodes.sgMidGain = ac.createGain();
-  // High band saturator
-  nodes.sgHPF = ac.createBiquadFilter(); nodes.sgHPF.type = 'highpass';
-  nodes.sgHiShaper = ac.createWaveShaper(); nodes.sgHiShaper.oversample = '2x';
+  // High band: LR-HP(hiFreq)
+  nodes.sgHiHP = _mkLR('highpass');
+  nodes.sgHiAA = ac.createBiquadFilter(); nodes.sgHiAA.type = 'lowpass'; nodes.sgHiAA.Q.value = 0.707;
+  nodes.sgHiShaper = ac.createWaveShaper(); nodes.sgHiShaper.oversample = '4x';
   nodes.sgHiGain = ac.createGain();
   // Mix bus
   nodes.sgDry = ac.createGain();
@@ -2612,7 +3055,7 @@ function buildLiveChain() {
   nodes.sgDynEQ = ac.createBiquadFilter(); nodes.sgDynEQ.type = 'peaking'; nodes.sgDynEQ.frequency.value = 2500; nodes.sgDynEQ.Q.value = 0.7;
   nodes.sgOutputComp = ac.createDynamicsCompressor();
   nodes.sgOutputComp.threshold.value = -12; nodes.sgOutputComp.ratio.value = 2;
-  nodes.sgOutputComp.attack.value = 0.003; nodes.sgOutputComp.release.value = 0.15; nodes.sgOutputComp.knee.value = 6;
+  nodes.sgOutputComp.attack.value = 0.003; nodes.sgOutputComp.release.value = 0.20; nodes.sgOutputComp.knee.value = 6;
 
 
   // --- Dolby Atmos Spatial Simulator ---
@@ -2694,6 +3137,13 @@ function buildLiveChain() {
   // Output
   nodes.outputGain = ac.createGain();
 
+  // 스테레오 처리 블록 — 라이브에서도 값만 갱신해 재사용한다
+  nodes.vinylWobble = buildWobble(ac);
+  nodes.vinylXtalk  = buildCrosstalk(ac);
+  nodes.sgWidth     = buildStereoWidth(ac);
+  nodes.masterWidth = buildStereoWidth(ac);
+  nodes.ceilClip    = buildCeilingClip(ac);
+
   // 모듈별 INPUT GAIN — 각 이펙트 진입 직전에 삽입된다
   nodes.inBbe     = ac.createGain();
   nodes.inTube    = ac.createGain();
@@ -2749,8 +3199,13 @@ function createVinylNoise(ac) {
 }
 
 function makeTubeCurve(drive, bias) {
-  // 실제 진공관 삼극관(triode)의 전달 특성 근사:
-  // - 비대칭 소프트 클리핑 → 2nd harmonic(짝수) 위주 생성
+  // 실제 진공관 삼극관(triode)의 전달 특성 근사.
+  // 실측(입력 0.7, drive 30) 배음 구조:
+  //   bias 50(중앙) → 2차 −39.9dB, 3차 −23.1dB   ← 3차가 17dB 우세
+  //   bias 0 / 100  → 2차 −30.7 / −26.3dB        ← 동작점 이동이 짝수를 만든다
+  // 즉 짝수 배음의 실질 제어는 bias이고, 1.15 비대칭 계수는
+  // bias 중앙에서도 짝수가 완전히 사라지지 않게 하는 보조 역할이다.
+  // 예전 주석의 "2nd harmonic 위주"는 과장된 서술이었다.
   // - 입력 레벨이 낮을 때도 미세한 포화가 일어나는 "warmth" 특성
   // - 양의 반주기와 음의 반주기를 다르게 처리 (bias 비대칭)
   const n = 4096; // 더 촘촘한 커브로 고역 앨리어싱 감소
@@ -2779,26 +3234,30 @@ function makeTubeCurve(drive, bias) {
 }
 
 function makeSGCurve(saturation, drive) {
-  // Soundgoodizer uses a soft-knee polynomial saturator that emphasizes even harmonics
-  // at low levels and odd harmonics at higher levels — the "fattening" character
+  // 실측(8192점 DFT, 입력 0.7, sat 0.6 / drive 0.4) 기준 배음 구조:
+  //   비대칭 없음 → 2차 −68.6dB, 3차 −17.7dB  (사실상 순수 기함수)
+  //   bias 0.08   → 2차 −28.9dB, 3차 −17.8dB
+  // soft와 cubic은 둘 다 기함수라 그것만으로는 짝수 배음이 생기지 않는다.
+  // 예전 주석의 "짝수 우세"는 틀린 서술이었다. 동작점을 옮겨야 짝수가 나온다.
+  //   soft  : 유리형 소프트클립 — 홀수 배음이 3,5,7…로 완만히 이어짐
+  //   cubic : 3차 항만 있어 사실상 3차 배음만 생성
+  //   blend : 위 둘의 비율. 홀수 배음의 '펼침' 정도를 정한다.
   const n = 2048;
   const curve = new Float32Array(n);
   const k = 1 + saturation * 2.5;
   const d = 1 + drive * 1.5;
+  const b = 0.08 * saturation;   // 동작점 이동 → 짝수 배음. DC는 후단에서 차단한다.
   for (let i = 0; i < n; i++) {
     const x = (i * 2 / n) - 1;
-    const xd = x * d;
-    // Blend of soft-clip (even harmonics) and cubic (odd harmonics)
-    const soft = xd / (1 + Math.abs(xd) * k);         // even-harmonic-rich
-    const cubic = xd - (xd * xd * xd) / (3 * k);      // odd-harmonic-rich
-    const blend = saturation; // 0=even-dominant, 1=balanced
+    const xd = (x + b) * d;
+    const soft  = xd / (1 + Math.abs(xd) * k);
+    const cubic = xd - (xd * xd * xd) / (3 * k);
+    const blend = saturation;
     curve[i] = soft * (1 - blend * 0.3) + cubic * (blend * 0.3);
-    // Normalize
     curve[i] = Math.max(-1, Math.min(1, curve[i]));
   }
   return curve;
 }
-
 function makeExciterCurve(drive) {
   const n = 1024;
   const curve = new Float32Array(n);
@@ -2820,10 +3279,15 @@ function connectLiveChain(nodes, ac) {
   const compEnabled   = document.getElementById('compOn').checked;
   const masterEnabled = document.getElementById('masterOn').checked;
 
-  // 모든 노드의 기존 연결 완전 해제 (이전 체인 잔재 제거)
+  // 기존 연결 해제 (이전 체인 잔재 제거)
+  // 복합 블록(스테레오 폭, 누화, 와우, LR 필터쌍)은 내부 배선이 이미 되어 있다.
+  // 내부까지 끊으면 블록이 망가지므로 바깥으로 나가는 출력만 끊는다.
   Object.values(nodes).forEach(n => {
-    if (n && typeof n.disconnect === 'function') {
+    if (!n) return;
+    if (typeof n.disconnect === 'function') {
       try { n.disconnect(); } catch(e) {}
+    } else if (typeof n === 'object' && n.out && typeof n.out.disconnect === 'function') {
+      try { n.out.disconnect(); } catch(e) {}
     }
   });
 
@@ -2862,8 +3326,10 @@ function connectLiveChain(nodes, ac) {
 
     // 포화 경로: HPF(>100Hz) → WaveShaper → HF rolloff → 저역 보상 → wet gain
     chain.connect(nodes.tubeInputHPF);
-    nodes.tubeInputHPF.connect(nodes.tubeWaveShaper);
-    nodes.tubeWaveShaper.connect(nodes.tubeOutputLPF);
+    nodes.tubeInputHPF.connect(nodes.tubeAALPF);
+    nodes.tubeAALPF.connect(nodes.tubeWaveShaper);
+    nodes.tubeWaveShaper.connect(nodes.tubeDCBlock);
+    nodes.tubeDCBlock.connect(nodes.tubeOutputLPF);
     nodes.tubeOutputLPF.connect(nodes.tubeOutputHiCut);
     nodes.tubeOutputHiCut.connect(nodes.tubeLowCompensate);
     nodes.tubeLowCompensate.connect(nodes.tubeWetGain);
@@ -2884,7 +3350,10 @@ function connectLiveChain(nodes, ac) {
     // Add noise
     nodes.vinylNoiseSource.connect(nodes.vinylNoiseGain);
     nodes.vinylNoiseGain.connect(nodes.vinylHighRolloff);
-    chain = nodes.vinylHighRolloff;
+    // 피치 변조 → 채널 누화
+    nodes.vinylHighRolloff.connect(nodes.vinylWobble.in);
+    nodes.vinylWobble.out.connect(nodes.vinylXtalk.in);
+    chain = nodes.vinylXtalk.out;
   }
 
   // EXCITER
@@ -2894,7 +3363,8 @@ function connectLiveChain(nodes, ac) {
     chain.connect(nodes.inExciter); chain = nodes.inExciter;
     chain.connect(nodes.excDryGain2);
     chain.connect(nodes.excHPF);
-    nodes.excHPF.connect(nodes.excShaper);
+    nodes.excHPF.connect(nodes.excAALPF);
+    nodes.excAALPF.connect(nodes.excShaper);
     nodes.excShaper.connect(nodes.excBPF);
     nodes.excBPF.connect(nodes.excWetGain2);
     nodes.excDryGain2.connect(nodes.excMixOut);
@@ -2910,20 +3380,23 @@ function connectLiveChain(nodes, ac) {
     chain.connect(nodes.sgDry);
 
     // Low band path
-    chain.connect(nodes.sgLPF);
-    nodes.sgLPF.connect(nodes.sgLowShaper);
-    nodes.sgLowShaper.connect(nodes.sgLowGain);
+    chain.connect(nodes.sgLoLP.a);
+    nodes.sgLoLP.b.connect(nodes.sgLowShaper);
+    nodes.sgLowShaper.connect(nodes.sgLowDC);
+    nodes.sgLowDC.connect(nodes.sgLowGain);
     nodes.sgLowGain.connect(nodes.sgWet);
 
     // Mid band path
-    chain.connect(nodes.sgBPF);
-    nodes.sgBPF.connect(nodes.sgMidShaper);
+    chain.connect(nodes.sgMidHP.a);
+    nodes.sgMidHP.b.connect(nodes.sgMidLP.a);
+    nodes.sgMidLP.b.connect(nodes.sgMidShaper);
     nodes.sgMidShaper.connect(nodes.sgMidGain);
     nodes.sgMidGain.connect(nodes.sgWet);
 
     // High band path
-    chain.connect(nodes.sgHPF);
-    nodes.sgHPF.connect(nodes.sgHiShaper);
+    chain.connect(nodes.sgHiHP.a);
+    nodes.sgHiHP.b.connect(nodes.sgHiAA);
+    nodes.sgHiAA.connect(nodes.sgHiShaper);
     nodes.sgHiShaper.connect(nodes.sgHiGain);
     nodes.sgHiGain.connect(nodes.sgWet);
 
@@ -2931,7 +3404,8 @@ function connectLiveChain(nodes, ac) {
     nodes.sgWet.connect(nodes.sgMixOut);
     nodes.sgMixOut.connect(nodes.sgDynEQ);
     nodes.sgDynEQ.connect(nodes.sgOutputComp);
-    chain = nodes.sgOutputComp;
+    nodes.sgOutputComp.connect(nodes.sgWidth.in);
+    chain = nodes.sgWidth.out;
   }
 
   // DOLBY ATMOS SPATIAL
@@ -2947,9 +3421,9 @@ function connectLiveChain(nodes, ac) {
     const mixAmt    = parseFloat(document.getElementById('atmosMix').value)    / 100;
 
     // Build & assign impulse responses
-    const ir = makeAtmosIR(ac, atmosScene, spaceAmt, heightAmt, depthAmt);
-    nodes.atmosEarlyConv.buffer = ir;
-    nodes.atmosLateConv.buffer  = ir;
+    // 초기 반사와 후기 잔향에 서로 다른 IR을 쓴다
+    nodes.atmosEarlyConv.buffer = makeAtmosIR(ac, atmosScene, spaceAmt, heightAmt, depthAmt, 'early');
+    nodes.atmosLateConv.buffer  = makeAtmosIR(ac, atmosScene, spaceAmt, heightAmt, depthAmt, 'late');
 
     // 레벨 설계: dry + wet = 1.0 합계 유지 (합산 시 레벨 폭발 방지)
     // wet 내부 분배: early 50% + late 25% + object 25% = 100%
@@ -3037,7 +3511,12 @@ function connectLiveChain(nodes, ac) {
     nodes.mbOutGain4.connect(nodes.mbMixGain);
 
     nodes.mbMixGain.connect(nodes.limiter);
-    chain = nodes.limiter;
+    // 스테레오 폭은 리미터 뒤. 앞에 두면 폭으로 커진 피크를 리미터가 다시 눌러
+    // 설정값과 결과가 어긋난다.
+    nodes.limiter.connect(nodes.masterWidth.in);
+    // 브릭월 세이프티는 최종단 — 폭 조절로 커진 피크까지 묶는다
+    nodes.masterWidth.out.connect(nodes.ceilClip.in);
+    chain = nodes.ceilClip.out;
   }
 
   // ── DOM 순서대로 처리 ───────────────────────────────────────────────
@@ -3160,6 +3639,10 @@ function applyLiveDSP() {
     nodes.vinylHighRolloff.frequency.value = 8000;
     nodes.vinylHighRolloff.gain.value = -wearVal * 4;
     nodes.vinylNoiseGain.gain.value = crackleVal * 0.03;
+    setWobble(nodes.vinylWobble,
+      parseFloat(document.getElementById('vinylWobble').value) / 100);
+    setCrosstalk(nodes.vinylXtalk,
+      parseFloat(document.getElementById('vinylCross').value) / 100);
   }
 
   // Exciter
@@ -3168,6 +3651,8 @@ function applyLiveDSP() {
   const excMixVal = parseFloat(document.getElementById('excMix').value) / 100;
   if (nodes.excHPF && document.getElementById('exciterOn').checked) {
     nodes.excHPF.frequency.value = excFreq;
+    // 차단점이 FREQ보다 낮아지면 대역이 사라지므로 하한을 둔다
+    nodes.excAALPF.frequency.value = Math.max(excFreq * 1.4, ctx().sampleRate / 3);
     nodes.excBPF.frequency.value = excFreq * 1.5;
     nodes.excBPF.Q.value = 0.8;
     nodes.excShaper.curve = makeExciterCurve(excDriveVal);
@@ -3207,11 +3692,16 @@ function applyLiveDSP() {
   const sgHiSat  = parseFloat(document.getElementById('sgHiSat').value)  / 100;
   const sgStereo = parseFloat(document.getElementById('sgStereo').value) / 100;
   const preset = SG_MODES[sgMode];
-  if (nodes.sgLPF && document.getElementById('sgOn').checked) {
-    nodes.sgLPF.frequency.value  = preset.loFreq;
-    nodes.sgBPF.frequency.value  = (preset.loFreq + preset.hiFreq) / 2;
-    nodes.sgBPF.Q.value          = preset.loQ;
-    nodes.sgHPF.frequency.value  = preset.hiFreq;
+  if (nodes.sgLoLP && document.getElementById('sgOn').checked) {
+    nodes.sgLoLP.a.frequency.value = preset.loFreq;
+    nodes.sgLoLP.b.frequency.value = preset.loFreq;
+    nodes.sgMidHP.a.frequency.value = preset.loFreq;
+    nodes.sgMidHP.b.frequency.value = preset.loFreq;
+    nodes.sgMidLP.a.frequency.value = preset.hiFreq;
+    nodes.sgMidLP.b.frequency.value = preset.hiFreq;
+    nodes.sgHiHP.a.frequency.value = preset.hiFreq;
+    nodes.sgHiHP.b.frequency.value = preset.hiFreq;
+    nodes.sgHiAA.frequency.value = Math.max(preset.hiFreq * 1.4, ctx().sampleRate / 3);
     nodes.sgLowShaper.curve = makeSGCurve(sgLowSat, preset.drive);
     nodes.sgMidShaper.curve = makeSGCurve(sgMidSat, preset.drive * 0.85);
     nodes.sgHiShaper.curve  = makeSGCurve(sgHiSat,  preset.drive * 0.7);
@@ -3222,9 +3712,10 @@ function applyLiveDSP() {
     nodes.sgWet.gain.value  = sgAmount * 0.6;
     nodes.sgMixOut.gain.value = 1.0 / (1 + sgAmount * 0.3); // prevent clipping
     nodes.sgDynEQ.gain.value = sgAmount * 3; // subtle presence boost
-    // Stereo enhancement (reflected in output comp release — wider = slower release = more space)
-    nodes.sgOutputComp.release.value = 0.08 + sgStereo * 0.22;
+    // 릴리즈는 고정. STEREO는 아래에서 실제 스테레오 폭을 조절한다.
+    nodes.sgOutputComp.release.value = 0.20;
     nodes.sgOutputComp.threshold.value = -10 - sgAmount * 8;
+    setStereoWidth(nodes.sgWidth, sgStereo * 2);   // 0=모노, 0.5=원본, 1.0=2배
     // Update SG meter
     const sgGR = Math.max(0, -nodes.sgOutputComp.reduction) * 5;
     document.getElementById('sgMeter').style.width = Math.min(100, sgGR + sgAmount * 40) + '%';
@@ -3283,7 +3774,11 @@ function applyLiveDSP() {
     nodes.mbMixGain.gain.value = 1.0;
 
     if (nodes.limiter) {
-      nodes.limiter.threshold.value = parseFloat(document.getElementById('limiterCeil').value);
+      const _ceil = parseFloat(document.getElementById('limiterCeil').value);
+      nodes.limiter.threshold.value = _ceil;
+      setCeilingClip(nodes.ceilClip, _ceil);
+      // 스테레오 폭 (0~200 → 0~2.0, 100이 원본)
+      setStereoWidth(nodes.masterWidth, width);
       nodes.limiter.ratio.value     = 20;
       nodes.limiter.attack.value    = 0.001;
       nodes.limiter.release.value   = 0.050;
@@ -3367,6 +3862,12 @@ function pausePlay() {
 function stopPlay() {
   if (srcNode) { try { srcNode.stop(); } catch(e){} srcNode = null; }
   if (liveDSP.vinylNoiseSource) try { liveDSP.vinylNoiseSource.stop(); } catch(e){}
+  // 와우/플러터 LFO도 정지시킨다. 체인은 재생마다 새로 만들어지므로
+  // 정리하지 않으면 이전 오실레이터가 계속 돌면서 쌓인다.
+  if (liveDSP.vinylWobble) {
+    try { liveDSP.vinylWobble.wow.stop(); } catch(e){}
+    try { liveDSP.vinylWobble.flt.stop(); } catch(e){}
+  }
   isPlaying = false; pausedAt = 0;
   document.getElementById('playBtn').textContent = '▶ PLAY';
   document.getElementById('progInner').style.width = '0%';
@@ -4054,7 +4555,16 @@ async function buildOfflineChain(offCtx, params) {
   function applyTube() {
     if (!params.tubeEnabled) return;
     const inHPF = ac.createBiquadFilter(); inHPF.type='highpass'; inHPF.frequency.value=100+params.tubeDrive*80; inHPF.Q.value=0.5;
-    const ws = ac.createWaveShaper(); ws.curve=makeTubeCurve(params.tubeDrive, params.tubeBias); ws.oversample='2x';
+    // 포화 전 대역 제한. 4배 오버샘플링에서 가청 앨리어싱은 3.5·sr 위 성분이
+    // 접혀 생기므로, 입력을 sr/3으로 묶으면 7차에서 10.5차로 밀려난다.
+    const aaLPF = ac.createBiquadFilter(); aaLPF.type='lowpass';
+    aaLPF.frequency.value = ac.sampleRate / 3; aaLPF.Q.value = 0.707;
+    const ws = ac.createWaveShaper(); ws.curve=makeTubeCurve(params.tubeDrive, params.tubeBias); ws.oversample='4x';
+    // DC 차단 — 비대칭 포화는 직류 오프셋을 만든다. 포화 이후 경로에
+    // 고역 통과가 하나도 없어 오프셋이 출력까지 그대로 갔다(마스터 밴드1은 저역 통과).
+    // 직류는 헤드룸을 잠식하고 리미터 동작점을 한쪽으로 밀어낸다.
+    const tubeDC = ac.createBiquadFilter(); tubeDC.type='highpass';
+    tubeDC.frequency.value=12; tubeDC.Q.value=0.707;
     const outLPF = ac.createBiquadFilter(); outLPF.type='lowshelf'; outLPF.frequency.value=6000; outLPF.gain.value=-(1+params.tubeDrive*4);
     const outHiCut = ac.createBiquadFilter(); outHiCut.type='highshelf'; outHiCut.frequency.value=9000; outHiCut.gain.value=-(2+params.tubeDrive*6);
     const loComp = ac.createBiquadFilter(); loComp.type='peaking'; loComp.frequency.value=100; loComp.Q.value=0.8; loComp.gain.value=1.5+params.tubeDrive*3;
@@ -4064,7 +4574,8 @@ async function buildOfflineChain(offCtx, params) {
     const mixOut = ac.createGain();
     const outG = ac.createGain(); outG.gain.value=Math.pow(10, params.tubeOut/20);
     chain.connect(lowLPF); lowLPF.connect(lowByp); lowByp.connect(mixOut);
-    chain.connect(inHPF); inHPF.connect(ws); ws.connect(outLPF); outLPF.connect(outHiCut); outHiCut.connect(loComp); loComp.connect(wet); wet.connect(mixOut);
+    chain.connect(inHPF); inHPF.connect(aaLPF); aaLPF.connect(ws);
+    ws.connect(tubeDC); tubeDC.connect(outLPF); outLPF.connect(outHiCut); outHiCut.connect(loComp); loComp.connect(wet); wet.connect(mixOut);
     mixOut.connect(outG);
     chain = outG;
   }
@@ -4078,18 +4589,33 @@ async function buildOfflineChain(offCtx, params) {
     noiseSrc.connect(noiseG); noiseG.connect(hsh);
     chain.connect(lpf); lpf.connect(hsh);
     noiseSrc.start(0);
-    chain = hsh;
+    // 피치 변조와 누화는 값이 0이어도 항상 체인에 넣는다.
+    // 라이브 체인은 노드를 재사용해 항상 연결되어 있으므로,
+    // 조건부로 넣으면 지연 6ms만큼 양쪽 결과가 어긋난다.
+    const wb = buildWobble(ac);
+    setWobble(wb, params.vinylWobble);
+    hsh.connect(wb.in);
+
+    const ct = buildCrosstalk(ac);
+    setCrosstalk(ct, params.vinylCross);
+    wb.out.connect(ct.in);
+
+    chain = ct.out;
   }
 
   function applyExciter() {
     if (!params.excEnabled) return;
     const hpf = ac.createBiquadFilter(); hpf.type='highpass'; hpf.frequency.value=params.excFreq;
-    const shaper = ac.createWaveShaper(); shaper.curve=makeExciterCurve(params.excDrive); shaper.oversample='2x';
+    // 포화 전 대역 제한 — 차단점이 FREQ보다 낮아지지 않도록 하한을 둔다
+    const excAA = ac.createBiquadFilter(); excAA.type='lowpass';
+    excAA.frequency.value = Math.max(params.excFreq * 1.4, ac.sampleRate / 3);
+    excAA.Q.value = 0.707;
+    const shaper = ac.createWaveShaper(); shaper.curve=makeExciterCurve(params.excDrive); shaper.oversample='4x';
     const bpf = ac.createBiquadFilter(); bpf.type='bandpass'; bpf.frequency.value=params.excFreq*1.5; bpf.Q.value=0.8;
     const dry = ac.createGain(); dry.gain.value=1;
     const wet = ac.createGain(); wet.gain.value=params.excMix*0.5;
     const mix = ac.createGain();
-    chain.connect(dry); chain.connect(hpf); hpf.connect(shaper); shaper.connect(bpf); bpf.connect(wet);
+    chain.connect(dry); chain.connect(hpf); hpf.connect(excAA); excAA.connect(shaper); shaper.connect(bpf); bpf.connect(wet);
     dry.connect(mix); wet.connect(mix);
     chain = mix;
   }
@@ -4100,34 +4626,72 @@ async function buildOfflineChain(offCtx, params) {
     const dry = ac.createGain(); dry.gain.value = 1.0;
     const wetBus = ac.createGain(); wetBus.gain.value = params.sgAmount * 0.6;
     const mixOut = ac.createGain(); mixOut.gain.value = 1.0 / (1 + params.sgAmount * 0.3);
-    const lpf = ac.createBiquadFilter(); lpf.type='lowpass'; lpf.frequency.value=preset.loFreq;
+    // Linkwitz-Riley 4차 상보 분할.
+    // 예전에는 LPF + BPF + HPF 병렬이라 합산 응답이 평탄하지 않았고
+    // 경계에서 에너지가 중복 가산됐다. 버터워스 2차를 2단으로 쌓으면
+    // 분할점에서 −6dB로 만나 합이 평탄해진다.
+    function lr(type, freq) {
+      const a = ac.createBiquadFilter(); a.type=type; a.frequency.value=freq; a.Q.value=0.707;
+      const b = ac.createBiquadFilter(); b.type=type; b.frequency.value=freq; b.Q.value=0.707;
+      a.connect(b); return { in: a, out: b };
+    }
+
+    // 저역: LR-LP(loFreq)
+    const sgLo = lr('lowpass', preset.loFreq);
     const lSh = ac.createWaveShaper(); lSh.curve=makeSGCurve(params.sgLowSat, preset.drive); lSh.oversample='4x';
     const lG = ac.createGain(); lG.gain.value = params.sgLowSat * 0.7;
-    chain.connect(lpf); lpf.connect(lSh); lSh.connect(lG); lG.connect(wetBus);
-    const bpf = ac.createBiquadFilter(); bpf.type='bandpass'; bpf.frequency.value=(preset.loFreq+preset.hiFreq)/2; bpf.Q.value=preset.loQ;
+    // 저역 밴드만 DC 차단이 필요하다. 중·고역은 크로스오버의 고역 통과가 겸한다.
+    const sgLoDC = ac.createBiquadFilter(); sgLoDC.type='highpass';
+    sgLoDC.frequency.value=12; sgLoDC.Q.value=0.707;
+    chain.connect(sgLo.in); sgLo.out.connect(lSh); lSh.connect(sgLoDC);
+    sgLoDC.connect(lG); lG.connect(wetBus);
+
+    // 중역: LR-HP(loFreq) → LR-LP(hiFreq)
+    const sgMidHi = lr('highpass', preset.loFreq);
+    const sgMidLo = lr('lowpass',  preset.hiFreq);
     const mSh = ac.createWaveShaper(); mSh.curve=makeSGCurve(params.sgMidSat, preset.drive*0.85); mSh.oversample='4x';
     const mG = ac.createGain(); mG.gain.value = params.sgMidSat * 0.5;
-    chain.connect(bpf); bpf.connect(mSh); mSh.connect(mG); mG.connect(wetBus);
-    const hpf2 = ac.createBiquadFilter(); hpf2.type='highpass'; hpf2.frequency.value=preset.hiFreq;
-    const hSh = ac.createWaveShaper(); hSh.curve=makeSGCurve(params.sgHiSat, preset.drive*0.7); hSh.oversample='2x';
+    chain.connect(sgMidHi.in); sgMidHi.out.connect(sgMidLo.in);
+    sgMidLo.out.connect(mSh); mSh.connect(mG); mG.connect(wetBus);
+
+    // 고역: LR-HP(hiFreq)
+    const sgHi = lr('highpass', preset.hiFreq);
+    // 고역 밴드만 포화 전 대역 제한이 필요하다. 저·중역은 크로스오버가 이미 묶는다.
+    const sgHiAA = ac.createBiquadFilter(); sgHiAA.type='lowpass';
+    sgHiAA.frequency.value = Math.max(preset.hiFreq * 1.4, ac.sampleRate / 3);
+    sgHiAA.Q.value = 0.707;
+    const hSh = ac.createWaveShaper(); hSh.curve=makeSGCurve(params.sgHiSat, preset.drive*0.7); hSh.oversample='4x';
     const hG = ac.createGain(); hG.gain.value = params.sgHiSat * 0.4;
-    chain.connect(hpf2); hpf2.connect(hSh); hSh.connect(hG); hG.connect(wetBus);
+    chain.connect(sgHi.in); sgHi.out.connect(sgHiAA); sgHiAA.connect(hSh); hSh.connect(hG); hG.connect(wetBus);
     chain.connect(dry); dry.connect(mixOut); wetBus.connect(mixOut);
     const dynEQ = ac.createBiquadFilter(); dynEQ.type='peaking'; dynEQ.frequency.value=2500; dynEQ.Q.value=0.7; dynEQ.gain.value=params.sgAmount*3;
     const outComp = ac.createDynamicsCompressor();
     outComp.threshold.value = -10 - params.sgAmount*8; outComp.ratio.value=2;
-    outComp.attack.value=0.003; outComp.release.value=0.08+params.sgStereo*0.22; outComp.knee.value=6;
+    // 릴리즈는 고정. 예전에는 STEREO가 여기에 묶여 있어 이름과 동작이 달랐다.
+    outComp.attack.value=0.003; outComp.release.value=0.20; outComp.knee.value=6;
     mixOut.connect(dynEQ); dynEQ.connect(outComp);
-    chain = outComp;
+    let sgTail = outComp;
+
+    // STEREO는 실제 스테레오 폭을 조절한다 (0=모노, 0.5=원본, 1.0=2배)
+    const sgW = params.sgStereo * 2;
+    if (Math.abs(sgW - 1) > 0.01) {
+      const sw = buildStereoWidth(ac);
+      setStereoWidth(sw, sgW);
+      sgTail.connect(sw.in);
+      sgTail = sw.out;
+    }
+    chain = sgTail;
   }
 
   function applyAtmos() {
     if (!params.atmosEnabled) return;
-    const ir = makeAtmosIR(ac, params.atmosScene, params.atmosSpace, params.atmosHeight, params.atmosDepth);
-    const earlyConv = ac.createConvolver(); earlyConv.normalize = false; earlyConv.buffer = ir;
+    // 초기 반사와 후기 잔향에 서로 다른 IR을 쓴다
+    const irEarly = makeAtmosIR(ac, params.atmosScene, params.atmosSpace, params.atmosHeight, params.atmosDepth, 'early');
+    const irLate  = makeAtmosIR(ac, params.atmosScene, params.atmosSpace, params.atmosHeight, params.atmosDepth, 'late');
+    const earlyConv = ac.createConvolver(); earlyConv.normalize = false; earlyConv.buffer = irEarly;
     const earlyGain = ac.createGain(); earlyGain.gain.value = params.atmosMix * params.atmosReverb * 0.50;
     const heightEQ  = ac.createBiquadFilter(); heightEQ.type='highShelf'; heightEQ.frequency.value=8000; heightEQ.gain.value=params.atmosHeight*6;
-    const lateConv  = ac.createConvolver(); lateConv.normalize = false; lateConv.buffer = ir;
+    const lateConv  = ac.createConvolver(); lateConv.normalize = false; lateConv.buffer = irLate;
     const lateGain  = ac.createGain(); lateGain.gain.value = params.atmosMix * params.atmosReverb * 0.25;
     const splitter  = ac.createChannelSplitter(2);
     const haasL     = ac.createDelay(0.05); haasL.delayTime.value = 0.0;
@@ -4195,7 +4759,26 @@ async function buildOfflineChain(offCtx, params) {
     limiter.threshold.value=params.limCeil; limiter.ratio.value=20;
     limiter.attack.value=0.001; limiter.release.value=0.050; limiter.knee.value=0;
     mixG.connect(limiter);
-    chain = limiter;
+    let mTail = limiter;
+
+    // 스테레오 폭 — 리미터 뒤에 둔다. 앞에 두면 폭 조절로 커진 피크를
+    // 리미터가 다시 눌러 설정값과 결과가 어긋난다.
+    const mw = params.stereoWidth;
+    if (Math.abs(mw - 1) > 0.005) {
+      const sw = buildStereoWidth(ac);
+      setStereoWidth(sw, mw);
+      mTail.connect(sw.in);
+      mTail = sw.out;
+    }
+
+    // 브릭월 세이프티는 반드시 최종단. 폭을 넓히면 사이드 성분이 더해져
+    // 피크가 다시 천장을 넘을 수 있으므로 그 뒤에서 묶어야 한다.
+    const cc = buildCeilingClip(ac);
+    setCeilingClip(cc, params.limCeil);
+    mTail.connect(cc.in);
+    mTail = cc.out;
+
+    chain = mTail;
   }
 
   const EFFECT_FN = {
@@ -4298,6 +4881,7 @@ function getParams(inputBuffer) {
     mbMid: parseFloat(document.getElementById('mbMid').value),
     mbHigh: parseFloat(document.getElementById('mbHigh').value),
     limCeil: parseFloat(document.getElementById('limiterCeil').value),
+    stereoWidth: parseFloat(document.getElementById('stereoWidth').value) / 100,
     outputGain: Math.pow(10, parseFloat(document.getElementById('masterGain').value)/20),
     atmosEnabled: document.getElementById('atmosOn').checked,
     atmosScene:   atmosScene,
@@ -4485,7 +5069,9 @@ async function applyHDRestoration(buffer, targetSR, bitDepth, hfStrength, smooth
         const lo2=Math.floor(j2),hi2=Math.min(lo2+1,half),f2=j2-lo2;
         if(lo2>=1){
           const m=(oMag[lo2]*(1-f2)+oMag[Math.min(hi2,half)]*f2)*levels[0]*lvlScale;
-          const p=Math.atan2(oIm[lo2],oRe[lo2]);
+          // 위상 배수 보정: 주파수가 n배면 위상도 n배여야 배음 관계가 유지된다.
+          // 예전에는 원본 위상을 그대로 써서 시간 영역 정합이 깨져 있었다.
+          const p=Math.atan2(oIm[lo2],oRe[lo2])*2;
           re[k]+=m*Math.cos(p)*wH; im[k]+=m*Math.sin(p)*wH;
         }
       }
@@ -4508,7 +5094,7 @@ async function applyHDRestoration(buffer, targetSR, bitDepth, hfStrength, smooth
           const dk=j*order;
           if(dk<1||dk>half)continue;
           const m=oMag[j]*lev;
-          const p=Math.atan2(oIm[j],oRe[j]);
+          const p=Math.atan2(oIm[j],oRe[j])*order;   // 위상 배수 보정
           let w=1.0;
           if(dk<cLo){
             const t=(dk-fLo)/Math.max(1,cLo-fLo);
@@ -4805,6 +5391,105 @@ document.getElementById('expUHD').addEventListener('click', () => exportAudio('u
   if (cv) cv.addEventListener('click', toggleSpecMode);
 });
 
+// ============================================================
+// 게시 페이지용 저장 경로
+// ------------------------------------------------------------
+// 로컬 파일로 열면 a[download]로 바로 저장된다.
+// claude.ai에 게시된 상태에서는 그 경로가 막혀 있고 downloads 기능을 써야 하는데,
+// 허용 확장자 목록에 wav가 없다. zip은 있으므로 무압축(store)으로 감싸 넘긴다.
+// ============================================================
+
+// CRC-32 (IEEE 802.3) — zip 항목 검증용
+const _crcTable = (function () {
+  const t = new Uint32Array(256);
+  for (let n = 0; n < 256; n++) {
+    let c = n;
+    for (let k = 0; k < 8; k++) c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
+    t[n] = c >>> 0;
+  }
+  return t;
+})();
+function crc32(u8) {
+  let c = 0xFFFFFFFF;
+  for (let i = 0; i < u8.length; i++) c = _crcTable[(c ^ u8[i]) & 0xFF] ^ (c >>> 8);
+  return (c ^ 0xFFFFFFFF) >>> 0;
+}
+
+// 단일 항목 무압축 zip. 4GB 미만이므로 zip64는 쓰지 않는다.
+function makeStoreZip(name, bytes) {
+  const enc  = new TextEncoder();
+  const nm   = enc.encode(name);
+  const crc  = crc32(bytes);
+  const size = bytes.length;
+
+  // MS-DOS 날짜/시각. 0을 그대로 두면 1980-00-00 같은 무효 값으로 표시된다.
+  const d = new Date();
+  const dosTime = (d.getHours() << 11) | (d.getMinutes() << 5) | (d.getSeconds() >> 1);
+  const dosDate = ((Math.max(1980, d.getFullYear()) - 1980) << 9) | ((d.getMonth() + 1) << 5) | d.getDate();
+
+  const put = (dv, o, vals) => {
+    let p = o;
+    for (const [w, v] of vals) {
+      if (w === 2) { dv.setUint16(p, v, true); p += 2; }
+      else         { dv.setUint32(p, v, true); p += 4; }
+    }
+    return p;
+  };
+
+  const lh = new Uint8Array(30 + nm.length);
+  const lv = new DataView(lh.buffer);
+  put(lv, 0, [[4,0x04034b50],[2,20],[2,0],[2,0],[2,dosTime],[2,dosDate],[4,crc],[4,size],[4,size],[2,nm.length],[2,0]]);
+  lh.set(nm, 30);
+
+  const cd = new Uint8Array(46 + nm.length);
+  const cv = new DataView(cd.buffer);
+  put(cv, 0, [[4,0x02014b50],[2,20],[2,20],[2,0],[2,0],[2,dosTime],[2,dosDate],[4,crc],[4,size],[4,size],
+              [2,nm.length],[2,0],[2,0],[2,0],[2,0],[4,0],[4,0]]);
+  cd.set(nm, 46);
+
+  const eo = new Uint8Array(22);
+  const ev = new DataView(eo.buffer);
+  put(ev, 0, [[4,0x06054b50],[2,0],[2,0],[2,1],[2,1],[4,cd.length],[4,lh.length + size],[2,0]]);
+
+  return new Blob([lh, bytes, cd, eo], { type: 'application/zip' });
+}
+
+// 파일을 사용자에게 건넨다. 게시 환경이면 downloads 기능, 아니면 앵커.
+async function deliverFile(baseName, wavBytes) {
+  let dl = null;
+  try { dl = window.claude && claude.use ? await claude.use('downloads') : null; } catch (e) { dl = null; }
+
+  if (dl) {
+    // 게시 페이지: wav는 허용 확장자가 아니므로 zip으로 감싼다
+    const zip = makeStoreZip(baseName + '.wav', wavBytes);
+    try {
+      await dl.save({ filename: baseName + '.zip', data: zip });
+      return 'saved';
+    } catch (err) {
+      const code = (err && err.code) || 'unavailable';
+      if (code === 'declined')      return 'declined';
+      if (code === 'too_large')     return 'too_large';
+      if (code === 'rate_limited')  return 'rate_limited';
+      return 'unavailable';
+    }
+  }
+
+  // 로컬 파일: 기존 경로
+  const blob = new Blob([wavBytes], { type: 'audio/wav' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url;
+  a.download = baseName + '.wav';
+  a.style.display = 'none';
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(function () {
+    URL.revokeObjectURL(url);
+    if (a.parentNode) a.parentNode.removeChild(a);
+  }, 60000);
+  return 'saved';
+}
+
 var _exporting = false;
 async function exportAudio(mode) {
   if (!sourceBuf || _exporting || _hdLiveBusy) return;
@@ -4960,21 +5645,16 @@ async function exportAudio(mode) {
     await new Promise(r => setTimeout(r, 30));
 
     const wavData = encodeWAV(rendered, bitDepth);
-    const blob = new Blob([wavData], { type: 'audio/wav' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = baseName + suffix + '.wav';
-    // 일부 브라우저는 DOM에 붙지 않은 링크의 클릭을 무시한다
-    a.style.display = 'none';
-    document.body.appendChild(a);
-    a.click();
-    // 즉시 revoke하면 대용량 파일은 저장이 시작되기 전에 URL이 사라져
-    // 다운로드가 조용히 취소된다. 넉넉히 지연시킨 뒤 해제한다.
-    setTimeout(function() {
-      URL.revokeObjectURL(url);
-      if (a.parentNode) a.parentNode.removeChild(a);
-    }, 60000);
+    const result = await deliverFile(baseName + suffix, new Uint8Array(wavData));
+    if (result === 'declined') {
+      setStatus('저장이 취소되었습니다.', 'warn');
+    } else if (result === 'too_large') {
+      setStatus('파일이 너무 커서 저장할 수 없습니다. 더 짧은 구간이나 HD로 시도하세요.', 'err');
+    } else if (result === 'rate_limited') {
+      setStatus('저장 요청이 몰렸습니다. 잠시 후 다시 눌러주세요.', 'warn');
+    } else if (result === 'unavailable') {
+      setStatus('이 환경에서는 저장을 쓸 수 없습니다. 파일을 내려받아 직접 열어주세요.', 'err');
+    }
 
     setOverlayProg(100, '완료!', '▸ 파일 다운로드 준비 완료');
     await new Promise(r => setTimeout(r, 500));
@@ -5422,5 +6102,617 @@ drawTubeViz();
 })();
 </script>
 
+<script>
+/* 로컬(file:)에서는 문서 링크를 같은 폴더 파일로 전환한다. */
+(function () {
+  if (location.protocol !== 'file:') return;
+  var MAP = {
+    'ce8a5d5b-3489-480d-8e39-011fd4c05084': 'analog-soul-dsp.html',
+    'bc046e44-cc26-4a89-ab65-54755e588746': 'analog-soul-manual.html',
+    '0a44a83c-82a8-4893-9a74-6e67f83fadd4': 'analog-soul-plain.html',
+    'addfcd64-f934-4e44-b1e2-e9d9635b3912': 'analog-soul-guide.html',
+    'd28fb51f-1860-4e0b-b4ea-79a015d86e60': 'analog-soul-engineering.html',
+    '7592ce90-adce-4f29-8532-777a382f9004': 'analog-soul-internals.html',
+    'bee5f232-9716-432c-bafd-31255f222978': 'index.html'
+  };
+  var RE = /https:\/\/claude\.ai\/code\/artifact\/([\w-]+)/;
+  Array.prototype.forEach.call(document.querySelectorAll('a[href]'), function (a) {
+    var m = RE.exec(a.getAttribute('href'));
+    if (!m || !MAP[m[1]]) return;
+    a.setAttribute('href', a.getAttribute('href').replace(RE, MAP[m[1]]));
+  });
+})();
+</script>
+<script>
+/* 문서를 옮기면 항상 맨 위에서 시작하도록 강제한다.
+   - 브라우저의 스크롤 자동 복원(history.scrollRestoration)을 끈다.
+   - html에 scroll-behavior:smooth가 걸려 있어 scrollTo가 애니메이션으로 처리되면
+     로딩 중 리플로우에 취소될 수 있다. 이동하는 순간만 auto로 내렸다 되돌린다.
+   - 폰트·이미지 로드로 레이아웃이 늦게 확정되므로 여러 시점에 반복 적용한다. */
+(function () {
+  if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+
+  var root = document.documentElement;
+
+  function jump(fn) {
+    var prev = root.style.scrollBehavior;
+    root.style.scrollBehavior = 'auto';   // 애니메이션 없이 즉시 이동
+    fn();
+    // 다음 프레임에 원복해야 이동이 확정된 뒤에 smooth가 돌아온다
+    requestAnimationFrame(function () { root.style.scrollBehavior = prev; });
+  }
+
+  function toTop() {
+    jump(function () {
+      window.scrollTo(0, 0);
+      if (document.scrollingElement) document.scrollingElement.scrollTop = 0;
+      root.scrollTop = 0;
+      if (document.body) document.body.scrollTop = 0;
+    });
+  }
+
+  function toHash(h) {
+    var el = document.getElementById(h);
+    if (!el) { toTop(); return; }
+    jump(function () { el.scrollIntoView(); });
+  }
+
+  function place() {
+    var h = location.hash ? decodeURIComponent(location.hash.slice(1)) : '';
+    if (h) toHash(h); else toTop();
+  }
+
+  // 스크립트 실행 시점에 한 번
+  place();
+
+  // 레이아웃이 확정되는 여러 시점에 다시 (해시 없을 때만 — 앵커는 한 번이면 충분)
+  function replaceIfTop() { if (!location.hash) toTop(); }
+  document.addEventListener('DOMContentLoaded', replaceIfTop);
+  window.addEventListener('load', function () {
+    place();
+    requestAnimationFrame(replaceIfTop);
+    setTimeout(replaceIfTop, 120);
+  });
+  window.addEventListener('pageshow', function (e) { if (e.persisted) place(); });
+
+  // 현재 문서를 가리키는 툴바 항목(href="#")은 기본 동작이 아무것도 하지 않으므로
+  // 직접 맨 위로 보낸다. 다른 문서로 가는 항목은 이동 후 위 place()가 처리한다.
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest ? e.target.closest('.hub-nav a') : null;
+    if (!a) return;
+    var href = a.getAttribute('href');
+    if (href === '#') { e.preventDefault(); toTop(); }
+  });
+})();
+</script>
+
+<!-- 이탈 확인 -->
+<div class="leave-overlay" id="leaveOverlay">
+  <div class="leave-box" role="alertdialog" aria-modal="true" aria-labelledby="leaveTitle">
+    <div class="leave-head" id="leaveTitle">▲ 저장하지 않은 변경</div>
+    <div class="leave-body">
+      설정을 변경했지만 아직 내보내지 않았습니다.<br>
+      이 페이지를 벗어나면 변경한 값이 모두 사라집니다.
+      <div class="sub">문서를 볼 거라면 새 탭으로 여는 편이 안전합니다.</div>
+      <div class="dest" id="leaveDest"></div>
+    </div>
+    <div class="leave-foot">
+      <button class="leave-btn" id="leaveCancel">머무르기</button>
+      <button class="leave-btn go" id="leaveGo">나가기</button>
+    </div>
+  </div>
+</div>
+<script>
+/* 설정을 바꾼 뒤 다른 문서로 나가려 하면 확인한다.
+   내보내기 전에 나가면 변경한 값이 전부 사라지기 때문이다. */
+(function () {
+  var dirty = false;
+
+  function markDirty(e) {
+    // EULA 모달 내부 조작은 설정 변경이 아니다
+    if (e && e.target && e.target.closest && e.target.closest('#eulaOverlay')) return;
+    dirty = true;
+  }
+
+  document.addEventListener('input',  markDirty, true);
+  document.addEventListener('change', markDirty, true);
+
+  // 모듈 순서 변경도 설정 변경으로 본다
+  var grid = document.getElementById('dspGrid');
+  if (grid) grid.addEventListener('drop', function () { dirty = true; }, true);
+
+  // 초기화하면 변경 사항이 없는 상태로 되돌아간다
+  var reset = document.getElementById('resetBtn');
+  if (reset) reset.addEventListener('click', function () { dirty = false; });
+
+  // ---- 이탈 확인 모달 ----
+  var overlay = document.getElementById('leaveOverlay');
+  var destEl  = document.getElementById('leaveDest');
+  var pending = null;
+
+  function close() { overlay.classList.remove('show'); pending = null; }
+
+  document.getElementById('leaveCancel').addEventListener('click', close);
+  document.getElementById('leaveGo').addEventListener('click', function () {
+    var href = pending;
+    dirty = false;            // 사용자가 승인했으므로 beforeunload는 띄우지 않는다
+    close();
+    if (href) location.href = href;
+  });
+  overlay.addEventListener('click', function (e) { if (e.target === overlay) close(); });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && overlay.classList.contains('show')) close();
+  });
+
+  // 툴바에서 다른 문서로 나가는 클릭을 가로챈다
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest ? e.target.closest('.hub-nav a[href]') : null;
+    if (!a) return;
+    var href = a.getAttribute('href');
+    if (!href || href === '#') return;      // 현재 문서 항목은 대상 아님
+    if (!dirty) return;
+    e.preventDefault();
+    e.stopPropagation();
+    pending = href;
+    destEl.textContent = '이동할 곳 — ' + (a.textContent || '').trim();
+    overlay.classList.add('show');
+  }, true);
+
+  // 새로고침·탭 닫기 등 브라우저 차원의 이탈
+  window.addEventListener('beforeunload', function (e) {
+    if (!dirty) return;
+    e.preventDefault();
+    e.returnValue = '';
+  });
+})();
+</script>
+<script>
+/* ============================================================
+   프리셋 — 모듈 순서·켜짐 상태·전 노브 값을 저장하고 복원한다.
+   음원은 포함하지 않는다. 파일(.json)과 브라우저 슬롯 두 경로.
+   ============================================================ */
+(function () {
+  var FORMAT = 'asde-preset';
+  var VERSION = 1;
+  var SLOT_KEY = 'asde.preset.slot.';
+
+  // 상태바는 EXPORT 아래에 있어 프리셋 패널에서 멀다.
+  // 패널 안에도 같은 메시지를 띄워 조작 결과가 바로 보이게 한다.
+  function say(m, t) {
+    setStatus(m, t);
+    var el = document.getElementById('presetMsg');
+    if (el) { el.textContent = m; el.className = 'preset-msg ' + (t || ''); }
+  }
+
+  function collect() {
+    var d = { format: FORMAT, version: VERSION, savedAt: new Date().toISOString(),
+              sliders: {}, toggles: {}, order: [], sgMode: null, atmosScene: null };
+
+    document.querySelectorAll('input[type=range]').forEach(function (el) {
+      if (el.id) d.sliders[el.id] = el.value;
+    });
+    document.querySelectorAll('input[type=checkbox]').forEach(function (el) {
+      if (el.id) d.toggles[el.id] = el.checked;
+    });
+
+    var grid = document.getElementById('dspGrid');
+    if (grid) grid.querySelectorAll('.module').forEach(function (m) {
+      if (m.id) d.order.push(m.id);
+    });
+
+    var sg = document.querySelector('.sg-mode-btn.active');
+    if (sg) d.sgMode = sg.getAttribute('data-mode');
+    var sc = document.querySelector('.atmos-scene-btn.active');
+    if (sc) d.atmosScene = sc.getAttribute('data-scene');
+
+    return d;
+  }
+
+  // 페이지가 뜬 직후 상태를 기본값으로 보관한다.
+  // 슬라이더와 체크박스는 마크업의 default 속성으로 덮어써서,
+  // 앱 초기화가 값을 건드렸더라도 문서에 적힌 값이 기준이 되게 한다.
+  var DEFAULTS = null;
+  function snapshotDefaults() {
+    var d = collect();
+    document.querySelectorAll('input[type=range]').forEach(function (el) {
+      if (el.id) d.sliders[el.id] = el.defaultValue;
+    });
+    document.querySelectorAll('input[type=checkbox]').forEach(function (el) {
+      if (el.id) d.toggles[el.id] = el.defaultChecked;
+    });
+    return d;
+  }
+
+  function apply(d) {
+    if (!d || d.format !== FORMAT) throw new Error('프리셋 형식이 아닙니다');
+
+    // 1) 씬·모드를 먼저 적용한다. 이 버튼들이 슬라이더를 덮어쓰기 때문이다.
+    if (d.atmosScene) {
+      var sb = document.querySelector('.atmos-scene-btn[data-scene="' + d.atmosScene + '"]');
+      if (sb) sb.click();
+    }
+    if (d.sgMode) {
+      var mb = document.querySelector('.sg-mode-btn[data-mode="' + d.sgMode + '"]');
+      if (mb) mb.click();
+    }
+
+    // 2) 슬라이더. 저장된 값이 씬 프리셋 값을 이긴다.
+    Object.keys(d.sliders || {}).forEach(function (id) {
+      var el = document.getElementById(id);
+      if (!el) return;
+      el.value = d.sliders[id];
+      el.dispatchEvent(new Event('input', { bubbles: true }));
+    });
+
+    // 3) 토글. LIVE 계열은 무거운 재렌더를 부르므로 마지막에 따로 처리한다.
+    var live = [];
+    Object.keys(d.toggles || {}).forEach(function (id) {
+      var el = document.getElementById(id);
+      if (!el) return;
+      if (id === 'hdLiveOn' || id === 'uhdLiveOn') { live.push([el, d.toggles[id]]); return; }
+      if (el.checked !== d.toggles[id]) {
+        el.checked = d.toggles[id];
+        el.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+    });
+
+    // 4) 모듈 순서
+    var grid = document.getElementById('dspGrid');
+    if (grid && d.order && d.order.length) {
+      d.order.forEach(function (id) {
+        var m = document.getElementById(id);
+        if (m && m.parentNode === grid) grid.appendChild(m);
+      });
+      // 마스터와 HD 패널은 항상 끝
+      var master = document.getElementById('mod-master');
+      var hd = document.getElementById('mod-hd');
+      if (master) grid.appendChild(master);
+      if (hd) grid.appendChild(hd);
+      if (typeof isPlaying !== 'undefined' && isPlaying && typeof hotswapDSP === 'function') hotswapDSP();
+    }
+
+    live.forEach(function (pair) {
+      if (pair[0].checked !== pair[1]) {
+        pair[0].checked = pair[1];
+        pair[0].dispatchEvent(new Event('change', { bubbles: true }));
+      }
+    });
+  }
+
+  function stamp() {
+    var t = new Date(), p = function (n) { return ('0' + n).slice(-2); };
+    return t.getFullYear() + p(t.getMonth() + 1) + p(t.getDate()) + '-' + p(t.getHours()) + p(t.getMinutes());
+  }
+
+  // ---- 파일 저장 ----
+  document.getElementById('presetSave').addEventListener('click', async function () {
+    var json = JSON.stringify(collect(), null, 2);
+    var name = 'asde-preset-' + stamp() + '.json';
+    var dl = null;
+    try { dl = (window.claude && claude.use) ? await claude.use('downloads') : null; } catch (e) { dl = null; }
+    if (dl) {
+      try { await dl.save({ filename: name, data: json }); say('프리셋을 저장했습니다.', 'ok'); }
+      catch (err) {
+        var c = (err && err.code) || '';
+        say(c === 'declined' ? '저장이 취소되었습니다.' : '프리셋 저장에 실패했습니다.', c === 'declined' ? 'warn' : 'err');
+      }
+      return;
+    }
+    var blob = new Blob([json], { type: 'application/json' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = name; a.style.display = 'none';
+    document.body.appendChild(a); a.click();
+    setTimeout(function () { URL.revokeObjectURL(url); if (a.parentNode) a.parentNode.removeChild(a); }, 30000);
+    say('프리셋을 저장했습니다.', 'ok');
+  });
+
+  // ---- 불러오기 — 파일 종류를 스스로 판별한다 ----
+  // 설정 파일(asde-preset)이면 지금 값에 적용하고,
+  // 슬롯 백업(asde-slots)이면 슬롯을 되돌린다. 사용자가 고를 필요가 없다.
+  function importText(text, name) {
+    var d;
+    try { d = JSON.parse(text); }
+    catch (e) { say('JSON 파일이 아닙니다 — ' + name, 'err'); return; }
+
+    if (d && d.format === FORMAT) {
+      try { apply(d); say('설정을 적용했습니다 — ' + name, 'ok'); }
+      catch (e) { say('설정을 적용하지 못했습니다: ' + e.message, 'err'); }
+      return;
+    }
+
+    if (d && d.format === BUNDLE) {
+      var wrote = 0, failed = 0;
+      SLOTS.forEach(function (k) {
+        var v = d.slots ? d.slots[k] : null;
+        if (v && v.format === FORMAT) {
+          if (slotSet(k, JSON.stringify(v))) wrote++; else failed++;
+        } else {
+          try { localStorage.removeItem(SLOT_KEY + k); } catch (e) {}
+        }
+      });
+      refreshSlots();
+      if (failed) { say('일부 슬롯을 쓰지 못했습니다. 저장 공간을 확인하세요.', 'err'); return; }
+      say('슬롯 ' + wrote + '개를 되돌렸습니다. 현재 설정은 그대로입니다.', 'ok');
+      return;
+    }
+
+    say('이 프로그램의 프리셋 파일이 아닙니다 — ' + name, 'err');
+  }
+
+  function importFile(f) {
+    if (!f) return;
+    var r = new FileReader();
+    r.onload = function () { importText(r.result, f.name); };
+    r.onerror = function () { say('파일을 읽지 못했습니다.', 'err'); };
+    r.readAsText(f);
+  }
+
+  var pf = document.getElementById('presetFile');
+  document.getElementById('presetLoad').addEventListener('click', function () { pf.click(); });
+  pf.addEventListener('change', function () { importFile(pf.files && pf.files[0]); pf.value = ''; });
+
+  // 패널에 파일을 끌어다 놓아도 동일하게 처리
+  var panel = document.getElementById('presetPanel');
+  ['dragenter', 'dragover'].forEach(function (ev) {
+    panel.addEventListener(ev, function (e) {
+      e.preventDefault(); e.stopPropagation();
+      panel.style.borderColor = 'var(--blue)';
+    });
+  });
+  ['dragleave', 'drop'].forEach(function (ev) {
+    panel.addEventListener(ev, function (e) {
+      e.preventDefault(); e.stopPropagation();
+      panel.style.borderColor = '';
+    });
+  });
+  panel.addEventListener('drop', function (e) {
+    var f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+    importFile(f);
+  });
+
+  // ---- 브라우저 슬롯 ----
+  function slotGet(n) {
+    try { return localStorage.getItem(SLOT_KEY + n); } catch (e) { return null; }
+  }
+  function slotSet(n, v) {
+    try { localStorage.setItem(SLOT_KEY + n, v); return true; } catch (e) { return false; }
+  }
+  var SLOTS = ['1', '2', '3', '4'];
+  var BUNDLE = 'asde-slots';
+
+  function refreshSlots() {
+    var n = 0;
+    document.querySelectorAll('.slot-btn[data-slot]').forEach(function (b) {
+      var has = !!slotGet(b.getAttribute('data-slot'));
+      if (has) n++;
+      b.classList.toggle('filled', has);
+    });
+    var c = document.getElementById('slotsCount');
+    if (c) c.textContent = n ? (n + ' / 4 사용 중') : '전부 비어 있음';
+    var bk = document.getElementById('slotsBackup');
+    if (bk) bk.disabled = (n === 0);
+  }
+
+  // ---- 슬롯 복사 ----
+  // 복사 → 원본 슬롯 → 대상 슬롯 순으로 누른다.
+  var copyMode = false, copySrc = null, eraseMode = false;
+  var copyBtn  = document.getElementById('slotCopy');
+  var eraseBtn = document.getElementById('slotErase');
+  var panelEl  = document.getElementById('presetPanel');
+
+  function copyReset() {
+    copyMode = false; copySrc = null;
+    copyBtn.classList.remove('copying');
+    panelEl.classList.remove('copy-mode');
+    document.querySelectorAll('.slot-btn[data-slot]').forEach(function (x) { x.classList.remove('src'); });
+  }
+
+  function eraseReset() {
+    eraseMode = false;
+    eraseBtn.classList.remove('erasing');
+    panelEl.classList.remove('erase-mode');
+  }
+
+  function allReset() { copyReset(); eraseReset(); }
+
+  // 지울 슬롯을 고른다
+  function erasePick(n) {
+    if (!slotGet(n)) {
+      say('SLOT ' + n + '은 이미 비어 있습니다.', 'warn');
+      return;                                  // 모드 유지 — 다시 고를 수 있게
+    }
+    try {
+      localStorage.removeItem(SLOT_KEY + n);
+      refreshSlots();
+      say('SLOT ' + n + '을 비웠습니다.', 'ok');
+    } catch (e) {
+      say('브라우저 저장 공간을 쓸 수 없습니다.', 'err');
+    }
+    eraseReset();
+  }
+
+  function copyPick(n) {
+    if (copySrc === null) {
+      if (!slotGet(n)) {
+        say('SLOT ' + n + '이 비어 있습니다. 내용이 있는 슬롯을 고르세요.', 'warn');
+        return;                                  // 모드는 유지해 다시 고를 수 있게 한다
+      }
+      copySrc = n;
+      var el = document.querySelector('.slot-btn[data-slot="' + n + '"]');
+      if (el) el.classList.add('src');
+      say('SLOT ' + n + ' 선택됨. 붙여넣을 슬롯을 누르세요.', '');
+      return;
+    }
+    if (n === copySrc) {
+      say('같은 슬롯입니다. 다른 슬롯을 고르세요.', 'warn');
+      return;
+    }
+    var v = slotGet(copySrc);
+    var had = !!slotGet(n);
+    if (v && slotSet(n, v)) {
+      refreshSlots();
+      say('SLOT ' + copySrc + ' → SLOT ' + n + ' 복사 완료' + (had ? ' (기존 내용 덮어씀)' : '') + '.', 'ok');
+    } else {
+      say('복사하지 못했습니다. 저장 공간을 확인하세요.', 'err');
+    }
+    copyReset();
+  }
+
+  copyBtn.addEventListener('click', function () {
+    if (copyMode) { copyReset(); say('복사를 취소했습니다.', ''); return; }
+    eraseReset();                                  // 두 모드는 동시에 켜지지 않는다
+    copyMode = true; copySrc = null;
+    copyBtn.classList.add('copying');
+    panelEl.classList.add('copy-mode');
+    say('복사할 원본 슬롯을 누르세요. 복사를 다시 누르면 취소됩니다.', '');
+  });
+
+  eraseBtn.addEventListener('click', function () {
+    if (eraseMode) { eraseReset(); say('비우기를 취소했습니다.', ''); return; }
+    copyReset();
+    eraseMode = true;
+    eraseBtn.classList.add('erasing');
+    panelEl.classList.add('erase-mode');
+    say('비울 슬롯을 누르세요. 다시 누르면 취소됩니다.', '');
+  });
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key !== 'Escape') return;
+    if (copyMode)  { copyReset();  say('복사를 취소했습니다.', ''); }
+    if (eraseMode) { eraseReset(); say('비우기를 취소했습니다.', ''); }
+  });
+
+  document.querySelectorAll('.slot-btn[data-slot]').forEach(function (b) {
+    var timer = null, held = false;
+    var n = b.getAttribute('data-slot');
+
+    function save() {
+      held = true;
+      if (slotSet(n, JSON.stringify(collect()))) {
+        refreshSlots();
+        say('SLOT ' + n + '에 저장했습니다.', 'ok');
+      } else {
+        say('브라우저 저장 공간을 쓸 수 없습니다.', 'err');
+      }
+    }
+    function down() {
+      if (copyMode || eraseMode) return;     // 특수 모드에서는 저장/불러오기 동작 안 함
+      held = false; timer = setTimeout(save, 600);
+    }
+    function up() {
+      clearTimeout(timer);
+      if (copyMode)  { copyPick(n);  return; }
+      if (eraseMode) { erasePick(n); return; }
+      if (held) return;                      // 길게 누름은 이미 저장 처리됨
+      var v = slotGet(n);
+      if (!v) {
+        // 빈 슬롯은 '설정 없음' 상태를 뜻하므로 기본값으로 되돌린다
+        try {
+          apply(DEFAULTS);
+          say('SLOT ' + n + '이 비어 있어 모든 값을 기본값으로 되돌렸습니다.', '');
+        } catch (e) {
+          say('기본값을 적용하지 못했습니다: ' + e.message, 'err');
+        }
+        return;
+      }
+      try { apply(JSON.parse(v)); say('SLOT ' + n + '을 불러왔습니다.', 'ok'); }
+      catch (e) { say('SLOT ' + n + '을 읽지 못했습니다.', 'err'); }
+    }
+    b.addEventListener('mousedown', down);
+    b.addEventListener('mouseup', up);
+    b.addEventListener('mouseleave', function () { clearTimeout(timer); });
+    b.addEventListener('touchstart', function (e) {
+      if (copyMode || eraseMode) { e.preventDefault(); return; }
+      e.preventDefault(); down();
+    }, { passive: false });
+    b.addEventListener('touchend', function (e) {
+      e.preventDefault();
+      if (copyMode)  { copyPick(n);  return; }
+      if (eraseMode) { erasePick(n); return; }
+      up();
+    });
+  });
+
+  // 전체 삭제는 되돌릴 수 없으므로 한 번 더 확인받는다
+  var clearBtn = document.getElementById('slotClear');
+  var clearArmed = false, clearTimer = null;
+
+  function disarmClear() {
+    clearArmed = false;
+    clearTimeout(clearTimer);
+    clearBtn.classList.remove('armed');
+    clearBtn.textContent = '모든 슬롯 비우기';
+  }
+
+  clearBtn.addEventListener('click', function () {
+    allReset();
+
+    var used = SLOTS.filter(function (n) { return !!slotGet(n); }).length;
+    if (!used) {
+      // 상태바가 멀리 있으므로 버튼에서도 짧게 알린다
+      clearBtn.textContent = '비어 있음';
+      setTimeout(function () { if (!clearArmed) clearBtn.textContent = '모든 슬롯 비우기'; }, 1400);
+      say('저장된 슬롯이 없습니다.', 'warn');
+      return;
+    }
+
+    if (!clearArmed) {
+      clearArmed = true;
+      clearBtn.classList.add('armed');
+      clearBtn.textContent = '정말 지울까요?';
+      say('슬롯 ' + used + '개를 지웁니다. 다시 누르면 실행됩니다.', 'warn');
+      clearTimer = setTimeout(function () {
+        disarmClear();
+        say('전체 비우기를 취소했습니다.', '');
+      }, 6000);
+      return;
+    }
+
+    disarmClear();
+    try {
+      SLOTS.forEach(function (n) { localStorage.removeItem(SLOT_KEY + n); });
+      refreshSlots();
+      say('슬롯 ' + used + '개를 모두 비웠습니다.', '');
+    } catch (e) { say('브라우저 저장 공간을 쓸 수 없습니다.', 'err'); }
+  });
+
+  // ---- 네 슬롯을 한 파일로 ----
+  document.getElementById('slotsBackup').addEventListener('click', async function () {
+    var bundle = { format: BUNDLE, version: 1, savedAt: new Date().toISOString(), slots: {} };
+    var n = 0;
+    SLOTS.forEach(function (k) {
+      var v = slotGet(k);
+      if (!v) { bundle.slots[k] = null; return; }
+      try { bundle.slots[k] = JSON.parse(v); n++; }
+      catch (e) { bundle.slots[k] = null; }   // 깨진 슬롯은 비운 것으로 본다
+    });
+    if (!n) { say('저장된 슬롯이 없습니다.', 'warn'); return; }
+
+    var json = JSON.stringify(bundle, null, 2);
+    var name = 'asde-slots-' + stamp() + '.json';
+    var dl = null;
+    try { dl = (window.claude && claude.use) ? await claude.use('downloads') : null; } catch (e) { dl = null; }
+    if (dl) {
+      try { await dl.save({ filename: name, data: json }); say('슬롯 ' + n + '개를 백업했습니다.', 'ok'); }
+      catch (err) {
+        var c = (err && err.code) || '';
+        say(c === 'declined' ? '저장이 취소되었습니다.' : '백업에 실패했습니다.', c === 'declined' ? 'warn' : 'err');
+      }
+      return;
+    }
+    var blob = new Blob([json], { type: 'application/json' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = name; a.style.display = 'none';
+    document.body.appendChild(a); a.click();
+    setTimeout(function () { URL.revokeObjectURL(url); if (a.parentNode) a.parentNode.removeChild(a); }, 30000);
+    say('슬롯 ' + n + '개를 백업했습니다.', 'ok');
+  });
+
+  DEFAULTS = snapshotDefaults();
+  refreshSlots();
+})();
+</script>
 </body>
 </html>

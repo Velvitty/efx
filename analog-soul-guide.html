@@ -79,8 +79,8 @@ code, .mono { font-family: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monos
 
 /* 목차 */
 .rail {
-  position: sticky; top: 0; align-self: start;
-  max-height: 100vh; overflow-y: auto;
+  position: sticky; top: 34px; align-self: start;
+  max-height: calc(100vh - 34px); overflow-y: auto;
   padding: 30px 22px 44px 0;
   border-right: 1px solid var(--rule-soft);
 }
@@ -245,9 +245,36 @@ footer {
   body { background: #fff; color: #000; font-size: 11pt; }
   h2, h3 { page-break-after: avoid; }
 }
+
+
+
+/* ===== 공통 상단 툴바 — 전 문서 동일 ===== */
+.hub-nav{
+  position:sticky; top:0; z-index:9000;
+  display:flex; align-items:center; gap:2px; flex-wrap:wrap;
+  padding:7px 16px; min-height:34px;
+  background:rgba(10,8,12,.95); border-bottom:1px solid #2a2535;
+  font-family:'IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+  font-size:11px; line-height:1.5;
+  backdrop-filter:saturate(150%) blur(8px);
+  -webkit-backdrop-filter:saturate(150%) blur(8px);
+}
+.hub-nav .home{ color:#ffb300; text-decoration:none; letter-spacing:.12em; margin-right:12px; white-space:nowrap; }
+.hub-nav .home:hover{ color:#ffd166; }
+.hub-nav a.hn{ color:#7d7291; text-decoration:none; padding:3px 9px; border-radius:2px; white-space:nowrap; }
+.hub-nav a.hn:hover{ color:#e4dcf0; background:#1c1825; }
+.hub-nav a.hn[aria-current]{ color:#ffb300; background:#1c1825; }
+.hub-nav .sep{ color:#3a3350; }
+@media print{ .hub-nav{ display:none; } }
+
+/* 앵커 이동 시 sticky 툴바에 가리지 않도록 여백 확보 */
+[id]{ scroll-margin-top: 46px; }
 </style>
 </head>
 <body>
+<nav class="hub-nav" aria-label="문서 간 이동">
+  <a class="home" href="https://claude.ai/code/artifact/bee5f232-9716-432c-bafd-31255f222978">◂ 통합 색인</a><a class="hn" href="https://claude.ai/code/artifact/ce8a5d5b-3489-480d-8e39-011fd4c05084">메인 어플리케이션 실행하기</a><span class="sep">/</span><a class="hn" href="https://claude.ai/code/artifact/bc046e44-cc26-4a89-ab65-54755e588746">공식 매뉴얼</a><span class="sep">/</span><a class="hn" href="https://claude.ai/code/artifact/0a44a83c-82a8-4893-9a74-6e67f83fadd4">쉬운 말</a><span class="sep">/</span><a class="hn" href="#" aria-current="page">기술 설명서</a><span class="sep">/</span><a class="hn" href="https://claude.ai/code/artifact/d28fb51f-1860-4e0b-b4ea-79a015d86e60">사양서</a><span class="sep">/</span><a class="hn" href="https://claude.ai/code/artifact/7592ce90-adce-4f29-8532-777a382f9004">논고</a>
+</nav>
 
 <div class="shell">
 
@@ -1331,5 +1358,91 @@ footer {
 })();
 </script>
 
+<script>
+/* 로컬 폴더에서 열렸을 때(file:) 문서 간 링크를 상대 경로로 바꾼다.
+   게시본과 로컬본이 같은 파일이므로 한 벌로 두 환경을 모두 지원한다. */
+(function () {
+  if (location.protocol !== 'file:') return;
+  var MAP = {
+    'ce8a5d5b-3489-480d-8e39-011fd4c05084': 'analog-soul-dsp.html',
+    'bc046e44-cc26-4a89-ab65-54755e588746': 'analog-soul-manual.html',
+    '0a44a83c-82a8-4893-9a74-6e67f83fadd4': 'analog-soul-plain.html',
+    'addfcd64-f934-4e44-b1e2-e9d9635b3912': 'analog-soul-guide.html',
+    'd28fb51f-1860-4e0b-b4ea-79a015d86e60': 'analog-soul-engineering.html',
+    '7592ce90-adce-4f29-8532-777a382f9004': 'analog-soul-internals.html',
+    'bee5f232-9716-432c-bafd-31255f222978': 'index.html'
+  };
+  var RE = /https:\/\/claude\.ai\/code\/artifact\/([\w-]+)/;
+  Array.prototype.forEach.call(document.querySelectorAll('a[href]'), function (a) {
+    var m = RE.exec(a.getAttribute('href'));
+    if (!m) return;
+    var f = MAP[m[1]];
+    if (!f) return;
+    a.setAttribute('href', a.getAttribute('href').replace(RE, f));
+  });
+})();
+</script>
+<script>
+/* 문서를 옮기면 항상 맨 위에서 시작하도록 강제한다.
+   - 브라우저의 스크롤 자동 복원(history.scrollRestoration)을 끈다.
+   - html에 scroll-behavior:smooth가 걸려 있어 scrollTo가 애니메이션으로 처리되면
+     로딩 중 리플로우에 취소될 수 있다. 이동하는 순간만 auto로 내렸다 되돌린다.
+   - 폰트·이미지 로드로 레이아웃이 늦게 확정되므로 여러 시점에 반복 적용한다. */
+(function () {
+  if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+
+  var root = document.documentElement;
+
+  function jump(fn) {
+    var prev = root.style.scrollBehavior;
+    root.style.scrollBehavior = 'auto';   // 애니메이션 없이 즉시 이동
+    fn();
+    // 다음 프레임에 원복해야 이동이 확정된 뒤에 smooth가 돌아온다
+    requestAnimationFrame(function () { root.style.scrollBehavior = prev; });
+  }
+
+  function toTop() {
+    jump(function () {
+      window.scrollTo(0, 0);
+      if (document.scrollingElement) document.scrollingElement.scrollTop = 0;
+      root.scrollTop = 0;
+      if (document.body) document.body.scrollTop = 0;
+    });
+  }
+
+  function toHash(h) {
+    var el = document.getElementById(h);
+    if (!el) { toTop(); return; }
+    jump(function () { el.scrollIntoView(); });
+  }
+
+  function place() {
+    var h = location.hash ? decodeURIComponent(location.hash.slice(1)) : '';
+    if (h) toHash(h); else toTop();
+  }
+
+  // 스크립트 실행 시점에 한 번
+  place();
+
+  // 레이아웃이 확정되는 여러 시점에 다시 (해시 없을 때만 — 앵커는 한 번이면 충분)
+  function replaceIfTop() { if (!location.hash) toTop(); }
+  document.addEventListener('DOMContentLoaded', replaceIfTop);
+  window.addEventListener('load', function () {
+    place();
+    requestAnimationFrame(replaceIfTop);
+    setTimeout(replaceIfTop, 120);
+  });
+  window.addEventListener('pageshow', function (e) { if (e.persisted) place(); });
+
+  // 현재 문서를 가리키는 툴바 항목(href="#")은 기본 동작이 아무것도 하지 않으므로
+  // 직접 맨 위로 보낸다. 다른 문서로 가는 항목은 이동 후 위 place()가 처리한다.
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest ? e.target.closest('.hub-nav a') : null;
+    if (!a) return;
+    var href = a.getAttribute('href');
+    if (href === '#') { e.preventDefault(); toTop(); }
+  });
+})();
+</script>
 </body>
 </html>
