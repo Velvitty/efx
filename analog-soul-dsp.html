@@ -6103,35 +6103,6 @@ drawTubeViz();
 </script>
 
 <script>
-/* 문서 간 링크는 같은 폴더의 파일명으로 적혀 있다.
-   내려받아 폴더에서 열면 그대로 파일끼리 연결되고,
-   claude.ai에 게시된 상태에서만 아티팩트 주소로 바꿔준다. */
-(function () {
-  if (location.protocol === 'file:') return;   // 로컬은 손대지 않는다
-
-  var MAP = {
-    'analog-soul-dsp.html':         'ce8a5d5b-3489-480d-8e39-011fd4c05084',
-    'analog-soul-manual.html':      'bc046e44-cc26-4a89-ab65-54755e588746',
-    'analog-soul-plain.html':       '0a44a83c-82a8-4893-9a74-6e67f83fadd4',
-    'analog-soul-guide.html':       'addfcd64-f934-4e44-b1e2-e9d9635b3912',
-    'analog-soul-engineering.html': 'd28fb51f-1860-4e0b-b4ea-79a015d86e60',
-    'analog-soul-internals.html':   '7592ce90-adce-4f29-8532-777a382f9004',
-    'index.html':                   'bee5f232-9716-432c-bafd-31255f222978'
-  };
-  var BASE = 'https://claude.ai/code/artifact/';
-
-  Array.prototype.forEach.call(document.querySelectorAll('a[href]'), function (a) {
-    var h = a.getAttribute('href');
-    if (!h || h.charAt(0) === '#' || /^[a-z]+:/i.test(h)) return;
-    var hash = '', i = h.indexOf('#');
-    if (i >= 0) { hash = h.slice(i); h = h.slice(0, i); }
-    var uid = MAP[h];
-    if (!uid) return;
-    a.setAttribute('href', BASE + uid + hash);
-  });
-})();
-</script>
-<script>
 /* 문서를 옮기면 항상 맨 위에서 시작하도록 강제한다.
    - 브라우저의 스크롤 자동 복원(history.scrollRestoration)을 끈다.
    - html에 scroll-behavior:smooth가 걸려 있어 scrollTo가 애니메이션으로 처리되면
