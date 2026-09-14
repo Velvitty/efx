@@ -251,7 +251,7 @@ footer {
 </head>
 <body>
 <nav class="hub-nav" aria-label="문서 간 이동">
-  <a class="home" href="https://claude.ai/code/artifact/bee5f232-9716-432c-bafd-31255f222978">◂ 통합 색인</a><a class="hn" href="https://claude.ai/code/artifact/ce8a5d5b-3489-480d-8e39-011fd4c05084">메인 어플리케이션 실행하기</a><span class="sep">/</span><a class="hn" href="https://claude.ai/code/artifact/bc046e44-cc26-4a89-ab65-54755e588746">공식 매뉴얼</a><span class="sep">/</span><a class="hn" href="https://claude.ai/code/artifact/0a44a83c-82a8-4893-9a74-6e67f83fadd4">쉬운 말</a><span class="sep">/</span><a class="hn" href="https://claude.ai/code/artifact/addfcd64-f934-4e44-b1e2-e9d9635b3912">기술 설명서</a><span class="sep">/</span><a class="hn" href="https://claude.ai/code/artifact/d28fb51f-1860-4e0b-b4ea-79a015d86e60">사양서</a><span class="sep">/</span><a class="hn" href="#" aria-current="page">논고</a>
+  <a class="home" href="index.html">◂ 통합 색인</a><a class="hn" href="analog-soul-dsp.html">메인 어플리케이션 실행하기</a><span class="sep">/</span><a class="hn" href="analog-soul-manual.html">공식 매뉴얼</a><span class="sep">/</span><a class="hn" href="analog-soul-plain.html">쉬운 말</a><span class="sep">/</span><a class="hn" href="analog-soul-guide.html">기술 설명서</a><span class="sep">/</span><a class="hn" href="analog-soul-engineering.html">사양서</a><span class="sep">/</span><a class="hn" href="#" aria-current="page">논고</a>
 </nav>
 <div class="shell">
 
@@ -1422,26 +1422,31 @@ nodes.analyser.maxDecibels = SG_MAX_DB;   <span class="c">// −30</span></pre>
 </script>
 
 <script>
-/* 로컬 폴더에서 열렸을 때(file:) 문서 간 링크를 상대 경로로 바꾼다.
-   게시본과 로컬본이 같은 파일이므로 한 벌로 두 환경을 모두 지원한다. */
+/* 문서 간 링크는 같은 폴더의 파일명으로 적혀 있다.
+   내려받아 폴더에서 열면 그대로 파일끼리 연결되고,
+   claude.ai에 게시된 상태에서만 아티팩트 주소로 바꿔준다. */
 (function () {
-  if (location.protocol !== 'file:') return;
+  if (location.protocol === 'file:') return;   // 로컬은 손대지 않는다
+
   var MAP = {
-    'ce8a5d5b-3489-480d-8e39-011fd4c05084': 'analog-soul-dsp.html',
-    'bc046e44-cc26-4a89-ab65-54755e588746': 'analog-soul-manual.html',
-    '0a44a83c-82a8-4893-9a74-6e67f83fadd4': 'analog-soul-plain.html',
-    'addfcd64-f934-4e44-b1e2-e9d9635b3912': 'analog-soul-guide.html',
-    'd28fb51f-1860-4e0b-b4ea-79a015d86e60': 'analog-soul-engineering.html',
-    '7592ce90-adce-4f29-8532-777a382f9004': 'analog-soul-internals.html',
-    'bee5f232-9716-432c-bafd-31255f222978': 'index.html'
+    'analog-soul-dsp.html':         'ce8a5d5b-3489-480d-8e39-011fd4c05084',
+    'analog-soul-manual.html':      'bc046e44-cc26-4a89-ab65-54755e588746',
+    'analog-soul-plain.html':       '0a44a83c-82a8-4893-9a74-6e67f83fadd4',
+    'analog-soul-guide.html':       'addfcd64-f934-4e44-b1e2-e9d9635b3912',
+    'analog-soul-engineering.html': 'd28fb51f-1860-4e0b-b4ea-79a015d86e60',
+    'analog-soul-internals.html':   '7592ce90-adce-4f29-8532-777a382f9004',
+    'index.html':                   'bee5f232-9716-432c-bafd-31255f222978'
   };
-  var RE = /https:\/\/claude\.ai\/code\/artifact\/([\w-]+)/;
+  var BASE = 'https://claude.ai/code/artifact/';
+
   Array.prototype.forEach.call(document.querySelectorAll('a[href]'), function (a) {
-    var m = RE.exec(a.getAttribute('href'));
-    if (!m) return;
-    var f = MAP[m[1]];
-    if (!f) return;
-    a.setAttribute('href', a.getAttribute('href').replace(RE, f));
+    var h = a.getAttribute('href');
+    if (!h || h.charAt(0) === '#' || /^[a-z]+:/i.test(h)) return;
+    var hash = '', i = h.indexOf('#');
+    if (i >= 0) { hash = h.slice(i); h = h.slice(0, i); }
+    var uid = MAP[h];
+    if (!uid) return;
+    a.setAttribute('href', BASE + uid + hash);
   });
 })();
 </script>
