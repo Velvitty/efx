@@ -2007,6 +2007,12 @@ body::after, body::before { display: none; }          /* 주사선·네온 번�
   position: absolute; width: 3px; border-radius: 2px; pointer-events: none; z-index: 4;   /* 끄는 노드보다 위 */
   background: var(--amber); box-shadow: 0 0 8px var(--amber-glow);
 }
+/* 끄는 동안 비켜 가기(한 줄) — 다른 칸이 새 순서의 자리로 미끄러지고, 빈 자리가 놓일 곳을 보여 주므로 자리 표시는 숨긴다 */
+.flow.sorting .flow-step:not(.lifted), .flow.sorting .flow-post-mark { transition: transform .3s cubic-bezier(.22, 1, .36, 1); }
+.flow.sorting .flow-slot { display: none; }
+.flow-step.lifted > .flow-wire { visibility: hidden; }  /* 끄는 노드의 전선 — 그 자리로 다른 칸이 들어온다 */
+.flow-step.landing { z-index: 2; }                      /* 놓은 노드는 다른 칸 위로 지나간다 */
+@media (prefers-reduced-motion: reduce) { .flow.sorting .flow-step:not(.lifted), .flow.sorting .flow-post-mark { transition: none; } }
 
 /* 폭 맞추기 — 스크립트가 실제 폭을 재서 고른다
    · 기본: 한 줄, 남는 폭은 전선이 나눠 가진다
@@ -9544,6 +9550,79 @@ drawTubeViz();
 
   // ── 신호 흐름 지도 ─────────────────────────────────────────
   var refocus = null;
+
+  // ── 흐름 지도의 움직임 ───────────────────────────────────
+  // 순서가 바뀌면(노드 끌기 · Alt+←/→ · 카드 끌기 · 프리셋) 흐름 지도는 새로 그려진다. 그리기 전후 칸의 자리를
+  // 재어, 자리가 바뀐 칸은 옛 자리에서 카드와 같은 스프링으로 새 자리를 찾아간다. 칸은 새로 만들어지므로
+  // 노드의 data-mod(재생 표시 · 출력은 이름)로 짝을 짓는다. 칸(전선 + 노드)째로 움직이고, 자리는 노드로 잰다.
+  var flowFirst = null, flowLifted = null;                  // 끌기를 끝낸 쪽이 재 둔 자리 · 놓은 노드
+  var flowMoving = new Map();                               // 움직이는 칸의 키 → 스프링 상태
+  function flowKey(c) {
+    if (c.classList.contains('flow-post-mark')) return 'mark';
+    if (c.classList.contains('flow-term')) return 'src';
+    if (!c.classList.contains('flow-step')) return null;    // 놓일 자리 표시
+    var n = c.querySelector('.flow-node');
+    return n ? n.getAttribute('data-mod') : 'out';
+  }
+  // 칸의 화면 자리(흐름 막대 기준) — 지금 그려진 그대로(움직이는 중이면 움직이는 자리, 끄는 노드는 포인터 자리)
+  function flowSpots() {
+    var t = track.getBoundingClientRect(), m = new Map();
+    Array.prototype.forEach.call(track.children, function (c) {
+      var k = flowKey(c); if (!k) return;
+      var r = (c.querySelector('.flow-node, .flow-term') || c).getBoundingClientRect();
+      m.set(k, { x: r.left - t.left, y: r.top - t.top });
+    });
+    return m;
+  }
+  function flowGlide(first, lifted) {
+    var now = performance.now(), vel = new Map();
+    flowMoving.forEach(function (st, k) {                   // 움직이던 칸은 지금 속도를 이어받는다
+      var t = (now - st.t0) / 1000;
+      vel.set(k, [springAt(st.x0, st.vx, t)[1], springAt(st.y0, st.vy, t)[1]]);
+    });
+    flowMoving.clear();                                     // 옛 칸은 지워졌으므로 움직임도 함께 사라졌다
+    if (calm() || !track.animate) return;                   // 움직임을 줄이는 설정이면 곧바로 새 자리
+    var last = flowSpots();
+    Array.prototype.forEach.call(track.children, function (c) {
+      var k = flowKey(c), f = k && first.get(k), p = k && last.get(k);
+      if (!f || !p) return;
+      var v = vel.get(k) || [0, 0], dx = f.x - p.x, dy = f.y - p.y;
+      if (Math.abs(dx) < 0.5 && Math.abs(dy) < 0.5 && Math.abs(v[0]) + Math.abs(v[1]) < 8) return;
+      var sp = springFrames(dx, dy, v[0], v[1]), st = { x0: dx, y0: dy, vx: v[0], vy: v[1], t0: now };
+      if (k === lifted) c.classList.add('landing');         // 놓은 노드는 다른 칸 위로 지나간다
+      var a = c.animate(sp.kf, { duration: sp.dur * 1000, easing: 'linear' });
+      flowMoving.set(k, st);
+      a.onfinish = function () {
+        if (flowMoving.get(k) === st) flowMoving.delete(k);
+        c.classList.remove('landing');
+      };
+    });
+  }
+  // 변형을 뺀 배치 자리(화면 좌표) — 비켜 가는 중인 칸도 원래 자리로 재므로, 놓일 자리 판정이 움직임에 흔들리지 않는다
+  function layRect(e) {
+    var r = e.getBoundingClientRect(), box = e.closest('.flow-step') || e, tf = getComputedStyle(box).transform;
+    if (!tf || tf === 'none' || box.classList.contains('lifted')) return r;
+    var mx = new DOMMatrixReadOnly(tf), x = r.left - mx.m41, y = r.top - mx.m42;
+    return { left: x, top: y, right: x + r.width, bottom: y + r.height, width: r.width, height: r.height };
+  }
+  // 끄는 동안 비켜 가기(한 줄일 때) — 칸의 폭은 순서와 상관없이 그대로이므로(남는 폭은 전선이 똑같이 나눈다),
+  // 새 순서로 칸을 늘어놓은 자리와 지금 자리의 차이만큼 옆으로 민다. 각 칸이 차지하는 폭은 다음 칸까지의 거리다.
+  // 여러 줄이면 줄바꿈이 달라질 수 있어 밀지 않고 놓일 자리 표시만 쓴다.
+  function makeRoom(liftedId, pre, post) {
+    var kids = Array.prototype.filter.call(track.children, function (c) { return !!flowKey(c); });
+    var keys = kids.map(flowKey), at = {}, adv = {};
+    kids.forEach(function (c, i) {
+      at[keys[i]] = c.offsetLeft;
+      adv[keys[i]] = i + 1 < kids.length ? kids[i + 1].offsetLeft - c.offsetLeft : 0;
+    });
+    var seq = ['src', 'mod-hd'].concat(pre, ['mod-master', 'mark'], post, ['out']), x = kids.length ? kids[0].offsetLeft : 0;
+    seq.forEach(function (k) {
+      var i = keys.indexOf(k); if (i < 0) return;
+      var d = x - at[k];
+      if (k !== liftedId) kids[i].style.transform = Math.abs(d) < 0.5 ? '' : 'translateX(' + d.toFixed(2) + 'px)';
+      x += adv[k];
+    });
+  }
   // 흐름 지도의 모양을 정하는 상태 — 처리 순서, 모듈 켜짐, HD LIVE. 폭 변화는 fit()이 따로 맡는다.
   function stateKey() {
     var live = ['hdLiveOn', 'uxhdLiveOn'].some(function (id) { var c = document.getElementById(id); return !!(c && c.checked); });
@@ -9557,6 +9636,9 @@ drawTubeViz();
       if (n) n.setAttribute('data-pos', pad(i + 1));
     });
     if (!track) return;
+    // 다시 그리기 전 자리 — 끌기를 끝낸 쪽이 미리 재 두었으면 그것을(놓은 노드가 포인터 자리에 있을 때)
+    var first = flowFirst || (track.firstChild ? flowSpots() : null), lifted = flowLifted;
+    flowFirst = null; flowLifted = null;
     var ae = document.activeElement;
     if (!refocus && ae && track.contains(ae) && ae.closest) {
       var nd = ae.closest('.flow-node');
@@ -9627,6 +9709,7 @@ drawTubeViz();
     syncPlace();
     step(el('span', 'flow-term', '출력'));
     fit();
+    if (first) flowGlide(first, lifted);                    // 자리가 바뀐 칸은 옛 자리에서 스프링으로
 
     if (refocus) {
       var t = track.querySelector('.flow-node[data-mod="' + refocus.mod + '"] .flow-' + refocus.part);
@@ -9679,6 +9762,8 @@ drawTubeViz();
         if (Math.abs(dx) < 5 && Math.abs(dy) < 5) return;
         moved = true; dragActive = true;
         node.classList.add('dragging');
+        node.parentNode.classList.add('lifted');             // 끄는 노드의 전선은 숨긴다 — 그 자리로 다른 칸이 들어온다
+        flow.classList.add('sorting');
         if (!slot) slot = el('span', 'flow-slot');
         track.appendChild(slot);
       }
@@ -9691,13 +9776,13 @@ drawTubeViz();
         return n !== node && !n.classList.contains('fixed') && !n.classList.contains('pre');
       });
       // MASTER 뒤(재생 단계)인가 — 읽는 순서로 포인터가 MASTER 가운데를 지났는가
-      var mNode = track.querySelector('.flow-node.fixed'), mR = mNode ? mNode.getBoundingClientRect() : null;
+      var mNode = track.querySelector('.flow-node.fixed'), mR = mNode ? layRect(mNode) : null;
       var past = !!mR && (wrap ? (e.clientY > mR.bottom + GAP2 || (e.clientY >= mR.top - GAP2 && e.clientX > mR.left + mR.width / 2))
                                : e.clientX > mR.left + mR.width / 2);
       if (past && !POST_OK[mod.id]) { zone.classList.add('deny'); return; }   // 재생 단계는 VINYL · ATMOS만 — 자리는 그대로
       if (zone.classList.contains('deny')) zone.classList.remove('deny');
       postSide = past;
-      var rects = others.map(function (n) { return n.getBoundingClientRect(); });
+      var rects = others.map(layRect);
       var preCount = others.filter(function (n) { return !n.classList.contains('post'); }).length;
       var idx = 0;
       rects.forEach(function (r) {
@@ -9709,13 +9794,15 @@ drawTubeViz();
         if (ahead) idx++;
       });
       target = idx;
+      flow.classList.toggle('sorting', !wrap);
+      if (!wrap) { var o = planned(); makeRoom(mod.id, o.pre, o.post); }
       // 자리 표시는 떠 있게 그린다 — 흐름 안에 끼우면 줄바꿈이 바뀌어 표시가 떨린다.
       // 줄 끝에 놓을 때는 다음 줄 첫머리가 아니라 그 줄 마지막 노드 뒤에 표시한다.
       var mark = track.querySelector('.flow-post-mark');
       var nextR = idx < rects.length ? rects[idx] : null;
       var prevR = idx > 0 ? rects[idx - 1] : null;
       if (!past && idx >= preCount) nextR = mR;                // 제작의 끝 — MASTER 바로 앞
-      if (past && idx <= preCount) prevR = mark ? mark.getBoundingClientRect() : mR;   // 재생 단계의 맨 앞
+      if (past && idx <= preCount) prevR = mark ? layRect(mark) : mR;   // 재생 단계의 맨 앞
       var t0 = track.getBoundingClientRect(), x = null, y = null, h = 0;
       if (prevR && (!nextR || (wrap && Math.abs(nextR.top - prevR.top) > 10 && e.clientY <= prevR.bottom + GAP2))) {
         x = prevR.right + 6; y = prevR.top; h = prevR.height;
@@ -9742,6 +9829,8 @@ drawTubeViz();
       listen(false);
       try { if (handle.hasPointerCapture(p)) handle.releasePointerCapture(p); } catch (err) {}
       if (!moved) { if (how === 'drop') jump(mod); return; }   // 옮기지 않고 눌렀다 뗐으면 카드로 이동
+      flowFirst = flowSpots(); flowLifted = mod.id;         // 놓은 자리(포인터) · 비켜 간 자리에서 새 자리로 잇는다
+      flow.classList.remove('sorting');
       moved = false; dragActive = false;
       node.classList.remove('dragging');
       node.style.transform = '';
@@ -9749,14 +9838,19 @@ drawTubeViz();
       if (zone.classList.contains('deny')) zone.classList.remove('deny');
       var key = function (pre, post) { return pre.join() + '|' + post.join(); };
       var cur = key(idsOf(movable().filter(function (m) { return !isPost(m); })), idsOf(movable().filter(isPost)));
-      var all = movable().filter(function (m) { return m.id !== mod.id; });
-      var pre = idsOf(all.filter(function (m) { return !isPost(m); })), post = idsOf(all.filter(isPost));
       if (how !== 'cancel' && target >= 0 && node.isConnected) {
-        if (postSide && POST_OK[mod.id]) post.splice(Math.max(0, Math.min(target - pre.length, post.length)), 0, mod.id);
-        else pre.splice(Math.min(target, pre.length), 0, mod.id);
-        if (key(pre, post) !== cur) { applyOrder(pre, post); return; }
+        var o = planned();
+        if (key(o.pre, o.post) !== cur) { applyOrder(o.pre, o.post); return; }
       }
       render();
+    }
+    // 지금 놓으면 될 순서 — 끄는 노드를 뺀 제작 · 재생 단계 순서에 놓일 자리(target · postSide)로 끼운다
+    function planned() {
+      var all = movable().filter(function (m) { return m.id !== mod.id; });
+      var pre = idsOf(all.filter(function (m) { return !isPost(m); })), post = idsOf(all.filter(isPost));
+      if (postSide && POST_OK[mod.id]) post.splice(Math.max(0, Math.min(target - pre.length, post.length)), 0, mod.id);
+      else pre.splice(Math.min(target, pre.length), 0, mod.id);
+      return { pre: pre, post: post };
     }
     // 키보드: Enter · Space는 카드로 이동(click, detail 0), Alt+←/→는 한 칸 이동
     handle.addEventListener('click', function (e) { if (e.detail === 0) jump(mod); });
@@ -9943,6 +10037,19 @@ drawTubeViz();
   // 흔들림 포락선의 진폭 — 이것이 0.25px 안으로 줄어드는 때 움직임이 끝난다
   function envelope(x0, v0) { return Math.hypot(x0, (v0 + KD * x0) / WD); }
 
+  // 변위 (dx, dy) · 초속 (vx, vy)에서 제자리(0)까지 가는 스프링을 키프레임으로 새긴다.
+  // 흔들림이 0.25px 안으로 줄면 끝(0.15 ~ 1초). 120 Hz로 새겨 주사율이 높은 화면에서도 매끈하게
+  function springFrames(dx, dy, vx, vy) {
+    var amp = Math.max(envelope(dx, vx), envelope(dy, vy), 0.25);
+    var dur = Math.min(1, Math.max(0.15, Math.log(amp / 0.25) / KD));
+    var n = Math.ceil(dur * 120), kf = [];
+    for (var k = 0; k <= n; k++) {
+      var t = dur * k / n, x = k === n ? 0 : springAt(dx, vx, t)[0], y = k === n ? 0 : springAt(dy, vy, t)[0];
+      kf.push({ transform: 'translate(' + x.toFixed(2) + 'px, ' + y.toFixed(2) + 'px)' });
+    }
+    return { kf: kf, dur: dur };
+  }
+
   var gliding = new Map();                                  // 움직이는 카드 → 스프링 상태
   var before = null;                                        // 불러오기 직전 카드 자리
   // 카드 자리는 카드판 기준으로 잰다 — 위쪽 내용이 늘거나 줄어 카드판이 통째로 밀려도 카드끼리의 움직임만 남게
@@ -9980,16 +10087,10 @@ drawTubeViz();
     if (!jobs.length || calm() || !grid.animate) return;    // 움직임을 줄이는 설정이면 곧바로 새 자리
     jobs.sort(function (a, b) { return Math.hypot(a.dx, a.dy) - Math.hypot(b.dx, b.dy); });   // 멀리 가는 카드가 위로 지나간다
     jobs.forEach(function (j, i) {
-      var amp = Math.max(envelope(j.dx, j.vx), envelope(j.dy, j.vy), 0.25);
-      var dur = Math.min(1, Math.max(0.15, Math.log(amp / 0.25) / KD));
-      var n = Math.ceil(dur * 120), kf = [];                // 120 Hz로 새긴 곡선 — 주사율이 높은 화면에서도 매끈하게
-      for (var k = 0; k <= n; k++) {
-        var t = dur * k / n, x = k === n ? 0 : springAt(j.dx, j.vx, t)[0], y = k === n ? 0 : springAt(j.dy, j.vy, t)[0];
-        kf.push({ transform: 'translate(' + x.toFixed(2) + 'px, ' + y.toFixed(2) + 'px)' });
-      }
+      var sp = springFrames(j.dx, j.dy, j.vx, j.vy);
       var st = { x0: j.dx, y0: j.dy, vx: j.vx, vy: j.vy, t0: now };
       j.card.style.zIndex = String(10 + i);
-      st.anim = j.card.animate(kf, { duration: dur * 1000, easing: 'linear' });   // 변형만 움직여 합성기에서 돈다
+      st.anim = j.card.animate(sp.kf, { duration: sp.dur * 1000, easing: 'linear' });   // 변형만 움직여 합성기에서 돈다
       gliding.set(j.card, st);
       st.anim.onfinish = function () {
         if (gliding.get(j.card) !== st) return;
