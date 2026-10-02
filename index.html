@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
+<meta name="color-scheme" content="dark light">
+<script>/* 화면 색 — 고른 값을 그리기 전에 적용한다(자동이면 속성을 두지 않아 컴퓨터 설정을 따른다) */try{var t=localStorage.getItem('asde.theme');if(t==='dark'||t==='light')document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ANALOG SOUL DSP ENGINE — 문서 색인</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Share+Tech+Mono&family=Noto+Sans+KR:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@500;600;700&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
 :root {
   --bg:       #06050a;
@@ -412,38 +414,358 @@ body::before {
 
 /* ===== 공통 상단 툴바 — 전 문서 동일 ===== */
 .hub-nav{
+  /* 콘솔 이동 바 — 프로그램과 같은 판과 글꼴. 컴퓨터가 라이트 모드면 아래에서 밝게 바꾼다 */
+  --hn-bg:rgba(41,51,60,.94); --hn-line:#3a4652; --hn-home:#f0b545; --hn-home-hi:#f6c464;
+  --hn-link:#aab5bd; --hn-link-hi:#ece3cf; --hn-hover:#303b45; --hn-sep:#52606d; --hn-mark:#f0b545;
   position:sticky; top:0; z-index:9000;
   display:flex; align-items:center; gap:2px; flex-wrap:wrap;
   padding:7px 16px; min-height:34px;
-  background:rgba(10,8,12,.95); border-bottom:1px solid #2a2535;
-  font-family:'IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
-  font-size:11px; line-height:1.5;
-  backdrop-filter:saturate(150%) blur(8px);
-  -webkit-backdrop-filter:saturate(150%) blur(8px);
+  background:var(--hn-bg); border-bottom:1px solid var(--hn-line);
+  font-family:'Barlow Condensed','Bahnschrift SemiCondensed','Bahnschrift','Avenir Next Condensed','Roboto Condensed','DejaVu Sans Condensed','Arial Narrow','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif;
+  font-size:13px; font-weight:500; letter-spacing:.02em; line-height:1.5;
+  backdrop-filter:saturate(140%) blur(8px);
+  -webkit-backdrop-filter:saturate(140%) blur(8px);
 }
-.hub-nav .home{ color:#ffb300; text-decoration:none; letter-spacing:.12em; margin-right:12px; white-space:nowrap; }
-.hub-nav .home:hover{ color:#ffd166; }
-.hub-nav a.hn{ color:#7d7291; text-decoration:none; padding:3px 9px; border-radius:2px; white-space:nowrap; }
-.hub-nav a.hn:hover{ color:#e4dcf0; background:#1c1825; }
-.hub-nav a.hn[aria-current]{ color:#ffb300; background:#1c1825; }
-.hub-nav .sep{ color:#3a3350; }
+/* 링크 규칙에는 :root:not(#_)를 붙인다 — 문서의 콘솔 층이 본문 링크를 같은 접두어로 앰버로 칠하므로,
+   접두어가 없으면 이동 바 링크까지 앰버가 된다(프로그램에서는 늘 맞아떨어져 달라지는 것이 없다) */
+:root:not(#_) .hub-nav .home{ color:var(--hn-home); font-weight:600; letter-spacing:.06em; text-decoration:none; margin-right:12px; white-space:nowrap; }
+:root:not(#_) .hub-nav .home:hover{ color:var(--hn-home-hi); }
+:root:not(#_) .hub-nav a.hn{ color:var(--hn-link); text-decoration:none; padding:3px 9px; border-radius:6px; white-space:nowrap; }
+:root:not(#_) .hub-nav a.hn:hover{ color:var(--hn-link-hi); background:var(--hn-hover); }
+:root:not(#_) .hub-nav a.hn[aria-current]{ color:var(--hn-link-hi); background:var(--hn-hover); box-shadow:inset 0 -2px 0 var(--hn-mark); }
+.hub-nav .sep{ color:var(--hn-sep); }
+.hub-nav a:focus-visible{ outline:2px solid var(--hn-home); outline-offset:1px; }
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]) .hub-nav{
+    --hn-bg:rgba(238,241,243,.94); --hn-line:#c2cad1; --hn-home:#835208; --hn-home-hi:#6a4200;
+    --hn-link:#46525c; --hn-link-hi:#1c242b; --hn-hover:#e4e8eb; --hn-sep:#9faab4; --hn-mark:#eeae3d;
+  }
+}
+:root[data-theme="light"] .hub-nav{
+  --hn-bg:rgba(238,241,243,.94); --hn-line:#c2cad1; --hn-home:#835208; --hn-home-hi:#6a4200;
+  --hn-link:#46525c; --hn-link-hi:#1c242b; --hn-hover:#e4e8eb; --hn-sep:#9faab4; --hn-mark:#eeae3d;
+}
+/* 화면 색 고르기 — 오른쪽 끝의 자동 · 야간 · 주간. 고른 단추는 현재 문서 표시와 같은 앰버 밑줄 */
+.hub-nav .hn-theme{ margin-left:auto; display:inline-flex; align-items:stretch; border:1px solid var(--hn-line); border-radius:7px; overflow:hidden; }
+.hub-nav .hn-theme-btn{ -webkit-appearance:none; appearance:none; font:inherit; letter-spacing:inherit; color:var(--hn-link); background:transparent; border:0; margin:0; padding:1px 10px; cursor:pointer; white-space:nowrap; }
+.hub-nav .hn-theme-btn + .hn-theme-btn{ border-left:1px solid var(--hn-line); }
+.hub-nav .hn-theme-btn:hover{ color:var(--hn-link-hi); background:var(--hn-hover); }
+.hub-nav .hn-theme-btn[aria-pressed="true"]{ color:var(--hn-link-hi); background:var(--hn-hover); box-shadow:inset 0 -2px 0 var(--hn-mark); }
+.hub-nav .hn-theme-btn:focus-visible{ outline:2px solid var(--hn-home); outline-offset:-2px; }
 @media print{ .hub-nav{ display:none; } }
 
 /* 앵커 이동 시 sticky 툴바에 가리지 않도록 여백 확보 */
 [id]{ scroll-margin-top: 46px; }
+
+/* ===== 콘솔 문서 층 — 프로그램과 같은 인터페이스 (빌드 때 선택자 앞에 :root:not(#_)를 붙였다) ===== */
+
+/* ============================================================
+   콘솔 문서 — 프로그램(ANALOG SOUL DSP ENGINE)과 같은 인터페이스
+   ------------------------------------------------------------
+   다크 모드는 야간 콘솔, 라이트 모드는 주간 콘솔. 색 · 글꼴 · 판을
+   프로그램과 같은 값으로 쓰고, 코드 · 수식처럼 '화면'에 해당하는 칸은
+   두 모드 모두 어둡게 둔다. 각 문서의 고유 변수는 문서별 층에서 이
+   값들에 잇는다. 선택자는 빌드 때 모두 :root:not(#_)로 시작하게 바꿔
+   문서 원래 규칙(자체 다크 · 라이트 재정의 포함)을 이긴다.
+   ============================================================ */
+:root:not(#_) {
+  color-scheme: dark;
+  /* 면 */
+  --c-bg: #1f272e; --c-bg2: #182026; --c-panel: #29333c; --c-panel2: #303b45;
+  --c-line: #3a4652; --c-line-soft: #323d48; --c-line-hi: #52606d;
+  /* 글자 — 쓰이는 모든 바탕에서 대비 4.5:1 이상 */
+  --c-text: #ece3cf; --c-muted: #aab5bd; --c-dim: #9ca6ae;
+  /* 신호 색 — 글자와 선 */
+  --c-amber: #f0b545; --c-red: #eb8c7c; --c-green: #86d39a; --c-blue: #6fb6e8; --c-purple: #b198ec; --c-teal: #4db6a9;
+  /* 앰버 면 */
+  --c-amber-fill: #f0b545; --c-amber-fill-hi: #f6c464; --c-amber-deep: #c98f2c; --c-on-amber: #161c21;
+  /* 캡 — 처리기마다 하나 */
+  --c-cap-comp: #8da9c4; --c-cap-bbe: #4db6a9; --c-cap-tube: #e8904a; --c-cap-exc: #d8bc4c; --c-cap-sg: #c977a9;
+  --c-cap-vinyl: #c67078; --c-cap-atmos: #6c9be0; --c-cap-master: #cfd6dc; --c-cap-hd: #a78bea;
+  --c-cap-ink: 50%; --c-cap-tint: 12%; --c-on-cap: #161c21;
+  /* 화면 — 두 모드 공통으로 어둡다. 그 안에 켜지는 색도 밝은 값 */
+  --c-screen: #0d1216; --c-screen-edge: #0a0e11; --c-screen-ink: #d7dee3; --c-screen-dim: #9aa6b0;
+  --c-lit-amber: #f0b545; --c-lit-blue: #6fb6e8; --c-lit-teal: #4db6a9; --c-lit-green: #86d39a; --c-lit-red: #eb8c7c; --c-lit-purple: #b198ec;
+  /* 빛과 그늘 */
+  --c-glow: #2b3640; --c-hilite: rgba(255,255,255,0.035); --c-shade: rgba(0,0,0,0.55);
+  --c-lift: 0 10px 24px -12px rgba(0,0,0,0.6);
+  /* 글꼴 — 인터넷이 없으면 Windows는 Bahnschrift, macOS는 Avenir Next Condensed */
+  --c-legend: 'Barlow Condensed', 'Bahnschrift SemiCondensed', 'Bahnschrift', 'Avenir Next Condensed', 'Roboto Condensed', 'DejaVu Sans Condensed', 'Arial Narrow', 'Noto Sans KR', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+  --c-body: 'Barlow', 'Segoe UI', 'Helvetica Neue', 'Noto Sans KR', 'Apple SD Gothic Neo', 'Malgun Gothic', system-ui, sans-serif;
+  --c-mono: 'JetBrains Mono', 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --cap: var(--c-amber-fill);
+}
+@media (prefers-color-scheme: light) {
+  :root:not(#_):not([data-theme="dark"]) {
+    color-scheme: light;
+    --c-bg: #dde2e6; --c-bg2: #d4dade; --c-panel: #eef1f3; --c-panel2: #e4e8eb;
+    --c-line: #c2cad1; --c-line-soft: #d3d9de; --c-line-hi: #9faab4;
+    --c-text: #1c242b; --c-muted: #46525c; --c-dim: #535f6a;
+    --c-amber: #835208; --c-red: #ab3226; --c-green: #286a3d; --c-blue: #285e9a; --c-purple: #5e44b8; --c-teal: #115f58;
+    --c-amber-fill: #eeae3d; --c-amber-fill-hi: #f3bd58; --c-amber-deep: #d4952b; --c-on-amber: #1c242b;
+    --c-cap-comp: #32597b; --c-cap-bbe: #115f58; --c-cap-tube: #864215; --c-cap-exc: #695304; --c-cap-sg: #87386c;
+    --c-cap-vinyl: #96303d; --c-cap-atmos: #2b5497; --c-cap-master: #4c5760; --c-cap-hd: #5b42ae;
+    --c-cap-ink: 80%; --c-cap-tint: 18%; --c-on-cap: #ffffff;
+    --c-glow: #f4f6f8; --c-hilite: rgba(255,255,255,0.75); --c-shade: rgba(30,40,50,0.28);
+    --c-lift: 0 10px 24px -14px rgba(30,40,50,0.35);
+  }
+}
+:root:not(#_)[data-theme="light"] {
+  color-scheme: light;
+  --c-bg: #dde2e6; --c-bg2: #d4dade; --c-panel: #eef1f3; --c-panel2: #e4e8eb;
+  --c-line: #c2cad1; --c-line-soft: #d3d9de; --c-line-hi: #9faab4;
+  --c-text: #1c242b; --c-muted: #46525c; --c-dim: #535f6a;
+  --c-amber: #835208; --c-red: #ab3226; --c-green: #286a3d; --c-blue: #285e9a; --c-purple: #5e44b8; --c-teal: #115f58;
+  --c-amber-fill: #eeae3d; --c-amber-fill-hi: #f3bd58; --c-amber-deep: #d4952b; --c-on-amber: #1c242b;
+  --c-cap-comp: #32597b; --c-cap-bbe: #115f58; --c-cap-tube: #864215; --c-cap-exc: #695304; --c-cap-sg: #87386c;
+  --c-cap-vinyl: #96303d; --c-cap-atmos: #2b5497; --c-cap-master: #4c5760; --c-cap-hd: #5b42ae;
+  --c-cap-ink: 80%; --c-cap-tint: 18%; --c-on-cap: #ffffff;
+  --c-glow: #f4f6f8; --c-hilite: rgba(255,255,255,0.75); --c-shade: rgba(30,40,50,0.28);
+  --c-lift: 0 10px 24px -14px rgba(30,40,50,0.35);
+}
+
+/* 처리기 캡 — 매뉴얼 · 쉬운 말은 data-cap, 가이드 · 사양서는 id로 잇는다 */
+:root:not(#_) [data-cap="comp"],
+:root:not(#_) #m-comp,
+:root:not(#_) #u-comp { --cap: var(--c-cap-comp); }
+:root:not(#_) [data-cap="bbe"],
+:root:not(#_) #m-bbe,
+:root:not(#_) #u-bbe { --cap: var(--c-cap-bbe); }
+:root:not(#_) [data-cap="tube"],
+:root:not(#_) #m-tube,
+:root:not(#_) #u-tube { --cap: var(--c-cap-tube); }
+:root:not(#_) [data-cap="exc"],
+:root:not(#_) #m-exciter,
+:root:not(#_) #u-exc { --cap: var(--c-cap-exc); }
+:root:not(#_) [data-cap="sg"],
+:root:not(#_) #m-sg,
+:root:not(#_) #u-sg { --cap: var(--c-cap-sg); }
+:root:not(#_) [data-cap="vinyl"],
+:root:not(#_) #m-vinyl,
+:root:not(#_) #u-vinyl { --cap: var(--c-cap-vinyl); }
+:root:not(#_) [data-cap="atmos"],
+:root:not(#_) #m-atmos,
+:root:not(#_) #u-atmos { --cap: var(--c-cap-atmos); }
+:root:not(#_) [data-cap="master"],
+:root:not(#_) #m-master,
+:root:not(#_) #u-master { --cap: var(--c-cap-master); }
+:root:not(#_) [data-cap="hd"] { --cap: var(--c-cap-hd); }
+
+/* ── 바탕과 글꼴 ───────────────────────────────────────────── */
+:root:not(#_) { background: var(--c-bg); }
+:root:not(#_) body {
+  background: radial-gradient(1100px 520px at 50% -180px, var(--c-glow) 0%, transparent 72%), var(--c-bg);
+  color: var(--c-text); font-family: var(--c-body); font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+}
+/* 요소마다 박힌 옛 글꼴을 걷어 낸다 — :where로 우선순위를 낮춰 아래 개별 규칙이 이기게 */
+:root:not(#_) body :where(*:not(pre, code, kbd, samp, .c-mono)) { font-family: inherit; }
+:root:not(#_) svg text { font-family: var(--c-legend); }
+:root:not(#_) h1,
+:root:not(#_) h2,
+:root:not(#_) h3,
+:root:not(#_) h4,
+:root:not(#_) h5,
+:root:not(#_) h6,
+:root:not(#_) th,
+:root:not(#_) dt,
+:root:not(#_) figcaption { font-family: var(--c-legend); }
+:root:not(#_) pre,
+:root:not(#_) code,
+:root:not(#_) kbd,
+:root:not(#_) samp { font-family: var(--c-mono); }
+:root:not(#_) b,
+:root:not(#_) strong { font-weight: 600; }
+
+:root:not(#_) a { color: var(--c-amber); text-decoration-color: color-mix(in srgb, var(--c-amber) 45%, transparent); text-underline-offset: 3px; }
+:root:not(#_) a:hover { color: var(--c-amber); text-decoration-color: currentColor; }
+:root:not(#_) ::selection { background: color-mix(in srgb, var(--c-amber-fill) 35%, transparent); color: inherit; }
+:root:not(#_) :focus-visible { outline: 2px solid var(--c-amber); outline-offset: 2px; border-radius: 3px; }
+
+/* 코드 — 글자 속 코드는 오목한 칸, 여러 줄 코드는 화면 */
+:root:not(#_) code {
+  font-size: .86em; color: var(--c-text); background: var(--c-bg2);
+  border: 1px solid var(--c-line); border-radius: 5px; padding: 1px 6px;
+}
+:root:not(#_) pre {
+  background: var(--c-screen); color: var(--c-screen-ink);
+  border: 1px solid var(--c-screen-edge); border-radius: 6px; padding: 14px 16px; overflow-x: auto;
+}
+:root:not(#_) pre code { background: none; border: 0; padding: 0; color: inherit; font-size: inherit; }
+
+/* 인쇄는 밝은 판으로 */
+@media print {
+  :root:not(#_) {
+    --c-bg: #ffffff; --c-bg2: #f2f4f5; --c-panel: #ffffff; --c-panel2: #f2f4f5;
+    --c-line: #c2cad1; --c-line-soft: #dde2e6; --c-line-hi: #9faab4;
+    --c-text: #000000; --c-muted: #333d45; --c-dim: #46525c; --c-amber: #6b4200;
+    --c-glow: #ffffff;
+  }
+  :root:not(#_) body { background: #fff; }
+}
+
+/* ── 색인 · 매뉴얼 공통 — 문서 변수를 콘솔 색에 잇는다 ─────── */
+:root:not(#_) {
+  --bg: var(--c-bg); --bg2: var(--c-bg2); --panel: var(--c-panel); --panel2: var(--c-panel2);
+  --border: var(--c-line); --border-hi: var(--c-line-hi);
+  --amber: var(--c-amber); --amber2: var(--c-amber-deep); --amber-dim: var(--c-amber);
+  --green: var(--c-green); --blue: var(--c-blue); --purple: var(--c-purple); --red: var(--c-red);
+  --text: var(--c-text); --muted: var(--c-muted); --muted2: var(--c-dim);
+}
+:root:not(#_) body::before,
+:root:not(#_) body::after { display: none; }                 /* 주사선 · 네온 번짐을 걷어 낸다 */
+:root:not(#_) body { font-size: 16.5px; font-weight: 400; line-height: 1.72; }
+
+/* 표지 — 프로그램 머리와 같은 워드마크. 창 전체를 덮지 않고 바로 내용으로 이어진다 */
+:root:not(#_) .cover { min-height: 0; padding: 72px 28px 40px; }
+:root:not(#_) .cover-eyebrow,
+:root:not(#_) .cover-title,
+:root:not(#_) .cover-sub,
+:root:not(#_) .cover-desc,
+:root:not(#_) .cover-badges { opacity: 1; animation: none; }
+:root:not(#_) .cover-eyebrow { font-family: var(--c-legend); font-size: 14px; font-weight: 600; letter-spacing: .05em; text-transform: none; color: var(--c-amber); margin-bottom: 16px; }
+:root:not(#_) .cover-title { font-family: var(--c-legend); font-weight: 700; font-size: clamp(2.8rem, 7vw, 4.75rem); line-height: .95; letter-spacing: .01em; color: var(--c-text); text-shadow: none; }
+:root:not(#_) .cover-sub { font-family: var(--c-legend); font-weight: 500; font-size: clamp(1.05rem, 2.4vw, 1.4rem); letter-spacing: .01em; color: var(--c-muted); margin-top: 10px; }   /* 한국어 부제라 자간을 벌리지 않는다 */
+:root:not(#_) .cover-desc { color: var(--c-muted); font-size: 17px; line-height: 1.8; margin-top: 24px; max-width: 620px; }
+:root:not(#_) .cover-badges { margin-top: 24px; gap: 8px; }
+:root:not(#_) .cover-scroll,
+:root:not(#_) .cover-rule { display: none; }
+
+/* 알약 배지 */
+:root:not(#_) .badge {
+  font-family: var(--c-legend); font-size: 13px; font-weight: 600; letter-spacing: .04em; padding: 4px 12px;
+  border-radius: 999px; color: var(--c-muted); background: var(--c-panel); border-color: var(--c-line-hi);
+}
+:root:not(#_) .badge.amber { color: color-mix(in srgb, var(--c-amber) var(--c-cap-ink), var(--c-text)); border-color: color-mix(in srgb, var(--c-amber-fill) 50%, transparent); background: color-mix(in srgb, var(--c-amber-fill) 10%, var(--c-panel)); }
+:root:not(#_) .badge.blue { color: color-mix(in srgb, var(--c-blue) var(--c-cap-ink), var(--c-text)); border-color: color-mix(in srgb, var(--c-blue) 50%, transparent); background: color-mix(in srgb, var(--c-blue) 10%, var(--c-panel)); }
+:root:not(#_) .badge.purple { color: color-mix(in srgb, var(--c-purple) var(--c-cap-ink), var(--c-text)); border-color: color-mix(in srgb, var(--c-purple) 50%, transparent); background: color-mix(in srgb, var(--c-purple) 10%, var(--c-panel)); }
+:root:not(#_) .badge.green { color: color-mix(in srgb, var(--c-green) var(--c-cap-ink), var(--c-text)); border-color: color-mix(in srgb, var(--c-green) 50%, transparent); background: color-mix(in srgb, var(--c-green) 10%, var(--c-panel)); }
+
+/* 구획 — 프로그램의 구획 제목처럼 앰버 사각형과 가는 선 */
+:root:not(#_) .section { padding-top: 72px; }
+:root:not(#_) .section-num { font-family: var(--c-legend); font-size: 13px; font-weight: 600; letter-spacing: .08em; color: var(--c-dim); margin-bottom: 6px; }
+:root:not(#_) .section-title {
+  font-family: var(--c-legend); font-weight: 600; font-size: clamp(1.45rem, 2.6vw, 1.75rem); letter-spacing: .01em;
+  color: var(--c-text); border-bottom: 0; padding-bottom: 0; margin-bottom: 22px; gap: 12px;
+}
+:root:not(#_) .section-title::before { content: ''; flex: 0 0 auto; width: 10px; height: 10px; border-radius: 2px; background: var(--c-amber-fill); font-size: 0; }
+:root:not(#_) .section-title::after { content: ''; flex: 1 1 40px; height: 1px; background: var(--c-line); }
+:root:not(#_) .deco-bar { display: none; }
+:root:not(#_) .divider { border: 0; border-top: 1px solid var(--c-line); height: 0; margin-top: 64px; }   /* 브라우저 기본 입체선을 걷어 낸 한 줄 */
+:root:not(#_) .section-lead { color: var(--c-muted); font-size: 17px; line-height: 1.8; }
+:root:not(#_) .sub-title { font-family: var(--c-legend); font-size: 18px; font-weight: 600; letter-spacing: .02em; color: var(--c-text); border-left: 3px solid var(--c-amber-fill); padding-left: 10px; }
+
+/* 표 — 앞판 안의 표 */
+:root:not(#_) .spec-table {
+  font-family: var(--c-body); font-size: 14.5px; background: var(--c-panel); border: 1px solid var(--c-line);
+  border-radius: 10px; border-collapse: separate; border-spacing: 0; overflow: hidden;
+}
+:root:not(#_) .spec-table th { font-family: var(--c-legend); font-size: 13px; font-weight: 600; letter-spacing: .04em; color: var(--c-muted); background: var(--c-panel2); border-bottom: 1px solid var(--c-line); }
+:root:not(#_) .spec-table td { color: var(--c-muted); border-bottom: 1px solid var(--c-line-soft); line-height: 1.65; }
+:root:not(#_) .spec-table tr:last-child td { border-bottom: 0; }
+:root:not(#_) .spec-table td:first-child { color: var(--c-text); font-family: var(--c-legend); font-weight: 600; font-size: 15px; letter-spacing: .02em; }
+:root:not(#_) .spec-table th,
+:root:not(#_) .spec-table td:first-child { word-break: keep-all; }   /* 한국어 낱말을 중간에서 끊지 않는다 */
+
+/* 안내 상자 — 왼쪽 막대, 색 글자는 본문색 쪽으로 섞는다 */
+:root:not(#_) .callout { padding: 18px 24px; margin: 28px 0; }   /* 통합 색인에는 상자 규칙이 없어 여백 없이 그려지던 것 — 매뉴얼과 같은 값 */
+:root:not(#_) .callout { background: color-mix(in srgb, var(--c-amber-fill) 8%, var(--c-panel)); border-left: 3px solid var(--c-amber-fill); border-radius: 0 8px 8px 0; }
+:root:not(#_) .callout p { color: var(--c-text); font-size: 15.5px; }
+:root:not(#_) .callout strong { color: color-mix(in srgb, var(--c-amber) var(--c-cap-ink), var(--c-text)); font-weight: 600; }
+:root:not(#_) .callout.blue { background: color-mix(in srgb, var(--c-blue) 8%, var(--c-panel)); border-left-color: var(--c-blue); }
+:root:not(#_) .callout.blue strong { color: color-mix(in srgb, var(--c-blue) var(--c-cap-ink), var(--c-text)); }
+:root:not(#_) .callout.purple { background: color-mix(in srgb, var(--c-purple) 8%, var(--c-panel)); border-left-color: var(--c-purple); }
+:root:not(#_) .callout.purple strong { color: color-mix(in srgb, var(--c-purple) var(--c-cap-ink), var(--c-text)); }
+:root:not(#_) .callout.ok { background: color-mix(in srgb, var(--c-green) 8%, var(--c-panel)); border-left-color: var(--c-green); border-top-color: transparent; border-right-color: transparent; border-bottom-color: transparent; }
+:root:not(#_) .callout.ok strong { color: color-mix(in srgb, var(--c-green) var(--c-cap-ink), var(--c-text)); }
+
+/* 새 기능 표시 · 글자 속 태그 */
+:root:not(#_) .badge-new {
+  font-family: var(--c-legend); font-size: 12px; font-weight: 600; letter-spacing: .03em; border-radius: 999px; padding: 0 8px;
+  color: color-mix(in srgb, var(--c-green) var(--c-cap-ink), var(--c-text)); border-color: color-mix(in srgb, var(--c-green) 50%, transparent);
+  background: color-mix(in srgb, var(--c-green) 10%, transparent);
+}
+:root:not(#_) .badge-new.v23 { color: color-mix(in srgb, var(--c-blue) var(--c-cap-ink), var(--c-text)); border-color: color-mix(in srgb, var(--c-blue) 50%, transparent); background: color-mix(in srgb, var(--c-blue) 10%, transparent); }
+:root:not(#_) .badge-new.v24 { color: color-mix(in srgb, var(--c-purple) var(--c-cap-ink), var(--c-text)); border-color: color-mix(in srgb, var(--c-purple) 50%, transparent); background: color-mix(in srgb, var(--c-purple) 10%, transparent); }
+:root:not(#_) .inline-tag { font-family: var(--c-mono); font-size: .82em; border-radius: 5px; background: var(--c-bg2); border-color: var(--c-line); color: var(--c-text); }
+
+/* 바닥 — 통합 색인에는 없던 윗선 · 배치를 매뉴얼과 같은 값으로 */
+:root:not(#_) .footer {
+  margin-top: 100px; padding-top: 32px; padding-bottom: 32px; border-top: 1px solid var(--c-line);
+  display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;
+}
+:root:not(#_) .footer-copy { font-family: var(--c-legend); font-size: 13.5px; letter-spacing: .02em; color: var(--c-dim); }
+:root:not(#_) .footer-name { color: var(--c-amber); }
+
+/* 좁은 화면 — 긴 낱말이 든 표는 표 안에서 옆으로 밀어 본다(페이지 전체가 밀리지 않게) */
+@media (max-width: 640px) {
+  :root:not(#_) .spec-table { display: block; overflow-x: auto; }
+}
+
+/* ── 통합 색인 ─────────────────────────────────────────────── */
+/* 프로그램 실행 — 재생 단추처럼 앰버 */
+:root:not(#_) .run-card { background: var(--c-panel); border: 1px solid var(--c-line); border-left: 3px solid var(--c-amber-fill); border-radius: 10px; box-shadow: inset 0 1px 0 var(--c-hilite); }
+:root:not(#_) .run-card:hover { transform: none; border-color: color-mix(in srgb, var(--c-amber-fill) 55%, var(--c-line)); border-left-color: var(--c-amber-fill); }
+:root:not(#_) .run-name { font-family: var(--c-legend); font-weight: 700; font-size: 22px; letter-spacing: .02em; color: var(--c-text); }
+:root:not(#_) .run-desc { font-size: 15px; color: var(--c-muted); }
+
+/* 문서 카드 — 문서마다 색 막대 */
+:root:not(#_) .doc-card {
+  position: relative; overflow: hidden; background: var(--c-panel); border: 1px solid var(--c-line); border-radius: 10px;
+  box-shadow: inset 0 1px 0 var(--c-hilite);
+}
+:root:not(#_) .doc-card::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 3px; background: var(--dc, var(--c-amber-fill)); }
+:root:not(#_) .doc-card:hover { transform: none; border-color: color-mix(in srgb, var(--dc) 50%, var(--c-line)); box-shadow: var(--c-lift); }
+:root:not(#_) .doc-lv { font-family: var(--c-legend); font-size: 13px; font-weight: 600; letter-spacing: .05em; color: color-mix(in srgb, var(--dc) var(--c-cap-ink), var(--c-text)); }
+:root:not(#_) .doc-name { font-family: var(--c-legend); font-weight: 700; font-size: 22px; letter-spacing: .02em; color: var(--c-text); }
+:root:not(#_) .doc-who { font-family: var(--c-legend); font-size: 14.5px; font-weight: 500; color: var(--c-muted); }
+:root:not(#_) .doc-desc { font-size: 15px; color: var(--c-muted); }
+:root:not(#_) .doc-meta { font-family: var(--c-legend); font-size: 13.5px; font-variant-numeric: tabular-nums; color: var(--c-dim); }
+:root:not(#_) .doc-go { font-family: var(--c-legend); font-size: 14px; font-weight: 600; letter-spacing: .04em; color: color-mix(in srgb, var(--dc) var(--c-cap-ink), var(--c-text)); border-top-color: var(--c-line); }
+
+/* 목적별 독서 경로 */
+:root:not(#_) .path-card { background: var(--c-panel); border: 1px solid var(--c-line); border-radius: 10px; box-shadow: inset 0 1px 0 var(--c-hilite); }
+:root:not(#_) .path-h { font-family: var(--c-legend); font-weight: 600; font-size: 19px; color: var(--c-text); }
+:root:not(#_) .path-w { font-family: var(--c-legend); font-size: 14px; color: var(--c-muted); }
+:root:not(#_) .path-card li { font-size: 15px; color: var(--c-muted); }
+:root:not(#_) .path-card li::before { border: 0; background: var(--c-amber-fill); color: var(--c-on-amber); font-family: var(--c-legend); font-weight: 700; font-size: 12px; line-height: 17px; }
+:root:not(#_) .path-card a { color: var(--c-text); border-bottom-color: var(--c-line-hi); }
+:root:not(#_) .path-card a:hover { color: var(--c-amber); border-bottom-color: var(--c-amber); }
+
+/* 주제별 상호 참조 */
+:root:not(#_) .matrix-wrap { background: var(--c-panel); border: 1px solid var(--c-line); border-radius: 10px; }
+:root:not(#_) .matrix { font-size: 14px; }
+:root:not(#_) .matrix thead th { background: var(--c-panel2); font-family: var(--c-legend); font-size: 13.5px; font-weight: 600; letter-spacing: .04em; border-bottom-color: var(--c-line-hi); }
+:root:not(#_) .matrix tbody td { border-bottom-color: var(--c-line-soft); }
+:root:not(#_) .matrix tbody tr:hover { background: color-mix(in srgb, var(--c-amber-fill) 6%, transparent); }
+:root:not(#_) .matrix tbody td:first-child { color: var(--c-text); font-family: var(--c-legend); font-weight: 600; }
+:root:not(#_) .matrix a { font-family: var(--c-legend); font-size: 14px; font-weight: 500; }
+:root:not(#_) .matrix .nil { font-family: var(--c-legend); font-size: 13px; color: var(--c-dim); }
+:root:not(#_) .c-a { color: color-mix(in srgb, var(--c-green) var(--c-cap-ink), var(--c-text)) !important; }
+:root:not(#_) .c-b { color: color-mix(in srgb, var(--c-blue) var(--c-cap-ink), var(--c-text)) !important; }
+:root:not(#_) .c-c { color: color-mix(in srgb, var(--c-amber) var(--c-cap-ink), var(--c-text)) !important; }
+:root:not(#_) .c-d { color: color-mix(in srgb, var(--c-purple) var(--c-cap-ink), var(--c-text)) !important; }
+:root:not(#_) .c-m { color: color-mix(in srgb, var(--c-red) var(--c-cap-ink), var(--c-text)) !important; }
+:root:not(#_) .legend { font-family: var(--c-legend); font-size: 13.5px; color: var(--c-muted); }
+
+/* 본문 폭 — 매뉴얼과 같은 924px. 틀 요소 없이 좌우 여백으로 가운데에 모은다 */
+:root:not(#_) .cover,
+:root:not(#_) .section { padding-left: max(28px, calc((100% - 924px) / 2)); padding-right: max(28px, calc((100% - 924px) / 2)); }
+:root:not(#_) hr.divider,
+:root:not(#_) .footer { margin-left: max(28px, calc((100% - 924px) / 2)); margin-right: max(28px, calc((100% - 924px) / 2)); }
 </style>
 </head>
 <body>
 
 <nav class="hub-nav" aria-label="문서 간 이동">
-  <a class="home" href="#">◂ 통합 색인</a><a class="hn" href="analog-soul-dsp.html">메인 어플리케이션 실행하기</a><span class="sep">/</span><a class="hn" href="analog-soul-manual.html">공식 매뉴얼</a><span class="sep">/</span><a class="hn" href="analog-soul-plain.html">쉬운 말</a><span class="sep">/</span><a class="hn" href="analog-soul-guide.html">기술 설명서</a><span class="sep">/</span><a class="hn" href="analog-soul-engineering.html">사양서</a><span class="sep">/</span><a class="hn" href="analog-soul-internals.html">논고</a>
+  <a class="home" href="#">◂ 통합 색인</a><a class="hn" href="analog-soul-dsp.html">메인 어플리케이션 실행하기</a><span class="sep" aria-hidden="true">/</span><a class="hn" href="analog-soul-manual.html">공식 매뉴얼</a><span class="sep" aria-hidden="true">/</span><a class="hn" href="analog-soul-plain.html">쉬운 말</a><span class="sep" aria-hidden="true">/</span><a class="hn" href="analog-soul-guide.html">기술 설명서</a><span class="sep" aria-hidden="true">/</span><a class="hn" href="analog-soul-engineering.html">사양서</a><span class="sep" aria-hidden="true">/</span><a class="hn" href="analog-soul-internals.html">논고</a>
 </nav>
 
 <div class="cover">
   <div class="cover-rule">
     <span class="cover-rule-label">ANALOG SOUL DSP ENGINE — DOCUMENTATION INDEX</span>
   </div>
-  <div class="cover-eyebrow">통합 색인 · Documentation Index · v2.4</div>
+  <div class="cover-eyebrow">통합 색인 · Documentation Index · v3.0</div>
   <div class="cover-title">ANALOG SOUL<br>DSP ENGINE</div>
   <div class="cover-sub">다섯 문서와 프로그램으로 가는 단일 진입점</div>
   <div class="cover-desc">
@@ -452,7 +774,7 @@ body::before {
   </div>
   <div class="cover-badges">
     <span class="badge">5 DOCUMENTS</span>
-    <span class="badge">24 TOPICS CROSS-LINKED</span>
+    <span class="badge">25 TOPICS CROSS-LINKED</span>
     <span class="badge">LEVEL 1 → 4</span>
   </div>
 </div>
@@ -468,7 +790,7 @@ body::before {
       브라우저에서 바로 구동됩니다. 내보내기도 동작하며, 저장 시 파일은 무압축 <code>.zip</code>으로
       전달됩니다. wav가 저장 허용 확장자가 아니기 때문이며 압축은 하지 않으므로 풀면 원본 그대로입니다.
       <code>analog-soul-dsp.html</code>을 내려받아 로컬에서 열면 <code>.wav</code>로 바로 저장됩니다.
-      Chrome을 권합니다. 192kHz 경로가 다른 브라우저에서 막히는 경우가 있습니다.
+      최신 데스크톱 Chrome을 기준으로 만들고 시험했습니다. 다른 브라우저에서는 일부 표시나 동작이 다를 수 있고, 192kHz 경로가 막히는 경우도 있습니다.
     </div>
   </a>
 
@@ -492,7 +814,7 @@ body::before {
 
   <div class="doc-grid">
       <a class="doc-card" style="--dc:var(--red)" href="analog-soul-manual.html">
-        <div class="doc-lv">ENTRY · v2.3</div>
+        <div class="doc-lv">ENTRY · v3.0</div>
         <div class="doc-name">공식 사용 설명서</div>
         <div class="doc-who">제품 전반 · 전 모듈 레퍼런스</div>
         <div class="doc-desc">제품 전체를 한 문서로 훑는 원본 매뉴얼. 모듈별 파라미터 카드, 신호 흐름도, 모니터링 도구, 활용 팁까지 담겨 있다. v2.3에서 LIVE·INPUT GAIN·스펙트로그램 등 신규 기능을 모두 반영했다.</div>
@@ -512,7 +834,7 @@ body::before {
         <div class="doc-name">기술 설명서</div>
         <div class="doc-who">직접 소리를 만지는 사람</div>
         <div class="doc-desc">모든 파라미터의 범위·기본값과 그 값을 고른 근거를 담았다. 초급·중급·고급 배지가 붙어 순서대로 읽으면 독학이 된다. 상황별 설정과 문제 해결을 포함한다.</div>
-        <div class="doc-meta">11장 · 난이도 표시<br>HD/UHD 8개 절 · 검증 5단계</div>
+        <div class="doc-meta">11장 · 난이도 표시<br>HD · ULTRA · eXtreme HD 8개 절 · 검증 5단계</div>
         <div class="doc-go">OPEN →</div>
       </a>
       <a class="doc-card" style="--dc:var(--amber)" href="analog-soul-engineering.html">
@@ -520,15 +842,15 @@ body::before {
         <div class="doc-name">신호 처리 사양서</div>
         <div class="doc-who">설계 의도를 확인하려는 사람</div>
         <div class="doc-desc">필터 종류·차단점·Q·시정수를 블록도와 함께 명시하고, 그 값이 왜 그래야 하는지를 음향학으로 정당화한다. 구현 코드와 플랫폼 이야기는 의도적으로 제외했다.</div>
-        <div class="doc-meta">7장 · 블록도와 계수표<br>배음 실측 · 잔류 앨리어싱 −80dBFS</div>
+        <div class="doc-meta">7장 · 블록도와 계수표<br>배음 · 잔향 · 천장 · 앨리어싱 실측</div>
         <div class="doc-go">OPEN →</div>
       </a>
       <a class="doc-card" style="--dc:var(--purple)" href="analog-soul-internals.html">
         <div class="doc-lv">LEVEL 4 · 박사급 전제</div>
         <div class="doc-name">개발자 논고</div>
         <div class="doc-who">구현을 고치거나 이식하려는 사람</div>
-        <div class="doc-desc">구현 코드가 축이고 그 위에 유도가 얹힌다. STFT 합성 이론, 체비쇼프 전개, Bregman의 융합 단서, BS.1770 라우드니스까지 동원해 코드 한 줄의 근거를 따진다.</div>
-        <div class="doc-meta">12장 · 코드 23블록 · 명제 10개<br>인용 104줄 대조 완료 · 참고문헌 15편</div>
+        <div class="doc-desc">구현 코드가 축이고 그 위에 유도가 얹힌다. STFT 합성 이론, 체비쇼프 전개, Bregman의 융합 단서, BS.1770 라우드니스까지 동원해 코드 한 줄의 근거를 따진다. 이펙터마다 물리 모형과 수식을 세우고 렌더링 실측으로 검증한다.</div>
+        <div class="doc-meta">19장 · 코드 43블록 · 명제 18개<br>인용 231줄 대조 완료 · 참고문헌 39편</div>
         <div class="doc-go">OPEN →</div>
       </a>
   </div>
@@ -647,12 +969,36 @@ body::before {
           <td><span class="nil">—</span></td>
         </tr>
         <tr>
+          <td>압축기</td>
+          <td><a class="c-m" href="analog-soul-manual.html#comp">COMPRESSOR</a></td>
+          <td><span class="nil">—</span></td>
+          <td><a class="c-b" href="analog-soul-guide.html#m-comp">COMPRESSOR</a></td>
+          <td><a class="c-c" href="analog-soul-engineering.html#u-comp">정적 곡선</a></td>
+          <td><a class="c-d" href="analog-soul-internals.html#comp">앞먹임 압축기</a></td>
+        </tr>
+        <tr>
+          <td>위상 정렬</td>
+          <td><a class="c-m" href="analog-soul-manual.html#bbe">BBE</a></td>
+          <td><span class="nil">—</span></td>
+          <td><a class="c-b" href="analog-soul-guide.html#m-bbe">BBE</a></td>
+          <td><a class="c-c" href="analog-soul-engineering.html#u-bbe">전역통과</a></td>
+          <td><a class="c-d" href="analog-soul-internals.html#bbe">군지연</a></td>
+        </tr>
+        <tr>
           <td>포화·왜곡</td>
           <td><a class="c-m" href="analog-soul-manual.html#tube">VACUUM TUBE</a></td>
           <td><span class="nil">—</span></td>
           <td><a class="c-b" href="analog-soul-guide.html#m-tube">VACUUM TUBE</a></td>
           <td><a class="c-c" href="analog-soul-engineering.html#u-tube">전달 함수</a></td>
-          <td><a class="c-d" href="analog-soul-internals.html#nl-cheb">체비쇼프 전개</a></td>
+          <td><a class="c-d" href="analog-soul-internals.html#tube">12AX7 모형</a></td>
+        </tr>
+        <tr>
+          <td>고역 배음</td>
+          <td><a class="c-m" href="analog-soul-manual.html#exciter">EXCITER</a></td>
+          <td><span class="nil">—</span></td>
+          <td><a class="c-b" href="analog-soul-guide.html#m-exciter">EXCITER</a></td>
+          <td><a class="c-c" href="analog-soul-engineering.html#u-exc">사이드체인</a></td>
+          <td><a class="c-d" href="analog-soul-internals.html#exciter">배음 생성</a></td>
         </tr>
         <tr>
           <td>대역 분할</td>
@@ -668,7 +1014,23 @@ body::before {
           <td><span class="nil">—</span></td>
           <td><a class="c-b" href="analog-soul-guide.html#m-master">MASTERING</a></td>
           <td><a class="c-c" href="analog-soul-engineering.html#u-master">4대역 압축</a></td>
-          <td><a class="c-d" href="analog-soul-internals.html#dyn">시정수 하한</a></td>
+          <td><a class="c-d" href="analog-soul-internals.html#dyn">자동 메이크업</a></td>
+        </tr>
+        <tr>
+          <td>최종 천장</td>
+          <td><a class="c-m" href="analog-soul-manual.html#master">CEILING</a></td>
+          <td><span class="nil">—</span></td>
+          <td><a class="c-b" href="analog-soul-guide.html#m-master">CEILING</a></td>
+          <td><a class="c-c" href="analog-soul-engineering.html#u-master">천장 클리퍼</a></td>
+          <td><a class="c-d" href="analog-soul-internals.html#master">Gibbs 넘침</a></td>
+        </tr>
+        <tr>
+          <td>레코드 재생</td>
+          <td><a class="c-m" href="analog-soul-manual.html#vinyl">VINYL RECORD</a></td>
+          <td><span class="nil">—</span></td>
+          <td><a class="c-b" href="analog-soul-guide.html#m-vinyl">VINYL</a></td>
+          <td><a class="c-c" href="analog-soul-engineering.html#u-vinyl">물리 모형</a></td>
+          <td><a class="c-d" href="analog-soul-internals.html#vinyl">RIAA · 트레이싱</a></td>
         </tr>
         <tr>
           <td>공간·잔향</td>
@@ -676,7 +1038,7 @@ body::before {
           <td><span class="nil">—</span></td>
           <td><a class="c-b" href="analog-soul-guide.html#m-atmos">DOLBY ATMOS</a></td>
           <td><a class="c-c" href="analog-soul-engineering.html#u-atmos">IR 구성</a></td>
-          <td><a class="c-d" href="analog-soul-internals.html#space">에코 밀도</a></td>
+          <td><a class="c-d" href="analog-soul-internals.html#space">영상원 · Eyring</a></td>
         </tr>
         <tr>
           <td>스테레오 폭</td>
@@ -695,7 +1057,7 @@ body::before {
           <td><a class="c-d" href="analog-soul-internals.html#sbr">SBR 비교</a></td>
         </tr>
         <tr>
-          <td>컷오프 탐지</td>
+          <td>컷오프·기울기</td>
           <td><span class="nil">—</span></td>
           <td><span class="nil">—</span></td>
           <td><a class="c-b" href="analog-soul-guide.html#hd-how">알고리즘 해부</a></td>
@@ -703,20 +1065,28 @@ body::before {
           <td><a class="c-d" href="analog-soul-internals.html#sbr-est">추정량</a></td>
         </tr>
         <tr>
-          <td>배음 전사·위상</td>
-          <td><a class="c-m" href="analog-soul-manual.html#hd">동작 원리</a></td>
+          <td>표본률 변환</td>
+          <td><a class="c-m" href="analog-soul-manual.html#export">처리 단계</a></td>
           <td><span class="nil">—</span></td>
-          <td><a class="c-b" href="analog-soul-guide.html#hd-how">배음 옮겨쓰기</a></td>
-          <td><a class="c-c" href="analog-soul-engineering.html#sbr-harm">차수별 레벨</a></td>
-          <td><a class="c-d" href="analog-soul-internals.html#sbr-phase">위상 배수 사상</a></td>
+          <td><a class="c-b" href="analog-soul-guide.html#hd-how">목표 샘플레이트</a></td>
+          <td><a class="c-c" href="analog-soul-engineering.html#sbr-up">표본률 변환</a></td>
+          <td><a class="c-d" href="analog-soul-internals.html#stft-up">표본률 변환</a></td>
         </tr>
         <tr>
-          <td>평활·교차</td>
+          <td>주파수 이동 복사</td>
+          <td><a class="c-m" href="analog-soul-manual.html#hd">동작 원리</a></td>
+          <td><a class="c-a" href="analog-soul-plain.html#restore">하는 일</a></td>
+          <td><a class="c-b" href="analog-soul-guide.html#hd-how">대역 옮겨 잇기</a></td>
+          <td><a class="c-c" href="analog-soul-engineering.html#sbr-shift">이동 복사</a></td>
+          <td><a class="c-d" href="analog-soul-internals.html#sbr-ssb">단측파대 이동</a></td>
+        </tr>
+        <tr>
+          <td>포락선·결</td>
           <td><a class="c-m" href="analog-soul-manual.html#hd">SMOOTH</a></td>
           <td><span class="nil">—</span></td>
-          <td><a class="c-b" href="analog-soul-guide.html#hd-knobs">SMOOTH</a></td>
-          <td><a class="c-c" href="analog-soul-engineering.html#sbr-sm">가우시안 커널</a></td>
-          <td><a class="c-d" href="analog-soul-internals.html#sbr-xfade">교차 규칙</a></td>
+          <td><a class="c-b" href="analog-soul-guide.html#hd-knobs">SYNTH · SMOOTH</a></td>
+          <td><a class="c-c" href="analog-soul-engineering.html#sbr-env">포락선 외삽</a></td>
+          <td><a class="c-d" href="analog-soul-internals.html#sbr-env">포락선과 결</a></td>
         </tr>
         <tr>
           <td>LIVE 모드</td>
@@ -752,10 +1122,10 @@ body::before {
         </tr>
         <tr>
           <td>내보내기</td>
-          <td><a class="c-m" href="analog-soul-manual.html#export">3가지 포맷</a></td>
+          <td><a class="c-m" href="analog-soul-manual.html#export">표본률 · 비트 깊이</a></td>
           <td><a class="c-a" href="analog-soul-plain.html#save">파일로 저장</a></td>
           <td><a class="c-b" href="analog-soul-guide.html#export">내보내기</a></td>
-          <td><a class="c-c" href="analog-soul-engineering.html#practice">운용 지침</a></td>
+          <td><a class="c-c" href="analog-soul-engineering.html#bitdepth">비트 깊이와 출력</a></td>
           <td><span class="nil">—</span></td>
         </tr>
         <tr>
@@ -817,17 +1187,101 @@ body::before {
   <div class="section-num">SECTION 04</div>
   <div class="section-title">개정 기록</div>
   <div class="deco-bar"></div>
-  <p class="section-lead">판별 변경 내역입니다. 각 항목의 근거는 사양서 또는 논고의 해당 절에 있습니다.</p>
+  <p class="section-lead">판별 변경 내역입니다. 각 항목의 근거는 사양서 또는 논고의 해당 절에 있습니다. 빌드마다의 세부 변경은 <code>README.md</code>의 변경 이력에 있습니다.</p>
 
-  <h3 class="sub-title">v2.4 — 현재 판</h3>
-  <p style="color:#9a8fb5;font-size:14px;margin-bottom:16px">
+  <h3 class="sub-title">v3.0 — 현재 판</h3>
+  <p style="color:var(--c-muted);font-size:15px;margin-bottom:16px">
+    화면을 녹음 콘솔 방식으로 새로 꾸민 판입니다. 글자를 키우고 컴퓨터의 다크·라이트 설정에 맞춰 야간·주간 콘솔로 그리며,
+    처리 순서를 보고 바꾸는 신호 흐름 지도를 더했습니다. 프리셋을 저장하면 카드가 처리 순서대로 깜빡이고,
+    불러오거나 순서를 바꾸면 카드가 새 자리로 미끄러져 갑니다. 문서 묶음도 같은 콘솔 화면으로 맞췄습니다.
+  </p>
+
+  <table class="spec-table">
+    <tr><th>항목</th><th>내용</th></tr>
+
+    <tr><td>화면 디자인</td><td>녹음 콘솔의 채널 스트립을 본떠 다시 꾸몄습니다. 청회색 앞판에 상아색 각인을 쓰고 값은 앰버로 표시합니다. 처리기마다 색을 하나씩 정해 카드 머리 막대, 신호 흐름 노드, 슬라이더 채움에 같은 색을 씁니다. 네 가족이 섞여 있던 글꼴을 Barlow · Barlow Condensed 한 계열로 정리했고, 인터넷이 없으면 Windows는 Bahnschrift, macOS는 Avenir Next Condensed로 대신합니다. 주사선과 발광 효과를 없앴고, 파일을 넣는 자리의 영문 안내를 우리말 문장으로 바꿨습니다.</td></tr>
+    <tr><td>글자 크기</td><td>화면 글자 대부분이 8~10 px(0.5~0.65 rem)라 읽기 어려웠습니다. 작은 표지 12 px부터 13·14·15 px 단계로 키우고, 커진 글자가 들어가도록 슬라이더 이름·값 칸과 카드 폭을 넓혔습니다.</td></tr>
+    <tr><td>스펙트럼 눈금 글자</td><td>스펙트럼 그림은 1040×150 캔버스를 화면 폭에 맞춰 늘려 보여 주므로, 그 안에 쓴 눈금 글자도 함께 늘어나거나 눌렸습니다(A/B 두 칸이면 가로 약 0.5배). 글자만 화면 픽셀 좌표로 따로 그려 어느 폭에서도 제 모양입니다. 주파수 축은 오른쪽 끝의 나이퀴스트 눈금과 그 앞 눈금 사이를 축 폭의 6 % 또는 40 px 중 큰 값 이상 띄워, 좁은 화면에서 두 글자가 겹치지 않습니다.</td></tr>
+    <tr><td>dB 숫자</td><td>넓은 화면을 위해 dB 숫자를 가로 네 곳에 반복하던 방식은 글자를 키우자 막대를 가렸습니다. 격자선은 10 dB마다 그대로 두고, 숫자는 20 dB마다 왼쪽에 씁니다. 그림 폭이 900 px를 넘으면 가운데에 한 번 더 씁니다.</td></tr>
+    <tr><td>주간 콘솔</td><td>컴퓨터가 라이트 모드면 밝은 주간 콘솔, 다크 모드면 야간 콘솔로 그립니다. 운영체제 설정을 바꾸면 열어 둔 화면도 새로고침 없이 따라갑니다. 주간 콘솔은 밝은 회청색 앞판에 먹색 각인을 쓰고, 처리기 색은 같은 색상의 깊은 값으로 바꿔 번호 배지에 흰 글자를 씁니다. 스펙트럼·곡선·미터 같은 계기창은 실제 장비처럼 두 모드 모두 어둡게 두고, 그 안에 켜지는 미터 색도 밝은 값을 그대로 씁니다. 앰버는 글자용(짙게)과 면용(밝게)으로 나눴고, 켜진 불빛의 번짐은 옅은 고리로 바꿨습니다. 사용권·진행·이탈 확인 창과 사용권 거절 화면도 모드를 따르며, ATMOS의 3D SPATIAL 배지는 팔레트 밖의 청록 대신 ATMOS 색을 씁니다.</td></tr>
+    <tr><td>화면 색 선택</td><td>상단 이동 바 오른쪽에서 자동 · 야간 · 주간을 고릅니다. 자동은 컴퓨터의 다크 · 라이트 설정을 따르고, 야간 · 주간은 설정과 관계없이 고정합니다. 고른 값은 이 브라우저에 기억되어 프로그램과 모든 문서에 같이 적용되고, 열어 둔 다른 창도 곧바로 따라갑니다. 저장된 값은 페이지를 그리기 전에 적용해 다른 색이 잠깐 비치지 않으며, 단추 글자는 두 모드에서 바탕과 6.2:1 이상 대비입니다.</td></tr>
+<tr><td>내보내기 형식 선택</td><td>WAV · HD · ULTRA HD 단추 셋 대신 표본률(44.1 · 48 · 96 · 192 · 384)과 비트 깊이(16 · 24 · 32)를 스펙트럼의 X-AXIS와 같은 눈금 스위치로 따로 고르고, 단추 하나로 내보냅니다. 원본보다 높은 표본률은 최고 규격 보간 뒤 목표 나이퀴스트까지 고역을 채우고(나가는 표본률이 96kHz 이하면 HD, 176.4 · 192kHz면 ULTRA HD, 352.8 · 384kHz면 eXtreme HD 설정), 낮은 표본률은 효율 규격으로 내립니다. 파일을 올리면 표본률과 비트 깊이가 원본 값에 맞춰져 그 눈금 아래에 (원본)이 붙고, 44.1kHz의 정수배 원본이면 위 세 눈금이 88.2 · 176.4 · 352.8로 바뀌며, 단추 아래에 처리 경로가 표시되며, 고른 값은 프리셋에 함께 담깁니다.</td></tr>
+<tr><td>비트 깊이 향상</td><td>16bit 정수 원본을 24 · 32bit로 쓸 때, 원래 값이 있던 칸(±½ LSB)을 벗어나지 않게 반올림 잡음만 줄입니다. 참값을 아는 신호에서 성긴 음악은 약 6 dB(1비트), 넓은 대역을 덮는 촘촘한 음악은 0.4 ~ 1.3 dB 오차가 줄었습니다. 노이즈 셰이핑 디더로 만든 원본은 잡음 모양을 추정해 주파수마다 다른 세기로 걸러 약 19 dB(3비트)를 줄이고, 원본에서 벗어나는 양을 원래 잡음의 3σ(최대 16 LSB)로 묶습니다. 원본의 정수 격자를 판별해 손실 압축 원본에는 적용하지 않고, 파일 정보에 원본 비트 깊이를 표시합니다.</td></tr>
+<tr><td>정수 변환과 디더</td><td>16 · 24bit 정수로 쓸 때 TPDF 디더를 더해 반올림합니다(DITHER로 끔). 배율을 Chrome이 정수를 읽는 나눗셈과 같게 맞춰, 모든 모듈을 끄고 원본과 같은 깊이로 쓰면 원본과 비트 단위로 같습니다. 이전 판은 두 부호에 같은 배율을 써서 −6 dBFS를 넘는 음수 표본이 1 LSB씩 어긋났습니다(시험 음원에서 0.23%).</td></tr>
+<tr><td>이동 바 링크 색</td><td>문서의 이동 바 링크가 본문 링크 색을 물려받아 프로그램과 달라 보이던 것을 맞췄습니다. 일곱 파일 모두 홈은 앰버, 다른 문서는 회색, 지금 문서는 밝은 글자입니다.</td></tr>
+<tr><td>표본률 변환 두 갈래</td><td>올림은 원본을 그대로 옮기는 보간이라 비용을 따지지 않고 입력 나이퀴스트의 99.5%까지 평탄 · 200 dB로, 내림은 효율을 앞세워 출력 나이퀴스트의 98%까지 평탄 · 180 dB로 거릅니다. 날카로운 거름은 FFT 합성곱으로 한 번만 걸고, 단 사이 버퍼는 배정밀도로 두되 입력을 블록마다 옮겨 담아 메모리 · 속도는 그대로입니다. 같은 입력을 SoX(libsoxr)와 대조해, 통과대역은 더 넓고 평탄하며 거울상 · 에일리어싱 억제는 SoX 최고 설정과 같은 수준(−160 ~ −170 dBc)임을 확인했습니다. 이전 판은 19.85 kHz부터 원본을 깎고(21 kHz −7 dB) 거울상이 −112 dBc였습니다.</td></tr>
+<tr><td>배음 맞춤 — f0 동기 이동</td><td>고역 복원이 원음 윗대역을 옮길 때, 한 음이 도드라지는 순간에는 옮기는 양을 그 음의 기본 주파수(f0)의 정수배로 맞춥니다. 한 음 시험에서 확장 대역이 배음 격자 위에 놓인 비율이 0%에서 100%가 됐고, 배음 번호가 빠짐없이 채워지며(34/35 · 72/72), 과도음 번짐 · 채움 에너지 · 연속성은 이전과 같습니다. 봉우리마다 주파수를 정수배 하는 전치는 배음을 T번째마다만 채워 층을 되살리고 과도음을 번지게 해 쓰지 않았습니다.</td></tr>
+<tr><td>원본 표시와 44.1 계열 눈금</td><td>내보내기 눈금에서 원본과 같은 칸의 숫자 아래에 (원본)을 붙이고 기본으로 고릅니다. 원본이 눈금보다 낮으면 44.1 · 16, 높으면 맨 위 눈금 · 32, 눈금 사이면 바로 위 눈금을 표시 없이 고릅니다. 44.1kHz의 정수배 원본이면 위 세 눈금이 88.2 · 176.4 · 352.8로 바뀌고, HD · ULTRA · eXtreme HD · eXtreme HD는 나가는 표본률(96kHz 이하 · 176.4 · 192kHz · 352.8 · 384kHz)로 가릅니다. 192kHz를 넘는 원본이 기기 기본 표본률로 디코딩되던 문제도 고쳤습니다.</td></tr>
+<tr><td>틀마다의 이음매 — 원본 최상단 구멍 채움</td><td>MP3는 틀마다 차단점 아래 최상단을 통째로 비우는 일이 잦아(128 kbps 약 6%, 64 kbps 약 3분의 1), 그 틀마다 빈 최상단 위에 찬 복원 대역이 얹혀 스펙트로그램에 가로 경계가 생겼습니다. 이제 틀마다 구멍을 찾아 거기서부터 채웁니다. 틀마다 이음매 계단의 상위 5%가 MP3 128 kbps +9.9 → +4.8 dB, 64 kbps +42.6 → +8.8 dB로 줄었습니다.</td></tr>
+<tr><td>복원 조각의 반복 무늬 없애기</td><td>복원 대역은 같은 원천 대역을 옮긴 조각을 이어 붙여, 잔결이 조각 간격(약 6 kHz)마다 되풀이됐습니다(자기상관 0.55 ~ 0.64). 일부 조각은 원천 창을 주파수 방향으로 뒤집고 넷째 조각부터 원천 창을 조금씩 밀어 0.08 ~ 0.13으로 낮췄습니다. 한 음 f0 동기 100%, 두 음 배음 적중 · 연속성 · 딸깍 번짐은 3.0.21보다 나아졌고, 이음매는 ±0.1 dB 안에서 오르내립니다. 둘째 조각부터 밀던 3.0.22 설정은 두 음 ±20 Hz 적중과 딸깍 번짐이 조금 나빠져 옮겼습니다.</td></tr>
+<tr><td>정답 시험과 새 목표선</td><td>무손실 원본을 정답으로 삼아 복원 결과를 직접 비교했습니다. 이전 목표선은 20 ~ 24 kHz를 10 ~ 20 dB 과하게 채워, 원음 기울기에서 코사인 S자로 떨어졌다가 평평해지는 곡선으로 바꿨습니다(LSD 15 ~ 16.5 → 11 ~ 11.6 dB, 청감 근사 오차 63 ~ 84% → 28 ~ 38%). HF SYNTH는 50이 이 곡선, 100이 거의 평탄입니다. 전이 구간은 국소 기울기로 목표선을 맞추고 원음을 절반까지 내리는 부분 교차로 정답의 ±0.8 dB 안에 들였습니다.</td></tr>
+<tr><td>검증 넓히기와 형식 안내</td><td>정답 시험을 MP3 VBR · Vorbis · Opus로 넓혔고(LSD 15 ~ 16.7 → 11.9 ~ 13.7 dB), LIVE의 복원 버퍼가 내보내기와 표본 단위로 같음을 확인했습니다. 남은 복원 수치(채운 배음 번호 35/35 · 72/72, 채움 에너지 차, 버린 대안의 번짐)를 새 정의로 다시 쟀습니다. 브라우저가 읽지 못하는 형식을 올리면 이유와 대안, 앞 파일이 남아 있음을 알립니다.</td></tr>
+<tr><td>AUTO와 복원 손잡이</td><td>KNEE · KNEE 2 · ATTACK · SUSTAIN · WIDTH 손잡이와 AUTO %를 더했습니다. 무손실 원본 네 곡으로 조합 전체를 재어 두 곡 이상에서 맞은 규칙만 AUTO에 쓰고, 결 고르기는 치는 순간과 음이 뚜렷한 틀을 따로 다뤄 교차검증했습니다(AUTO 75%: 네 곡 모두 정답에 가까워짐, 딸깍 · 배음 시험은 이전 수준). 스테레오는 가운데 · 옆으로 복원하고, 채움은 출력마다 나이퀴스트에서 끝납니다.</td></tr>
+<tr><td>이름 체계와 복원 프리셋</td><td>출력 등급을 HD(88.2 · 96kHz) · ULTRA HD(176.4 · 192kHz) · eXtreme HD(352.8 · 384kHz)로 나누고, 두 번째 복원 모듈을 ULTRA · eXtreme HD RESTORE로, 파일 꼬리표를 _HD · _UHD · _XHD로 바꿨습니다. 두 복원 모듈에 탭으로 나뉜 PRESET 판(기준 · 밝기 · 질감 · 공간 · 음악 종류 · 초고역)을 더했습니다.</td></tr>
+<tr><td>카드 타일과 스크롤</td><td>넓은 화면에서 이펙트 카드를 같은 크기로 처리 순서대로 놓고, 고해상도 복원 카드를 맨 앞으로 옮겼습니다. 켜진 카드는 넘치면 카드 안에서 스크롤하고 꺼진 카드는 배경으로 물러나며, 화면을 굴리기 시작하면 켜진 카드가 지나가도 끊기지 않습니다. 카드를 끌어 놓으면 스프링으로 미끄러져 자리를 잡습니다.</td></tr>
+<tr><td>재생 단계 (MASTER 뒤)</td><td>VINYL과 DOLBY ATMOS를 MASTER 뒤로 옮겨, 마스터링이 끝난 소리를 LP로 재생하거나 듣는 기기에서 공간을 그리는 단계를 흉내 낼 수 있게 했습니다. 두 카드의 처리 위치 단추, 카드 끌기, 흐름 지도 끌기로 옮기며, 청록 경계와 구역으로 표시되고 다른 카드는 놓을 수 없습니다.</td></tr>
+<tr><td>MACRO와 처음 상태</td><td>카드마다 MACRO 손잡이를 두어 주요 손잡이들을 가장 약한 위치에서 기준 설계값까지 함께 옮기게 했습니다. 처음 열면 COMPRESSOR · BBE · EXCITER · SOUNDGOODIZER · MASTERING CHAIN이 정해진 MACRO 값으로 켜져 있습니다.</td></tr>
+    <tr><td>글자 대비</td><td>두 모드의 모든 글자가 실제로 놓이는 바탕과 4.5:1 이상 대비를 갖도록 색을 계산해 골랐고, 반투명 배경까지 겹친 실제 바탕색으로 주 화면과 창들의 글자 360곳을 재어 확인했습니다. 야간 콘솔에서 기준에 못 미치던 주파수 축 눈금(2.6:1)과 꺼진 노드 번호, 안내 문구, 오류 빨강, HD 배지, 진행 기록의 지난 줄, 사용권 거절 화면의 저작권 줄을 밝혔습니다. 꺼진 HD 노드는 반투명 대신 비운 바탕과 회색 점으로 꺼짐을 나타내 글자가 읽힙니다.</td></tr>
+    <tr><td>신호 흐름 지도</td><td>처리 체인 위에 원음 → HD 복원 → 처리기 → MASTER → 출력을 한 줄로 보여 주는 지도를 두었습니다. 노드를 끌면 순서가 바뀌고, 불빛을 누르면 켜고 끄며, 이름을 누르면 그 카드로 이동해 카드가 한 번 반짝입니다. 키보드로는 Alt+←/→로 한 칸씩 옮깁니다. 자리가 고정된 HD 복원과 MASTER 노드는 양 끝의 원음·출력처럼 점선 테두리로 그려 끌 수 없음을 나타냅니다. 카드를 끌어 옮길 때와 같은 경로를 거치므로 재생 단계 규칙(MASTER 뒤에는 VINYL · ATMOS만), 재생 중 체인 교체, 이탈 확인이 똑같이 적용됩니다. HD 복원 노드는 LIVE가 켜져 있을 때 밝아지고, 재생 중에는 전선에 신호가 흐릅니다.</td></tr>
+    <tr><td>흐름 지도 폭 맞추기</td><td>창 폭을 실제로 재서 세 모양 중 하나를 고릅니다. 한 줄에 들어가면 그대로, 넘치면 여백과 글자를 줄인 한 줄, 그래도 넘치면 여러 줄로 감기며 줄 첫머리에 윗줄에서 꺾여 내려오는 전선을 그립니다. 노드 폭이 글꼴과 표시 상태에 따라 달라지므로 기준 폭을 정해 두지 않았습니다. 여러 줄일 때는 크기를 줄이지 않고, 터치 화면에서는 줄이는 단계를 건너뛰며 불빛의 누름 영역을 32×34 px로 넓힙니다. 여러 줄에서 끌 때는 읽는 순서로 포인터 앞에 있는 노드 수를 세어 놓일 자리를 정합니다.</td></tr>
+    <tr><td>순서 변경 이동</td><td>흐름 지도에서 노드를 끌거나 Alt+←/→로 순서를 바꾸면, 흐름 지도는 놓는 순간 바뀌고 카드들은 프리셋을 불러올 때와 같은 스프링으로 새 자리를 찾아갑니다. 재생 중에는 체인 교체(한 번에 0.1초 남짓)를 그 자리에서 해서 화면이 그만큼 멈춘 뒤에야 반영됐는데, 이제 첫 프레임이 그려진 뒤로 미뤄 30 ms 안팎에 카드가 출발합니다. 교체 전에 또 바꾸면 마지막 것만 교체합니다. 순서를 바꾼 쪽이 흐름 지도를 곧바로 그렸으면 같은 내용을 다음 프레임에 한 번 더 그리지 않습니다. 동작 줄이기 설정이면 카드는 움직이지 않습니다.</td></tr>
+    <tr><td>노드 끌기 안정</td><td>흐름 지도에서 노드를 끄는 도중 버튼을 뗀 신호를 놓치면 끌기가 끝나지 않아, 뗀 뒤에도 노드가 포인터를 따라다니고 흐름 지도가 다시 그려지지 않았습니다. 노드 붙잡기가 풀리면 포인터가 노드를 벗어난 순간 노드가 멈추기도 했습니다. 이제 끄는 동안 창 전체에서 이동과 떼기를 듣고, 버튼이 이미 떼어진 것을 알아채면 마지막 자리에서 끝냅니다. Esc를 누르거나 창이 포커스를 잃거나 우클릭 메뉴가 열리면 제자리로 돌려놓고, 한 번에 한 노드만 끌립니다.</td></tr>
+    <tr><td>카드 번호 · 접기 · 쌓기</td><td>카드 이름 앞에 처리 순서 번호가 붙고, 순서를 바꾸면 번호도 따라 바뀝니다. 카드마다 접기 단추가 있고 모두 접기 단추로 한꺼번에 접으며, 접은 상태는 새로고침 뒤에도 남습니다. 긴 카드 옆에 빈칸이 생기지 않도록 카드를 제 높이대로 빈틈없이 쌓습니다. 쌓인 자리가 줄 순서와 다를 수 있으므로 실제 순서는 번호와 흐름 지도로 봅니다.</td></tr>
+    <tr><td>슬라이더 채움 · 재생 줄 고정</td><td>슬라이더 홈이 처리기 색으로 값만큼 채워지며, 0을 지나는 범위(INPUT GAIN −24~+24 dB 등)는 0에서부터 채웁니다. 재생 줄은 스크롤해도 화면 위에 붙어 있어 아래쪽 카드를 조정하는 동안에도 재생·정지와 위치가 보입니다. 폭 640 px 이하에서는 제자리에 둡니다.</td></tr>
+    <tr><td>키보드 · 움직임</td><td>켜기 스위치가 키보드 초점을 받지 못해 마우스로만 켤 수 있었습니다. 이제 Tab으로 옮겨 Space로 켜고 끄며, 초점이 있는 조작 요소에는 앰버 테두리가 표시됩니다. 움직임 줄이기를 설정한 환경에서는 흐르는 전선, 카드 반짝임 같은 움직임을 끕니다.</td></tr>
+    <tr><td>저장 표시</td><td>화면 설정 저장이나 슬롯 길게 누르기로 저장하면, 신호 흐름 지도의 노드와 카드가 처리 순서대로(HD 복원 → 체인 → MASTERING) 각자의 색으로 두 번 깜빡입니다. 값과 함께 순서까지 담겼다는 것이 깜빡이는 차례로 보입니다.</td></tr>
+    <tr><td>불러오기 이동</td><td>프리셋을 불러오면 신호 흐름 지도는 누르는 순간 저장된 순서로 바뀌고, 카드들은 저장된 자리로 미끄러져 갑니다. 응답 0.38초 · 감쇠비 0.86의 스프링이라 기다림 없이 출발해 0.3초 안에 거의 도착하고 0.6초 안팎에 멈추며, 움직이는 중에 다시 불러오면 지금의 속도를 이어받아 방향을 틉니다. 모듈 순서는 전부터 프리셋에 담겼지만 카드가 순간 이동해 바뀐 것을 알아보기 어려웠습니다. 동작 줄이기 설정이면 움직이지 않습니다.</td></tr>
+    <tr><td>재생 중 불러오기</td><td>재생 중에 프리셋을 불러오면 켜짐이 바뀐 모듈마다, 순서가 같아도 체인을 다시 짜서(한 번에 0.1초 남짓) 켜짐이 넷 다른 프리셋에서 화면이 0.6초 멈춘 뒤에야 반응했습니다. 재구성 요청을 모아 카드가 움직이기 시작한 뒤 한 번만 하고, 순서가 같으면 건너뜁니다. 불러오기 자체는 40 ms 안에 끝납니다.</td></tr>
+    <tr><td>문서 화면 통일</td><td>통합 색인, 공식 매뉴얼, 쉬운 말, 기술 설명서, 사양서, 개발자 논고를 프로그램과 같은 콘솔 화면으로 바꿨습니다. 같은 색 체계(다크 모드는 야간 콘솔, 라이트 모드는 주간 콘솔), 같은 글꼴(Barlow · Barlow Condensed, 한글은 프로그램과 함께 Noto Sans KR), 같은 앞판 카드와 구획 제목, 같은 번호 배지를 씁니다. 모듈을 설명하는 카드에는 프로그램과 같은 처리기 색 막대를 붙였고, 코드 · 수식 · 블록도처럼 화면에 해당하는 칸은 두 모드 모두 어둡습니다. 개발자 논고의 코드 인용은 두 모드에서 같은 문법 색으로 보입니다.</td></tr>
+    <tr><td>상단 툴바 콘솔화</td><td>공통 상단 툴바를 프로그램과 같은 콘솔 모양으로 바꿔 어느 문서에서나 같은 모습이며, 컴퓨터의 다크·라이트 설정을 따라 어둡거나 밝게 그립니다. 구분자 '/'는 화면 낭독기가 읽지 않습니다.</td></tr>
+    <tr><td>매뉴얼 연출 정리</td><td>공식 매뉴얼의 입자 배경, 커서 꼬리, 스크롤하면 카드가 날아 들어오는 연출, 주사선 번쩍임, 떠 있는 구획 번호와 진행 막대, 실제 화면 틀의 네온 발광을 없앴습니다. 내용이 처음부터 모두 보이고, 멈추지 않고 돌던 배경 그리기도 사라졌습니다. 실제 화면 구획의 구동 화면도 지금 화면으로 바꿨습니다.</td></tr>
+    <tr><td>문서 글자 대비</td><td>통합 색인과 다섯 문서의 모든 글자가 두 모드에서 바탕과 4.5:1 이상 대비를 갖습니다. 바뀌기 전에는 통합 색인 515곳 중 177곳과 공식 매뉴얼 850여 곳 중 290여 곳이 1.4~2.7:1에 머물렀고, 개발자 논고는 표 머리 · 목차 · 코드 블록 머리 · 코드 주석 등 2,787곳 중 302곳(2.7~3.9:1, 라이트 모드는 77곳), 사양서는 표 머리 · 목차 · 태그 180여 곳(3.8~4.4:1), 기술 설명서는 라이트 모드의 난이도 · 노트 표시 10곳(4.1~4.3:1)이 기준에 못 미쳤습니다. 7.7~11.5px이던 작은 글자(흐름도 이름표, 구획 번호, 배지, 표 머리, 명제 이름표 등)는 12px 이상으로 키웠습니다.</td></tr>
+    <tr><td>좁은 화면 · 본문 폭</td><td>통합 색인과 매뉴얼이 휴대폰 폭에서 페이지째 옆으로 밀리던 문제(89px · 57px)를 고쳤습니다. 긴 낱말이 든 표는 표 안에서 옆으로 밀어 봅니다. 통합 색인은 본문 폭이 정해져 있지 않아 넓은 화면에서 글이 화면 끝까지 퍼지던 것을 매뉴얼과 같은 폭으로 모았습니다. 사양서와 개발자 논고의 수식 · 블록도 화면은 본문보다 좁게 그려져 긴 줄이 잘리던 것을 본문 폭으로 넓혀, 옆으로 밀어야 보는 화면이 사양서 15개에서 2개로, 논고 12개에서 1개로 줄었습니다. 통합 색인에서 안내 상자가 여백 없이 막대와 위 카드에 붙어 있던 것, 구획 구분선이 브라우저 기본 모양의 밝은 입체선으로 그려지던 것, 바닥글에 윗선과 좌우 배치가 없던 것도 매뉴얼과 같게 맞췄습니다.</td></tr>
+    <tr><td>변경 이력</td><td>빌드마다 추가·변경·수정된 것을 <code>판.빌드</code> 번호(예: 3.0.0)로 나눠 <code>README.md</code>의 '변경 이력'에 적었습니다. 2.3.0부터 모든 빌드가 들어 있고, 판 구분은 이 개정 기록과 같습니다.</td></tr>
+  </table>
+
+  <h3 class="sub-title">v2.4</h3>
+  <p style="color:var(--c-muted);font-size:15px;margin-bottom:16px">
     설정을 보관하고 다시 불러오는 경로를 만든 판입니다.
+    모든 이펙터를 물리 모형과 실측으로 다시 검증해 바로잡았고,
+    고해상도 복원을 층 없이 이어지는 주파수 이동 방식으로 다시 만들었으며,
     문서 묶음의 이동 구조와 이탈 보호도 함께 정리했습니다.
   </p>
 
   <table class="spec-table">
     <tr><th>항목</th><th>내용</th></tr>
 
+    <tr><td>숨은 자동 메이크업</td><td>Web Audio 압축기는 명세상 문턱 아래의 조용한 신호까지 키우는 자동 메이크업을 항상 겁니다. COMPRESSOR는 MAKEUP 4 dB에 6.03 dB가 더해졌고, MASTERING은 대역마다 +5.4~+7.1 dB가 달리 걸려 중역이 1.7 dB 도드라졌습니다. 같은 식으로 계산해 상쇄했으므로 이제 MAKEUP 노브만 이득을 줍니다. 기본값에서 전체 소리가 약 6 dB 작아졌으며, 크게 하려면 MASTERING의 INPUT GAIN으로 리미터를 밉니다.</td></tr>
+    <tr><td>천장 보장</td><td>4배 표본률에서 자른 파형을 원래 표본률로 내리는 필터가 모서리를 복원하며 천장을 넘는 봉우리를 만들었습니다(사각파 +0.32 dBFS, 임펄스 +2.97 dBFS, 천장 −0.3 dB). 원래 표본률에서 한 번 더 묶어 어떤 입력에도 표본 최댓값이 천장을 넘지 않습니다. v2.3의 설명과 달리 곡선이 1에 점근하는 것만으로는 보장되지 않았습니다.</td></tr>
+    <tr><td>BBE 위상 정렬</td><td>전역통과 필터를 원음에 더하는 구조라 위상이 반대인 주파수에서 골이 생겼습니다(LO CONTOUR 100에서 100 Hz −9.3 dB). 직렬로 바꿔 크기는 평탄하게 두고 저역을 2.5 ms, 중역을 0.5 ms 늦춥니다. PROCESS는 3 kHz 셸프 0~+8 dB, HI DEF는 10 kHz 셸프 0~+6 dB입니다.</td></tr>
+    <tr><td>VACUUM TUBE 12AX7 모형</td><td>12AX7 삼극관의 Koren 방정식과 부하선, 그리드 전류, 밀러 입력 용량으로 전달 곡선을 계산합니다. DRIVE는 그리드 신호 전압(0.1~10 V), BIAS는 그리드 바이어스(−3~−0.5 V)이며, 같은 값이라도 이전 판과 소리가 다릅니다. 저역 우회 경로와 포화 경로가 250 Hz에서 −8 dB로 상쇄되고 20 kHz가 −17 dB 깎이던 결함도 사라졌습니다.</td></tr>
+    <tr><td>TUBE THD 표시</td><td>카드의 THD 수치와 파형 그림이 옛 곡선을 따로 계산하고, 배음을 사인 성분으로만 재 2차 배음을 세지 못했습니다. 실제 소리와 같은 곡선으로 −6 dBFS 사인을 계산하며, 표시 THD가 렌더링 실측과 0.02 %p 안에서 같습니다.</td></tr>
+    <tr><td>오버샘플링 지연 정렬</td><td>오버샘플링한 포화 경로는 4 ms 늦는데 원음 경로는 그렇지 않아, 둘을 섞으면 빗살 필터가 됐습니다. 원음 경로에 같은 오버샘플링의 항등 곡선을 넣어 표본 단위로 맞췄습니다. TUBE·EXCITER·SOUNDGOODIZER에 적용됩니다.</td></tr>
+    <tr><td>EXCITER DRIVE</td><td>DRIVE를 끝까지 돌려도 곡선 기울기가 5 % 변하는 데 그쳐 배음이 1 dB 남짓 움직였습니다. 0~24 dB 구동으로 바꿔 배음이 20 dB 넘게 변합니다.</td></tr>
+    <tr><td>SOUNDGOODIZER 내보내기</td><td>렌더링 엔진의 크로스오버가 선형 Q 0.707로 남아 내보낸 파일에만 분할점마다 +7.4 dB 봉우리가 있었습니다. 포화기 뒤 직류 차단이 없어 무음에서도 −42.3 dBFS 직류가 나왔고, 대역 합과 원음의 위상이 어긋나 250 Hz에 골이 있었습니다. 모두 바로잡았습니다.</td></tr>
+    <tr><td>ATMOS 방 모형</td><td>고정된 반사 열 개와 매번 다른 난수 잔향을 방의 물리 모형으로 바꿨습니다. 영상원 반사, Eyring 잔향 시간과 공기 흡음, 주파수마다 정확한 감쇠와 두 귀 결맞음, 거리에 따른 잔향 세기(Barron)를 계산합니다. OBJECT는 옆벽 반사로 음원 폭을, HEIGHT는 천장 반사와 머리 위 방향 대역을 조절합니다. 오른쪽 채널 지연이 원음과 더해져 생기던 빗살 필터도 없어졌습니다.</td></tr>
+    <tr><td>MASTERING 대역 1 감쇠</td><td>대역 합이 평탄해진 뒤에도 저역 대역에 남아 있던 ×0.95(−0.445 dB)를 없앴습니다.</td></tr>
+    <tr><td>두 엔진 공용 블록</td><td>모든 이펙터를 한 빌더로 만들어 재생과 내보내기가 같은 코드를 씁니다. 한쪽만 고쳐져 파일에만 결함이 남는 일이 구조적으로 생기지 않습니다.</td></tr>
+    <tr><td>HD 복원 재설계</td><td>잘린 지점 아래 한 옥타브를 2·4·8…배 자리에 1/k 세기로 복사하던 방식을, 원음 윗대역을 주파수만 옮겨 잇는 방식으로 바꿨습니다. 옥타브마다 같은 재료가 되풀이되며 경계에서 레벨이 튀고(최대 4.2 dB) 위로 갈수록 성분이 절반씩 성겨져 계단 층이 보였습니다. 이제 원음 기울기를 이은 곡선 하나에 맞춰 층 없이 이어집니다(인접 대역 차의 흔들림 1.05 → 0.25 dB, 정답 음원 0.26 dB).</td></tr>
+    <tr><td>직접 업샘플</td><td>브라우저 재생 노드의 변환에 맡기던 업샘플을 Kaiser 창 sinc 다상 변환으로 바꿨습니다. 선형 보간 구현에서는 16 kHz가 −3.9 dB 깎이고 22 kHz 위에 −16 dB의 거울상이 남았습니다. 이제 19.8 kHz까지 ±0.0002 dB, 거울상 −114 dB 이하입니다.</td></tr>
+    <tr><td>원음 보존</td><td>잘린 지점 아래 25% 구간의 원음을 합성음으로 바꿔 끼우던 교차 때문에 12~14.4 kHz가 −4.9 dB 깎였습니다. 원음은 그대로 두고, 곡선보다 모자란 에너지만 더합니다.</td></tr>
+    <tr><td>복원 순서</td><td>내보내기가 DSP 체인 뒤에서 복원해 MASTERING 천장을 넘을 수 있었고 ±0.99에서 잘랐습니다. 복원을 체인 앞으로 옮겨 LIVE와 순서가 같아졌고, 천장이 복원까지 포함해 지켜집니다.</td></tr>
+    <tr><td>홉 주기 떨림</td><td>빈 번호를 k배 하던 전사는 반송파가 빈 중심에 묶여 k ≥ 4에서 프레임 사이 위상이 어긋났습니다(홉 주기 +20 dB 변조). 주파수 이동은 프레임마다 i<sup>s·m</sup> 회전으로 정확히 이어집니다.</td></tr>
+    <tr><td>고해상도 원본 보호</td><td>컷오프 탐색 상한이 목표 레이트의 1/4로 고정되어, 이미 고해상도인 원본의 진짜 고역을 합성으로 덮을 수 있었습니다. 원본 나이퀴스트까지 탐색하고 채울 대역이 없으면 건너뜁니다.</td></tr>
+    <tr><td>LIVE 표본률 대체</td><td>장치가 96·192 kHz를 거부하면 복원 버퍼의 변환을 재생 노드에 맡겨 고역이 접힐 수 있었습니다. 장치 속도로 직접 내려 재생합니다.</td></tr>
+    <tr><td>저장 완료 표시</td><td>저장 뒤 용량을 다른 함수의 지역 변수로 세어, 저장은 되는데 매번 "렌더링 오류"가 떴고 취소 문구도 덮였습니다. 인코딩한 바이트로 세고 저장했을 때만 완료를 알립니다.</td></tr>
+    <tr><td>논고 대역 확장 장</td><td>개발자 논고 §2·§3을 새 알고리즘으로 다시 썼습니다. 다상 위상의 정확성, 고리 버퍼의 무간섭, 단측파대 이동, 정수배 사상의 위상 오차, 전력 상보 교차, 결 정규화를 명제로 세우고, 정답을 아는 합성 음악으로 실측했습니다.</td></tr>
+    <tr><td>논고 이펙터 항목</td><td>개발자 논고에 이펙터별 항목 여덟 개를 두었습니다. 각 항목이 물리 세계, 수식, 원문 코드, 렌더링 실측 검증, 바로잡은 점을 담습니다.</td></tr>
+    <tr><td>레코드 재생 물리 모형</td><td>VINYL을 다시 만들었습니다. 커팅의 RIAA 기록 곡선과 엘립티컬 EQ, 재생의 RIAA 곡선(보정 영점으로 가청 대역 오차 0.3 dB 이내), 홈 반경에 따라 변하는 주사 손실·트레이싱 왜곡·편심 와우, 회전마다 되풀이되는 먼지·스크래치·휨, 다음 홈의 후행 에코, 고역으로 갈수록 나빠지는 채널 누화를 담았습니다. 먼지와 스크래치는 홈 안에서 생겨 재생 곡선을 거치므로 레코드 특유의 둥근 소리가 됩니다.</td></tr>
+    <tr><td>실제 사양 파라미터</td><td>VINYL의 손잡이를 실제 턴테이블·카트리지·레코드 사양서의 단위로 바꿨습니다. 레코드(회전수, 트랙 위치, 표면 잡음 S/N dB, 크래클 /s, 팝 /min, 스크래치 dBFS, 휨·편심 mm, 재생 횟수), 턴테이블(와우·플러터 %, 럼블 dB, 톤암 공진 Hz), 카트리지(바늘 형태, 분리도 dB, 방위각 °, 부하 용량 pF) 16가지입니다. 이전 판 프리셋의 VINYL 값은 불러오지 않습니다.</td></tr>
+    <tr><td>카트리지 공진</td><td>MM 코일과 부하 용량의 RLC 공진을 정합 z 변환으로 디지털화했습니다. 바이쿼드로는 48 kHz에서 20 kHz가 9 dB 넘게 틀렸는데, 가청 대역 오차가 0.21 dB 이내가 되었습니다.</td></tr>
+    <tr><td>팝 반복 제거</td><td>굵은 먼지를 짧은 루프 대신 곡 전체의 사건 목록으로 예약해, 같은 딸깍이 일정 간격으로 되풀이되지 않습니다.</td></tr>
+    <tr><td>들은 소리 그대로의 딸깍</td><td>레코드 재료를 고정된 씨앗의 난수로 만들고 곡의 시간 위치에 맞춰 재생합니다. 재생 중 들은 딸깍 소리가 내보낸 파일의 같은 자리에 납니다. 두 엔진이 같은 빌더로 블록을 만듭니다.</td></tr>
+    <tr><td>크로스오버 +7.4 dB</td><td>Web Audio 명세는 저역·고역 통과 필터의 Q를 dB로 해석하는데, 버터워스를 의도한 0.707을 그대로 넣어 선형 1.085의 봉우리 있는 필터가 되었습니다. MASTERING과 SOUNDGOODIZER의 대역 합이 교차점에서 최대 +7.4 dB 부풀었습니다. 36곳을 −3.01 dB(버터워스)와 −6.02 dB(임계 감쇠)로 교정했습니다.</td></tr>
+    <tr><td>MASTERING 4대역 합</td><td>교차점 셋을 인접 대역끼리만 나눠 411 Hz 부근에 −1.2 dB 골이 있었습니다. 전역통과 보상을 넣은 트리 구조로 바꿔 합이 정확히 평탄합니다.</td></tr>
+    <tr><td>재생 위치 초기화</td><td>일시정지 뒤 재개, 진행 막대 탐색, LIVE 전환이 모두 곡 처음으로 돌아가던 결함을 고쳤습니다. 재생 함수가 첫머리에서 부르는 정지 함수가 위치를 지우고 있었습니다.</td></tr>
+    <tr><td>일시정지 중 잡음</td><td>일시정지가 음원만 멈추고 레코드 잡음은 계속 흘리던 결함을 고쳤습니다.</td></tr>
+    <tr><td>BBE HI DEF · ATMOS HEIGHT</td><td>필터 종류가 <code>'highShelf'</code>로 적혀 무시되고 8 kHz 저역 통과로 남아 있었습니다. BBE를 켜면 오히려 먹먹해지고 HI DEF는 아무 효과가 없었으며, ATMOS HEIGHT의 밝기 조절도 무시됐습니다. 두 엔진이 똑같이 틀려 비교로는 드러나지 않았습니다.</td></tr>
     <tr><td>프리셋 저장·불러오기</td><td>화면 설정 전체를 <code>.json</code> 파일로 내보내고 되돌립니다. 슬라이더 50개, 토글 10개, 모듈 순서, SG 모드, ATMOS 씬이 담기며 음원은 포함하지 않습니다.</td></tr>
     <tr><td>빠른 슬롯 4개</td><td>브라우저에 남는 즉석 보관함. 짧게 누르면 불러오고 0.6초 길게 누르면 현재 설정을 덮어씁니다. 내용이 있는 슬롯은 초록으로 표시됩니다.</td></tr>
     <tr><td>빈 슬롯 → 기본값</td><td>비어 있는 슬롯을 누르면 모든 값이 기본값으로 돌아갑니다. 마크업의 default 속성을 기준으로 삼아 초기 상태를 정확히 복원하며, 음원은 그대로 남습니다.</td></tr>
@@ -838,8 +1292,11 @@ body::before {
     <tr><td>불러오기 자동 판별</td><td>파일의 <code>format</code> 필드를 읽어 설정 파일이면 지금 값에 적용하고 슬롯 백업이면 슬롯을 되돌립니다. 사용자가 종류를 고를 필요가 없습니다.</td></tr>
     <tr><td>드래그 앤 드롭</td><td>프리셋 패널에 파일을 끌어다 놓아도 같은 경로로 처리됩니다. 드래그가 올라오면 테두리 색으로 놓을 자리를 알립니다.</td></tr>
     <tr><td>패널 내 피드백</td><td>상태바가 EXPORT 아래에 있어 프리셋 조작 결과가 화면 밖이었습니다. 패널 안에도 같은 메시지를 띄우고 성공·주의·오류를 색으로 구분합니다.</td></tr>
+    <tr><td>재생 중 MAKEUP 무효</td><td>실시간 엔진이 컴프레서 MAKEUP을 최종 출력 노드에 쓰고, 마스터 블록이 같은 노드를 곧바로 덮어써 재생 중에는 효과가 없었습니다. 내보내기에서는 압축기 뒤에 기본 +4 dB가 걸려, 컴프레서를 켜면 들은 소리보다 뜨거운 파일이 만들어졌습니다. 압축기 바로 뒤에 메이크업 노드를 두어 일치시켰습니다.</td></tr>
+    <tr><td>재생 중 ATMOS 초기 반사 누락</td><td>값을 바꿀 때마다 후기 잔향 응답 하나를 초기·후기 양쪽에 넣고 있어, 재생 중에는 직접음과 초기 반사가 빠지고 잔향 꼬리만 두 번 겹쳐 들렸습니다. 서로 다른 응답을 넣도록 고쳤습니다.</td></tr>
+    <tr><td>OUTPUT GAIN 위치</td><td>출력 게인이 천장 클리퍼 뒤에 있어, 천장 −0.3 dB에서 +3 dB만 올려도 출력이 +2.4 dBFS까지 올라갔습니다. 클리퍼 앞으로 옮겨 +12 dB에서도 천장 아래에 묶입니다.</td></tr>
+    <tr><td>공간 응답 재사용</td><td>ATMOS 응답을 입력 조합별로 보관해 다른 노브를 돌릴 때 다시 만들지 않습니다. 후기 잔향의 난수 잡음이 조작할 때마다 바뀌어 결이 흔들리던 현상도 사라졌습니다.</td></tr>
     <tr><td>이탈 확인</td><td>값을 바꾼 뒤 다른 문서로 나가려 하면 확인 창이 뜹니다. 새로고침·탭 닫기는 브라우저 기본 경고로 처리합니다.</td></tr>
-
     <tr><td>공통 상단 툴바</td><td>문서마다 다른 클래스와 색을 쓰던 이동 바를 하나로 통일했습니다. 문서 테마와 무관한 고정 팔레트를 써서 어디서나 같은 모습입니다. 프로그램에도 추가해 문서로 돌아올 수 있습니다.</td></tr>
     <tr><td>목차 겹침 보정</td><td>사양서·논고·기술 설명서의 좌측 목차가 툴바 아래로 파고들던 문제. 레일 위치와 높이를 툴바 높이만큼 보정했습니다.</td></tr>
     <tr><td>탭 전환 스크롤</td><td>브라우저의 스크롤 자동 복원 때문에 문서를 옮기면 중간 위치에 떨어졌습니다. 복원을 끄고 맨 위에서 시작하도록 했으며, <code>scroll-behavior:smooth</code>가 이동을 취소하던 문제도 함께 잡았습니다.</td></tr>
@@ -848,11 +1305,13 @@ body::before {
     <tr><td>중복 색인 제거</td><td>내용이 같은 색인이 두 벌이라 어느 쪽에서 들어왔느냐에 따라 다른 파일에 도착했습니다. <code>index.html</code> 하나로 합쳤습니다.</td></tr>
     <tr><td>색인 UI 통일</td><td>색인의 디자인 언어를 공식 매뉴얼과 같게 맞췄습니다. 폰트·색 토큰·컴포넌트를 공유합니다.</td></tr>
     <tr><td>매뉴얼 v2.3 갱신</td><td>공식 매뉴얼 본문에 LIVE 미리듣기, 모듈별 입력 게인, A/B 스펙트럼과 스펙트로그램, X-AXIS 고정, 구현된 세 파라미터를 반영했습니다.</td></tr>
+    <tr><td>표면 잡음 생성</td><td>사양서에 Voss-McCartney 방식으로 잘못 적혀 있던 핑크 잡음 표기를 바로잡은 뒤, 레코드 모형을 다시 만들며 별도의 핑크 잡음 생성을 없앴습니다. 표면 잡음은 홈 안의 백색 잡음이 RIAA 재생 곡선을 지나며 성형됩니다.</td></tr>
+    <tr><td>README</td><td>쉬운 설명, 원리, 작동 방식, 알고리즘과 수식을 한 문서에 단계적으로 담은 README를 추가했습니다.</td></tr>
     <tr><td>버튼 라벨 정리</td><td>화면 설정 저장 · 모든 슬롯을 백업 · 불러오기 · 한 슬롯 비우기 · 모든 슬롯 비우기로 이름을 명확히 했습니다.</td></tr>
   </table>
 
   <h3 class="sub-title">v2.3</h3>
-  <p style="color:#9a8fb5;font-size:14px;margin-bottom:16px">
+  <p style="color:var(--c-muted);font-size:15px;margin-bottom:16px">
     문서를 쓰면서 구현 코드를 읽다 발견해 고친 것과, 그 과정에서 새로 넣은 것들입니다.
   </p>
 
@@ -872,7 +1331,7 @@ body::before {
     <tr><td>VINYL WOBBLE</td><td>미구현이었습니다. 가변 지연을 와우 0.556Hz와 플러터 4.2Hz로 변조. 최대 피치 편차 ±0.31%.</td></tr>
     <tr><td>VINYL CROSSTALK</td><td>미구현이었습니다. 채널 교차 합산으로 최대 −9.1dB 누설. 합산 보정으로 레벨은 불변.</td></tr>
     <tr><td>SMOOTH</td><td>복원 함수에 전달만 되고 쓰이지 않았습니다. 가우시안 커널 반경 1~4와 적용 비율을 제어하도록 연결.</td></tr>
-    <tr><td>AIR MIX 개명</td><td>실제로는 평활을 제어하므로 UHD 쪽 라벨을 SMOOTH로 변경.</td></tr>
+    <tr><td>AIR MIX 개명</td><td>실제로는 평활을 제어하므로 UHD · XHD 쪽 라벨을 SMOOTH로 변경.</td></tr>
     <tr><td>SG STEREO</td><td>스테레오 폭이 아니라 압축기 릴리즈만 바꾸고 있었습니다. 실제 M/S 폭 조절로 교체, 릴리즈는 200ms 고정.</td></tr>
 
     <tr><td>재생·내보내기 순서 불일치</td><td>드래그 순서가 내보내기에만 반영되고 재생은 고정 순서였습니다. 양쪽 모두 DOM 순서를 읽도록 통일.</td></tr>
@@ -903,8 +1362,8 @@ body::before {
   </table>
 
   <h3 class="sub-title">v2.2 — 최초 판</h3>
-  <p style="color:#9a8fb5;font-size:14px">
-    여덟 개 처리 모듈과 HD/ULTRA HD 복원, 드래그 순서 변경, 기본 스펙트럼 표시를 갖춘 판입니다.
+  <p style="color:var(--c-muted);font-size:15px">
+    여덟 개 처리 모듈과 HD/ULTRA · eXtreme HD 복원, 드래그 순서 변경, 기본 스펙트럼 표시를 갖춘 판입니다.
     v2.3에서 고친 항목들은 이 판에 존재하던 것입니다.
   </p>
 </div>
@@ -912,7 +1371,7 @@ body::before {
 <div class="footer">
   <div class="footer-name">ANALOG SOUL DSP ENGINE</div>
   <div class="footer-copy">
-    DOCUMENTATION INDEX v2.4<br>
+    DOCUMENTATION INDEX v3.0<br>
     모든 수치는 구현 코드에서 추출하거나 실측·유도한 값이며, 검증되지 않은 주장은 각 문서에 그렇게 표시했습니다.<br>
     개인적, 비상업적 용도로만 사용하세요.
   </div>
@@ -978,6 +1437,60 @@ body::before {
     var href = a.getAttribute('href');
     if (href === '#') { e.preventDefault(); toTop(); }
   });
+})();
+</script>
+<script>
+/* ============================================================
+   화면 색 고르기 — 상단 이동 바 오른쪽의 자동 · 야간 · 주간
+   ------------------------------------------------------------
+   고른 값은 이 브라우저에 기억해(asde.theme) 프로그램과 모든 문서에
+   같이 적용한다. 자동이면 data-theme을 두지 않아 컴퓨터의 다크 · 라이트
+   설정을 따른다. 그리기 전 적용은 <head>의 짧은 스크립트가 맡고,
+   여기서는 스위치를 붙이고 누른 값을 저장한다.
+   ============================================================ */
+(function () {
+  var KEY = 'asde.theme', root = document.documentElement;
+  var nav = document.querySelector('.hub-nav');
+  if (!nav || nav.querySelector('.hn-theme')) return;
+
+  function stored() {
+    try { var t = localStorage.getItem(KEY); return (t === 'dark' || t === 'light') ? t : 'auto'; }
+    catch (e) { return 'auto'; }                            // 저장소가 막힌 환경 — 이번 방문 동안만 적용된다
+  }
+
+  var OPTS = [
+    ['auto',  '자동', '자동 — 컴퓨터의 다크 · 라이트 설정을 따릅니다'],
+    ['dark',  '야간', '야간 — 늘 어두운 야간 콘솔(다크 모드)'],
+    ['light', '주간', '주간 — 늘 밝은 주간 콘솔(라이트 모드)']
+  ];
+  var box = document.createElement('div');
+  box.className = 'hn-theme';
+  box.setAttribute('role', 'group');
+  box.setAttribute('aria-label', '화면 색');
+  var btns = OPTS.map(function (o) {
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'hn-theme-btn';
+    b.textContent = o[1];
+    b.title = o[2];
+    b.setAttribute('data-choice', o[0]);
+    b.addEventListener('click', function () { choose(o[0], true); });
+    box.appendChild(b);
+    return b;
+  });
+
+  function choose(t, save) {
+    if (t === 'auto') root.removeAttribute('data-theme');
+    else root.setAttribute('data-theme', t);
+    btns.forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-choice') === t ? 'true' : 'false'); });
+    if (!save) return;
+    try { if (t === 'auto') localStorage.removeItem(KEY); else localStorage.setItem(KEY, t); } catch (e) {}
+  }
+
+  nav.appendChild(box);
+  choose(stored(), false);
+  // 다른 창(탭)에서 바꾸면 이 창도 따라간다
+  window.addEventListener('storage', function (e) { if (e.key === KEY || e.key === null) choose(stored(), false); });
 })();
 </script>
 </body>

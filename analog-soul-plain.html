@@ -1,12 +1,14 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
+<meta name="color-scheme" content="dark light">
+<script>/* 화면 색 — 고른 값을 그리기 전에 적용한다(자동이면 속성을 두지 않아 컴퓨터 설정을 따른다) */try{var t=localStorage.getItem('asde.theme');if(t==='dark'||t==='light')document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ANALOG SOUL DSP ENGINE — 쉬운 말 설명서</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@500;600;700&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
 /* ============================================================
    토큰 — 라이트 기본, 다크는 세 곳에서 재정의
@@ -223,30 +225,281 @@ footer {
 
 /* ===== 공통 상단 툴바 — 전 문서 동일 ===== */
 .hub-nav{
+  /* 콘솔 이동 바 — 프로그램과 같은 판과 글꼴. 컴퓨터가 라이트 모드면 아래에서 밝게 바꾼다 */
+  --hn-bg:rgba(41,51,60,.94); --hn-line:#3a4652; --hn-home:#f0b545; --hn-home-hi:#f6c464;
+  --hn-link:#aab5bd; --hn-link-hi:#ece3cf; --hn-hover:#303b45; --hn-sep:#52606d; --hn-mark:#f0b545;
   position:sticky; top:0; z-index:9000;
   display:flex; align-items:center; gap:2px; flex-wrap:wrap;
   padding:7px 16px; min-height:34px;
-  background:rgba(10,8,12,.95); border-bottom:1px solid #2a2535;
-  font-family:'IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
-  font-size:11px; line-height:1.5;
-  backdrop-filter:saturate(150%) blur(8px);
-  -webkit-backdrop-filter:saturate(150%) blur(8px);
+  background:var(--hn-bg); border-bottom:1px solid var(--hn-line);
+  font-family:'Barlow Condensed','Bahnschrift SemiCondensed','Bahnschrift','Avenir Next Condensed','Roboto Condensed','DejaVu Sans Condensed','Arial Narrow','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif;
+  font-size:13px; font-weight:500; letter-spacing:.02em; line-height:1.5;
+  backdrop-filter:saturate(140%) blur(8px);
+  -webkit-backdrop-filter:saturate(140%) blur(8px);
 }
-.hub-nav .home{ color:#ffb300; text-decoration:none; letter-spacing:.12em; margin-right:12px; white-space:nowrap; }
-.hub-nav .home:hover{ color:#ffd166; }
-.hub-nav a.hn{ color:#7d7291; text-decoration:none; padding:3px 9px; border-radius:2px; white-space:nowrap; }
-.hub-nav a.hn:hover{ color:#e4dcf0; background:#1c1825; }
-.hub-nav a.hn[aria-current]{ color:#ffb300; background:#1c1825; }
-.hub-nav .sep{ color:#3a3350; }
+/* 링크 규칙에는 :root:not(#_)를 붙인다 — 문서의 콘솔 층이 본문 링크를 같은 접두어로 앰버로 칠하므로,
+   접두어가 없으면 이동 바 링크까지 앰버가 된다(프로그램에서는 늘 맞아떨어져 달라지는 것이 없다) */
+:root:not(#_) .hub-nav .home{ color:var(--hn-home); font-weight:600; letter-spacing:.06em; text-decoration:none; margin-right:12px; white-space:nowrap; }
+:root:not(#_) .hub-nav .home:hover{ color:var(--hn-home-hi); }
+:root:not(#_) .hub-nav a.hn{ color:var(--hn-link); text-decoration:none; padding:3px 9px; border-radius:6px; white-space:nowrap; }
+:root:not(#_) .hub-nav a.hn:hover{ color:var(--hn-link-hi); background:var(--hn-hover); }
+:root:not(#_) .hub-nav a.hn[aria-current]{ color:var(--hn-link-hi); background:var(--hn-hover); box-shadow:inset 0 -2px 0 var(--hn-mark); }
+.hub-nav .sep{ color:var(--hn-sep); }
+.hub-nav a:focus-visible{ outline:2px solid var(--hn-home); outline-offset:1px; }
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]) .hub-nav{
+    --hn-bg:rgba(238,241,243,.94); --hn-line:#c2cad1; --hn-home:#835208; --hn-home-hi:#6a4200;
+    --hn-link:#46525c; --hn-link-hi:#1c242b; --hn-hover:#e4e8eb; --hn-sep:#9faab4; --hn-mark:#eeae3d;
+  }
+}
+:root[data-theme="light"] .hub-nav{
+  --hn-bg:rgba(238,241,243,.94); --hn-line:#c2cad1; --hn-home:#835208; --hn-home-hi:#6a4200;
+  --hn-link:#46525c; --hn-link-hi:#1c242b; --hn-hover:#e4e8eb; --hn-sep:#9faab4; --hn-mark:#eeae3d;
+}
+/* 화면 색 고르기 — 오른쪽 끝의 자동 · 야간 · 주간. 고른 단추는 현재 문서 표시와 같은 앰버 밑줄 */
+.hub-nav .hn-theme{ margin-left:auto; display:inline-flex; align-items:stretch; border:1px solid var(--hn-line); border-radius:7px; overflow:hidden; }
+.hub-nav .hn-theme-btn{ -webkit-appearance:none; appearance:none; font:inherit; letter-spacing:inherit; color:var(--hn-link); background:transparent; border:0; margin:0; padding:1px 10px; cursor:pointer; white-space:nowrap; }
+.hub-nav .hn-theme-btn + .hn-theme-btn{ border-left:1px solid var(--hn-line); }
+.hub-nav .hn-theme-btn:hover{ color:var(--hn-link-hi); background:var(--hn-hover); }
+.hub-nav .hn-theme-btn[aria-pressed="true"]{ color:var(--hn-link-hi); background:var(--hn-hover); box-shadow:inset 0 -2px 0 var(--hn-mark); }
+.hub-nav .hn-theme-btn:focus-visible{ outline:2px solid var(--hn-home); outline-offset:-2px; }
 @media print{ .hub-nav{ display:none; } }
 
 /* 앵커 이동 시 sticky 툴바에 가리지 않도록 여백 확보 */
 [id]{ scroll-margin-top: 46px; }
+
+/* ===== 콘솔 문서 층 — 프로그램과 같은 인터페이스 (빌드 때 선택자 앞에 :root:not(#_)를 붙였다) ===== */
+
+/* ============================================================
+   콘솔 문서 — 프로그램(ANALOG SOUL DSP ENGINE)과 같은 인터페이스
+   ------------------------------------------------------------
+   다크 모드는 야간 콘솔, 라이트 모드는 주간 콘솔. 색 · 글꼴 · 판을
+   프로그램과 같은 값으로 쓰고, 코드 · 수식처럼 '화면'에 해당하는 칸은
+   두 모드 모두 어둡게 둔다. 각 문서의 고유 변수는 문서별 층에서 이
+   값들에 잇는다. 선택자는 빌드 때 모두 :root:not(#_)로 시작하게 바꿔
+   문서 원래 규칙(자체 다크 · 라이트 재정의 포함)을 이긴다.
+   ============================================================ */
+:root:not(#_) {
+  color-scheme: dark;
+  /* 면 */
+  --c-bg: #1f272e; --c-bg2: #182026; --c-panel: #29333c; --c-panel2: #303b45;
+  --c-line: #3a4652; --c-line-soft: #323d48; --c-line-hi: #52606d;
+  /* 글자 — 쓰이는 모든 바탕에서 대비 4.5:1 이상 */
+  --c-text: #ece3cf; --c-muted: #aab5bd; --c-dim: #9ca6ae;
+  /* 신호 색 — 글자와 선 */
+  --c-amber: #f0b545; --c-red: #eb8c7c; --c-green: #86d39a; --c-blue: #6fb6e8; --c-purple: #b198ec; --c-teal: #4db6a9;
+  /* 앰버 면 */
+  --c-amber-fill: #f0b545; --c-amber-fill-hi: #f6c464; --c-amber-deep: #c98f2c; --c-on-amber: #161c21;
+  /* 캡 — 처리기마다 하나 */
+  --c-cap-comp: #8da9c4; --c-cap-bbe: #4db6a9; --c-cap-tube: #e8904a; --c-cap-exc: #d8bc4c; --c-cap-sg: #c977a9;
+  --c-cap-vinyl: #c67078; --c-cap-atmos: #6c9be0; --c-cap-master: #cfd6dc; --c-cap-hd: #a78bea;
+  --c-cap-ink: 50%; --c-cap-tint: 12%; --c-on-cap: #161c21;
+  /* 화면 — 두 모드 공통으로 어둡다. 그 안에 켜지는 색도 밝은 값 */
+  --c-screen: #0d1216; --c-screen-edge: #0a0e11; --c-screen-ink: #d7dee3; --c-screen-dim: #9aa6b0;
+  --c-lit-amber: #f0b545; --c-lit-blue: #6fb6e8; --c-lit-teal: #4db6a9; --c-lit-green: #86d39a; --c-lit-red: #eb8c7c; --c-lit-purple: #b198ec;
+  /* 빛과 그늘 */
+  --c-glow: #2b3640; --c-hilite: rgba(255,255,255,0.035); --c-shade: rgba(0,0,0,0.55);
+  --c-lift: 0 10px 24px -12px rgba(0,0,0,0.6);
+  /* 글꼴 — 인터넷이 없으면 Windows는 Bahnschrift, macOS는 Avenir Next Condensed */
+  --c-legend: 'Barlow Condensed', 'Bahnschrift SemiCondensed', 'Bahnschrift', 'Avenir Next Condensed', 'Roboto Condensed', 'DejaVu Sans Condensed', 'Arial Narrow', 'Noto Sans KR', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+  --c-body: 'Barlow', 'Segoe UI', 'Helvetica Neue', 'Noto Sans KR', 'Apple SD Gothic Neo', 'Malgun Gothic', system-ui, sans-serif;
+  --c-mono: 'JetBrains Mono', 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --cap: var(--c-amber-fill);
+}
+@media (prefers-color-scheme: light) {
+  :root:not(#_):not([data-theme="dark"]) {
+    color-scheme: light;
+    --c-bg: #dde2e6; --c-bg2: #d4dade; --c-panel: #eef1f3; --c-panel2: #e4e8eb;
+    --c-line: #c2cad1; --c-line-soft: #d3d9de; --c-line-hi: #9faab4;
+    --c-text: #1c242b; --c-muted: #46525c; --c-dim: #535f6a;
+    --c-amber: #835208; --c-red: #ab3226; --c-green: #286a3d; --c-blue: #285e9a; --c-purple: #5e44b8; --c-teal: #115f58;
+    --c-amber-fill: #eeae3d; --c-amber-fill-hi: #f3bd58; --c-amber-deep: #d4952b; --c-on-amber: #1c242b;
+    --c-cap-comp: #32597b; --c-cap-bbe: #115f58; --c-cap-tube: #864215; --c-cap-exc: #695304; --c-cap-sg: #87386c;
+    --c-cap-vinyl: #96303d; --c-cap-atmos: #2b5497; --c-cap-master: #4c5760; --c-cap-hd: #5b42ae;
+    --c-cap-ink: 80%; --c-cap-tint: 18%; --c-on-cap: #ffffff;
+    --c-glow: #f4f6f8; --c-hilite: rgba(255,255,255,0.75); --c-shade: rgba(30,40,50,0.28);
+    --c-lift: 0 10px 24px -14px rgba(30,40,50,0.35);
+  }
+}
+:root:not(#_)[data-theme="light"] {
+  color-scheme: light;
+  --c-bg: #dde2e6; --c-bg2: #d4dade; --c-panel: #eef1f3; --c-panel2: #e4e8eb;
+  --c-line: #c2cad1; --c-line-soft: #d3d9de; --c-line-hi: #9faab4;
+  --c-text: #1c242b; --c-muted: #46525c; --c-dim: #535f6a;
+  --c-amber: #835208; --c-red: #ab3226; --c-green: #286a3d; --c-blue: #285e9a; --c-purple: #5e44b8; --c-teal: #115f58;
+  --c-amber-fill: #eeae3d; --c-amber-fill-hi: #f3bd58; --c-amber-deep: #d4952b; --c-on-amber: #1c242b;
+  --c-cap-comp: #32597b; --c-cap-bbe: #115f58; --c-cap-tube: #864215; --c-cap-exc: #695304; --c-cap-sg: #87386c;
+  --c-cap-vinyl: #96303d; --c-cap-atmos: #2b5497; --c-cap-master: #4c5760; --c-cap-hd: #5b42ae;
+  --c-cap-ink: 80%; --c-cap-tint: 18%; --c-on-cap: #ffffff;
+  --c-glow: #f4f6f8; --c-hilite: rgba(255,255,255,0.75); --c-shade: rgba(30,40,50,0.28);
+  --c-lift: 0 10px 24px -14px rgba(30,40,50,0.35);
+}
+
+/* 처리기 캡 — 매뉴얼 · 쉬운 말은 data-cap, 가이드 · 사양서는 id로 잇는다 */
+:root:not(#_) [data-cap="comp"],
+:root:not(#_) #m-comp,
+:root:not(#_) #u-comp { --cap: var(--c-cap-comp); }
+:root:not(#_) [data-cap="bbe"],
+:root:not(#_) #m-bbe,
+:root:not(#_) #u-bbe { --cap: var(--c-cap-bbe); }
+:root:not(#_) [data-cap="tube"],
+:root:not(#_) #m-tube,
+:root:not(#_) #u-tube { --cap: var(--c-cap-tube); }
+:root:not(#_) [data-cap="exc"],
+:root:not(#_) #m-exciter,
+:root:not(#_) #u-exc { --cap: var(--c-cap-exc); }
+:root:not(#_) [data-cap="sg"],
+:root:not(#_) #m-sg,
+:root:not(#_) #u-sg { --cap: var(--c-cap-sg); }
+:root:not(#_) [data-cap="vinyl"],
+:root:not(#_) #m-vinyl,
+:root:not(#_) #u-vinyl { --cap: var(--c-cap-vinyl); }
+:root:not(#_) [data-cap="atmos"],
+:root:not(#_) #m-atmos,
+:root:not(#_) #u-atmos { --cap: var(--c-cap-atmos); }
+:root:not(#_) [data-cap="master"],
+:root:not(#_) #m-master,
+:root:not(#_) #u-master { --cap: var(--c-cap-master); }
+:root:not(#_) [data-cap="hd"] { --cap: var(--c-cap-hd); }
+
+/* ── 바탕과 글꼴 ───────────────────────────────────────────── */
+:root:not(#_) { background: var(--c-bg); }
+:root:not(#_) body {
+  background: radial-gradient(1100px 520px at 50% -180px, var(--c-glow) 0%, transparent 72%), var(--c-bg);
+  color: var(--c-text); font-family: var(--c-body); font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+}
+/* 요소마다 박힌 옛 글꼴을 걷어 낸다 — :where로 우선순위를 낮춰 아래 개별 규칙이 이기게 */
+:root:not(#_) body :where(*:not(pre, code, kbd, samp, .c-mono)) { font-family: inherit; }
+:root:not(#_) svg text { font-family: var(--c-legend); }
+:root:not(#_) h1,
+:root:not(#_) h2,
+:root:not(#_) h3,
+:root:not(#_) h4,
+:root:not(#_) h5,
+:root:not(#_) h6,
+:root:not(#_) th,
+:root:not(#_) dt,
+:root:not(#_) figcaption { font-family: var(--c-legend); }
+:root:not(#_) pre,
+:root:not(#_) code,
+:root:not(#_) kbd,
+:root:not(#_) samp { font-family: var(--c-mono); }
+:root:not(#_) b,
+:root:not(#_) strong { font-weight: 600; }
+
+:root:not(#_) a { color: var(--c-amber); text-decoration-color: color-mix(in srgb, var(--c-amber) 45%, transparent); text-underline-offset: 3px; }
+:root:not(#_) a:hover { color: var(--c-amber); text-decoration-color: currentColor; }
+:root:not(#_) ::selection { background: color-mix(in srgb, var(--c-amber-fill) 35%, transparent); color: inherit; }
+:root:not(#_) :focus-visible { outline: 2px solid var(--c-amber); outline-offset: 2px; border-radius: 3px; }
+
+/* 코드 — 글자 속 코드는 오목한 칸, 여러 줄 코드는 화면 */
+:root:not(#_) code {
+  font-size: .86em; color: var(--c-text); background: var(--c-bg2);
+  border: 1px solid var(--c-line); border-radius: 5px; padding: 1px 6px;
+}
+:root:not(#_) pre {
+  background: var(--c-screen); color: var(--c-screen-ink);
+  border: 1px solid var(--c-screen-edge); border-radius: 6px; padding: 14px 16px; overflow-x: auto;
+}
+:root:not(#_) pre code { background: none; border: 0; padding: 0; color: inherit; font-size: inherit; }
+
+/* 인쇄는 밝은 판으로 */
+@media print {
+  :root:not(#_) {
+    --c-bg: #ffffff; --c-bg2: #f2f4f5; --c-panel: #ffffff; --c-panel2: #f2f4f5;
+    --c-line: #c2cad1; --c-line-soft: #dde2e6; --c-line-hi: #9faab4;
+    --c-text: #000000; --c-muted: #333d45; --c-dim: #46525c; --c-amber: #6b4200;
+    --c-glow: #ffffff;
+  }
+  :root:not(#_) body { background: #fff; }
+}
+
+/* ── 쉬운 말 — 문서 변수를 콘솔 색에 잇는다 ───────────────── */
+:root:not(#_) {
+  --paper: var(--c-bg); --card: var(--c-panel); --sunk: var(--c-bg2);
+  --ink: var(--c-text); --ink-soft: var(--c-muted); --mute: var(--c-dim);
+  --line: var(--c-line); --line-soft: var(--c-line-soft);
+  --teal: var(--c-teal); --teal-bg: color-mix(in srgb, var(--c-teal) 10%, var(--c-panel));
+  --brick: var(--c-red); --brick-bg: color-mix(in srgb, var(--c-red) 10%, var(--c-panel));
+  --ochre: var(--c-amber); --ochre-bg: color-mix(in srgb, var(--c-amber-fill) 10%, var(--c-panel));
+}
+:root:not(#_) body { font-size: 18px; line-height: 1.82; letter-spacing: 0; }
+
+/* 표제 */
+:root:not(#_) .masthead { padding: 56px 0 30px; border-bottom: 1px solid var(--c-line); }
+:root:not(#_) .masthead .kicker { font-family: var(--c-legend); font-weight: 600; font-size: 15px; letter-spacing: .05em; color: var(--c-teal); }
+:root:not(#_) .masthead h1 { font-weight: 700; font-size: clamp(34px, 6vw, 50px); line-height: 1.08; letter-spacing: .005em; }
+:root:not(#_) .masthead .lede { color: var(--c-muted); }
+
+/* 안내 · 목차 — 앞판 */
+:root:not(#_) .readme,
+:root:not(#_) .toc {
+  background: var(--c-panel); border: 1px solid var(--c-line); border-radius: 10px;
+  box-shadow: inset 0 1px 0 var(--c-hilite); color: var(--c-muted);
+}
+:root:not(#_) .toc { padding: 16px 20px 6px; }
+:root:not(#_) .toc h2 { font-size: 14px; font-weight: 600; letter-spacing: .06em; color: var(--c-muted); }
+:root:not(#_) .toc li { border-bottom-color: var(--c-line-soft); }
+:root:not(#_) .toc li:last-child { border-bottom: 0; }
+:root:not(#_) .toc a { color: var(--c-text); }
+:root:not(#_) .toc a::before { font-family: var(--c-legend); font-weight: 700; color: var(--c-amber); }
+:root:not(#_) .toc a:hover { color: var(--c-amber); }
+
+/* 구획 제목 — 번호는 프로그램의 번호 배지처럼 */
+:root:not(#_) section > h2 {
+  display: flex; align-items: center; gap: 12px; font-size: 28px; font-weight: 600; letter-spacing: .005em;
+  border-bottom: 1px solid var(--c-line);
+}
+:root:not(#_) section > h2 .n {
+  flex: 0 0 auto; display: inline-grid; place-items: center; min-width: 1.8em; height: 1.45em; padding: 0 6px; margin: 0;
+  border-radius: 5px; background: var(--c-amber-fill); color: var(--c-on-amber);
+  font-size: 16px; font-weight: 700; font-variant-numeric: tabular-nums;
+}
+:root:not(#_) h3 { font-size: 21px; font-weight: 600; letter-spacing: .01em; }
+:root:not(#_) h4 { font-size: 18px; font-weight: 600; }
+:root:not(#_) strong { color: var(--c-text); }
+
+/* 상자 — 왼쪽 막대 */
+:root:not(#_) .box { border-radius: 0 8px 8px 0; }
+:root:not(#_) .box .t { font-family: var(--c-legend); font-size: 15px; font-weight: 600; letter-spacing: .04em; }
+/* 색 글자는 본문색 쪽으로 섞는다 — 물든 상자 바탕 위에서도 대비 4.5:1 이상 */
+:root:not(#_) .box .t { color: color-mix(in srgb, var(--teal) var(--c-cap-ink), var(--c-text)); }
+:root:not(#_) .box.warn .t { color: color-mix(in srgb, var(--brick) var(--c-cap-ink), var(--c-text)); }
+:root:not(#_) .box.point .t { color: color-mix(in srgb, var(--ochre) var(--c-cap-ink), var(--c-text)); }
+
+/* 단계 번호 */
+:root:not(#_) .steps > li::before {
+  background: var(--c-amber-fill); color: var(--c-on-amber);
+  font-family: var(--c-legend); font-weight: 700; font-size: 14px;
+}
+
+/* 장치 — 처리기 캡 색 막대가 달린 앞판 */
+:root:not(#_) .mod {
+  position: relative; overflow: hidden; background: var(--c-panel); border: 1px solid var(--c-line); border-radius: 10px;
+  box-shadow: inset 0 1px 0 var(--c-hilite);
+}
+:root:not(#_) .mod::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 3px; background: var(--cap); }
+:root:not(#_) .mod h3 { font-size: 21px; font-weight: 700; letter-spacing: .05em; }
+:root:not(#_) .mod .sub { color: var(--c-muted); }
+:root:not(#_) .mod dt { font-family: var(--c-legend); font-size: 16px; font-weight: 600; letter-spacing: .03em; color: color-mix(in srgb, var(--cap) var(--c-cap-ink), var(--c-text)); }
+
+/* 표 — 앞판 안의 표 */
+:root:not(#_) .tw { background: var(--c-panel); border: 1px solid var(--c-line); border-radius: 10px; padding: 10px 16px 2px; box-shadow: inset 0 1px 0 var(--c-hilite); }
+:root:not(#_) th { font-size: 14px; font-weight: 600; letter-spacing: .04em; color: var(--c-muted); border-bottom-color: var(--c-line); }
+:root:not(#_) td { border-bottom-color: var(--c-line-soft); }
+:root:not(#_) tr:last-child td { border-bottom: 0; }
+:root:not(#_) td.num { font-family: var(--c-legend); font-weight: 600; font-variant-numeric: tabular-nums; color: var(--c-muted); }
+
+:root:not(#_) figcaption { font-family: var(--c-body); color: var(--c-muted); }
+:root:not(#_) .band { border-color: var(--c-line); }
+:root:not(#_) .band-label { font-family: var(--c-legend); font-variant-numeric: tabular-nums; color: var(--c-muted); }
+:root:not(#_) footer { color: var(--c-muted); border-top-color: var(--c-line); }
 </style>
 </head>
 <body>
 <nav class="hub-nav" aria-label="문서 간 이동">
-  <a class="home" href="index.html">◂ 통합 색인</a><a class="hn" href="analog-soul-dsp.html">메인 어플리케이션 실행하기</a><span class="sep">/</span><a class="hn" href="analog-soul-manual.html">공식 매뉴얼</a><span class="sep">/</span><a class="hn" href="#" aria-current="page">쉬운 말</a><span class="sep">/</span><a class="hn" href="analog-soul-guide.html">기술 설명서</a><span class="sep">/</span><a class="hn" href="analog-soul-engineering.html">사양서</a><span class="sep">/</span><a class="hn" href="analog-soul-internals.html">논고</a>
+  <a class="home" href="index.html">◂ 통합 색인</a><a class="hn" href="analog-soul-dsp.html">메인 어플리케이션 실행하기</a><span class="sep" aria-hidden="true">/</span><a class="hn" href="analog-soul-manual.html">공식 매뉴얼</a><span class="sep" aria-hidden="true">/</span><a class="hn" href="#" aria-current="page">쉬운 말</a><span class="sep" aria-hidden="true">/</span><a class="hn" href="analog-soul-guide.html">기술 설명서</a><span class="sep" aria-hidden="true">/</span><a class="hn" href="analog-soul-engineering.html">사양서</a><span class="sep" aria-hidden="true">/</span><a class="hn" href="analog-soul-internals.html">논고</a>
 </nav>
 
 <div class="wrap">
@@ -317,9 +570,12 @@ footer {
   <h2><span class="n">2</span>시작하기</h2>
   <p>
     따로 설치할 것은 없습니다. 파일 하나를 인터넷 브라우저로 열면 그것이 프로그램 전체입니다.
-    Chrome을 권합니다. 뒤에 나오는 가장 높은 품질의 저장 기능이 다른 브라우저에서는
-    막히는 경우가 있습니다.
+    이 프로그램은 최신 데스크톱 Chrome에서 잘 돌아가도록 만들고 시험했습니다.
+    다른 브라우저에서는 화면이 조금 다르게 보이거나, 가장 높은 품질의 저장 기능이 막히는 경우가 있습니다.
   </p>
+    <p>처음 열면 다섯 가지 효과가 알맞은 세기로 켜져 있습니다. 효과 상자마다 맨 위에 있는 MACRO 손잡이 하나로,
+    그 효과를 가장 약하게(0%)부터 기준 세기(100%)까지 한꺼번에 조절할 수 있습니다.
+    효과를 아예 빼고 싶으면 상자의 전원을 끄면 됩니다.</p>
 
   <ol class="steps">
     <li>
@@ -341,6 +597,7 @@ footer {
       <h4>장치를 하나만 켭니다</h4>
       <p>
         각 장치의 오른쪽 위에 켜고 끄는 스위치가 있습니다.
+        장치들 위의 신호 흐름 지도에서 동그란 불빛을 눌러도 켜고 끌 수 있습니다.
         하나만 켜고 들어본 뒤 다시 꺼서 비교해보세요.
       </p>
     </li>
@@ -391,15 +648,19 @@ footer {
     <tbody>
       <tr><td class="num">맨 위</td><td>넣은 파일의 이름, 길이, 용량</td></tr>
       <tr><td class="num">그 아래</td><td>소리를 그림으로 보여주는 그래프 두 개. 왼쪽은 원래 소리, 오른쪽은 바뀐 소리입니다.</td></tr>
-      <tr><td class="num">가운데</td><td>재생과 정지 버튼, 진행 막대. 막대를 누르면 그 지점으로 이동합니다.</td></tr>
-      <tr><td class="num">본문</td><td>여덟 개의 장치가 세로로 놓여 있습니다.</td></tr>
-      <tr><td class="num">맨 아래</td><td>저장 버튼과 초기화 버튼</td></tr>
+      <tr><td class="num">가운데</td><td>재생과 정지 버튼, 진행 막대. 막대를 누르면 그 지점으로 이동합니다. 화면을 아래로 내려도 위쪽에 계속 보입니다. 휴대폰처럼 좁은 화면에서는 제자리에 있습니다.</td></tr>
+      <tr><td class="num">본문</td><td>여덟 개의 장치가 카드로 놓여 있습니다. 그 위의 신호 흐름 지도가 소리가 지나는 순서를 한 줄로 보여 줍니다.</td></tr>
+      <tr><td class="num">맨 아래</td><td>저장할 파일의 모양을 고르는 막대 두 개, 저장 버튼과 초기화 버튼</td></tr>
     </tbody>
   </table></div>
   <p>
-    장치는 모두 같은 모양입니다. 맨 위에 이름과 켜는 스위치가 있고,
-    그 아래에 조절 막대들이 줄지어 있습니다. 막대를 좌우로 끌면 숫자가 바뀝니다.
-    켜진 장치는 테두리에 표시가 나타납니다.
+    장치는 모두 같은 모양입니다. 맨 위에 순서 번호와 이름, 접는 단추, 켜는 스위치가 있고,
+    그 아래에 조절 막대들이 줄지어 있습니다. 막대를 좌우로 끌면 숫자가 바뀌고, 막대 안이 그 장치의 색으로 채워집니다.
+    켜진 장치는 맨 위 색 띠와 스위치에 불이 들어옵니다. 접는 단추를 누르면 이름 줄만 남아 화면이 짧아집니다.
+  </p>
+  <p>
+    컴퓨터를 어두운 화면(다크 모드)으로 쓰면 프로그램도 어둡게, 밝은 화면(라이트 모드)으로 쓰면 밝게 그려집니다. 맨 위 막대 오른쪽의 '자동 · 야간 · 주간'을 누르면 직접 고를 수 있고, 고른 것은 다음에 열 때도 그대로입니다.
+    소리 그래프와 음량 막대는 어느 쪽이든 검은 창 안에 나타납니다.
   </p>
 </section>
 
@@ -426,18 +687,18 @@ footer {
       <tr><td class="num">5</td><td><strong>SOUNDGOODIZER</strong><br>세 대역 다듬기</td><td>전체 균형을 마지막으로 정리합니다.</td></tr>
       <tr><td class="num">6</td><td><strong>VINYL</strong><br>LP 느낌 내기</td><td>음색 작업이 끝난 뒤 질감을 덮어야 자연스럽습니다.</td></tr>
       <tr><td class="num">7</td><td><strong>ATMOS</strong><br>공간감 주기</td><td>완성된 소리를 공간에 놓는 단계라 뒤쪽입니다.</td></tr>
-      <tr><td class="num">8</td><td><strong>MASTER</strong><br>마무리 정리</td><td>항상 맨 마지막입니다.</td></tr>
+      <tr><td class="num">8</td><td><strong>MASTER</strong><br>마무리 정리</td><td>만드는 과정의 맨 마지막입니다.</td></tr>
     </tbody>
   </table></div>
 
   <h3>순서 바꾸기</h3>
   <p>
-    장치 이름 왼쪽의 손잡이를 잡고 위아래로 끌면 순서가 바뀝니다.
+    신호 흐름 지도에서 장치 이름을 잡고 원하는 자리로 끌면 순서가 바뀌고, 아래 카드들도 새 자리로 미끄러져 따라옵니다. 끄는 도중 마음이 바뀌면 Esc 키를 누르세요. 제자리로 돌아갑니다.
+    카드 이름 왼쪽의 손잡이를 잡고 다른 카드 앞이나 뒤로 끌어도 됩니다.
     재생 중에 바꾸면 재생 위치를 유지한 채 바로 반영되므로 차이를 즉시 들을 수 있습니다.
   </p>
   <p>
-    딱 하나 예외가 있습니다. <strong>MASTER는 어디에 놓아도 항상 맨 마지막</strong>에
-    처리됩니다. 전체를 정리하는 역할이라 그렇습니다.
+    딱 하나 예외가 있습니다. <strong>MASTER는 항상 만드는 과정의 맨 마지막</strong>에 처리됩니다. 전체를 정리하는 역할이라 그렇습니다. 다만 레코드판(VINYL)과 공간 음향(ATMOS)은 ‘MASTER 뒤’로 옮길 수 있습니다. 완성된 음반을 턴테이블이나 듣는 기기로 재생하는 단계를 흉내 내는 것입니다. 신호 흐름 지도에서 MASTER가 점선 테두리로 그려지는 것도 이 때문입니다. 맨 앞의 HD 복원도 자리가 정해져 있어 같은 점선입니다.
   </p>
   <p>바꿔볼 만한 조합을 들면 이렇습니다.</p>
   <ul>
@@ -480,7 +741,7 @@ footer {
     모든 장치에 INPUT GAIN이 공통으로 있으므로 아래에서는 생략했습니다.
   </p>
 
-  <div class="mod">
+  <div class="mod" data-cap="comp">
     <h3>COMPRESSOR</h3>
     <p class="sub">소리 크기를 고르게 만듭니다</p>
     <dl>
@@ -508,7 +769,7 @@ footer {
     </dl>
   </div>
 
-  <div class="mod">
+  <div class="mod" data-cap="bbe">
     <h3>BBE SONIC MAXIMIZER</h3>
     <p class="sub">소리를 또렷하고 선명하게 만듭니다</p>
     <dl>
@@ -516,9 +777,8 @@ footer {
       <dd>소리를 선명하게 만듭니다. 뿌옇던 것이 걷히는 느낌입니다.</dd>
       <dt>비유</dt>
       <dd>
-        스피커에서는 낮은 소리가 높은 소리보다 아주 조금 늦게 나옵니다.
-        이 장치는 빠른 쪽을 살짝 늦춰서 도착 시각을 맞춰줍니다.
-        타이밍이 맞으면 소리가 또렷해집니다.
+        소리의 첫머리는 높은 성분이 모양을 잡습니다. 이 장치는 낮은 소리를 1000분의 2.5초쯤 늦춰
+        높은 성분이 먼저 귀에 닿게 합니다. 그러면 소리의 윤곽이 또렷하게 들립니다.
         단순히 특정 음역을 키우는 것과는 다른 방식입니다.
       </dd>
       <dt>먼저 만질 값</dt>
@@ -534,7 +794,7 @@ footer {
     </dl>
   </div>
 
-  <div class="mod">
+  <div class="mod" data-cap="tube">
     <h3>VACUUM TUBE</h3>
     <p class="sub">소리를 따뜻하고 두껍게 만듭니다</p>
     <dl>
@@ -560,7 +820,7 @@ footer {
     </dl>
   </div>
 
-  <div class="mod">
+  <div class="mod" data-cap="exc">
     <h3>EXCITER</h3>
     <p class="sub">높은 쪽에 밝은 성분을 더합니다</p>
     <dl>
@@ -586,7 +846,7 @@ footer {
     </dl>
   </div>
 
-  <div class="mod">
+  <div class="mod" data-cap="sg">
     <h3>SOUNDGOODIZER</h3>
     <p class="sub">소리를 세 덩어리로 나눠 각각 다듬습니다</p>
     <dl>
@@ -609,7 +869,7 @@ footer {
     </dl>
   </div>
 
-  <div class="mod">
+  <div class="mod" data-cap="vinyl">
     <h3>VINYL RECORD</h3>
     <p class="sub">LP판으로 듣는 듯한 질감을 더합니다</p>
     <dl>
@@ -625,14 +885,26 @@ footer {
       </dd>
       <dt>먼저 만질 값</dt>
       <dd>
-        <strong>CRACKLE</strong>은 지직거리는 양,
-        <strong>WOBBLE</strong>은 음정이 흔들리는 정도입니다.
+        손잡이가 많지만 세 묶음입니다. <strong>판</strong>의 상태(먼지, 긁힘, 휨, 몇 번 틀었는지),
+        <strong>턴테이블</strong>의 성능(판이 얼마나 고르게 도는지, 모터가 얼마나 조용한지),
+        <strong>바늘</strong>의 종류와 설치 상태입니다.
+        가진 기기의 설명서에 적힌 숫자를 그대로 넣으면 그 소리가 납니다.
+        처음에는 <strong>CRACKLE</strong>(탁탁 소리 개수)과 <strong>WOW &amp; FLUTTER</strong>(음정 흔들림)만 만져 보세요.
         장치 안의 작은 그림이 지금 설정된 잡음 양을 보여줍니다.
+      </dd>
+      <dt>진짜 레코드처럼 움직이는 것들</dt>
+      <dd>
+        <strong>SCRATCH</strong>를 올리면 판에 긁힌 자국이 생겨, 판이 한 바퀴 돌 때마다 같은 자리에서 딸깍합니다.
+        <strong>TRACK POS</strong>는 이 곡이 판의 바깥쪽에 새겨졌는지 안쪽에 새겨졌는지입니다.
+        레코드는 안쪽으로 갈수록 홈이 천천히 지나가서 높은 소리가 줄고 "스" 소리가 거칠어지는데,
+        곡이 흐르는 동안 그 변화가 조금씩 진행됩니다.
+        <strong>SPEED</strong>를 45로 바꾸면 판이 빨리 돌아 이런 손해가 줄어듭니다.
+        들은 자리의 딸깍 소리는 저장한 파일에서도 같은 자리에 납니다.
       </dd>
     </dl>
   </div>
 
-  <div class="mod">
+  <div class="mod" data-cap="atmos">
     <h3>DOLBY ATMOS</h3>
     <p class="sub">넓은 공간에서 울리는 느낌을 만듭니다</p>
     <dl>
@@ -646,7 +918,7 @@ footer {
       <dt>가장 쉬운 사용법</dt>
       <dd>
         영화관, 공연장, 경기장, 녹음실, 클럽 다섯 개의 버튼이 있습니다.
-        경기장이 가장 넓고 녹음실이 가장 좁습니다. 눌러보면 바로 차이를 알 수 있습니다.
+        \1\n        DEPTH를 올리면 소리가 멀어지면서 울림이 커지고, OBJECT MIX를 올리면 옆벽의 울림이 늘어 소리가 넓게 퍼집니다.
       </dd>
       <dt>주의</dt>
       <dd>
@@ -657,7 +929,7 @@ footer {
     </dl>
   </div>
 
-  <div class="mod">
+  <div class="mod" data-cap="master">
     <h3>MASTERING CHAIN</h3>
     <p class="sub">전체를 마지막으로 정리합니다</p>
     <dl>
@@ -665,7 +937,7 @@ footer {
       <dd>
         다른 장치들이 모두 일한 뒤 전체를 마지막으로 정리합니다.
         소리를 네 구간으로 나눠 각각 다듬고, 좌우 폭을 정하고,
-        소리가 일정 크기를 넘지 못하도록 막습니다.
+        \1\n        조용한 부분을 키우지는 않으므로, 전체를 더 크게 하고 싶으면 이 장치의 INPUT GAIN을 조금 올려 보세요.
       </dd>
       <dt>비유</dt>
       <dd>선물 포장과 비슷합니다. 안에 무엇을 넣든 마지막에는 단정하게 싸서 마무리합니다.</dd>
@@ -730,8 +1002,10 @@ footer {
 
   <h3>이 기능이 하는 일</h3>
   <p>
-    잘린 지점을 스스로 찾아냅니다. 그리고 남아 있는 아래쪽 소리를 분석해서,
-    그 위에 어울릴 만한 소리를 계산해 채워 넣습니다.
+    잘린 지점을 스스로 찾아냅니다. 그리고 바로 아래에 남아 있는 소리를 통째로 위로 옮겨
+    빈 곳에 이어 붙이고, 원래 소리가 높아지며 약해지던 흐름을 그대로 이어 크기를 맞춥니다.
+    그래서 잘린 자리에 층이나 계단 없이 이어집니다. 원래 있던 소리는 조금도 건드리지 않고,
+    비어 있는 만큼만 채웁니다.
   </p>
   <p>
     책의 한 장이 윗부분만 찢어졌다고 생각해보세요.
@@ -769,24 +1043,25 @@ footer {
 
   <h3>두 가지 방식의 차이</h3>
   <p>
-    <strong>HD RESTORE</strong>와 <strong>ULTRA HD RESTORE</strong> 두 가지가 있습니다.
+    <strong>HD RESTORE</strong>와 <strong>ULTRA · eXtreme HD RESTORE</strong> 두 가지가 있습니다.
     하는 일은 같고 얼마나 넓게 채우느냐만 다릅니다.
+    저장할 때 촘촘함을 원래 파일보다 높게 고르면 쓰입니다. 나가는 촘촘함이 96 이하면 HD, 176.4 · 192면 ULTRA HD, 352.8 · 384면 eXtreme HD입니다. 한 악기나 목소리가 두드러지는 순간에는 채운 소리의 음정이 원래 소리의 배음 자리에 맞게 놓입니다.
   </p>
   <div class="tw"><table>
-    <thead><tr><th></th><th>HD RESTORE</th><th>ULTRA HD RESTORE</th></tr></thead>
+    <thead><tr><th></th><th>HD RESTORE</th><th>ULTRA · eXtreme HD RESTORE</th></tr></thead>
     <tbody>
       <tr><td>채우는 범위</td><td>넓음</td><td>아주 넓음</td></tr>
-      <tr><td>1분당 용량</td><td class="num">약 33MB</td><td class="num">약 92MB</td></tr>
+      <tr><td>1분당 용량(세밀함 24)</td><td class="num">약 33MB</td><td class="num">약 66MB</td></tr>
       <tr><td>걸리는 시간</td><td>보통</td><td>두 배 이상</td></tr>
     </tbody>
   </table></div>
   <p>
-    그런데 ULTRA HD가 더 채우는 부분은 <strong>사람이 들을 수 없는 영역</strong>입니다.
-    파일은 세 배 가까이 커지고 시간도 두 배 넘게 걸리는데 귀로는 차이를 알기 어렵습니다.
+    그런데 ULTRA · eXtreme HD가 더 채우는 부분은 <strong>사람이 들을 수 없는 영역</strong>입니다.
+    파일은 두 배로 커지고 시간도 두 배 넘게 걸리는데 귀로는 차이를 알기 어렵습니다.
   </p>
   <p>
     듣기 위한 용도라면 <strong>HD로 충분합니다.</strong>
-    ULTRA HD는 오래 보관할 파일을 만들거나, 나중에 다른 프로그램에서 추가 작업을 할 예정이라
+    ULTRA · eXtreme HD는 오래 보관할 파일을 만들거나, 나중에 다른 프로그램에서 추가 작업을 할 예정이라
     여유를 남겨두고 싶을 때 쓰시면 됩니다.
   </p>
 
@@ -796,31 +1071,46 @@ footer {
     <tbody>
       <tr>
         <td>HF SYNTH<br>UHF SYNTH</td>
-        <td>새로 만든 소리를 얼마나 세게 넣을지 정합니다. 올릴수록 많이 들어갑니다.</td>
-        <td class="num">60 ~ 65</td>
+        <td>새로 채우는 소리의 모양과 양을 정합니다. 50이면 실제 녹음처럼 높은 소리일수록 자연스럽게 줄어들게 채우고, 올릴수록 평평하게(더 밝게) 채웁니다.</td>
+        <td class="num">50</td>
+      </tr>
+      <tr>
+        <td>PRESET</td>
+        <td>누르면 기준 · 밝기 · 질감 · 공간 · 음악 종류 칸이 나뉜 판이 열립니다. 칸마다 마음에 드는 것을 하나씩 고르면 아래 손잡이들이 그에 맞게 움직입니다.</td>
+        <td class="num">자연</td>
+      </tr>
+      <tr>
+        <td>AUTO</td>
+        <td>파일을 열면 원래 소리를 살펴 아래 손잡이들을 곡에 맞게 놓아 줍니다. 비율을 낮추면 덜 맞춥니다.</td>
+        <td class="num">75%</td>
+      </tr>
+      <tr>
+        <td>KNEE · ATTACK · SUSTAIN · WIDTH</td>
+        <td>새로 채운 높은 소리가 어디서 줄어들기 시작할지, 치는 순간과 여운을 얼마나 살릴지, 좌우로 얼마나 퍼질지를 정합니다. 보통은 AUTO가 맞춘 그대로 두면 됩니다.</td>
+        <td class="num">AUTO</td>
       </tr>
       <tr>
         <td>SMOOTH</td>
         <td>
-          새로 만든 소리를 얼마나 부드럽게 다듬을지 정합니다.
-          올리면 매끄러워지고, 내리면 또렷하지만 가끔 뾰족한 소리가 섞입니다.
+          높은 곳으로 갈수록 채운 소리를 얼마나 고르게 펼지 정합니다.
+          올리면 위쪽이 바람 소리처럼 고르게 되고, 내리면 또렷하지만 높은 곳에 쇳소리가 남을 수 있습니다.
         </td>
         <td class="num">40</td>
       </tr>
     </tbody>
   </table></div>
   <p>
-    소리가 쇳소리처럼 따갑게 들리면 먼저 HF SYNTH를 10씩 내려보세요.
-    세기는 유지하고 싶은데 따갑기만 하다면 SMOOTH를 올리는 것이 답입니다.
+    소리가 쇳소리처럼 따갑게 들리면 먼저 SMOOTH를 올려보세요.
+    그래도 따가우면 HF SYNTH를 50 쪽으로 내리세요.
   </p>
   <p>
-    많이 압축된 파일일수록 높은 값이 어울리고, 원래 좋은 파일일수록 낮춰야 합니다.
-    채울 것이 없는데 많이 넣으면 없던 소리만 얹히기 때문입니다.
+    많이 압축된 파일일수록 채울 곳이 넓어 효과가 크고, 원래 좋은 파일일수록 채울 곳이 적어 달라지는 것이 거의 없습니다.
+    음질이 아주 낮은 파일이라면 SMOOTH를 조금 더 올려 두는 것이 좋습니다.
   </p>
 
   <h3>미리 들어보기</h3>
   <p>
-    HD와 ULTRA HD 칸에 각각 <strong>LIVE</strong> 스위치가 있습니다.
+    HD와 ULTRA · eXtreme HD 칸에 각각 <strong>LIVE</strong> 스위치가 있습니다.
     켜면 저장하기 전에 결과를 미리 들을 수 있습니다. 둘은 동시에 켜지지 않습니다.
   </p>
   <p>
@@ -831,17 +1121,18 @@ footer {
   </p>
   <p>
     한 번 만든 결과는 보관됩니다. 껐다 켜는 것은 즉시 되고,
-    조절 막대를 움직였을 때만 다시 만듭니다.
+    조절 막대를 움직였을 때만 다시 만듭니다. 미리 들은 소리와 저장한 파일은
+    같은 순서로 만들어지므로 똑같습니다.
   </p>
 
   <div class="box warn">
     <span class="t">저장할 때 주의</span>
     <p>
-      LIVE를 켜고 듣다가 <strong>WAV</strong>로 저장하면 되살린 소리는 파일에 들어가지 않습니다.
-      되살린 소리까지 저장하시려면 HD나 ULTRA HD 버튼으로 저장하셔야 합니다.
+      LIVE를 켜고 듣다가 촘촘함을 원래 파일과 <strong>같거나 낮게</strong> 골라 저장하면 되살린 소리는 파일에 들어가지 않습니다.
+      되살린 소리까지 저장하시려면 촘촘함을 원래보다 높게 고르셔야 합니다.
     </p>
     <p>
-      반대로 LIVE를 켜둔 채 HD로 저장해도 효과가 두 번 겹치지는 않습니다.
+      반대로 LIVE를 켜둔 채 96으로 저장해도 효과가 두 번 겹치지는 않습니다.
       저장은 언제나 원본에서 새로 시작합니다.
     </p>
   </div>
@@ -868,8 +1159,8 @@ footer {
       <h4>LIVE를 켜고 같은 구간을 다시 재생합니다</h4>
       <p>
         비어 있던 자리에 색이 들어차면 제대로 동작한 것입니다.
-        아래쪽 무늬와 비슷한 결로 이어지면 잘 된 것이고,
-        아래와 상관없는 균일한 띠가 생겼다면 세기가 과한 것입니다.
+        잘린 자리에서 색과 무늬가 끊김 없이 이어지고 위로 갈수록 고르게 옅어지면 잘 된 것입니다.
+        경계에 밝은 띠가 보이면 세기가 과한 것입니다.
       </p>
     </li>
     <li>
@@ -941,26 +1232,53 @@ footer {
 <!-- 8 -->
 <section id="save">
   <h2><span class="n">8</span>파일로 저장하기</h2>
+  <p>
+    맨 아래에 막대 두 개와 저장 버튼이 있습니다. 막대로 파일을 어떻게 만들지 고르고 버튼을 누르면 됩니다.
+  </p>
   <div class="tw"><table>
-    <thead><tr><th>버튼</th><th>특징</th><th>1분당 용량</th></tr></thead>
+    <thead><tr><th>막대</th><th>고르는 것</th><th>뜻</th></tr></thead>
     <tbody>
-      <tr><td>WAV</td><td>가장 빠릅니다. 되살리기는 들어가지 않습니다.</td><td class="num">약 10MB</td></tr>
-      <tr><td>HD RESTORE</td><td>되살리기가 들어갑니다. 일상적인 용도에 권합니다.</td><td class="num">약 33MB</td></tr>
-      <tr><td>ULTRA HD</td><td>가장 크고 가장 오래 걸립니다. 보관용입니다.</td><td class="num">약 92MB</td></tr>
+      <tr><td>SAMPLE RATE<br>(촘촘함)</td><td class="num">44.1 · 48 · 96 · 192 · 384 (또는 44.1 · 48 · 88.2 · 176.4 · 352.8)</td><td>1초를 얼마나 촘촘하게 나눠 적을지입니다. 원래 파일보다 높게 고르면 잘린 높은 소리를 그 높이에 맞춰 되살려 채우고, 낮게 고르면 원래 소리를 최대한 지키며 줄입니다. 파일을 올리면 원래 파일과 같은 값에 맞춰지고, 그 눈금 아래에 (원본)이 붙습니다. 원래 파일이 44.1의 두 배 · 네 배 · 여덟 배(88.2 · 176.4 · 352.8)거나 44.1이면, 위쪽 세 눈금도 88.2 · 176.4 · 352.8로 바뀝니다.</td></tr>
+      <tr><td>BIT DEPTH<br>(세밀함)</td><td class="num">16 · 24 · 32</td><td>한 번 적을 때 얼마나 세밀하게 적을지입니다. 원래 파일이 16비트면, 24나 32를 고를 때 계단처럼 끊긴 사이를 부드럽게 이어 줍니다.</td></tr>
     </tbody>
   </table></div>
   <p>
+    막대를 옮기면 버튼 글자와 그 아래 안내가 바뀌어, 어떤 순서로 처리되는지 알려줍니다.
     버튼을 누르면 진행 막대가 나타나 지금 무슨 작업을 하는지 알려줍니다.
-    ULTRA HD는 곡 길이에 따라 몇 분이 걸릴 수 있습니다.
+    장치를 모두 끄고 촘촘함은 맞춰진 그대로, 세밀함 16으로 저장하면, 16비트 원래 파일과 한 점도 다르지 않은 파일이 나옵니다.
   </p>
+  <div class="tw"><table>
+    <thead><tr><th>고르는 법</th><th>이럴 때</th><th>1분당 용량</th></tr></thead>
+    <tbody>
+      <tr><td>원래 값 · 16</td><td>가장 빠르고 가볍습니다. 되살리기는 들어가지 않습니다.</td><td class="num">약 10MB (44.1)</td></tr>
+      <tr><td>96 · 24</td><td>되살리기가 들어갑니다. 일상적인 용도에 권합니다.</td><td class="num">약 33MB</td></tr>
+      <tr><td>192 · 32</td><td>크고 오래 걸립니다. 보관용입니다.</td><td class="num">약 88MB</td></tr>
+      <tr><td>384 · 32</td><td>가장 촘촘합니다. 채우는 범위가 가장 넓지만 귀로 듣는 차이는 거의 없습니다.</td><td class="num">약 176MB</td></tr>
+    </tbody>
+  </table></div>
   <p>
     저장되는 파일은 모두 WAV 형식입니다.
-    ULTRA HD로 만든 파일은 일부 오래된 재생 프로그램에서 열리지 않을 수 있습니다.
+    세밀함을 32로 만든 파일은 일부 오래된 재생 프로그램에서 열리지 않을 수 있습니다.
   </p>
+  <div class="box">
+    <span class="t">세밀함을 올리면 무엇이 달라지나</span>
+    <p>
+      16비트 파일은 소리의 크기를 약 6만 5천 단계 가운데 가장 가까운 칸에 맞춰 적은 것이라,
+      칸 사이만큼의 아주 작은 쉬 소리가 섞여 있습니다.
+      24나 32를 고르면 원래 값이 있었을 칸을 벗어나지 않는 범위에서 그 사이를 이어 채워 이 소리를 줄입니다.
+    </p>
+    <p>
+      차이는 아주 작아서 보통은 들리지 않습니다. 소리를 크게 끌어올리는 설정에서 조용한 부분의 쉬 소리가 줄어드는 정도입니다.
+      mp3처럼 이미 압축된 파일에는 이 과정이 들어가지 않습니다.
+    </p>
+    <p>
+      CD 가운데는 이 쉬 소리를 일부러 높은 소리 쪽으로 몰아 만든 파일이 많습니다. 이런 파일은 먼저 곡 전체를 훑어 쉬 소리의 모양을 알아낸 뒤 그 모양대로 걸러, 훨씬 많이 줄입니다. 원래 값에서 벗어나는 양도 정해진 폭 안으로 묶습니다.
+    </p>
+  </div>
   <div class="box">
     <span class="t">용량을 미리 가늠하세요</span>
     <p>
-      5분짜리 곡을 ULTRA HD로 저장하면 파일 하나가 460MB 정도 됩니다.
+      5분짜리 곡을 192 · 32로 저장하면 파일 하나가 440MB, 384 · 32면 880MB 정도 됩니다.
       만드는 동안에는 그보다 더 많은 메모리를 씁니다.
       너무 클 것 같으면 프로그램이 시작 전에 알려주고 멈춥니다.
     </p>
@@ -974,9 +1292,9 @@ footer {
 
   <h3>오래된 mp3를 살리고 싶을 때</h3>
   <p>
-    이 프로그램이 가장 잘하는 일입니다. HD의 LIVE를 켜고 HF SYNTH를 65 정도에 둡니다.
+    이 프로그램이 가장 잘하는 일입니다. HD의 LIVE를 켜고 HF SYNTH를 50에 둡니다.
     나머지 장치는 전부 끄세요. 되살리기 효과를 판단하는 데 다른 처리가 끼면 방해가 됩니다.
-    판단이 끝난 뒤에 색을 입히시면 됩니다.
+    판단이 끝난 뒤에 색을 입히시면 됩니다. 저장할 때는 촘촘함을 96으로 고르세요.
   </p>
 
   <h3>밋밋한 녹음에 온기를 더하고 싶을 때</h3>
@@ -995,15 +1313,15 @@ footer {
 
   <h3>LP처럼 듣고 싶을 때</h3>
   <p>
-    VINYL을 켜고 CRACKLE 25, WOBBLE 20에 둡니다.
+    VINYL을 켜고 CRACKLE 10, WOW &amp; FLUTTER 0.15에 둡니다.
     TUBE를 함께 켜면 훨씬 그럴듯해집니다.
     MASTER의 STEREO WIDTH는 95 정도로 살짝 좁히세요. 실제 LP도 좌우가 넓지 않습니다.
   </p>
 
   <h3>오래 보관할 파일을 만들고 싶을 때</h3>
   <p>
-    장치를 모두 끄거나 최소한만 켜고 ULTRA HD로 저장합니다.
-    UHF SYNTH는 40 이하로 절제하세요.
+    장치를 모두 끄거나 최소한만 켜고 촘촘함 192, 세밀함 32로 저장합니다.
+    UHF SYNTH는 자연스러운 곡선인 50 이하로 두세요.
     나중에 다른 프로그램에서 작업하실 파일이라면 지금 색을 많이 입히지 않는 편이 낫습니다.
     CEILING은 −1.0으로 여유를 크게 두세요.
   </p>
@@ -1016,14 +1334,20 @@ footer {
   <h3>저장 버튼을 눌러도 아무 일이 없습니다</h3>
   <p>브라우저 화면을 새로 고쳐보세요. 대부분 해결됩니다.</p>
 
-  <h3>ULTRA HD만 실패합니다</h3>
+  <h3>파일을 올렸는데 읽지 못했다고 나옵니다</h3>
+    <p>
+      이 브라우저가 그 파일의 형식을 풀지 못한 것입니다. 화면 아래 알림에 이유가 나옵니다. 흔한 경우는 m4a(AAC) 파일과 아주 특이한 WAV입니다.
+      파일을 WAV나 FLAC으로 바꾸거나, Chrome이나 Edge에서 열어 보세요. 먼저 열어 둔 파일은 그대로 남아 있습니다.
+    </p>
+
+    <h3>촘촘함 192나 384로만 실패합니다</h3>
   <p>
     쓰고 계신 브라우저가 지원하지 않거나 메모리가 부족한 경우입니다.
-    Chrome을 쓰시거나, 더 짧은 파일로 시도하시거나, HD로 저장하세요.
+    Chrome을 쓰시거나, 더 짧은 파일로 시도하시거나, 촘촘함을 96으로 골라 저장하세요.
   </p>
 
   <h3>저장이 시작되다 멈춥니다</h3>
-  <p>디스크 여유 공간을 확인하세요. ULTRA HD 파일은 생각보다 훨씬 큽니다.</p>
+  <p>디스크 여유 공간을 확인하세요. 192 · 32로 만든 파일은 생각보다 훨씬 큽니다.</p>
 
   <h3>LIVE를 켜니 소리가 끊깁니다</h3>
   <p>컴퓨터가 버거워하는 상태입니다. 다른 창을 닫거나 HD 쪽으로 낮춰보세요.</p>
@@ -1031,14 +1355,16 @@ footer {
   <h3>되살리기를 켜도 그래프가 그대로입니다</h3>
   <p>
     원본에 잘린 부분이 없는 경우입니다. 품질이 좋은 파일이라는 뜻이니 정상입니다.
+    처음부터 아주 높은 곳까지 담긴 파일은 채우기를 건너뜁니다.
     또한 그래프 위 스위치를 96이나 192로 옮겨야 채워진 부분이 화면에 들어옵니다.
   </p>
 
   <h3>SMOOTH를 움직여도 차이를 모르겠습니다</h3>
   <p>
-    새로 만든 소리가 적으면 다듬을 대상도 적어 차이가 작습니다.
-    HF SYNTH를 70 이상으로 올린 뒤 심벌이 나오는 구간에서 SMOOTH를 0과 100으로
-    번갈아 두고 비교해보세요.
+    SMOOTH는 채우는 양이 아니라 결을 바꿉니다. 잘린 자리 바로 위에서는 거의 작용하지 않고
+    높이 올라갈수록 커지는데, 그 높이는 사람이 듣지 못하는 곳이라 귀로는 차이가 작을 수 있습니다.
+    그래프 위 스위치를 192에 두고 SMOOTH를 0과 100으로 번갈아 보면,
+    위쪽의 가는 줄무늬가 고른 색으로 바뀌는 것이 보입니다.
   </p>
 
   <h3>바꿨더니 오히려 나빠졌습니다</h3>
@@ -1099,6 +1425,20 @@ footer {
       <tr>
         <td>WAV</td>
         <td>아무것도 버리지 않고 저장하는 형식입니다. 그래서 용량이 큽니다.</td>
+      </tr>
+      <tr>
+        <td>비트 깊이</td>
+        <td>
+          소리의 크기를 몇 단계로 나눠 적는지를 뜻합니다. 16비트는 약 6만 5천 단계, 24비트는 약 1,678만 단계입니다.
+          단계가 많을수록 아주 작은 소리까지 곱게 담깁니다.
+        </td>
+      </tr>
+      <tr>
+        <td>디더</td>
+        <td>
+          칸에 맞춰 적을 때 아주 작은 잡음을 일부러 섞는 방법입니다.
+          사라져 가는 조용한 소리가 거칠게 부서지지 않고 부드럽게 잦아듭니다.
+        </td>
       </tr>
       <tr>
         <td>배음</td>
@@ -1187,6 +1527,60 @@ footer {
     var href = a.getAttribute('href');
     if (href === '#') { e.preventDefault(); toTop(); }
   });
+})();
+</script>
+<script>
+/* ============================================================
+   화면 색 고르기 — 상단 이동 바 오른쪽의 자동 · 야간 · 주간
+   ------------------------------------------------------------
+   고른 값은 이 브라우저에 기억해(asde.theme) 프로그램과 모든 문서에
+   같이 적용한다. 자동이면 data-theme을 두지 않아 컴퓨터의 다크 · 라이트
+   설정을 따른다. 그리기 전 적용은 <head>의 짧은 스크립트가 맡고,
+   여기서는 스위치를 붙이고 누른 값을 저장한다.
+   ============================================================ */
+(function () {
+  var KEY = 'asde.theme', root = document.documentElement;
+  var nav = document.querySelector('.hub-nav');
+  if (!nav || nav.querySelector('.hn-theme')) return;
+
+  function stored() {
+    try { var t = localStorage.getItem(KEY); return (t === 'dark' || t === 'light') ? t : 'auto'; }
+    catch (e) { return 'auto'; }                            // 저장소가 막힌 환경 — 이번 방문 동안만 적용된다
+  }
+
+  var OPTS = [
+    ['auto',  '자동', '자동 — 컴퓨터의 다크 · 라이트 설정을 따릅니다'],
+    ['dark',  '야간', '야간 — 늘 어두운 야간 콘솔(다크 모드)'],
+    ['light', '주간', '주간 — 늘 밝은 주간 콘솔(라이트 모드)']
+  ];
+  var box = document.createElement('div');
+  box.className = 'hn-theme';
+  box.setAttribute('role', 'group');
+  box.setAttribute('aria-label', '화면 색');
+  var btns = OPTS.map(function (o) {
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'hn-theme-btn';
+    b.textContent = o[1];
+    b.title = o[2];
+    b.setAttribute('data-choice', o[0]);
+    b.addEventListener('click', function () { choose(o[0], true); });
+    box.appendChild(b);
+    return b;
+  });
+
+  function choose(t, save) {
+    if (t === 'auto') root.removeAttribute('data-theme');
+    else root.setAttribute('data-theme', t);
+    btns.forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-choice') === t ? 'true' : 'false'); });
+    if (!save) return;
+    try { if (t === 'auto') localStorage.removeItem(KEY); else localStorage.setItem(KEY, t); } catch (e) {}
+  }
+
+  nav.appendChild(box);
+  choose(stored(), false);
+  // 다른 창(탭)에서 바꾸면 이 창도 따라간다
+  window.addEventListener('storage', function (e) { if (e.key === KEY || e.key === null) choose(stored(), false); });
 })();
 </script>
 </body>

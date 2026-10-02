@@ -1,12 +1,14 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
+<meta name="color-scheme" content="dark light">
+<script>/* 화면 색 — 고른 값을 그리기 전에 적용한다(자동이면 속성을 두지 않아 컴퓨터 설정을 따른다) */try{var t=localStorage.getItem('asde.theme');if(t==='dark'||t==='light')document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ANALOG SOUL DSP ENGINE — 독학 가이드</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@500;600;700&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
 /* ============================================================
    토큰 — 라이트 기본, 다크는 세 곳에서 재정의
@@ -250,30 +252,278 @@ footer {
 
 /* ===== 공통 상단 툴바 — 전 문서 동일 ===== */
 .hub-nav{
+  /* 콘솔 이동 바 — 프로그램과 같은 판과 글꼴. 컴퓨터가 라이트 모드면 아래에서 밝게 바꾼다 */
+  --hn-bg:rgba(41,51,60,.94); --hn-line:#3a4652; --hn-home:#f0b545; --hn-home-hi:#f6c464;
+  --hn-link:#aab5bd; --hn-link-hi:#ece3cf; --hn-hover:#303b45; --hn-sep:#52606d; --hn-mark:#f0b545;
   position:sticky; top:0; z-index:9000;
   display:flex; align-items:center; gap:2px; flex-wrap:wrap;
   padding:7px 16px; min-height:34px;
-  background:rgba(10,8,12,.95); border-bottom:1px solid #2a2535;
-  font-family:'IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
-  font-size:11px; line-height:1.5;
-  backdrop-filter:saturate(150%) blur(8px);
-  -webkit-backdrop-filter:saturate(150%) blur(8px);
+  background:var(--hn-bg); border-bottom:1px solid var(--hn-line);
+  font-family:'Barlow Condensed','Bahnschrift SemiCondensed','Bahnschrift','Avenir Next Condensed','Roboto Condensed','DejaVu Sans Condensed','Arial Narrow','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif;
+  font-size:13px; font-weight:500; letter-spacing:.02em; line-height:1.5;
+  backdrop-filter:saturate(140%) blur(8px);
+  -webkit-backdrop-filter:saturate(140%) blur(8px);
 }
-.hub-nav .home{ color:#ffb300; text-decoration:none; letter-spacing:.12em; margin-right:12px; white-space:nowrap; }
-.hub-nav .home:hover{ color:#ffd166; }
-.hub-nav a.hn{ color:#7d7291; text-decoration:none; padding:3px 9px; border-radius:2px; white-space:nowrap; }
-.hub-nav a.hn:hover{ color:#e4dcf0; background:#1c1825; }
-.hub-nav a.hn[aria-current]{ color:#ffb300; background:#1c1825; }
-.hub-nav .sep{ color:#3a3350; }
+/* 링크 규칙에는 :root:not(#_)를 붙인다 — 문서의 콘솔 층이 본문 링크를 같은 접두어로 앰버로 칠하므로,
+   접두어가 없으면 이동 바 링크까지 앰버가 된다(프로그램에서는 늘 맞아떨어져 달라지는 것이 없다) */
+:root:not(#_) .hub-nav .home{ color:var(--hn-home); font-weight:600; letter-spacing:.06em; text-decoration:none; margin-right:12px; white-space:nowrap; }
+:root:not(#_) .hub-nav .home:hover{ color:var(--hn-home-hi); }
+:root:not(#_) .hub-nav a.hn{ color:var(--hn-link); text-decoration:none; padding:3px 9px; border-radius:6px; white-space:nowrap; }
+:root:not(#_) .hub-nav a.hn:hover{ color:var(--hn-link-hi); background:var(--hn-hover); }
+:root:not(#_) .hub-nav a.hn[aria-current]{ color:var(--hn-link-hi); background:var(--hn-hover); box-shadow:inset 0 -2px 0 var(--hn-mark); }
+.hub-nav .sep{ color:var(--hn-sep); }
+.hub-nav a:focus-visible{ outline:2px solid var(--hn-home); outline-offset:1px; }
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]) .hub-nav{
+    --hn-bg:rgba(238,241,243,.94); --hn-line:#c2cad1; --hn-home:#835208; --hn-home-hi:#6a4200;
+    --hn-link:#46525c; --hn-link-hi:#1c242b; --hn-hover:#e4e8eb; --hn-sep:#9faab4; --hn-mark:#eeae3d;
+  }
+}
+:root[data-theme="light"] .hub-nav{
+  --hn-bg:rgba(238,241,243,.94); --hn-line:#c2cad1; --hn-home:#835208; --hn-home-hi:#6a4200;
+  --hn-link:#46525c; --hn-link-hi:#1c242b; --hn-hover:#e4e8eb; --hn-sep:#9faab4; --hn-mark:#eeae3d;
+}
+/* 화면 색 고르기 — 오른쪽 끝의 자동 · 야간 · 주간. 고른 단추는 현재 문서 표시와 같은 앰버 밑줄 */
+.hub-nav .hn-theme{ margin-left:auto; display:inline-flex; align-items:stretch; border:1px solid var(--hn-line); border-radius:7px; overflow:hidden; }
+.hub-nav .hn-theme-btn{ -webkit-appearance:none; appearance:none; font:inherit; letter-spacing:inherit; color:var(--hn-link); background:transparent; border:0; margin:0; padding:1px 10px; cursor:pointer; white-space:nowrap; }
+.hub-nav .hn-theme-btn + .hn-theme-btn{ border-left:1px solid var(--hn-line); }
+.hub-nav .hn-theme-btn:hover{ color:var(--hn-link-hi); background:var(--hn-hover); }
+.hub-nav .hn-theme-btn[aria-pressed="true"]{ color:var(--hn-link-hi); background:var(--hn-hover); box-shadow:inset 0 -2px 0 var(--hn-mark); }
+.hub-nav .hn-theme-btn:focus-visible{ outline:2px solid var(--hn-home); outline-offset:-2px; }
 @media print{ .hub-nav{ display:none; } }
 
 /* 앵커 이동 시 sticky 툴바에 가리지 않도록 여백 확보 */
 [id]{ scroll-margin-top: 46px; }
+
+/* ===== 콘솔 문서 층 — 프로그램과 같은 인터페이스 (빌드 때 선택자 앞에 :root:not(#_)를 붙였다) ===== */
+
+/* ============================================================
+   콘솔 문서 — 프로그램(ANALOG SOUL DSP ENGINE)과 같은 인터페이스
+   ------------------------------------------------------------
+   다크 모드는 야간 콘솔, 라이트 모드는 주간 콘솔. 색 · 글꼴 · 판을
+   프로그램과 같은 값으로 쓰고, 코드 · 수식처럼 '화면'에 해당하는 칸은
+   두 모드 모두 어둡게 둔다. 각 문서의 고유 변수는 문서별 층에서 이
+   값들에 잇는다. 선택자는 빌드 때 모두 :root:not(#_)로 시작하게 바꿔
+   문서 원래 규칙(자체 다크 · 라이트 재정의 포함)을 이긴다.
+   ============================================================ */
+:root:not(#_) {
+  color-scheme: dark;
+  /* 면 */
+  --c-bg: #1f272e; --c-bg2: #182026; --c-panel: #29333c; --c-panel2: #303b45;
+  --c-line: #3a4652; --c-line-soft: #323d48; --c-line-hi: #52606d;
+  /* 글자 — 쓰이는 모든 바탕에서 대비 4.5:1 이상 */
+  --c-text: #ece3cf; --c-muted: #aab5bd; --c-dim: #9ca6ae;
+  /* 신호 색 — 글자와 선 */
+  --c-amber: #f0b545; --c-red: #eb8c7c; --c-green: #86d39a; --c-blue: #6fb6e8; --c-purple: #b198ec; --c-teal: #4db6a9;
+  /* 앰버 면 */
+  --c-amber-fill: #f0b545; --c-amber-fill-hi: #f6c464; --c-amber-deep: #c98f2c; --c-on-amber: #161c21;
+  /* 캡 — 처리기마다 하나 */
+  --c-cap-comp: #8da9c4; --c-cap-bbe: #4db6a9; --c-cap-tube: #e8904a; --c-cap-exc: #d8bc4c; --c-cap-sg: #c977a9;
+  --c-cap-vinyl: #c67078; --c-cap-atmos: #6c9be0; --c-cap-master: #cfd6dc; --c-cap-hd: #a78bea;
+  --c-cap-ink: 50%; --c-cap-tint: 12%; --c-on-cap: #161c21;
+  /* 화면 — 두 모드 공통으로 어둡다. 그 안에 켜지는 색도 밝은 값 */
+  --c-screen: #0d1216; --c-screen-edge: #0a0e11; --c-screen-ink: #d7dee3; --c-screen-dim: #9aa6b0;
+  --c-lit-amber: #f0b545; --c-lit-blue: #6fb6e8; --c-lit-teal: #4db6a9; --c-lit-green: #86d39a; --c-lit-red: #eb8c7c; --c-lit-purple: #b198ec;
+  /* 빛과 그늘 */
+  --c-glow: #2b3640; --c-hilite: rgba(255,255,255,0.035); --c-shade: rgba(0,0,0,0.55);
+  --c-lift: 0 10px 24px -12px rgba(0,0,0,0.6);
+  /* 글꼴 — 인터넷이 없으면 Windows는 Bahnschrift, macOS는 Avenir Next Condensed */
+  --c-legend: 'Barlow Condensed', 'Bahnschrift SemiCondensed', 'Bahnschrift', 'Avenir Next Condensed', 'Roboto Condensed', 'DejaVu Sans Condensed', 'Arial Narrow', 'Noto Sans KR', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+  --c-body: 'Barlow', 'Segoe UI', 'Helvetica Neue', 'Noto Sans KR', 'Apple SD Gothic Neo', 'Malgun Gothic', system-ui, sans-serif;
+  --c-mono: 'JetBrains Mono', 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --cap: var(--c-amber-fill);
+}
+@media (prefers-color-scheme: light) {
+  :root:not(#_):not([data-theme="dark"]) {
+    color-scheme: light;
+    --c-bg: #dde2e6; --c-bg2: #d4dade; --c-panel: #eef1f3; --c-panel2: #e4e8eb;
+    --c-line: #c2cad1; --c-line-soft: #d3d9de; --c-line-hi: #9faab4;
+    --c-text: #1c242b; --c-muted: #46525c; --c-dim: #535f6a;
+    --c-amber: #835208; --c-red: #ab3226; --c-green: #286a3d; --c-blue: #285e9a; --c-purple: #5e44b8; --c-teal: #115f58;
+    --c-amber-fill: #eeae3d; --c-amber-fill-hi: #f3bd58; --c-amber-deep: #d4952b; --c-on-amber: #1c242b;
+    --c-cap-comp: #32597b; --c-cap-bbe: #115f58; --c-cap-tube: #864215; --c-cap-exc: #695304; --c-cap-sg: #87386c;
+    --c-cap-vinyl: #96303d; --c-cap-atmos: #2b5497; --c-cap-master: #4c5760; --c-cap-hd: #5b42ae;
+    --c-cap-ink: 80%; --c-cap-tint: 18%; --c-on-cap: #ffffff;
+    --c-glow: #f4f6f8; --c-hilite: rgba(255,255,255,0.75); --c-shade: rgba(30,40,50,0.28);
+    --c-lift: 0 10px 24px -14px rgba(30,40,50,0.35);
+  }
+}
+:root:not(#_)[data-theme="light"] {
+  color-scheme: light;
+  --c-bg: #dde2e6; --c-bg2: #d4dade; --c-panel: #eef1f3; --c-panel2: #e4e8eb;
+  --c-line: #c2cad1; --c-line-soft: #d3d9de; --c-line-hi: #9faab4;
+  --c-text: #1c242b; --c-muted: #46525c; --c-dim: #535f6a;
+  --c-amber: #835208; --c-red: #ab3226; --c-green: #286a3d; --c-blue: #285e9a; --c-purple: #5e44b8; --c-teal: #115f58;
+  --c-amber-fill: #eeae3d; --c-amber-fill-hi: #f3bd58; --c-amber-deep: #d4952b; --c-on-amber: #1c242b;
+  --c-cap-comp: #32597b; --c-cap-bbe: #115f58; --c-cap-tube: #864215; --c-cap-exc: #695304; --c-cap-sg: #87386c;
+  --c-cap-vinyl: #96303d; --c-cap-atmos: #2b5497; --c-cap-master: #4c5760; --c-cap-hd: #5b42ae;
+  --c-cap-ink: 80%; --c-cap-tint: 18%; --c-on-cap: #ffffff;
+  --c-glow: #f4f6f8; --c-hilite: rgba(255,255,255,0.75); --c-shade: rgba(30,40,50,0.28);
+  --c-lift: 0 10px 24px -14px rgba(30,40,50,0.35);
+}
+
+/* 처리기 캡 — 매뉴얼 · 쉬운 말은 data-cap, 가이드 · 사양서는 id로 잇는다 */
+:root:not(#_) [data-cap="comp"],
+:root:not(#_) #m-comp,
+:root:not(#_) #u-comp { --cap: var(--c-cap-comp); }
+:root:not(#_) [data-cap="bbe"],
+:root:not(#_) #m-bbe,
+:root:not(#_) #u-bbe { --cap: var(--c-cap-bbe); }
+:root:not(#_) [data-cap="tube"],
+:root:not(#_) #m-tube,
+:root:not(#_) #u-tube { --cap: var(--c-cap-tube); }
+:root:not(#_) [data-cap="exc"],
+:root:not(#_) #m-exciter,
+:root:not(#_) #u-exc { --cap: var(--c-cap-exc); }
+:root:not(#_) [data-cap="sg"],
+:root:not(#_) #m-sg,
+:root:not(#_) #u-sg { --cap: var(--c-cap-sg); }
+:root:not(#_) [data-cap="vinyl"],
+:root:not(#_) #m-vinyl,
+:root:not(#_) #u-vinyl { --cap: var(--c-cap-vinyl); }
+:root:not(#_) [data-cap="atmos"],
+:root:not(#_) #m-atmos,
+:root:not(#_) #u-atmos { --cap: var(--c-cap-atmos); }
+:root:not(#_) [data-cap="master"],
+:root:not(#_) #m-master,
+:root:not(#_) #u-master { --cap: var(--c-cap-master); }
+:root:not(#_) [data-cap="hd"] { --cap: var(--c-cap-hd); }
+
+/* ── 바탕과 글꼴 ───────────────────────────────────────────── */
+:root:not(#_) { background: var(--c-bg); }
+:root:not(#_) body {
+  background: radial-gradient(1100px 520px at 50% -180px, var(--c-glow) 0%, transparent 72%), var(--c-bg);
+  color: var(--c-text); font-family: var(--c-body); font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+}
+/* 요소마다 박힌 옛 글꼴을 걷어 낸다 — :where로 우선순위를 낮춰 아래 개별 규칙이 이기게 */
+:root:not(#_) body :where(*:not(pre, code, kbd, samp, .c-mono)) { font-family: inherit; }
+:root:not(#_) svg text { font-family: var(--c-legend); }
+:root:not(#_) h1,
+:root:not(#_) h2,
+:root:not(#_) h3,
+:root:not(#_) h4,
+:root:not(#_) h5,
+:root:not(#_) h6,
+:root:not(#_) th,
+:root:not(#_) dt,
+:root:not(#_) figcaption { font-family: var(--c-legend); }
+:root:not(#_) pre,
+:root:not(#_) code,
+:root:not(#_) kbd,
+:root:not(#_) samp { font-family: var(--c-mono); }
+:root:not(#_) b,
+:root:not(#_) strong { font-weight: 600; }
+
+:root:not(#_) a { color: var(--c-amber); text-decoration-color: color-mix(in srgb, var(--c-amber) 45%, transparent); text-underline-offset: 3px; }
+:root:not(#_) a:hover { color: var(--c-amber); text-decoration-color: currentColor; }
+:root:not(#_) ::selection { background: color-mix(in srgb, var(--c-amber-fill) 35%, transparent); color: inherit; }
+:root:not(#_) :focus-visible { outline: 2px solid var(--c-amber); outline-offset: 2px; border-radius: 3px; }
+
+/* 코드 — 글자 속 코드는 오목한 칸, 여러 줄 코드는 화면 */
+:root:not(#_) code {
+  font-size: .86em; color: var(--c-text); background: var(--c-bg2);
+  border: 1px solid var(--c-line); border-radius: 5px; padding: 1px 6px;
+}
+:root:not(#_) pre {
+  background: var(--c-screen); color: var(--c-screen-ink);
+  border: 1px solid var(--c-screen-edge); border-radius: 6px; padding: 14px 16px; overflow-x: auto;
+}
+:root:not(#_) pre code { background: none; border: 0; padding: 0; color: inherit; font-size: inherit; }
+
+/* 인쇄는 밝은 판으로 */
+@media print {
+  :root:not(#_) {
+    --c-bg: #ffffff; --c-bg2: #f2f4f5; --c-panel: #ffffff; --c-panel2: #f2f4f5;
+    --c-line: #c2cad1; --c-line-soft: #dde2e6; --c-line-hi: #9faab4;
+    --c-text: #000000; --c-muted: #333d45; --c-dim: #46525c; --c-amber: #6b4200;
+    --c-glow: #ffffff;
+  }
+  :root:not(#_) body { background: #fff; }
+}
+
+/* ── 기술 설명서 — 문서 변수를 콘솔 색에 잇는다 ───────────── */
+:root:not(#_) {
+  --paper: var(--c-bg); --paper-sunk: var(--c-bg2); --card: var(--c-panel);
+  --ink: var(--c-text); --ink-soft: var(--c-muted); --mute: var(--c-dim);
+  --rule: var(--c-line); --rule-soft: var(--c-line-soft);
+  --signal: var(--c-blue); --signal-bg: color-mix(in srgb, var(--c-blue) 10%, var(--c-panel));
+  --hot: var(--c-amber); --hot-bg: color-mix(in srgb, var(--c-amber-fill) 10%, var(--c-panel));
+  --warn: var(--c-red); --warn-bg: color-mix(in srgb, var(--c-red) 10%, var(--c-panel));
+}
+:root:not(#_) body { font-size: 17px; line-height: 1.74; }
+:root:not(#_) .mono,
+:root:not(#_) td.mono,
+:root:not(#_) .param td:nth-child(2) { font-family: var(--c-legend); font-weight: 500; font-size: 14.5px; font-variant-numeric: tabular-nums; color: var(--c-muted); }
+:root:not(#_) .param td:first-child { font-family: var(--c-legend); font-weight: 600; font-size: 14.5px; letter-spacing: .04em; color: var(--c-text); }
+
+/* 목차 */
+:root:not(#_) .rail { border-right-color: var(--c-line-soft); }
+:root:not(#_) .rail-title { font-family: var(--c-legend); font-size: 13px; font-weight: 600; letter-spacing: .06em; color: var(--c-muted); }
+:root:not(#_) .rail a { font-size: 14.5px; color: var(--c-muted); }
+:root:not(#_) .rail > ol > li > a::before { font-family: var(--c-legend); font-weight: 700; font-size: 12.5px; color: var(--c-dim); }
+:root:not(#_) .rail a:hover { color: var(--c-amber); }
+:root:not(#_) .rail a.here { color: var(--c-text); border-left-color: var(--c-amber-fill); }
+:root:not(#_) .rail ol ol a { font-size: 13.5px; color: var(--c-dim); }
+
+/* 표제 */
+:root:not(#_) .hero { border-bottom: 1px solid var(--c-line); }
+:root:not(#_) .hero h1 { font-weight: 700; font-size: clamp(34px, 5.4vw, 52px); line-height: 1.04; letter-spacing: .005em; }
+:root:not(#_) .hero .edition { font-family: var(--c-legend); font-size: 13.5px; font-weight: 600; letter-spacing: .06em; color: var(--c-muted); }
+:root:not(#_) .hero .lede { color: var(--c-muted); }
+:root:not(#_) .schematic { border-top-color: var(--c-line-soft); }
+:root:not(#_) .schematic-note { font-family: var(--c-legend); font-size: 13px; color: var(--c-dim); }
+
+/* 구획 제목 — 번호는 번호 배지, 난이도는 알약 */
+:root:not(#_) section > h2 { display: flex; align-items: center; flex-wrap: wrap; gap: 10px 12px; font-size: 28px; font-weight: 600; letter-spacing: .005em; border-bottom-color: var(--c-line); }
+:root:not(#_) section > h2 .num {
+  flex: 0 0 auto; display: inline-grid; place-items: center; min-width: 2em; height: 1.5em; padding: 0 6px; margin: 0;
+  border-radius: 5px; background: var(--c-amber-fill); color: var(--c-on-amber);
+  font-family: var(--c-legend); font-size: 15px; font-weight: 700; vertical-align: 0; font-variant-numeric: tabular-nums;
+}
+:root:not(#_) .level {
+  font-family: var(--c-legend); font-size: 12.5px; font-weight: 600; letter-spacing: .04em; vertical-align: 0; margin-left: 2px;
+  border-radius: 999px; padding: 2px 10px; color: var(--c-muted); border-color: var(--c-line-hi);
+}
+:root:not(#_) .level.b { color: color-mix(in srgb, var(--c-blue) var(--c-cap-ink), var(--c-text)); border-color: color-mix(in srgb, var(--c-blue) 50%, transparent); background: color-mix(in srgb, var(--c-blue) 10%, transparent); }
+:root:not(#_) .level.a { color: color-mix(in srgb, var(--c-amber) var(--c-cap-ink), var(--c-text)); border-color: color-mix(in srgb, var(--c-amber-fill) 55%, transparent); background: color-mix(in srgb, var(--c-amber-fill) 10%, transparent); }
+:root:not(#_) h3 { font-size: 21px; font-weight: 600; letter-spacing: .01em; }
+:root:not(#_) h4 { font-size: 17.5px; font-weight: 600; }
+
+/* 표 — 앞판 안의 표 */
+:root:not(#_) .tw { background: var(--c-panel); border: 1px solid var(--c-line); border-radius: 10px; padding: 10px 16px 2px; box-shadow: inset 0 1px 0 var(--c-hilite); }
+:root:not(#_) th { font-family: var(--c-legend); font-size: 13.5px; font-weight: 600; letter-spacing: .04em; color: var(--c-muted); border-bottom-color: var(--c-line); }
+:root:not(#_) td { border-bottom-color: var(--c-line-soft); }
+:root:not(#_) tr:last-child td { border-bottom: 0; }
+
+/* 노트 — 왼쪽 막대, 색 글자는 본문색 쪽으로 섞어 대비를 지킨다 */
+:root:not(#_) .note { border-radius: 0 8px 8px 0; }
+:root:not(#_) .note .tag { font-family: var(--c-legend); font-size: 13px; font-weight: 600; letter-spacing: .05em; color: color-mix(in srgb, var(--signal) var(--c-cap-ink), var(--c-text)); }
+:root:not(#_) .note.hot .tag { color: color-mix(in srgb, var(--hot) var(--c-cap-ink), var(--c-text)); }
+:root:not(#_) .note.warn .tag { color: color-mix(in srgb, var(--warn) var(--c-cap-ink), var(--c-text)); }
+
+/* 단계 번호 */
+:root:not(#_) .steps > li::before { border: 0; background: var(--c-amber-fill); color: var(--c-on-amber); font-family: var(--c-legend); font-weight: 700; font-size: 13.5px; line-height: 25px; }
+
+/* 모듈 — 처리기 캡 색 막대가 달린 앞판 */
+:root:not(#_) .mod {
+  position: relative; overflow: hidden; background: var(--c-panel); border: 1px solid var(--c-line); border-radius: 10px;
+  padding: 18px 20px 6px; margin: 0 0 16px; box-shadow: inset 0 1px 0 var(--c-hilite);
+}
+:root:not(#_) .mod::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 3px; background: var(--cap); }
+:root:not(#_) .mod-head h3 { font-size: 21px; font-weight: 700; letter-spacing: .03em; }
+:root:not(#_) .mod-head .ko { color: var(--c-muted); }
+:root:not(#_) .mod-head .slot { font-family: var(--c-legend); font-size: 13px; font-weight: 600; letter-spacing: .03em; color: color-mix(in srgb, var(--cap) var(--c-cap-ink), var(--c-text)); }
+
+:root:not(#_) .lut { border-color: var(--c-line); }
+:root:not(#_) .lut-scale { font-family: var(--c-legend); font-size: 13px; font-variant-numeric: tabular-nums; color: var(--c-muted); }
+:root:not(#_) .kv dt { font-family: var(--c-legend); font-size: 15px; font-weight: 600; letter-spacing: .02em; color: color-mix(in srgb, var(--c-blue) var(--c-cap-ink), var(--c-text)); }
+:root:not(#_) footer { color: var(--c-muted); border-top-color: var(--c-line); }
 </style>
 </head>
 <body>
 <nav class="hub-nav" aria-label="문서 간 이동">
-  <a class="home" href="index.html">◂ 통합 색인</a><a class="hn" href="analog-soul-dsp.html">메인 어플리케이션 실행하기</a><span class="sep">/</span><a class="hn" href="analog-soul-manual.html">공식 매뉴얼</a><span class="sep">/</span><a class="hn" href="analog-soul-plain.html">쉬운 말</a><span class="sep">/</span><a class="hn" href="#" aria-current="page">기술 설명서</a><span class="sep">/</span><a class="hn" href="analog-soul-engineering.html">사양서</a><span class="sep">/</span><a class="hn" href="analog-soul-internals.html">논고</a>
+  <a class="home" href="index.html">◂ 통합 색인</a><a class="hn" href="analog-soul-dsp.html">메인 어플리케이션 실행하기</a><span class="sep" aria-hidden="true">/</span><a class="hn" href="analog-soul-manual.html">공식 매뉴얼</a><span class="sep" aria-hidden="true">/</span><a class="hn" href="analog-soul-plain.html">쉬운 말</a><span class="sep" aria-hidden="true">/</span><a class="hn" href="#" aria-current="page">기술 설명서</a><span class="sep" aria-hidden="true">/</span><a class="hn" href="analog-soul-engineering.html">사양서</a><span class="sep" aria-hidden="true">/</span><a class="hn" href="analog-soul-internals.html">논고</a>
 </nav>
 
 <div class="shell">
@@ -306,7 +556,7 @@ footer {
         <li><a href="#hd-what">무엇을 하는가</a></li>
         <li><a href="#hd-why">왜 필요한가</a></li>
         <li><a href="#hd-how">알고리즘 해부</a></li>
-        <li><a href="#hd-diff">HD와 ULTRA HD</a></li>
+        <li><a href="#hd-diff">HD와 ULTRA · eXtreme HD</a></li>
         <li><a href="#hd-knobs">노브 다루기</a></li>
         <li><a href="#hd-live">LIVE 모드</a></li>
         <li><a href="#hd-truth">정말 들리는가</a></li>
@@ -329,7 +579,7 @@ footer {
     <p class="edition">독학 가이드 · 초급에서 고급까지</p>
     <p class="lede">
       브라우저에서 도는 오디오 처리 엔진입니다. 여덟 개 모듈을 원하는 순서로 쌓아 소리를
-      다듬고, 손실 압축으로 잘려나간 고역을 다시 합성해 96kHz 또는 192kHz로 내보냅니다.
+      다듬고, 손실 압축으로 잘려나간 고역을 다시 합성해 원본보다 높은 표본률(48 ~ 384kHz)로 내보냅니다.
       파일은 기기 밖으로 나가지 않습니다.
     </p>
 
@@ -395,9 +645,9 @@ footer {
         <text x="950" y="45" text-anchor="end" font-family="IBM Plex Mono, monospace"
               font-size="11.5" fill="var(--hot)">MASTER</text>
         <text x="950" y="59" text-anchor="end" font-family="IBM Plex Mono, monospace"
-              font-size="9.5" fill="var(--mute)">항상 마지막</text>
+              font-size="9.5" fill="var(--mute)">제작의 끝</text>
       </svg>
-      <p class="schematic-note">MASTER는 어디에 놓아도 언제나 체인의 끝에서 처리됩니다.</p>
+      <p class="schematic-note">MASTER는 제작의 끝에 고정됩니다. 그 뒤 재생 단계에는 VINYL · ATMOS만 옮길 수 있습니다.</p>
     </div>
   </header>
 
@@ -407,7 +657,7 @@ footer {
     <div class="reading">
       <p>
         설치할 것은 없습니다. HTML 파일 하나를 브라우저로 열면 그것이 프로그램 전체입니다.
-        Chrome을 권합니다. 뒤에 나올 192kHz 기능이 다른 브라우저에서는 막히는 경우가 있습니다.
+        이 프로그램은 최신 데스크톱 Chrome에서 원활히 동작하는 것을 전제로 만들고 시험했습니다. 다른 브라우저에서는 일부 표시나 동작이 다를 수 있고, 뒤에 나올 192kHz 기능이 막히는 경우도 있습니다.
       </p>
 
       <ol class="steps">
@@ -444,7 +694,7 @@ footer {
         <li>
           <h4>내보냅니다</h4>
           <p>
-            아래쪽 내보내기 영역에서 형식을 고릅니다. 처음에는 <code>WAV</code>로 해보세요.
+            아래쪽 내보내기 영역에서 표본률과 비트 깊이를 고릅니다. 처음에는 파일을 올릴 때 맞춰진 표본률 그대로, 비트 깊이 <code>16</code>으로 해보세요.
             가장 빠르고 가볍습니다.
           </p>
         </li>
@@ -476,20 +726,25 @@ footer {
           그래프를 클릭하면 스펙트로그램으로 바뀝니다.
         </dd>
         <dt>재생 바</dt>
-        <dd>재생과 정지, 진행 막대. 막대를 클릭하면 그 지점으로 이동합니다.</dd>
+        <dd>재생과 정지, 진행 막대. 막대를 클릭하면 그 지점으로 이동합니다. 화면을 아래로 내려도 위쪽에 붙어 있습니다(휴대폰처럼 좁은 화면에서는 제자리).</dd>
         <dt>처리 체인</dt>
         <dd>
-          여덟 개 모듈이 세로로 쌓여 있습니다. 위에서 아래 순서가 신호가 지나는 순서입니다.
-          모듈 머리의 손잡이를 끌어 순서를 바꿉니다.
+          여덟 개 모듈이 카드로 놓여 있습니다. 카드 이름 앞 번호와 그 위의 신호 흐름 지도가 신호가 지나는 순서입니다.
+          흐름 지도의 노드나 모듈 머리의 손잡이를 끌어 순서를 바꿉니다. 넓은 화면에서는 카드가 같은 크기로 처리 순서대로 놓이고, 켜진 카드만 내용이 넘치면 카드 안에서 스크롤되며, 꺼진 카드는 배경으로 물러나 그 위에서는 휠이 화면을 굴립니다. 카드 맨 위의 MACRO 손잡이 하나로 그 카드의 주요 손잡이들을 가장 약한 위치(0%)부터 기준 설계값(100%)까지 함께 옮길 수 있고, 처음에는 COMPRESSOR 50% · BBE 40% · EXCITER 80% · SOUNDGOODIZER 65% · MASTERING CHAIN 95%가 켜져 있습니다.
         </dd>
         <dt>내보내기</dt>
-        <dd>세 가지 형식과 초기화 버튼.</dd>
+        <dd>표본률(44.1 · 48 · 96 · 192 · 384 — 44.1 계열 원본이면 44.1 · 48 · 88.2 · 176.4 · 352.8)과 비트 깊이(16 · 24 · 32)를 고르는 눈금 스위치 둘, 내보내기 버튼과 초기화 버튼.</dd>
       </dl>
+      <p>
+        화면 색은 컴퓨터의 다크·라이트 설정을 따라 어두운 야간 콘솔이나 밝은 주간 콘솔로 바뀝니다. 맨 위 이동 바 오른쪽의 자동 · 야간 · 주간으로 직접 고를 수도 있고, 고른 것은 이 브라우저에 기억되어 모든 문서에 같이 적용됩니다.
+        스펙트럼과 미터 같은 계기창은 어느 쪽이든 어두워서, 그래프는 같은 색으로 읽힙니다.
+      </p>
 
       <h3>모듈 하나의 생김새</h3>
       <p>
-        모든 모듈이 같은 구조입니다. 머리줄에 이름과 켜기 스위치가 있고, 본문 첫 줄이
-        INPUT GAIN, 점선 아래로 그 모듈 고유의 노브들이 옵니다. 켜진 모듈은 테두리에 불이 들어옵니다.
+        모든 모듈이 같은 구조입니다. 머리줄에 순서 번호와 이름, 접기 단추, 켜기 스위치가 있고, 본문 첫 줄이
+        INPUT GAIN, 가는 선 아래로 그 모듈 고유의 노브들이 옵니다. 모듈마다 색이 하나 있어,
+        켜진 모듈은 머리 위 막대와 스위치가 그 색으로 밝아지고 슬라이더의 홈도 값만큼 그 색으로 채워집니다.
       </p>
     </div>
   </section>
@@ -520,8 +775,9 @@ footer {
 
       <h3 id="flow-order">순서 바꾸기<span class="level">중급</span></h3>
       <p>
-        모듈 머리 왼쪽의 손잡이를 끌어 위아래로 옮기면 처리 순서가 바뀝니다.
-        MASTER는 예외로, 어디에 놓든 마지막에 처리됩니다.
+        처리 체인 위 신호 흐름 지도에서 노드를 끌어 놓거나, 모듈 머리 왼쪽의 손잡이를 끌어 다른 카드 앞이나 뒤에 놓으면
+        처리 순서가 바뀝니다. 키보드로는 흐름 지도의 노드 이름에 초점을 두고 Alt+←/→로 한 칸씩 옮깁니다. 끄는 중에 Esc를 누르면 제자리로 돌아갑니다. 흐름 지도에서 바꾸면 아래 카드들이 새 자리로 미끄러져 따라옵니다. 카드를 직접 끌면 점선 빈칸이 커서를 따라가고, 놓은 카드는 놓은 자리에서 빈칸으로 미끄러져 들어갑니다. VINYL · ATMOS는 제목줄 아래 ‘처리 위치’로 MASTER 뒤 재생 단계에 둘 수 있습니다. 다른 카드를 재생 단계로 끌면 ‘놓을 수 없음’이 뜹니다.
+        MASTER는 예외로 제작의 마지막에 고정되고, 그 뒤 재생 단계에는 VINYL · ATMOS만 놓을 수 있습니다. 흐름 지도에서는 자리가 고정된 HD 복원과 MASTER를 양 끝의 원음·출력처럼 점선 테두리로 그려, 끌어 옮길 수 없는 노드임을 나타냅니다.
       </p>
       <ul>
         <li><strong>TUBE를 COMP 앞으로.</strong> 포화된 피크를 압축이 잡아내므로 더 두껍고 단단해집니다.</li>
@@ -582,8 +838,8 @@ footer {
           <tr><td>RATIO</td><td>1~20 · 4</td><td>넘은 만큼을 얼마나 눌러 담을지. 4면 4dB 초과가 1dB로 줄어듭니다.</td></tr>
           <tr><td>ATTACK</td><td>0.1~200 ms · 10</td><td>누르기 시작하는 속도. 짧으면 타격음이 뭉툭해지고, 길면 펀치가 살아납니다.</td></tr>
           <tr><td>RELEASE</td><td>10~3000 ms · 250</td><td>손을 떼는 속도. 너무 짧으면 음량이 출렁거립니다.</td></tr>
-          <tr><td>MAKEUP</td><td>0~24 dB · 4</td><td>눌러서 줄어든 만큼 되올립니다.</td></tr>
-          <tr><td>KNEE</td><td>0~40 · 10</td><td>문턱 근처를 부드럽게 넘길지 딱 잘라 넘길지.</td></tr>
+          <tr><td>MAKEUP</td><td>0~24 dB · 4</td><td>눌러서 줄어든 만큼 되올립니다. 조용한 소리도 이만큼 커집니다.</td></tr>
+          <tr><td>KNEE</td><td>0~40 · 10</td><td>문턱 위쪽을 부드럽게 넘길지 딱 잘라 넘길지.</td></tr>
         </tbody>
       </table></div>
       <p>
@@ -595,15 +851,16 @@ footer {
     <div class="mod" id="m-bbe">
       <div class="mod-head"><h3>BBE Sonic Maximizer</h3><span class="ko">위상 보정과 존재감</span><span class="slot">기본 2번</span></div>
       <p>
-        스피커는 저음을 고음보다 늦게 내보냅니다. BBE는 저역을 일부러 더 지연시켜 타이밍을 맞추는
-        방식으로 선명함을 만듭니다. 단순한 EQ와 다른 점이 여기 있습니다.
+        BBE는 저역을 약 2.5 ms, 중역을 약 0.5 ms 늦춰 고역의 어택이 먼저 오게 합니다. 제조사는 이를 스피커의 위상 보정이라고 설명하지만,
+        실제 스피커는 우퍼와 크로스오버 때문에 이미 저역을 늦게 내므로, 되돌린다기보다 고역을 앞세워 윤곽을 도드라지게 하는 처리입니다.
+        크기는 바꾸지 않고 시간만 바꾼다는 점이 단순한 EQ와 다릅니다.
       </p>
       <div class="tw"><table class="param">
         <thead><tr><th>노브</th><th>범위 · 기본</th><th>하는 일</th></tr></thead>
         <tbody>
-          <tr><td>LO CONTOUR</td><td>0~100 · 40</td><td>저역 위상 지연의 폭. 올리면 저음이 단단하게 모입니다.</td></tr>
-          <tr><td>PROCESS</td><td>0~100 · 60</td><td>3.2kHz 부근을 들어올려 존재감을 냅니다. 최대 9dB.</td></tr>
-          <tr><td>HI DEF</td><td>0~100 · 50</td><td>8kHz 위를 셸빙으로 올립니다. 최대 10dB.</td></tr>
+          <tr><td>LO CONTOUR</td><td>0~100 · 40</td><td>80 Hz 아래를 셸빙으로 올립니다. 최대 10dB. 저음이 단단해집니다.</td></tr>
+          <tr><td>PROCESS</td><td>0~100 · 60</td><td>3 kHz 위를 셸빙으로 올려 존재감을 냅니다. 최대 8dB.</td></tr>
+          <tr><td>HI DEF</td><td>0~100 · 50</td><td>10 kHz 위를 셸빙으로 올립니다. 최대 6dB.</td></tr>
         </tbody>
       </table></div>
       <div class="note hot">
@@ -615,14 +872,14 @@ footer {
     <div class="mod" id="m-tube">
       <div class="mod-head"><h3>Vacuum Tube</h3><span class="ko">짝수 하모닉 포화</span><span class="slot">기본 3번</span></div>
       <p>
-        진공관이 신호를 살짝 찌그러뜨릴 때 생기는 배음을 흉내냅니다. 원음에 없던 2배, 4배 주파수가
-        더해지면서 따뜻하고 두껍게 들립니다. 저역은 포화 경로를 우회시켜 탁해지지 않게 설계돼 있습니다.
+        12AX7 진공관 증폭기 한 단을 실제 회로 방정식으로 계산합니다. 원음에 없던 2배, 3배 주파수가
+        더해지면서 따뜻하고 두껍게 들리는데, 작게 걸면 2배음이 주로 생기고 세게 밀면 3배음이 늘어 거칠어집니다.
       </p>
       <div class="tw"><table class="param">
         <thead><tr><th>노브</th><th>범위 · 기본</th><th>하는 일</th></tr></thead>
         <tbody>
-          <tr><td>DRIVE</td><td>0~100 · 30</td><td>찌그러뜨리는 정도. 30 아래는 은은하고 70을 넘으면 확실히 들립니다.</td></tr>
-          <tr><td>BIAS</td><td>0~100 · 50</td><td>파형의 위아래를 비대칭으로 만듭니다. 50에서 멀어질수록 짝수 배음이 늘어 관 냄새가 짙어집니다.</td></tr>
+          <tr><td>DRIVE</td><td>0~100 · 30</td><td>진공관에 거는 신호 전압(0.1~10 V). 30 언저리는 은은하고 70을 넘으면 확실히 들립니다. 작은 소리의 크기는 그대로입니다.</td></tr>
+          <tr><td>BIAS</td><td>0~100 · 50</td><td>진공관의 동작점(그리드 바이어스 −3~−0.5 V). 낮출수록 짝수 배음이 늘어 관 냄새가 짙어지고, 높일수록 깨끗해집니다.</td></tr>
           <tr><td>OUTPUT</td><td>−12~+6 dB · 0</td><td>포화 후 레벨 보정.</td></tr>
           <tr><td>MIX</td><td>0~100 · 50</td><td>원음과 포화음의 비율.</td></tr>
         </tbody>
@@ -643,7 +900,7 @@ footer {
         <thead><tr><th>노브</th><th>범위 · 기본</th><th>하는 일</th></tr></thead>
         <tbody>
           <tr><td>FREQ</td><td>2~12 kHz · 6000</td><td>이 주파수 위쪽을 재료로 씁니다. 낮출수록 중고역까지 건드립니다.</td></tr>
-          <tr><td>DRIVE</td><td>0~100 · 40</td><td>배음을 만드는 세기.</td></tr>
+          <tr><td>DRIVE</td><td>0~100 · 40</td><td>배음을 만드는 세기(0~24 dB 구동). 올릴수록 배음이 크게 늘어납니다.</td></tr>
           <tr><td>MIX</td><td>0~100 · 35</td><td>만든 배음을 얼마나 섞을지.</td></tr>
         </tbody>
       </table></div>
@@ -694,40 +951,67 @@ footer {
       <div class="tw"><table class="param">
         <thead><tr><th>노브</th><th>범위 · 기본</th><th>하는 일</th></tr></thead>
         <tbody>
-          <tr><td>CRACKLE</td><td>0~100 · 30</td><td>먼지와 흠집에서 나는 탁탁거림.</td></tr>
-          <tr><td>WOBBLE</td><td>0~100 · 25</td><td>회전 불균일로 생기는 음정 흔들림.</td></tr>
-          <tr><td>WEAR</td><td>0~100 · 40</td><td>닳은 판 특유의 고역 감쇠.</td></tr>
-          <tr><td>CROSSTALK</td><td>0~100 · 20</td><td>좌우 채널이 서로 새어드는 정도. 스테레오가 좁아집니다.</td></tr>
+          <tr><td colspan="3" style="color:var(--mute)">레코드</td></tr>
+          <tr><td>SPEED</td><td>33⅓ / 45</td><td>회전수. 45는 같은 자리에서도 홈 속도가 1.35배라 고역이 살고 찌그러짐이 줄어듭니다.</td></tr>
+          <tr><td>TRACK POS</td><td>0~100 % · 30</td><td>곡이 판의 어디쯤 새겨졌는지. 안쪽일수록 고역이 줄고 찌그러짐과 흔들림이 커지며, 곡이 흐르는 동안 그 변화가 이어집니다.</td></tr>
+          <tr><td>SURFACE S/N</td><td>40~75 dB · 60</td><td>판 표면의 "쉬이" 소리 크기. 새 프레싱이 65~70 dB, 흔한 중고가 55~60 dB입니다.</td></tr>
+          <tr><td>CRACKLE</td><td>0~40 /s · 8</td><td>고운 먼지의 탁탁거림 개수. 올려도 이미 난 소리는 그대로 두고 새 소리만 더해집니다.</td></tr>
+          <tr><td>POPS</td><td>0~120 /min · 10</td><td>굵은 먼지의 "톡". 여러 홈에 걸친 먼지는 한 바퀴마다 몇 번 되풀이됩니다.</td></tr>
+          <tr><td>SCRATCH</td><td>−60~−10 dBFS · 없음</td><td>긁힌 자국의 크기. 한 바퀴마다 같은 자리에서 딸깍합니다.</td></tr>
+          <tr><td>WARP</td><td>0~3 mm · 0.5</td><td>판이 휜 높이. 들리지 않는 초저역이지만 스피커 콘을 흔들고 뒤의 압축기를 건드립니다.</td></tr>
+          <tr><td>ECCENTRICITY</td><td>0~0.5 mm · 0.10</td><td>중심 구멍이 어긋난 정도. 한 바퀴마다 음정이 천천히 오르내리고, 안쪽 홈일수록 심해집니다.</td></tr>
+          <tr><td>PLAYS</td><td>0~1000 회 · 100</td><td>그 판을 튼 횟수. 홈이 닳아 고역 손실·찌그러짐·잡음이 함께 늡니다.</td></tr>
+          <tr><td colspan="3" style="color:var(--mute)">턴테이블</td></tr>
+          <tr><td>WOW &amp; FLUTTER</td><td>0.01~0.30 % · 0.08</td><td>모터와 벨트의 속도 변동. 사양서의 WRMS 값을 그대로 넣으면 됩니다.</td></tr>
+          <tr><td>RUMBLE</td><td>−80~−40 dB · −65</td><td>모터·베어링 진동의 크기. 좋은 턴테이블은 −75 dB 이하입니다.</td></tr>
+          <tr><td>ARM RESONANCE</td><td>6~16 Hz · 10</td><td>톤암과 카트리지의 궁합. 8~12 Hz를 벗어나면 휨과 럼블이 커집니다.</td></tr>
+          <tr><td colspan="3" style="color:var(--mute)">카트리지</td></tr>
+          <tr><td>STYLUS</td><td>원뿔 · 타원 · 마이크로라인</td><td>바늘 끝 모양. 원뿔형은 안쪽 홈에서 고역이 크게 줄고, 마이크로라인은 끝까지 지킵니다.</td></tr>
+          <tr><td>SEPARATION</td><td>15~35 dB · 25</td><td>카트리지 사양의 채널 분리도(1 kHz). 고역에서는 약 8 dB 나빠집니다.</td></tr>
+          <tr><td>AZIMUTH</td><td>0~3° · 0.5</td><td>바늘의 좌우 기울기 오차. 헤드셸을 비뚤게 달면 분리도가 더 떨어집니다.</td></tr>
+          <tr><td>LOAD CAP</td><td>100~470 pF · 200</td><td>포노 앰프의 입력 용량과 케이블 용량의 합. 클수록 10 kHz 부근이 도드라지고 그 위가 일찍 깎입니다.</td></tr>
         </tbody>
       </table></div>
-      <p>모듈 안의 작은 파형 그림이 지금 설정된 CRACKLE 양을 눈으로 보여줍니다.</p>
+      <p>
+        먼지와 스크래치는 고정된 배치로 곡의 시간에 맞춰 나므로, 재생 중 들은 딸깍 소리가
+        내보낸 파일의 같은 자리에 그대로 들어갑니다. 모듈 안의 작은 파형 그림은 CRACKLE 양을 눈으로 보여줍니다.
+      </p>
+      <div class="note">
+        <span class="tag">안쪽 홈 왜곡을 들어보려면</span>
+        <p>
+          치찰음(ㅅ·ㅊ 소리)이 많은 보컬 곡을 TRACK POS 100, PLAYS 600, STYLUS 원뿔형으로 두고 들어보세요.
+          곡 끝으로 갈수록 "스" 소리가 거칠어집니다. SPEED를 45로 바꾸거나 STYLUS를 마이크로라인으로 바꾸면 눈에 띄게 줄어듭니다.
+          실제 레코드에서 앨범의 마지막 곡이 가장 불리한 이유입니다.
+        </p>
+      </div>
     </div>
 
     <div class="mod" id="m-atmos">
       <div class="mod-head"><h3>Dolby Atmos</h3><span class="ko">공간 시뮬레이터</span><span class="slot">기본 7번</span></div>
       <p>
-        실제 Atmos 규격이 아니라, 두 채널 안에서 공간감을 흉내내는 처리입니다.
-        초기 반사와 잔향을 만들어 넓이와 거리를 만듭니다.
+        실제 Atmos 규격이 아니라, 두 채널 안에서 방의 울림을 계산하는 처리입니다.
+        고른 방의 크기와 벽의 흡음에서 벽·바닥·천장 반사와 잔향을 계산해 넓이와 거리를 만듭니다. 원음은 그대로 두고 울림만 더합니다.
       </p>
       <div class="tw"><table>
-        <thead><tr><th>씬</th><th>성격</th><th>잔향 · 초기 반사</th></tr></thead>
+        <thead><tr><th>씬</th><th>성격</th><th>잔향 · 방 크기</th></tr></thead>
         <tbody>
-          <tr><td class="mono">CINEMA</td><td>영화관</td><td class="mono">1.8s · 22ms</td></tr>
-          <tr><td class="mono">CONCERT</td><td>공연장</td><td class="mono">2.4s · 35ms</td></tr>
-          <tr><td class="mono">STADIUM</td><td>경기장</td><td class="mono">3.2s · 55ms</td></tr>
-          <tr><td class="mono">STUDIO</td><td>스튜디오, 가장 좁음</td><td class="mono">0.4s · 8ms</td></tr>
-          <tr><td class="mono">CLUB</td><td>클럽</td><td class="mono">0.9s · 15ms</td></tr>
+          <tr><td class="mono">CINEMA</td><td>영화관</td><td class="mono">0.8s · 27×19×10 m</td></tr>
+          <tr><td class="mono">CONCERT</td><td>공연장</td><td class="mono">2.0s · 43×27×19 m</td></tr>
+          <tr><td class="mono">STADIUM</td><td>실내 경기장</td><td class="mono">3.8s · 162×119×43 m</td></tr>
+          <tr><td class="mono">STUDIO</td><td>스튜디오, 가장 좁음</td><td class="mono">0.28s · 7.6×5.4×3.2 m</td></tr>
+          <tr><td class="mono">CLUB</td><td>클럽</td><td class="mono">0.8s · 22×16×5 m</td></tr>
         </tbody>
-      </table></div>
+      </table>
+      <p>표의 값은 처음 열었을 때의 SPACE 60 기준입니다. 씬 버튼을 누르면 SPACE·HEIGHT·DEPTH·REVERB·OBJECT도 씬마다 정해진 값으로 바뀌어, 1 kHz 잔향 시간이 STUDIO(SPACE 25) 0.21 s · CLUB(SPACE 55) 0.76 s · CINEMA(SPACE 75) 0.90 s · CONCERT(SPACE 85) 2.37 s · STADIUM(SPACE 95) 4.73 s가 됩니다.</p></div>
       <div class="tw"><table class="param">
         <thead><tr><th>노브</th><th>범위 · 기본</th><th>하는 일</th></tr></thead>
         <tbody>
-          <tr><td>SPACE</td><td>0~100 · 60</td><td>공간의 크기.</td></tr>
-          <tr><td>HEIGHT</td><td>0~100 · 45</td><td>위쪽에서 오는 느낌.</td></tr>
-          <tr><td>DEPTH</td><td>0~100 · 50</td><td>앞뒤 거리감.</td></tr>
-          <tr><td>REVERB</td><td>0~100 · 35</td><td>잔향의 양.</td></tr>
-          <tr><td>OBJECT MIX</td><td>0~100 · 40</td><td>소리를 개별 물체처럼 배치하는 정도.</td></tr>
-          <tr><td>DRY/WET</td><td>0~100 · 60</td><td>원음과 공간음의 비율.</td></tr>
+          <tr><td>SPACE</td><td>0~100 · 60</td><td>방의 크기(0.6~1.4배). 잔향도 함께 길어집니다.</td></tr>
+          <tr><td>HEIGHT</td><td>0~100 · 45</td><td>천장 반사의 세기와 위쪽에서 오는 느낌. 50이 실제 방입니다.</td></tr>
+          <tr><td>DEPTH</td><td>0~100 · 50</td><td>소리가 나는 거리. 멀수록 잔향이 커집니다.</td></tr>
+          <tr><td>REVERB</td><td>0~100 · 35</td><td>잔향의 양. 50이 실제 방입니다.</td></tr>
+          <tr><td>OBJECT MIX</td><td>0~100 · 40</td><td>옆벽 반사의 세기. 올릴수록 소리가 넓게 퍼집니다.</td></tr>
+          <tr><td>DRY/WET</td><td>0~100 · 60</td><td>반사와 잔향의 양. 원음은 줄지 않습니다.</td></tr>
         </tbody>
       </table></div>
       <div class="note hot">
@@ -744,6 +1028,7 @@ footer {
       <p>
         마지막 정리 단계입니다. 신호를 네 대역으로 나눠 각각 압축한 뒤 다시 합치고,
         스테레오 폭을 정하고, 리미터로 천장을 막습니다.
+        압축이 걸리지 않는 조용한 부분은 키우지 않으므로, 전체를 더 크게 하려면 INPUT GAIN으로 리미터를 미세요.
       </p>
       <div class="tw"><table>
         <thead><tr><th>대역</th><th>범위</th><th>담당</th></tr></thead>
@@ -762,7 +1047,7 @@ footer {
           <tr><td>HIGH COMP</td><td>1~10 · 2</td><td>고역 압축비.</td></tr>
           <tr><td>STEREO WIDTH</td><td>0~200 · 110</td><td>100이 원본. 아래는 좁아지고 0이면 모노입니다.</td></tr>
           <tr><td>CEILING</td><td>−6~0 dB · −0.3</td><td>절대 넘지 않을 천장.</td></tr>
-          <tr><td>OUTPUT GAIN</td><td>−12~+12 dB · 0</td><td>최종 음량.</td></tr>
+          <tr><td>OUTPUT GAIN</td><td>−12~+12 dB · 0</td><td>최종 음량. 천장 클리퍼 앞에서 걸리므로 올려도 CEILING을 넘지 않습니다. 올리면 그만큼 클리퍼에 부딪혀 살짝 눌립니다.</td></tr>
         </tbody>
       </table></div>
       <div class="note">
@@ -785,7 +1070,7 @@ footer {
     <h2><span class="num">05</span>고해상도 복원<span class="level a">이 프로그램의 핵심</span></h2>
     <div class="reading">
       <p>
-        HD RESTORE와 ULTRA HD RESTORE는 이 프로그램에서 가장 공을 들인 기능이자
+        HD RESTORE와 ULTRA · eXtreme HD RESTORE는 이 프로그램에서 가장 공을 들인 기능이자
         가장 오해받기 쉬운 기능입니다. 다른 모듈이 있는 소리를 다듬는다면,
         이 기능은 <strong>없어진 소리를 만들어 넣습니다</strong>.
         그래서 무엇을 할 수 있고 무엇을 할 수 없는지 아는 것이 특히 중요합니다.
@@ -798,8 +1083,9 @@ footer {
         스펙트럼으로 보면 그 지점에서 신호가 절벽처럼 떨어지고 위는 완전한 침묵입니다.
       </p>
       <p>
-        이 기능은 그 절벽을 찾아내고, 남아 있는 아래쪽 신호에서 배음을 계산해 빈 자리를 채웁니다.
-        그리고 96kHz 또는 192kHz로 저장합니다.
+        이 기능은 그 절벽을 찾아내고, 절벽 바로 아래에 남아 있는 소리를 주파수만 옮겨 빈 자리에 이어 붙입니다.
+        크기는 원음이 높아지며 약해지던 기울기를 그대로 이어 그린 곡선에 맞춥니다.
+        그리고 원본보다 높게 고른 표본률로 저장합니다.
       </p>
       <div class="note warn">
         <span class="tag">먼저 분명히 해둘 것</span>
@@ -835,98 +1121,111 @@ footer {
         <li>
           <h4>목표 샘플레이트로 올립니다</h4>
           <p>
-            HD는 96kHz, ULTRA HD는 192kHz로 리샘플링합니다. 이 단계 자체로는 음질이
+            원본보다 높게 고른 표본률(48 ~ 384kHz, 44.1 계열 원본이면 88.2 · 176.4 · 352.8kHz)로 올립니다. 나가는 표본률이 96kHz 이하면 HD, 176.4 · 192kHz면 ULTRA HD, 352.8 · 384kHz면 eXtreme HD 설정을 씁니다. 이 단계 자체로는 음질이
             좋아지지 않습니다. 단지 위쪽에 신호를 써넣을 <em>자리</em>가 생길 뿐입니다.
             44.1kHz 파일은 원리상 22.05kHz 위를 담을 수 없고, 96kHz가 되면 48kHz까지 담을 수 있습니다.
+          </p>
+          <p>
+            이 변환은 브라우저에 맡기지 않고 프로그램이 직접 계산합니다. 원래 대역을 나이퀴스트의 99.5%까지 평탄하게 두고, 거울상은 200 dB 설계로 막습니다. 브라우저의 재생 변환은
+            품질이 정해져 있지 않아, 단순한 방식이면 16kHz 부근이 4dB 가까이 깎이고
+            원래 없던 거울상이 22kHz 위에 생깁니다. 직접 계산하면 20kHz까지 0.0002dB 안으로 평탄합니다.
           </p>
         </li>
         <li>
           <h4>파일 전체를 훑어 평균 스펙트럼을 구합니다</h4>
           <p>
-            4096점 FFT로 파일 곳곳을 표본 조사해 주파수별 평균 세기를 구하고,
-            8개 빈 단위로 매끄럽게 다듬습니다. 한 순간만 보면 우연히 고역이 없는 조용한 대목에
-            속을 수 있어서 전체를 봅니다.
+            파일 곳곳 64군데를 표본 조사해 주파수별 평균 세기를 구하고, 9개 빈 단위로 매끄럽게 다듬습니다.
+            한 순간만 보면 우연히 고역이 없는 조용한 대목에 속을 수 있어서 전체를 봅니다.
           </p>
         </li>
         <li>
-          <h4>절벽 지점을 찾습니다</h4>
+          <h4>절벽과 기울기를 찾습니다</h4>
           <p>
             1~4kHz의 평균 레벨을 기준으로 삼고, 높은 쪽에서 내려오면서 연속된 12개 빈의 평균이
-            기준보다 30dB 이상 낮지 않은 첫 지점을 찾습니다. 거기가 신호가 살아 있는 상단입니다.
-            그다음 그 위가 실제로 15dB 이상 뚝 떨어지는지 검증하고, 아니면 20dB 급락 지점을
-            다시 찾습니다. 코드에서는 이 지점을 <code>cutBin</code>이라 부릅니다.
+            기준보다 30dB 이상 낮지 않은 첫 지점을 찾습니다. 거기가 신호가 살아 있는 상단, 곧 잘린 지점입니다.
+            그다음 그 아래 한 옥타브 남짓에서 소리가 높아지며 얼마나 빠르게 약해지는지(기울기)를 잽니다.
+            잘린 지점 바로 아래에서 소리가 먼저 옅어지기 시작하는 곳(전이 시작점)도 함께 찾습니다.
+            원본이 이미 96·192kHz 대역을 채우고 있으면 여기서 멈춥니다.
           </p>
         </li>
         <li>
-          <h4>배음을 위로 옮겨 씁니다</h4>
+          <h4>아래쪽 대역을 통째로 위로 옮깁니다</h4>
           <p>
-            아래쪽의 살아 있는 성분을 2배, 4배, 8배, 16배, 32배, 64배, 128배 주파수 자리에
-            복사합니다. 세기는 배수가 올라갈수록 절반씩 줄어
-            <code>1/2, 1/4, 1/8 … 1/128</code>이 됩니다. 위상은 원래 성분의 것을 그대로 씁니다.
+            전이 시작점 아래 한 옥타브 남짓의 소리를 <strong>주파수만 옮겨</strong> 빈 자리에 이어 붙입니다.
+            성분 사이의 간격과 시간 모양이 그대로이므로, 심벌이 치는 순간에 채운 고역도 같은 순간에 칩니다.
+            한 번으로 모자라면 몇 번 더 옮겨 위쪽 끝까지 덮고, 조각끼리는 가장자리를 겹쳐 잇습니다.
+          
+            한 음이 도드라지는 순간에는 옮기는 양을 그 음의 기본 주파수(f0)의 정수배로 맞춰, 옮긴 배음이 원래 배음 자리에 빠짐없이 놓이게 합니다.
+            코덱이 틀마다 차단점 아래를 통째로 비운 구멍이 있으면, 그 틀은 구멍부터 채웁니다(목표보다 30 dB 이상 낮은 빈이 4빈 넘게 이어질 때, 차단점의 75%까지).
+            원천이 모두 같으면 원천 안의 무늬가 조각 간격(약 6 kHz)마다 되풀이되므로, 일부 조각은 원천 창을 주파수 방향으로 뒤집고(거울), 넷째 조각부터는 원천 창을 조금씩(원천 폭의 ⅙ 안) 아래로 밉니다.
           </p>
           <p>
-            이 배치에는 근거가 있습니다. 현악기나 관악기 같은 자연 악기의 배음은 차수가 올라갈수록
-            대체로 이런 비율로 줄어듭니다. 그래서 합성한 고역이 원래 있었던 것처럼 어울립니다.
-          </p>
-        </li>
-        <li>
-          <h4>경계를 겹쳐서 잇습니다</h4>
-          <p>
-            절벽의 75% 지점부터 원음을 서서히 줄이고 합성음을 서서히 올려 코사인 곡선으로
-            교차시킵니다. 배음끼리도 서로의 구간을 25%씩 침범하며 겹칩니다.
-            이렇게 하지 않으면 이어붙인 자리마다 빈틈이 생겨 금속성 울림이 납니다.
+            이전 판은 배음을 2배, 4배, 8배 … 자리에 복사했습니다. 그러면 옥타브마다 같은 재료가
+            절반 세기로 되풀이되고 위로 갈수록 성분이 절반씩 성겨져, 스펙트로그램에 계단 같은 층이 생겼습니다.
+            주파수를 옮기는 방식은 간격이 그대로라 층이 생기지 않습니다.
           </p>
         </li>
         <li>
-          <h4>튀는 부분을 다듬습니다</h4>
+          <h4>기울기를 이어 그린 곡선에 맞춥니다</h4>
           <p>
-            합성한 구간에 가우시안 평활을 적용해 유난히 솟은 주파수를 눌러줍니다.
-            이것을 건너뛰면 특정 음에서 삐 소리가 섞입니다.
+            옮긴 소리의 크기는 옮겨 온 조각의 모양이 아니라, 원음이 높아지며 약해지던 기울기를
+            그대로 이어 그린 곡선 하나로 정합니다. 그래서 잘린 지점에서 끊기지 않고 조각의 경계도 드러나지 않습니다.
+            밝은 대목에서는 곡선도 조금 밝아지고, 아주 높은 곳은 공기와 마이크가 고역을 깎는 경향을 따라
+            조금 더 가파르게 줄어듭니다.
           </p>
         </li>
         <li>
-          <h4>시간 축으로 되돌립니다</h4>
+          <h4>위로 갈수록 결을 고르게 폅니다</h4>
           <p>
-            역FFT로 파형을 복구하고 1024 샘플씩 겹쳐가며 이어붙입니다.
-            창 함수의 제곱을 누적해 나누는 방식이라 이음매에서 음량이 출렁이지 않습니다.
+            실제 악기의 고역은 높아질수록 또렷한 음보다 바람 소리 같은 잡음이 많아집니다.
+            그래서 옮겨 온 소리의 뾰족한 봉우리를 위로 갈수록 조금씩 눕힙니다. 그 정도를 SMOOTH가 정합니다.
+            크기는 바꾸지 않고 결만 바꿉니다.
           </p>
         </li>
         <li>
-          <h4>음량을 원래대로 맞춥니다</h4>
+          <h4>모자란 만큼만 더합니다</h4>
           <p>
-            고역을 더했으니 전체 에너지가 커졌습니다. 처리 전 RMS와 비교해 커진 만큼 되돌리고,
-            마지막으로 0.99를 넘는 지점을 눌러 클리핑을 막습니다. 덕분에 기능을 켜고 꺼도
-            음량이 크게 뛰지 않아 비교가 공평합니다.
+            원음이 이미 가진 소리를 먼저 세고, 곡선보다 모자란 만큼만 원음에 더합니다.
+            원음은 한 표본도 바뀌지 않습니다. mp3가 윗부분을 순간마다 버렸다 살렸다 해서 생긴 빈틈도
+            이때 비어 있는 만큼만 채워집니다.
+          </p>
+        </li>
+        <li>
+          <h4>음량을 맞추고 DSP로 넘깁니다</h4>
+          <p>
+            고역을 더했으니 전체 에너지가 조금 커졌습니다. 처리 전 RMS와 비교해 1% 넘게 커졌으면
+            그만큼 되돌려, 기능을 켜고 꺼도 음량이 뛰지 않게 합니다. 복원된 소리는 그다음 DSP 모듈들을
+            지나므로 MASTERING의 천장이 복원까지 포함해 지켜집니다.
           </p>
         </li>
       </ol>
 
-      <h3 id="hd-diff">HD와 ULTRA HD<span class="level">중급</span></h3>
+      <h3 id="hd-diff">HD와 ULTRA · eXtreme HD<span class="level">중급</span></h3>
       <div class="tw"><table>
-        <thead><tr><th></th><th>HD RESTORE</th><th>ULTRA HD RESTORE</th></tr></thead>
+        <thead><tr><th></th><th>HD RESTORE</th><th>ULTRA · eXtreme HD RESTORE</th></tr></thead>
         <tbody>
-          <tr><td>샘플레이트</td><td class="mono">96 kHz</td><td class="mono">192 kHz</td></tr>
-          <tr><td>비트 심도</td><td class="mono">24 bit 정수</td><td class="mono">32 bit 부동소수</td></tr>
-          <tr><td>담을 수 있는 상한</td><td class="mono">48 kHz</td><td class="mono">96 kHz</td></tr>
-          <tr><td>1분당 용량 (스테레오)</td><td class="mono">약 33 MB</td><td class="mono">약 92 MB</td></tr>
+          <tr><td>샘플레이트</td><td class="mono">48 · 88.2 · 96 kHz</td><td class="mono">176.4 · 192 · 352.8 · 384 kHz</td></tr>
+          <tr><td>쓰이는 때</td><td>원본보다 높은 44.1 · 48 · 88.2 · 96 kHz</td><td>원본보다 높은 176.4 · 192 · 352.8 · 384 kHz</td></tr>
+          <tr><td>담을 수 있는 상한</td><td class="mono">24 ~ 48 kHz</td><td class="mono">88.2 ~ 192 kHz</td></tr>
+          <tr><td>1분당 용량 (24bit 스테레오)</td><td class="mono">약 16 · 33 MB</td><td class="mono">약 66 · 132 MB</td></tr>
           <tr><td>처리 시간</td><td>보통</td><td>HD의 두 배 이상</td></tr>
         </tbody>
       </table></div>
       <p>
-        중요한 것은 <strong>ULTRA HD가 HD를 두 번 처리한 것이 아니라는 점</strong>입니다.
+        중요한 것은 <strong>ULTRA · eXtreme HD가 HD를 두 번 처리한 것이 아니라는 점</strong>입니다.
         같은 알고리즘을 192kHz에서 한 번만 돌립니다. 초기에는 HD 결과에 한 번 더 거는 방식이었는데,
         합성 과정에서 생기는 미세한 잡음이 두 배로 쌓여 오히려 나빠졌습니다.
         그래서 단일 패스로 바꿨습니다.
       </p>
       <p>
-        따라서 ULTRA HD가 HD보다 항상 낫다고 말하기 어렵습니다. 얻는 것은 48~96kHz 구간이
+        따라서 ULTRA · eXtreme HD가 HD보다 항상 낫다고 말하기 어렵습니다. 얻는 것은 48~96kHz 구간이
         채워지는 것뿐인데 그 구간은 사람이 들을 수 없고, 치르는 대가는 세 배의 용량과
         두 배 이상의 시간입니다.
       </p>
       <div class="note">
         <span class="tag">권장</span>
         <p>
-          일상적인 감상용이라면 HD로 충분합니다. ULTRA HD는 보관용 마스터를 만들거나,
+          일상적인 감상용이라면 표본률 96(HD)으로 충분합니다. 192(ULTRA HD) · 384(eXtreme HD)는 보관용 마스터를 만들거나,
           이후 다른 프로그램에서 추가 처리를 할 예정이라 여유분을 남겨두고 싶을 때 쓰세요.
         </p>
       </div>
@@ -935,60 +1234,62 @@ footer {
       <div class="tw"><table class="param">
         <thead><tr><th>노브</th><th>범위 · 기본</th><th>하는 일</th></tr></thead>
         <tbody>
-          <tr><td>HF SYNTH</td><td>0~100 · 60</td><td>HD에서 합성한 고역의 세기.</td></tr>
-          <tr><td>SMOOTH</td><td>0~100 · 40</td><td>합성 구간의 평활 강도. 커널 반경과 적용 비율을 함께 정합니다.</td></tr>
-          <tr><td>UHF SYNTH</td><td>0~100 · 50</td><td>ULTRA HD에서 합성한 고역의 세기.</td></tr>
-          <tr><td>SMOOTH (UHD)</td><td>0~100 · 35</td><td>ULTRA HD 쪽의 평활 강도. 예전 이름은 AIR MIX였습니다.</td></tr>
+          <tr><td>HF SYNTH</td><td>0~100 · 50</td><td>HD에서 채우는 고역의 모양과 양. 50이 실제 녹음처럼 떨어졌다가 평평해지는 곡선입니다.</td></tr>
+<tr><td>PRESET</td><td>탭 6개</td><td>기준 · 밝기 · 질감 · 공간 · 음악 종류 · 초고역 탭에서 하나씩 골라 섞습니다. 기준 외에는 AUTO가 곡에 맞춘 값에서 얼마나 옮길지를 정하는 취향 프리셋입니다.</td></tr>
+<tr><td>AUTO</td><td>0~100% · 75%</td><td>파일을 열 때 원음을 분석해 SMOOTH · ATTACK · KNEE를 곡에 맞게 놓습니다. 비율을 낮출수록 이전 기본 동작에 가까워집니다.</td></tr>
+<tr><td>KNEE</td><td>AUTO · 12~24 kHz</td><td>첫 번째 S자가 꺾이기 시작하는 곳. 늦출수록 16~20 kHz의 공기감이 밝아집니다.</td></tr>
+<tr><td>KNEE 2</td><td>AUTO · 24~64 kHz</td><td>ULTRA · eXtreme HD에서 음악이 끝나는 곳. 들리지 않는 대역의 양만 바뀝니다.</td></tr>
+<tr><td>ATTACK · SUSTAIN</td><td>−6~+6 dB · 0</td><td>복원 고역에서 치는 순간과 잦아드는 울림만 조절합니다.</td></tr>
+<tr><td>WIDTH</td><td>0~150% · AUTO</td><td>복원 고역의 좌우 폭. AUTO는 원음의 폭을 따릅니다.</td></tr>
+          <tr><td>SMOOTH</td><td>0~100 · 40</td><td>HD에서 위로 갈수록 결을 고르게 펴는 정도.</td></tr>
+          <tr><td>UHF SYNTH</td><td>0~100 · 50</td><td>ULTRA · eXtreme HD에서 채우는 양.</td></tr>
+          <tr><td>SMOOTH (UHD · XHD)</td><td>0~100 · 35</td><td>ULTRA · eXtreme HD 쪽 결 평탄화. 예전 이름은 AIR MIX였습니다.</td></tr>
         </tbody>
       </table></div>
       <p>
-        HF SYNTH와 UHF SYNTH는 합성 배음의 전체 세기를 정합니다. 0이면 배수 0.5,
-        100이면 1.5가 되어 <strong>최대와 최소가 세 배 차이</strong>입니다.
-        0으로 내려도 합성이 아예 꺼지지는 않고 절반 세기로 들어갑니다.
-      </p>
+        HF SYNTH와 UHF SYNTH는 채우는 고역의 모양과 양을 정합니다. 50이면 무손실 원본에 맞춘 곡선(원음 기울기에서 S자로 약 30 dB 떨어진 뒤 평평) 그대로이고, 올리면 옥타브당 −3 dB의 거의 평탄한 선 쪽으로 옮겨 가 100에서 거의 평탄합니다. 50 아래로 내리면 곡선 모양 그대로 전체가 낮아집니다(25에서 −2.5 dB).</p>
       <h4>SMOOTH는 무엇을 바꾸는가</h4>
       <p>
-        합성한 고역에는 유난히 솟은 주파수가 남기 쉽고, 그대로 두면 특정 음에서 삐 소리가 섞입니다.
-        SMOOTH는 이것을 눌러주는 정도입니다. 값에 따라 가우시안 커널의 반경과 적용 비율이
-        함께 커집니다.
+        옮겨 온 고역에는 원음의 또렷한 음 봉우리가 그대로 딸려 옵니다. 잘린 지점 근처에서는 그게 자연스럽지만,
+        아주 높은 곳까지 뾰족하게 남으면 쇳소리로 들릴 수 있습니다. SMOOTH는 위로 갈수록 이 봉우리를 얼마나
+        눕힐지 정합니다. 잘린 지점에서는 원음의 결 그대로이고, 채우는 양(크기)은 바뀌지 않습니다.
       </p>
       <div class="tw"><table>
-        <thead><tr><th>SMOOTH</th><th>커널 반경</th><th>적용 비율</th><th>성격</th></tr></thead>
+        <thead><tr><th>SMOOTH</th><th>한 옥타브 위의 결</th><th>성격</th></tr></thead>
         <tbody>
-          <tr><td class="mono">0</td><td class="mono">—</td><td class="mono">0%</td><td>평활 없음. 또렷하지만 스파이크가 남을 수 있습니다.</td></tr>
-          <tr><td class="mono">20</td><td class="mono">2</td><td class="mono">20%</td><td>아주 가볍게.</td></tr>
-          <tr><td class="mono">40</td><td class="mono">2</td><td class="mono">40%</td><td>기본값. 대부분의 소스에 무난합니다.</td></tr>
-          <tr><td class="mono">60~80</td><td class="mono">3</td><td class="mono">60~80%</td><td>거친 합성음을 다듬을 때.</td></tr>
-          <tr><td class="mono">100</td><td class="mono">4</td><td class="mono">100%</td><td>가장 매끄럽지만 고역이 무뎌집니다.</td></tr>
+          <tr><td class="mono">0</td><td>원음 그대로</td><td>또렷하지만 높은 곳까지 음 봉우리가 남습니다.</td></tr>
+          <tr><td class="mono">35~40</td><td>봉우리가 절반쯤 눕혀짐</td><td>기본값. 대부분의 소스에 무난합니다.</td></tr>
+          <tr><td class="mono">70</td><td>3분의 1쯤으로</td><td>음질이 낮은 파일의 쇳소리를 누를 때.</td></tr>
+          <tr><td class="mono">100</td><td>4분의 1쯤으로</td><td>위쪽이 거의 고른 바람 소리가 됩니다.</td></tr>
         </tbody>
       </table></div>
       <p>
-        SYNTH를 높게 쓸수록 SMOOTH도 함께 올리는 것이 보통입니다. 합성량이 많으면
-        튀는 지점도 많아지기 때문입니다. 심벌에서 쇳소리가 들리는데 SYNTH를 내리고 싶지 않다면
-        SMOOTH를 먼저 올려보세요.
+        심벌에서 쇳소리가 들리는데 SYNTH를 내리고 싶지 않다면 SMOOTH를 먼저 올려보세요.
+        잘린 지점이 낮은 파일일수록 효과가 큽니다.
       </p>
 
       <h4>어느 값에서 시작할까</h4>
       <div class="tw"><table>
         <thead><tr><th>소스</th><th>잘린 지점</th><th>권장 SYNTH</th><th>이유</th></tr></thead>
         <tbody>
-          <tr><td>128kbps mp3</td><td class="mono">~16 kHz</td><td class="mono">60~75</td><td>채울 구간이 넓고 그중 상당수가 들리는 영역입니다.</td></tr>
-          <tr><td>320kbps mp3</td><td class="mono">~20 kHz</td><td class="mono">40~55</td><td>채울 구간이 좁고 대부분 안 들리는 영역이라 과하면 손해입니다.</td></tr>
-          <tr><td>CD 음질 wav</td><td class="mono">없음</td><td class="mono">0~30</td><td>자를 것이 없어 22kHz 위에만 얹힙니다. 효과가 거의 없습니다.</td></tr>
-          <tr><td>오래된 녹음</td><td class="mono">10~14 kHz</td><td class="mono">50~65</td><td>원래 그 위가 녹음되지 않은 것이라 과하면 이질적입니다.</td></tr>
+          <tr><td>64~96kbps mp3</td><td class="mono">11~15 kHz</td><td class="mono">50~55</td><td>옮긴 소리가 쇳소리로 들리기 쉬워 SMOOTH를 55~70으로 함께 올립니다.</td></tr>
+          <tr><td>128kbps mp3</td><td class="mono">~16 kHz</td><td class="mono">50~60</td><td>채울 구간이 넓고 그중 일부가 들리는 영역입니다.</td></tr>
+          <tr><td>320kbps mp3</td><td class="mono">~20 kHz</td><td class="mono">50</td><td>채울 구간이 좁고 대부분 안 들리는 영역이라 곡선 그대로면 충분합니다.</td></tr>
+          <tr><td>CD 음질 wav</td><td class="mono">없음</td><td class="mono">0~50</td><td>자를 것이 없어 22kHz 위에만 얹힙니다. 효과가 거의 없습니다.</td></tr>
+          <tr><td>오래된 녹음</td><td class="mono">10~14 kHz</td><td class="mono">45~50</td><td>원래 그 위가 녹음되지 않은 것이라 과하면 이질적입니다.</td></tr>
         </tbody>
       </table></div>
       <div class="note hot">
         <span class="tag">과하면 이렇게 들립니다</span>
         <p>
           심벌과 하이햇에 쇳소리가 섞이고, 치찰음이 날카로워지며, 조용한 대목에서 배경이
-          사각거립니다. 이런 징후가 보이면 SYNTH를 10씩 내리세요.
+          사각거립니다. 쇳소리면 SMOOTH를 먼저 올리고, 나머지는 SYNTH를 50 쪽으로 내리세요.
         </p>
       </div>
 
       <h3 id="hd-live">LIVE 모드<span class="level a">고급</span></h3>
       <p>
-        HD와 ULTRA HD 칸에 각각 LIVE 스위치가 있습니다. 켜면 내보내기 전에 복원된 소리를
+        HD와 ULTRA · eXtreme HD 칸에 각각 LIVE 스위치가 있습니다. 켜면 내보내기 전에 복원된 소리를
         바로 들을 수 있습니다. 두 스위치는 동시에 켜지지 않습니다.
       </p>
 
@@ -1000,30 +1301,30 @@ footer {
         그 결과를 재생합니다. 진행 막대가 뜨는 것이 그 과정입니다.
       </p>
       <p>
-        한 번 만든 결과는 보관됩니다. 껐다 켜는 것은 즉시 전환되고, HF SYNTH를 바꿨을 때만
+        한 번 만든 결과는 보관됩니다. 껐다 켜는 것은 즉시 전환되고, HF SYNTH나 SMOOTH를 바꿨을 때만
         다시 만듭니다. 슬라이더는 손을 뗐을 때 반응하므로 끄는 동안 계속 재계산되지는 않습니다.
       </p>
 
       <h4>샘플레이트가 바뀝니다</h4>
       <p>
-        LIVE를 켜면 오디오 엔진 자체가 96kHz 또는 192kHz로 다시 만들어집니다.
+        LIVE를 켜면 오디오 엔진 자체가 96kHz 또는 192kHz(44.1 계열 원본이면 88.2kHz 또는 176.4kHz)로 다시 만들어집니다.
         모듈 머리줄에 실제 적용된 값이 표시됩니다. 기기가 그 속도를 받아주지 못하면
-        <em>장치 제한</em>이라고 뜨고 가능한 값으로 내려갑니다.
+        <em>장치 제한</em>이라고 뜨고 가능한 값으로 내려갑니다. 이때는 복원 결과도 그 속도로 직접 내려
+        재생하므로, 들리는 대역의 복원은 그대로이고 고역이 접혀 들어오지 않습니다.
       </p>
 
-      <div class="note warn">
-        <span class="tag">듣는 소리와 파일이 완전히 같지는 않습니다</span>
+      <div class="note">
+        <span class="tag">듣는 소리가 그대로 파일이 됩니다</span>
         <p>
-          내보내기는 <strong>DSP를 먼저 걸고 그 결과에 복원</strong>을 적용합니다.
-          LIVE는 <strong>원음을 먼저 복원하고 그 위에 DSP</strong>를 얹습니다.
-          순서를 뒤집은 이유는, 노브를 돌릴 때마다 전체를 다시 복원해야 한다면 실시간이라
-          부를 수 없기 때문입니다. 차이가 크지는 않지만 최종 판단은 내보낸 파일로 하세요.
+          LIVE와 내보내기는 모두 <strong>원음을 먼저 복원하고 그 위에 DSP</strong>를 얹습니다.
+          복원은 DSP 앞에서 한 번만 하므로, 모듈의 노브를 돌려도 복원을 다시 계산하지 않고
+          들은 소리가 그대로 파일에 담깁니다.
         </p>
         <p>
-          또 하나. 내보내기는 LIVE 스위치를 무시합니다. LIVE를 켜고 듣다가 <code>WAV</code>로
-          내보내면 그 파일에는 복원이 들어가지 않습니다. 복원을 파일에 담으려면 HD나
-          ULTRA HD 버튼으로 내보내야 합니다. 반대로 LIVE를 켠 채 HD로 내보내도 복원이 두 번
-          걸리지는 않습니다. 내보내기는 언제나 원본에서 새로 시작합니다.
+          또 하나. 내보내기는 LIVE 스위치를 무시합니다. LIVE를 켜고 듣다가 원본과 같거나 낮은
+          표본률로 내보내면 그 파일에는 복원이 들어가지 않습니다. 복원을 파일에 담으려면 원본보다 높은 표본률을
+          골라 내보내면 됩니다(96kHz 이하 HD, 176.4 · 192kHz ULTRA HD, 352.8 · 384kHz eXtreme HD). 반대로 LIVE를 켠 채
+          내보내도 복원이 두 번 걸리지는 않습니다. 내보내기는 언제나 원본에서 새로 시작합니다.
         </p>
       </div>
 
@@ -1031,7 +1332,7 @@ footer {
       <p>솔직하게 정리하겠습니다.</p>
       <p>
         <strong>20kHz 위는 들리지 않습니다.</strong> 젊고 청력이 좋아도 대개 18~20kHz가 한계이고
-        나이가 들면 더 내려갑니다. HD가 채우는 20~48kHz, ULTRA HD가 채우는 48~96kHz는
+        나이가 들면 더 내려갑니다. HD가 채우는 범위 가운데 20~48kHz, ULTRA HD가 더 채우는 48~96kHz는
         직접 들리는 소리가 아닙니다.
       </p>
       <p>
@@ -1073,8 +1374,8 @@ footer {
           <h4>LIVE를 켜고 비교합니다</h4>
           <p>
             같은 구간을 다시 재생합니다. 비어 있던 영역에 색이 들어차면 복원이 작동한 것입니다.
-            아래쪽 무늬와 비슷한 결로 이어지면 잘 된 것이고, 아래와 무관한 균일한 띠가 생겼다면
-            SYNTH가 과합니다.
+            잘린 지점에서 색과 무늬가 끊김 없이 이어지고 위로 갈수록 고르게 옅어지면 잘 된 것입니다.
+            경계에 밝은 띠가 보이면 SYNTH가 높습니다(50이 원음 기울기 그대로).
           </p>
         </li>
         <li>
@@ -1104,8 +1405,8 @@ footer {
         <dt>막대 보기</dt>
         <dd>
           지금 이 순간의 주파수별 세기입니다. 가로가 주파수(로그), 세로가 음압입니다.
-          세로축에 10dB 간격으로 −30에서 −100dB까지 눈금이 붙고, 넓은 화면에서 어디서든 읽을 수
-          있도록 숫자가 가로로 네 번 반복됩니다. 막대 위의 가는 선은 최근 최고치가 천천히
+          세로축에 −30에서 −100dB까지 10dB 간격의 격자선이 있고, 숫자는 20dB마다 왼쪽에 붙습니다.
+          그래프 폭이 900px를 넘으면 가운데에 한 번 더 씁니다. 막대 위의 가는 선은 최근 최고치가 천천히
           내려오는 표시입니다.
         </dd>
         <dt>스펙트로그램 보기</dt>
@@ -1153,31 +1454,116 @@ footer {
   <section id="export">
     <h2><span class="num">07</span>내보내기<span class="level b">초급</span></h2>
     <div class="reading">
+      <p>
+        표본률(44.1 · 48 · 96 · 192 · 384 — 44.1 계열 원본이면 44.1 · 48 · 88.2 · 176.4 · 352.8)과 비트 깊이를 눈금 스위치로 따로 고른 뒤 내보내기 버튼을 누릅니다. 파일을 올리면 표본률과 비트 깊이가 원본 값에 맞춰지고, 그 눈금 숫자 아래에 (원본)이 붙습니다. 원본이 눈금보다 낮으면 44.1 · 16, 높으면 맨 위 눈금 · 32, 눈금 사이면 바로 위 눈금을 표시 없이 고릅니다. 44.1kHz의 정수배 원본(44.1 · 88.2 · 176.4 · 352.8)이면 위 세 눈금이 88.2 · 176.4 · 352.8로 바뀝니다.
+        버튼 글자에 고른 형식이, 그 아래에 처리 경로가 표시됩니다. 고른 값은 프리셋에 함께 담깁니다.
+      </p>
       <div class="tw"><table>
-        <thead><tr><th>형식</th><th>사양</th><th>고역 복원</th><th>1분당 용량</th></tr></thead>
+        <thead><tr><th>원본 대비 표본률</th><th>처리</th><th>고역 복원</th></tr></thead>
         <tbody>
-          <tr><td>WAV</td><td class="mono">원본 SR · 16bit</td><td>없음</td><td class="mono">약 10 MB</td></tr>
-          <tr><td>HD RESTORE</td><td class="mono">96kHz · 24bit</td><td>적용</td><td class="mono">약 33 MB</td></tr>
-          <tr><td>ULTRA HD</td><td class="mono">192kHz · 32bit</td><td>적용</td><td class="mono">약 92 MB</td></tr>
+          <tr><td>같음</td><td>변환 없음</td><td>없음</td></tr>
+          <tr><td>높음</td><td>최고 규격 보간 (99.5%까지 평탄 · 200 dB)</td><td>잘린 지점 ~ 목표 나이퀴스트 — 96 kHz 이하 HD, 176.4 · 192 kHz ULTRA HD, 352.8 · 384 kHz eXtreme HD</td></tr>
+          <tr><td>낮음</td><td>효율 규격 변환 (98%까지 평탄 · 180 dB)</td><td>없음</td></tr>
+        </tbody>
+      </table></div>
+      <div class="tw"><table>
+        <thead><tr><th>비트 깊이</th><th>형식</th><th>처리</th></tr></thead>
+        <tbody>
+          <tr><td class="mono">16</td><td>정수 PCM</td><td>TPDF 디더</td></tr>
+          <tr><td class="mono">24</td><td>정수 PCM</td><td>비트 깊이 향상 → TPDF 디더</td></tr>
+          <tr><td class="mono">32</td><td>부동소수</td><td>비트 깊이 향상</td></tr>
+        </tbody>
+      </table></div>
+      <div class="tw"><table>
+        <thead><tr><th>1분당 용량 (스테레오)</th><th>16bit</th><th>24bit</th><th>32bit</th></tr></thead>
+        <tbody>
+          <tr><td>44.1 kHz</td><td class="mono">약 10 MB</td><td class="mono">약 15 MB</td><td class="mono">약 20 MB</td></tr>
+          <tr><td>48 kHz</td><td class="mono">약 11 MB</td><td class="mono">약 16 MB</td><td class="mono">약 22 MB</td></tr>
+          <tr><td>96 kHz</td><td class="mono">약 22 MB</td><td class="mono">약 33 MB</td><td class="mono">약 44 MB</td></tr>
+          <tr><td>192 kHz</td><td class="mono">약 44 MB</td><td class="mono">약 66 MB</td><td class="mono">약 88 MB</td></tr>
+          <tr><td>384 kHz</td><td class="mono">약 88 MB</td><td class="mono">약 132 MB</td><td class="mono">약 176 MB</td></tr>
         </tbody>
       </table></div>
       <p>
         모두 WAV 컨테이너입니다. 32bit는 부동소수 형식이라 일부 오래된 재생기가 읽지 못할 수 있습니다.
       </p>
       <p>
-        처리는 세 단계입니다. 목표 샘플레이트로 리샘플링하고, DSP 체인을 통과시키고, 고역을
-        합성합니다. 진행 막대에 지금 무엇을 하는지 표시됩니다.
+        처리 순서는 <strong>비트 깊이 향상 → 표본률 변환 → 고역 복원 → DSP 체인 → 기록</strong>입니다.
+        필요한 단계만 거칩니다. 변환은 올릴 때 최고 규격, 내릴 때 효율 규격을 쓰고(아래 표본률 변환), 복원은 SYNTH가 0이면 건너뜁니다.
+        LIVE와 같은 순서이며, 진행 막대에 지금 무엇을 하는지 표시됩니다.
+        파일 이름에는 거친 경로가 붙습니다. 복원을 거치면 <code>_HD96k24bit</code>처럼, 아니면 <code>_dsp44.1k16bit</code>처럼 붙습니다.
+      </p>
+
+      <h3>표본률 변환 — 두 갈래<span class="level">중급</span></h3>
+      <p>
+        올릴 때는 원본을 그대로 옮기는 보간이라 비용을 따지지 않고 가장 높은 규격을 씁니다. 입력 나이퀴스트의 99.5%까지
+        평탄하게 두고(44.1 kHz면 21.94 kHz), 나이퀴스트부터 200 dB를 막습니다. 내릴 때는 효율을 앞세워 출력 나이퀴스트의 98%까지
+        평탄하게 두고 나이퀴스트부터 180 dB를 막습니다. 두 경우 모두 통과대역을 가르는 날카로운 거름을 FFT 합성곱으로 한 번만 겁니다.
+      </p>
+      <div class="tw"><table>
+        <thead><tr><th>같은 입력을 SoX(libsoxr)와 대조</th><th>이 프로그램</th><th>SoX VHQ</th><th>SoX 최고 설정</th></tr></thead>
+        <tbody>
+          <tr><td>44.1 → 96 kHz, 21.9 kHz 응답</td><td class="mono">0.0000 dB</td><td class="mono">−71.4 dB</td><td class="mono">−0.0075 dB</td></tr>
+          <tr><td>44.1 → 96 kHz, 거울상 최대</td><td class="mono">−166.8 dBc</td><td class="mono">−168.7 dBc</td><td class="mono">−166.6 dBc</td></tr>
+          <tr><td>96 → 44.1 kHz, 21.6 kHz 응답</td><td class="mono">0.0000 dB</td><td class="mono">−13.5 dB</td><td class="mono">−0.0042 dB</td></tr>
+          <tr><td>96 → 44.1 kHz, 에일리어싱 최대</td><td class="mono">−164.8 dBc</td><td class="mono">−164.8 dBc</td><td class="mono">−164.8 dBc</td></tr>
+        </tbody>
+      </table></div>
+      <p>
+        원본을 더 넓게 평탄하게 지키면서, 거울상과 에일리어싱은 SoX와 같은 수준으로 막습니다. 이 값들은 32bit float 저장의
+        반올림 바닥(−150 dBc 안팎)보다 한참 아래라 어떤 출력 형식에서도 드러나지 않습니다.
+      </p>
+
+      <h3>비트 깊이 향상<span class="level">중급</span></h3>
+      <p>
+        16bit 파일의 표본은 원래 값을 65,536단계 가운데 가장 가까운 칸으로 반올림한 것입니다.
+        그러니 원래 값은 반드시 그 칸, 곧 표본 값 ±½ LSB 안에 있었습니다. 24 · 32bit로 쓸 때 계단을 그대로 옮기면
+        반올림 잡음(디더 없이 만든 파일은 약 −101 dBFS, 디더가 있으면 약 −96 dBFS)도 그대로 따라오므로,
+        이 칸을 벗어나지 않는 범위에서 더 그럴듯한 값을 찾아 채웁니다.
+      </p>
+      <ol class="steps">
+        <li><h4>격자를 확인합니다</h4><p>파일을 올릴 때 표본이 정수 격자 위에 있는지 봅니다. 16bit 원본이면 파일 정보에 16bit가 붙습니다. mp3처럼 손실 압축된 파일에는 격자가 없어 이 과정을 건너뜁니다.</p></li>
+        <li><h4>잡음만 줄입니다</h4><p>짧은 조각의 주파수 성분으로 나눈 뒤, 반올림 잡음을 세기를 아는 고른 잡음으로 보고 성분마다 신호 대 잡음비에 맞춰 줄입니다. 조각 사이에서 줄이는 정도를 부드럽게 이어 삑삑거리는 잔향(음악적 잡음)이 생기지 않게 합니다.</p></li>
+        <li><h4>칸 안으로 되돌립니다</h4><p>되돌린 값이 칸을 벗어나면 칸 끝으로 되돌립니다. 결과는 원본에서 ½ LSB를 넘지 않고, REFINE만큼 원본과 섞습니다. 디지털 무음은 그대로 0입니다.</p></li>
+      </ol>
+      <div class="tw"><table>
+        <thead><tr><th>참값을 아는 신호로 잰 오차 감소 (REFINE 100)</th><th>디더 없음</th><th>TPDF</th><th>셰이핑 (F-가중)</th></tr></thead>
+        <tbody>
+          <tr><td>성긴 음악 (악기 넷, 사라지는 끝까지)</td><td class="mono">6.8 dB</td><td class="mono">6.3 dB</td><td class="mono">19.2 dB</td></tr>
+          <tr><td>조용히 이어지는 음 −60 dBFS</td><td class="mono">10.4 dB</td><td class="mono">6.4 dB</td><td class="mono">19.7 dB</td></tr>
+          <tr><td>촘촘한 음악 (넓은 대역을 덮는 성분이 많음)</td><td class="mono">0.4 dB</td><td class="mono">1.3 dB</td><td class="mono">3.3 dB</td></tr>
+          <tr><td>원본에서 벗어나는 최대량</td><td class="mono">½ LSB</td><td class="mono">½ LSB</td><td class="mono">13 LSB (3σ, 최대 16)</td></tr>
+        </tbody>
+      </table></div>
+      <p>
+        촘촘한 음악에서 이득이 작은 것은 잡음과 비슷한 세기로 같은 성분에 겹친 음악을 잡음과 가를 수 없기 때문입니다. 노이즈 셰이핑 디더로 만든 원본(상용 CD에 흔함)은 반올림 잡음이 고역으로 몰려 원래 값이 칸 밖으로 여러 LSB 벗어나 있습니다. 이런 원본은 파일 전체의 틀별 스펙트럼에서 빈마다 조용한 순간의 바닥(10% 백분위)을 모아 잡음 모양을 알아내고, 고역 바닥이 평탄 수준의 10배 이상이면서 중역 바닥의 3배 이상일 때 셰이핑으로 판별합니다. 그다음 주파수마다 추정한 잡음 세기로 거르고, 원본에서 벗어나는 양을 원래 잡음의 3σ(최대 16 LSB)로 묶습니다.
+        반복을 늘려도 나아지지 않고, 디더 없이 만든 파일에서는 오히려 나빠져 한 번만 돌립니다.
+        이 차이가 쓸모 있는 것은 체인이 조용한 구간을 크게 끌어올릴 때입니다. 원본의 반올림 잡음도 함께 커지는데,
+        체인 앞에서 줄여 두면 24 · 32bit 파일의 잡음 바닥이 그만큼 낮습니다. 4분 스테레오 곡은 Chrome에서 약 6초 걸립니다.
+      </p>
+
+      <h3>정수 변환과 디더<span class="level">고급</span></h3>
+      <p>
+        16 · 24bit 정수로 쓸 때는 반올림 전에 TPDF 디더(±1 LSB의 삼각 분포 잡음)를 더합니다.
+        반올림 오차가 신호를 따라다니는 왜곡 대신 신호와 상관없는 고른 잡음이 되어, 사라지는 꼬리가 거칠게 부서지지 않습니다.
+        이미 격자 위에 있는 표본(디지털 무음, 손대지 않은 원본 정수)에는 더하지 않고, 난수의 시작값을 고정해 같은 입력이면 같은 파일이 나옵니다.
+        복원 모듈의 DITHER로 끌 수 있습니다.
+      </p>
+      <p>
+        배율은 음수 ×32768, 양수 ×32767(24bit는 ×8388608 · ×8388607)입니다. Chrome이 정수를 읽을 때의 나눗셈을 그대로 뒤집으므로,
+        모듈을 모두 끄고 원본과 같은 비트 깊이로 내보내면 원본 파일과 비트 단위로 같습니다.
+        16bit 원본을 24bit로 쓸 때 향상을 끄면(REFINE 0) 원본 정수를 그대로 256배 한 값이 됩니다.
       </p>
 
       <h3>메모리에 관하여</h3>
       <p>
-        192kHz 32bit 스테레오는 분당 약 92MB입니다. 5분 곡이면 460MB이고, 처리 중에는 원본 버퍼와
+        192kHz 32bit 스테레오는 분당 약 88MB, 384kHz는 약 176MB입니다. 5분 곡이면 각각 440MB와 880MB이고, 처리 중에는 원본 버퍼와
         인코딩 버퍼가 함께 존재하므로 실제 사용량은 그 두세 배가 됩니다.
         예상 크기가 1.8GB를 넘으면 시작 전에 막고 알려줍니다.
       </p>
       <p>
-        Firefox와 Safari는 192kHz를 아예 거부하는 경우가 있습니다. 시작 전에 확인해서
-        지원하지 않으면 메시지를 띄우므로, 그때는 Chrome을 쓰거나 HD로 내보내면 됩니다.
+        Firefox와 Safari는 192 · 384kHz를 아예 거부하는 경우가 있습니다. 시작 전에 확인해서
+        지원하지 않으면 메시지를 띄우므로, 그때는 Chrome을 쓰거나 96으로 내보내면 됩니다.
       </p>
     </div>
   </section>
@@ -1190,7 +1576,7 @@ footer {
 
       <h3>저비트레이트 mp3 되살리기</h3>
       <p>
-        이 프로그램이 가장 잘하는 일입니다. HD LIVE를 켜고 HF SYNTH 65에서 시작합니다.
+        이 프로그램이 가장 잘하는 일입니다. HD LIVE를 켜고 HF SYNTH 50에서 시작합니다.
         BBE의 HI DEF를 40 정도로 올려 위쪽을 살짝 열고, MASTER의 CEILING은 −0.5dB.
         나머지 모듈은 끕니다. 복원 결과를 판단하는 데 다른 처리가 끼면 방해가 됩니다.
         판단이 끝난 뒤에 색을 입히세요.
@@ -1205,21 +1591,21 @@ footer {
 
       <h3>보컬을 앞으로</h3>
       <p>
-        BBE의 PROCESS를 55로 올립니다. 3.2kHz 부근이 들리면서 목소리가 앞으로 나옵니다.
+        BBE의 PROCESS를 55로 올립니다. 3 kHz 위가 올라가면서 목소리가 앞으로 나옵니다.
         치찰음이 튀면 EXCITER의 FREQ를 8kHz 위로 올려 겹치지 않게 하고 MIX는 25 아래로.
         MASTER의 MID COMP를 3.5로 올리면 목소리 레벨이 더 고르게 유지됩니다.
       </p>
 
       <h3>LP처럼 듣기</h3>
       <p>
-        VINYL을 CRACKLE 25, WOBBLE 20, WEAR 45, CROSSTALK 30으로 켭니다.
+        VINYL을 SURFACE S/N 55, CRACKLE 10, POPS 20, WOW &amp; FLUTTER 0.15, PLAYS 400, SEPARATION 20으로 켭니다.
         TUBE를 DRIVE 40으로 함께 켜면 훨씬 그럴듯해집니다.
         MASTER의 STEREO WIDTH는 95로 살짝 좁히세요. LP는 원래 좌우가 넓지 않습니다.
       </p>
 
       <h3>보관용 마스터 만들기</h3>
       <p>
-        모듈을 모두 끄거나 최소한만 켜고 ULTRA HD로 내보냅니다. UHF SYNTH는 40 이하로 절제합니다.
+        모듈을 모두 끄거나 최소한만 켜고 표본률 192 · 비트 깊이 32로 내보냅니다. UHF SYNTH는 곡선 그대로인 50 이하로 둡니다.
         나중에 다른 프로그램에서 작업할 파일이라면 지금 색을 많이 입히지 않는 편이 낫습니다.
         CEILING은 −1.0dB로 여유를 크게 둡니다.
       </p>
@@ -1231,6 +1617,11 @@ footer {
     <h2><span class="num">09</span>문제 해결<span class="level b">초급</span></h2>
     <div class="reading">
       <dl class="kv">
+        <dt>파일을 올렸는데 읽지 못했다고 나옵니다</dt>
+        <dd>
+          브라우저가 그 형식을 디코딩하지 못한 경우입니다. 상태 표시줄에 이유가 나옵니다. AAC · ALAC(m4a)은 특허 코덱을 뺀 일부 Chromium 빌드가,
+          64비트 float WAV는 Chromium이 읽지 못합니다. WAV(16 · 24bit)나 FLAC으로 바꾸거나 Chrome · Edge에서 여세요. 앞에 열어 둔 파일은 그대로 남습니다.
+        </dd>
         <dt>내보내기 버튼을 눌러도 아무 일이 없습니다</dt>
         <dd>
           이전 내보내기가 오류로 끝나 잠금이 풀리지 않았을 수 있습니다. 페이지를 새로 고치면 풀립니다.
@@ -1244,13 +1635,15 @@ footer {
         <dd>엔진이 높은 샘플레이트로 돌면서 부하가 커진 상태입니다. 다른 탭을 닫거나 HD 쪽으로 내려보세요.</dd>
         <dt>복원을 켜도 스펙트럼에 변화가 없습니다</dt>
         <dd>
-          원본에 자를 것이 없는 경우입니다. 무손실 파일이라면 정상적인 결과입니다.
+          원본에 자를 것이 없는 경우입니다. 무손실 파일이라면 정상적인 결과이고,
+          이미 96·192kHz 대역을 채운 고해상도 파일은 복원을 건너뜁니다.
           X-AXIS를 <code>96</code> 이상으로 놓아야 새로 채워진 영역이 화면에 들어옵니다.
         </dd>
         <dt>SMOOTH를 움직여도 차이를 모르겠습니다</dt>
         <dd>
-          합성량이 적으면 평활할 대상도 적어 차이가 작습니다. SYNTH를 70 이상으로 올린 뒤
-          SMOOTH를 0과 100으로 번갈아 두고 심벌이 나오는 구간에서 비교해보세요.
+          SMOOTH는 크기가 아니라 결만 바꾸고, 잘린 지점 바로 위에서는 거의 작용하지 않다가 위로 갈수록 커집니다.
+          X-AXIS를 <code>192</code>에 고정하고 SMOOTH를 0과 100으로 번갈아 두면, 위쪽의 가는 줄무늬가 고른 색으로
+          바뀌는 것이 보입니다. 20kHz 위는 들리지 않으므로 귀로는 차이가 작을 수 있습니다.
           LIVE 모드에서는 슬라이더를 놓는 순간 다시 복원하므로 잠시 기다려야 합니다.
         </dd>
         <dt>처리한 소리가 더 나쁩니다</dt>
@@ -1268,10 +1661,13 @@ footer {
     <div class="reading">
       <p>지금 버전에서 분명히 알고 써야 할 것들입니다.</p>
       <ul>
-        <li><strong>LIVE와 내보내기의 처리 순서가 반대입니다.</strong> LIVE는 복원 후 DSP, 내보내기는 DSP 후 복원입니다.</li>
         <li>
-          <strong>파일의 원래 샘플레이트가 보존되지 않습니다.</strong> 디코딩 시점에 기기 기본값으로
-          변환됩니다. <code>WAV</code> 내보내기의 <em>원본 SR</em>은 그 값을 뜻합니다.
+          <strong>채운 고역은 잘린 지점 아래의 소리를 옮겨 온 것입니다.</strong> 실제 고역에서 악기들이
+          차지하던 비율까지는 되살리지 못하고, 아주 높은 곳은 원음 기울기보다 조금 더 가파르게 줄어든다고 가정합니다.
+        </li>
+        <li>
+          <strong>알 수 없는 형식의 파일은 원래 샘플레이트를 읽지 못합니다.</strong> 이때는 기기 기본값으로
+          디코딩되고, 내보내기의 <em>원본</em> 표본률도 그 값이 됩니다. 정수 격자도 알 수 없는 형식이면 비트 깊이 향상은 건너뜁니다.
         </li>
         <li>
           <strong>복원은 되돌리는 것이 아니라 만들어내는 것입니다.</strong>
@@ -1293,8 +1689,16 @@ footer {
         <dd>샘플레이트의 절반. 담을 수 있는 주파수의 이론적 상한입니다. 96kHz로 기록하면 48kHz까지 담깁니다.</dd>
         <dt>비트 심도</dt>
         <dd>한 번 기록할 때 쓰는 정밀도. 16bit는 65,536단계, 24bit는 약 1,678만 단계입니다.</dd>
+        <dt>LSB</dt>
+        <dd>가장 작은 한 단계의 크기. 16bit에서는 전체 폭의 65,536분의 1입니다. 반올림 오차는 ±½ LSB 안에 있습니다.</dd>
+        <dt>디더</dt>
+        <dd>반올림하기 전에 아주 작은 잡음을 일부러 더하는 처리. 반올림 오차가 소리를 따라다니는 왜곡 대신 고른 잡음이 됩니다. 이 프로그램은 ±1 LSB의 삼각 분포(TPDF) 디더를 씁니다.</dd>
         <dt>배음</dt>
         <dd>기본음의 정수배 주파수. 같은 음정이라도 악기마다 다르게 들리는 이유입니다.</dd>
+        <dt>주파수 이동</dt>
+        <dd>소리 덩어리를 성분 사이의 간격과 시간 모양을 그대로 둔 채 통째로 위나 아래로 옮기는 처리. HD 복원이 잘린 고역을 채울 때 씁니다.</dd>
+        <dt>f0 동기 이동</dt>
+        <dd>옮기는 양을 음의 기본 주파수(f0)의 정수배로 맞추는 것. 옮긴 배음이 원래 배음 자리에 빠짐없이 놓입니다. 한 음이 도드라질 때만 씁니다.</dd>
         <dt>dB</dt>
         <dd>소리 크기의 단위. 로그 척도라 6dB 차이가 진폭 두 배입니다.</dd>
         <dt>RMS</dt>
@@ -1418,6 +1822,60 @@ footer {
     var href = a.getAttribute('href');
     if (href === '#') { e.preventDefault(); toTop(); }
   });
+})();
+</script>
+<script>
+/* ============================================================
+   화면 색 고르기 — 상단 이동 바 오른쪽의 자동 · 야간 · 주간
+   ------------------------------------------------------------
+   고른 값은 이 브라우저에 기억해(asde.theme) 프로그램과 모든 문서에
+   같이 적용한다. 자동이면 data-theme을 두지 않아 컴퓨터의 다크 · 라이트
+   설정을 따른다. 그리기 전 적용은 <head>의 짧은 스크립트가 맡고,
+   여기서는 스위치를 붙이고 누른 값을 저장한다.
+   ============================================================ */
+(function () {
+  var KEY = 'asde.theme', root = document.documentElement;
+  var nav = document.querySelector('.hub-nav');
+  if (!nav || nav.querySelector('.hn-theme')) return;
+
+  function stored() {
+    try { var t = localStorage.getItem(KEY); return (t === 'dark' || t === 'light') ? t : 'auto'; }
+    catch (e) { return 'auto'; }                            // 저장소가 막힌 환경 — 이번 방문 동안만 적용된다
+  }
+
+  var OPTS = [
+    ['auto',  '자동', '자동 — 컴퓨터의 다크 · 라이트 설정을 따릅니다'],
+    ['dark',  '야간', '야간 — 늘 어두운 야간 콘솔(다크 모드)'],
+    ['light', '주간', '주간 — 늘 밝은 주간 콘솔(라이트 모드)']
+  ];
+  var box = document.createElement('div');
+  box.className = 'hn-theme';
+  box.setAttribute('role', 'group');
+  box.setAttribute('aria-label', '화면 색');
+  var btns = OPTS.map(function (o) {
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'hn-theme-btn';
+    b.textContent = o[1];
+    b.title = o[2];
+    b.setAttribute('data-choice', o[0]);
+    b.addEventListener('click', function () { choose(o[0], true); });
+    box.appendChild(b);
+    return b;
+  });
+
+  function choose(t, save) {
+    if (t === 'auto') root.removeAttribute('data-theme');
+    else root.setAttribute('data-theme', t);
+    btns.forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-choice') === t ? 'true' : 'false'); });
+    if (!save) return;
+    try { if (t === 'auto') localStorage.removeItem(KEY); else localStorage.setItem(KEY, t); } catch (e) {}
+  }
+
+  nav.appendChild(box);
+  choose(stored(), false);
+  // 다른 창(탭)에서 바꾸면 이 창도 따라간다
+  window.addEventListener('storage', function (e) { if (e.key === KEY || e.key === null) choose(stored(), false); });
 })();
 </script>
 </body>
