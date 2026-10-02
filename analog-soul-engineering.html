@@ -1,12 +1,14 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
+<meta name="color-scheme" content="dark light">
+<script>/* 화면 색 — 고른 값을 그리기 전에 적용한다(자동이면 속성을 두지 않아 컴퓨터 설정을 따른다) */try{var t=localStorage.getItem('asde.theme');if(t==='dark'||t==='light')document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ANALOG SOUL DSP ENGINE — 신호 처리 사양서</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@500;600;700&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
 /* ============================================================
    토큰 — 계측기 화면의 대비. 다크 우선.
@@ -193,30 +195,282 @@ footer {
 
 /* ===== 공통 상단 툴바 — 전 문서 동일 ===== */
 .hub-nav{
+  /* 콘솔 이동 바 — 프로그램과 같은 판과 글꼴. 컴퓨터가 라이트 모드면 아래에서 밝게 바꾼다 */
+  --hn-bg:rgba(41,51,60,.94); --hn-line:#3a4652; --hn-home:#f0b545; --hn-home-hi:#f6c464;
+  --hn-link:#aab5bd; --hn-link-hi:#ece3cf; --hn-hover:#303b45; --hn-sep:#52606d; --hn-mark:#f0b545;
   position:sticky; top:0; z-index:9000;
   display:flex; align-items:center; gap:2px; flex-wrap:wrap;
   padding:7px 16px; min-height:34px;
-  background:rgba(10,8,12,.95); border-bottom:1px solid #2a2535;
-  font-family:'IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
-  font-size:11px; line-height:1.5;
-  backdrop-filter:saturate(150%) blur(8px);
-  -webkit-backdrop-filter:saturate(150%) blur(8px);
+  background:var(--hn-bg); border-bottom:1px solid var(--hn-line);
+  font-family:'Barlow Condensed','Bahnschrift SemiCondensed','Bahnschrift','Avenir Next Condensed','Roboto Condensed','DejaVu Sans Condensed','Arial Narrow','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif;
+  font-size:13px; font-weight:500; letter-spacing:.02em; line-height:1.5;
+  backdrop-filter:saturate(140%) blur(8px);
+  -webkit-backdrop-filter:saturate(140%) blur(8px);
 }
-.hub-nav .home{ color:#ffb300; text-decoration:none; letter-spacing:.12em; margin-right:12px; white-space:nowrap; }
-.hub-nav .home:hover{ color:#ffd166; }
-.hub-nav a.hn{ color:#7d7291; text-decoration:none; padding:3px 9px; border-radius:2px; white-space:nowrap; }
-.hub-nav a.hn:hover{ color:#e4dcf0; background:#1c1825; }
-.hub-nav a.hn[aria-current]{ color:#ffb300; background:#1c1825; }
-.hub-nav .sep{ color:#3a3350; }
+/* 링크 규칙에는 :root:not(#_)를 붙인다 — 문서의 콘솔 층이 본문 링크를 같은 접두어로 앰버로 칠하므로,
+   접두어가 없으면 이동 바 링크까지 앰버가 된다(프로그램에서는 늘 맞아떨어져 달라지는 것이 없다) */
+:root:not(#_) .hub-nav .home{ color:var(--hn-home); font-weight:600; letter-spacing:.06em; text-decoration:none; margin-right:12px; white-space:nowrap; }
+:root:not(#_) .hub-nav .home:hover{ color:var(--hn-home-hi); }
+:root:not(#_) .hub-nav a.hn{ color:var(--hn-link); text-decoration:none; padding:3px 9px; border-radius:6px; white-space:nowrap; }
+:root:not(#_) .hub-nav a.hn:hover{ color:var(--hn-link-hi); background:var(--hn-hover); }
+:root:not(#_) .hub-nav a.hn[aria-current]{ color:var(--hn-link-hi); background:var(--hn-hover); box-shadow:inset 0 -2px 0 var(--hn-mark); }
+.hub-nav .sep{ color:var(--hn-sep); }
+.hub-nav a:focus-visible{ outline:2px solid var(--hn-home); outline-offset:1px; }
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]) .hub-nav{
+    --hn-bg:rgba(238,241,243,.94); --hn-line:#c2cad1; --hn-home:#835208; --hn-home-hi:#6a4200;
+    --hn-link:#46525c; --hn-link-hi:#1c242b; --hn-hover:#e4e8eb; --hn-sep:#9faab4; --hn-mark:#eeae3d;
+  }
+}
+:root[data-theme="light"] .hub-nav{
+  --hn-bg:rgba(238,241,243,.94); --hn-line:#c2cad1; --hn-home:#835208; --hn-home-hi:#6a4200;
+  --hn-link:#46525c; --hn-link-hi:#1c242b; --hn-hover:#e4e8eb; --hn-sep:#9faab4; --hn-mark:#eeae3d;
+}
+/* 화면 색 고르기 — 오른쪽 끝의 자동 · 야간 · 주간. 고른 단추는 현재 문서 표시와 같은 앰버 밑줄 */
+.hub-nav .hn-theme{ margin-left:auto; display:inline-flex; align-items:stretch; border:1px solid var(--hn-line); border-radius:7px; overflow:hidden; }
+.hub-nav .hn-theme-btn{ -webkit-appearance:none; appearance:none; font:inherit; letter-spacing:inherit; color:var(--hn-link); background:transparent; border:0; margin:0; padding:1px 10px; cursor:pointer; white-space:nowrap; }
+.hub-nav .hn-theme-btn + .hn-theme-btn{ border-left:1px solid var(--hn-line); }
+.hub-nav .hn-theme-btn:hover{ color:var(--hn-link-hi); background:var(--hn-hover); }
+.hub-nav .hn-theme-btn[aria-pressed="true"]{ color:var(--hn-link-hi); background:var(--hn-hover); box-shadow:inset 0 -2px 0 var(--hn-mark); }
+.hub-nav .hn-theme-btn:focus-visible{ outline:2px solid var(--hn-home); outline-offset:-2px; }
 @media print{ .hub-nav{ display:none; } }
 
 /* 앵커 이동 시 sticky 툴바에 가리지 않도록 여백 확보 */
 [id]{ scroll-margin-top: 46px; }
+
+/* ===== 콘솔 문서 층 — 프로그램과 같은 인터페이스 (빌드 때 선택자 앞에 :root:not(#_)를 붙였다) ===== */
+
+/* ============================================================
+   콘솔 문서 — 프로그램(ANALOG SOUL DSP ENGINE)과 같은 인터페이스
+   ------------------------------------------------------------
+   다크 모드는 야간 콘솔, 라이트 모드는 주간 콘솔. 색 · 글꼴 · 판을
+   프로그램과 같은 값으로 쓰고, 코드 · 수식처럼 '화면'에 해당하는 칸은
+   두 모드 모두 어둡게 둔다. 각 문서의 고유 변수는 문서별 층에서 이
+   값들에 잇는다. 선택자는 빌드 때 모두 :root:not(#_)로 시작하게 바꿔
+   문서 원래 규칙(자체 다크 · 라이트 재정의 포함)을 이긴다.
+   ============================================================ */
+:root:not(#_) {
+  color-scheme: dark;
+  /* 면 */
+  --c-bg: #1f272e; --c-bg2: #182026; --c-panel: #29333c; --c-panel2: #303b45;
+  --c-line: #3a4652; --c-line-soft: #323d48; --c-line-hi: #52606d;
+  /* 글자 — 쓰이는 모든 바탕에서 대비 4.5:1 이상 */
+  --c-text: #ece3cf; --c-muted: #aab5bd; --c-dim: #9ca6ae;
+  /* 신호 색 — 글자와 선 */
+  --c-amber: #f0b545; --c-red: #eb8c7c; --c-green: #86d39a; --c-blue: #6fb6e8; --c-purple: #b198ec; --c-teal: #4db6a9;
+  /* 앰버 면 */
+  --c-amber-fill: #f0b545; --c-amber-fill-hi: #f6c464; --c-amber-deep: #c98f2c; --c-on-amber: #161c21;
+  /* 캡 — 처리기마다 하나 */
+  --c-cap-comp: #8da9c4; --c-cap-bbe: #4db6a9; --c-cap-tube: #e8904a; --c-cap-exc: #d8bc4c; --c-cap-sg: #c977a9;
+  --c-cap-vinyl: #c67078; --c-cap-atmos: #6c9be0; --c-cap-master: #cfd6dc; --c-cap-hd: #a78bea;
+  --c-cap-ink: 50%; --c-cap-tint: 12%; --c-on-cap: #161c21;
+  /* 화면 — 두 모드 공통으로 어둡다. 그 안에 켜지는 색도 밝은 값 */
+  --c-screen: #0d1216; --c-screen-edge: #0a0e11; --c-screen-ink: #d7dee3; --c-screen-dim: #9aa6b0;
+  --c-lit-amber: #f0b545; --c-lit-blue: #6fb6e8; --c-lit-teal: #4db6a9; --c-lit-green: #86d39a; --c-lit-red: #eb8c7c; --c-lit-purple: #b198ec;
+  /* 빛과 그늘 */
+  --c-glow: #2b3640; --c-hilite: rgba(255,255,255,0.035); --c-shade: rgba(0,0,0,0.55);
+  --c-lift: 0 10px 24px -12px rgba(0,0,0,0.6);
+  /* 글꼴 — 인터넷이 없으면 Windows는 Bahnschrift, macOS는 Avenir Next Condensed */
+  --c-legend: 'Barlow Condensed', 'Bahnschrift SemiCondensed', 'Bahnschrift', 'Avenir Next Condensed', 'Roboto Condensed', 'DejaVu Sans Condensed', 'Arial Narrow', 'Noto Sans KR', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+  --c-body: 'Barlow', 'Segoe UI', 'Helvetica Neue', 'Noto Sans KR', 'Apple SD Gothic Neo', 'Malgun Gothic', system-ui, sans-serif;
+  --c-mono: 'JetBrains Mono', 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --cap: var(--c-amber-fill);
+}
+@media (prefers-color-scheme: light) {
+  :root:not(#_):not([data-theme="dark"]) {
+    color-scheme: light;
+    --c-bg: #dde2e6; --c-bg2: #d4dade; --c-panel: #eef1f3; --c-panel2: #e4e8eb;
+    --c-line: #c2cad1; --c-line-soft: #d3d9de; --c-line-hi: #9faab4;
+    --c-text: #1c242b; --c-muted: #46525c; --c-dim: #535f6a;
+    --c-amber: #835208; --c-red: #ab3226; --c-green: #286a3d; --c-blue: #285e9a; --c-purple: #5e44b8; --c-teal: #115f58;
+    --c-amber-fill: #eeae3d; --c-amber-fill-hi: #f3bd58; --c-amber-deep: #d4952b; --c-on-amber: #1c242b;
+    --c-cap-comp: #32597b; --c-cap-bbe: #115f58; --c-cap-tube: #864215; --c-cap-exc: #695304; --c-cap-sg: #87386c;
+    --c-cap-vinyl: #96303d; --c-cap-atmos: #2b5497; --c-cap-master: #4c5760; --c-cap-hd: #5b42ae;
+    --c-cap-ink: 80%; --c-cap-tint: 18%; --c-on-cap: #ffffff;
+    --c-glow: #f4f6f8; --c-hilite: rgba(255,255,255,0.75); --c-shade: rgba(30,40,50,0.28);
+    --c-lift: 0 10px 24px -14px rgba(30,40,50,0.35);
+  }
+}
+:root:not(#_)[data-theme="light"] {
+  color-scheme: light;
+  --c-bg: #dde2e6; --c-bg2: #d4dade; --c-panel: #eef1f3; --c-panel2: #e4e8eb;
+  --c-line: #c2cad1; --c-line-soft: #d3d9de; --c-line-hi: #9faab4;
+  --c-text: #1c242b; --c-muted: #46525c; --c-dim: #535f6a;
+  --c-amber: #835208; --c-red: #ab3226; --c-green: #286a3d; --c-blue: #285e9a; --c-purple: #5e44b8; --c-teal: #115f58;
+  --c-amber-fill: #eeae3d; --c-amber-fill-hi: #f3bd58; --c-amber-deep: #d4952b; --c-on-amber: #1c242b;
+  --c-cap-comp: #32597b; --c-cap-bbe: #115f58; --c-cap-tube: #864215; --c-cap-exc: #695304; --c-cap-sg: #87386c;
+  --c-cap-vinyl: #96303d; --c-cap-atmos: #2b5497; --c-cap-master: #4c5760; --c-cap-hd: #5b42ae;
+  --c-cap-ink: 80%; --c-cap-tint: 18%; --c-on-cap: #ffffff;
+  --c-glow: #f4f6f8; --c-hilite: rgba(255,255,255,0.75); --c-shade: rgba(30,40,50,0.28);
+  --c-lift: 0 10px 24px -14px rgba(30,40,50,0.35);
+}
+
+/* 처리기 캡 — 매뉴얼 · 쉬운 말은 data-cap, 가이드 · 사양서는 id로 잇는다 */
+:root:not(#_) [data-cap="comp"],
+:root:not(#_) #m-comp,
+:root:not(#_) #u-comp { --cap: var(--c-cap-comp); }
+:root:not(#_) [data-cap="bbe"],
+:root:not(#_) #m-bbe,
+:root:not(#_) #u-bbe { --cap: var(--c-cap-bbe); }
+:root:not(#_) [data-cap="tube"],
+:root:not(#_) #m-tube,
+:root:not(#_) #u-tube { --cap: var(--c-cap-tube); }
+:root:not(#_) [data-cap="exc"],
+:root:not(#_) #m-exciter,
+:root:not(#_) #u-exc { --cap: var(--c-cap-exc); }
+:root:not(#_) [data-cap="sg"],
+:root:not(#_) #m-sg,
+:root:not(#_) #u-sg { --cap: var(--c-cap-sg); }
+:root:not(#_) [data-cap="vinyl"],
+:root:not(#_) #m-vinyl,
+:root:not(#_) #u-vinyl { --cap: var(--c-cap-vinyl); }
+:root:not(#_) [data-cap="atmos"],
+:root:not(#_) #m-atmos,
+:root:not(#_) #u-atmos { --cap: var(--c-cap-atmos); }
+:root:not(#_) [data-cap="master"],
+:root:not(#_) #m-master,
+:root:not(#_) #u-master { --cap: var(--c-cap-master); }
+:root:not(#_) [data-cap="hd"] { --cap: var(--c-cap-hd); }
+
+/* ── 바탕과 글꼴 ───────────────────────────────────────────── */
+:root:not(#_) { background: var(--c-bg); }
+:root:not(#_) body {
+  background: radial-gradient(1100px 520px at 50% -180px, var(--c-glow) 0%, transparent 72%), var(--c-bg);
+  color: var(--c-text); font-family: var(--c-body); font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+}
+/* 요소마다 박힌 옛 글꼴을 걷어 낸다 — :where로 우선순위를 낮춰 아래 개별 규칙이 이기게 */
+:root:not(#_) body :where(*:not(pre, code, kbd, samp, .c-mono)) { font-family: inherit; }
+:root:not(#_) svg text { font-family: var(--c-legend); }
+:root:not(#_) h1,
+:root:not(#_) h2,
+:root:not(#_) h3,
+:root:not(#_) h4,
+:root:not(#_) h5,
+:root:not(#_) h6,
+:root:not(#_) th,
+:root:not(#_) dt,
+:root:not(#_) figcaption { font-family: var(--c-legend); }
+:root:not(#_) pre,
+:root:not(#_) code,
+:root:not(#_) kbd,
+:root:not(#_) samp { font-family: var(--c-mono); }
+:root:not(#_) b,
+:root:not(#_) strong { font-weight: 600; }
+
+:root:not(#_) a { color: var(--c-amber); text-decoration-color: color-mix(in srgb, var(--c-amber) 45%, transparent); text-underline-offset: 3px; }
+:root:not(#_) a:hover { color: var(--c-amber); text-decoration-color: currentColor; }
+:root:not(#_) ::selection { background: color-mix(in srgb, var(--c-amber-fill) 35%, transparent); color: inherit; }
+:root:not(#_) :focus-visible { outline: 2px solid var(--c-amber); outline-offset: 2px; border-radius: 3px; }
+
+/* 코드 — 글자 속 코드는 오목한 칸, 여러 줄 코드는 화면 */
+:root:not(#_) code {
+  font-size: .86em; color: var(--c-text); background: var(--c-bg2);
+  border: 1px solid var(--c-line); border-radius: 5px; padding: 1px 6px;
+}
+:root:not(#_) pre {
+  background: var(--c-screen); color: var(--c-screen-ink);
+  border: 1px solid var(--c-screen-edge); border-radius: 6px; padding: 14px 16px; overflow-x: auto;
+}
+:root:not(#_) pre code { background: none; border: 0; padding: 0; color: inherit; font-size: inherit; }
+
+/* 인쇄는 밝은 판으로 */
+@media print {
+  :root:not(#_) {
+    --c-bg: #ffffff; --c-bg2: #f2f4f5; --c-panel: #ffffff; --c-panel2: #f2f4f5;
+    --c-line: #c2cad1; --c-line-soft: #dde2e6; --c-line-hi: #9faab4;
+    --c-text: #000000; --c-muted: #333d45; --c-dim: #46525c; --c-amber: #6b4200;
+    --c-glow: #ffffff;
+  }
+  :root:not(#_) body { background: #fff; }
+}
+
+/* ── 사양서 — 문서 변수를 콘솔 색에 잇는다 ───────────────── */
+:root:not(#_) {
+  --bg: var(--c-bg); --panel: var(--c-panel); --panel2: var(--c-panel2);
+  --ink: var(--c-text); --ink-dim: var(--c-muted); --mute: var(--c-dim);
+  --line: var(--c-line); --line-lo: var(--c-line-soft);
+  --trace: var(--c-teal); --node: var(--c-blue); --coef: var(--c-amber); --alert: var(--c-red); --ok: var(--c-green);
+}
+:root:not(#_) body { font-size: 16.5px; line-height: 1.72; }
+:root:not(#_) th { font-family: var(--c-legend); }
+:root:not(#_) .m,
+:root:not(#_) td.m { font-family: var(--c-mono); }
+
+/* 목차 */
+:root:not(#_) .rail { border-right-color: var(--c-line-soft); font-size: 14px; }
+:root:not(#_) .rail h2 { font-family: var(--c-legend); font-size: 13px; font-weight: 600; letter-spacing: .06em; color: var(--c-muted); }
+:root:not(#_) .rail a { color: var(--c-muted); }
+:root:not(#_) .rail > ol > li > a::before { font-family: var(--c-legend); font-weight: 700; font-size: 12.5px; color: var(--c-dim); }
+:root:not(#_) .rail a:hover { color: var(--c-amber); }
+:root:not(#_) .rail a.on { color: var(--c-text); border-left-color: var(--c-amber-fill); }
+:root:not(#_) .rail ol ol a { font-size: 13px; color: var(--c-dim); }
+
+/* 표제 */
+:root:not(#_) .head { border-bottom-color: var(--c-line); }
+:root:not(#_) .head .id { font-family: var(--c-legend); font-size: 13.5px; font-weight: 600; letter-spacing: .08em; color: var(--c-amber); }
+:root:not(#_) .head h1 { font-weight: 700; font-size: clamp(32px, 4.8vw, 46px); line-height: 1.06; letter-spacing: .005em; }
+:root:not(#_) .head p { color: var(--c-muted); }
+:root:not(#_) .abstract { background: var(--c-panel); border: 1px solid var(--c-line); border-radius: 10px; box-shadow: inset 0 1px 0 var(--c-hilite); color: var(--c-muted); }
+
+/* 구획 제목 */
+:root:not(#_) section > h2 { display: flex; align-items: center; gap: 12px; font-size: 27px; font-weight: 600; letter-spacing: .005em; border-bottom-color: var(--c-line); }
+:root:not(#_) section > h2 .n {
+  flex: 0 0 auto; display: inline-grid; place-items: center; min-width: 2em; height: 1.5em; padding: 0 6px; margin: 0;
+  border-radius: 5px; background: var(--c-amber-fill); color: var(--c-on-amber);
+  font-family: var(--c-legend); font-size: 15px; font-weight: 700; font-variant-numeric: tabular-nums;
+}
+:root:not(#_) h3 { font-size: 20px; font-weight: 600; letter-spacing: .01em; border-left-color: var(--c-amber-fill); }
+:root:not(#_) h4 { font-size: 17px; font-weight: 600; }
+
+/* 수식 · 블록도 — 화면. 두 모드 모두 어둡고, 그 안의 강조색은 밝은 값 */
+:root:not(#_) .eq,
+:root:not(#_) .blk {
+  background: var(--c-screen); color: var(--c-screen-ink); border-color: var(--c-screen-edge); border-radius: 6px;
+  font-family: var(--c-mono);
+}
+:root:not(#_) .eq { border-left: 3px solid var(--c-amber-fill); }
+:root:not(#_) .eq b { color: var(--c-lit-amber); }
+:root:not(#_) .eq i { color: var(--c-screen-dim); }
+:root:not(#_) .blk b { color: var(--c-lit-blue); }
+:root:not(#_) .blk i { color: var(--c-lit-amber); }
+
+/* 표 — 앞판 안의 표 */
+:root:not(#_) .tw { background: var(--c-panel); border: 1px solid var(--c-line); border-radius: 10px; padding: 10px 16px 2px; box-shadow: inset 0 1px 0 var(--c-hilite); }
+:root:not(#_) th { font-size: 13px; font-weight: 600; letter-spacing: .04em; color: var(--c-muted); border-bottom-color: var(--c-line); }
+:root:not(#_) td { border-bottom-color: var(--c-line-soft); }
+:root:not(#_) tr:last-child td { border-bottom: 0; }
+:root:not(#_) td.m { font-size: 12.5px; color: var(--c-amber); }
+:root:not(#_) td.n { font-family: var(--c-legend); font-size: 14px; font-weight: 600; font-variant-numeric: tabular-nums; color: color-mix(in srgb, var(--c-blue) var(--c-cap-ink), var(--c-text)); }
+
+/* 노트 */
+:root:not(#_) .nb { background: var(--c-panel); border-radius: 0 8px 8px 0; }
+:root:not(#_) .nb .t { font-family: var(--c-legend); font-size: 13px; font-weight: 600; letter-spacing: .05em; color: color-mix(in srgb, var(--node) var(--c-cap-ink), var(--c-text)); }
+:root:not(#_) .nb.warn .t { color: color-mix(in srgb, var(--alert) var(--c-cap-ink), var(--c-text)); }
+:root:not(#_) .nb.ok .t { color: color-mix(in srgb, var(--ok) var(--c-cap-ink), var(--c-text)); }
+
+/* 처리 단 — 처리기 캡 색 막대가 달린 앞판 */
+:root:not(#_) .unit {
+  position: relative; overflow: hidden; background: var(--c-panel); border: 1px solid var(--c-line); border-radius: 10px;
+  padding: 18px 20px 4px; box-shadow: inset 0 1px 0 var(--c-hilite);
+}
+:root:not(#_) .unit::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 3px; background: var(--cap); }
+:root:not(#_) .unit-h h3 { font-size: 20px; font-weight: 700; letter-spacing: .04em; }
+:root:not(#_) .unit-h .tag {
+  font-family: var(--c-legend); font-size: 13px; font-weight: 600; letter-spacing: .02em; border-radius: 999px; padding: 1px 10px;
+  color: color-mix(in srgb, var(--cap) var(--c-cap-ink), var(--c-text)); border-color: color-mix(in srgb, var(--cap) 45%, transparent);
+  background: color-mix(in srgb, var(--cap) var(--c-cap-tint), transparent);
+}
+:root:not(#_) footer { color: var(--c-muted); border-top-color: var(--c-line); }
+
+/* 수식 · 블록도 화면을 본문 폭에 맞춘다 — 74ch가 고정폭 글자 기준으로 계산되어 본문보다 좁고 줄이 잘리던 것 */
+:root:not(#_) .eq,
+:root:not(#_) .blk { max-width: none; }
 </style>
 </head>
 <body>
 <nav class="hub-nav" aria-label="문서 간 이동">
-  <a class="home" href="index.html">◂ 통합 색인</a><a class="hn" href="analog-soul-dsp.html">메인 어플리케이션 실행하기</a><span class="sep">/</span><a class="hn" href="analog-soul-manual.html">공식 매뉴얼</a><span class="sep">/</span><a class="hn" href="analog-soul-plain.html">쉬운 말</a><span class="sep">/</span><a class="hn" href="analog-soul-guide.html">기술 설명서</a><span class="sep">/</span><a class="hn" href="#" aria-current="page">사양서</a><span class="sep">/</span><a class="hn" href="analog-soul-internals.html">논고</a>
+  <a class="home" href="index.html">◂ 통합 색인</a><a class="hn" href="analog-soul-dsp.html">메인 어플리케이션 실행하기</a><span class="sep" aria-hidden="true">/</span><a class="hn" href="analog-soul-manual.html">공식 매뉴얼</a><span class="sep" aria-hidden="true">/</span><a class="hn" href="analog-soul-plain.html">쉬운 말</a><span class="sep" aria-hidden="true">/</span><a class="hn" href="analog-soul-guide.html">기술 설명서</a><span class="sep" aria-hidden="true">/</span><a class="hn" href="#" aria-current="page">사양서</a><span class="sep" aria-hidden="true">/</span><a class="hn" href="analog-soul-internals.html">논고</a>
 </nav>
 <div class="shell">
 
@@ -244,16 +498,31 @@ footer {
     <li><a href="#sbr">대역 확장</a>
       <ol>
         <li><a href="#sbr-why">손실 압축의 흔적</a></li>
+        <li><a href="#sbr-up">표본률 변환</a></li>
         <li><a href="#sbr-detect">컷오프 판정</a></li>
-        <li><a href="#sbr-harm">배음 전사</a></li>
-        <li><a href="#sbr-xf">교차 특성</a></li>
-        <li><a href="#sbr-sm">스펙트럼 평활</a></li>
+        <li><a href="#sbr-seam">이음매</a></li>
+        <li><a href="#sbr-mirror">조각의 반복 무늬</a></li>
+        <li><a href="#sbr-truth">정답 시험</a></li>
+        <li><a href="#sbr-shift">주파수 이동 복사</a></li>
+        <li><a href="#sbr-env">포락선 외삽</a></li>
+        <li><a href="#sbr-sm">결 평탄화</a></li>
         <li><a href="#sbr-lvl">레벨 정합</a></li>
+        <li><a href="#sbr-meas">실측</a></li>
       </ol>
     </li>
     <li><a href="#meter">계측과 판독</a></li>
     <li><a href="#psycho">청감 한계</a></li>
     <li><a href="#practice">운용 지침</a></li>
+    <li><a href="#bitdepth">비트 깊이와 출력</a>
+      <ol>
+        <li><a href="#bd-grid">격자 판별</a></li>
+        <li><a href="#bd-deq">일관 재구성</a></li>
+        <li><a href="#bd-shaped">셰이핑 원본</a></li>
+        <li><a href="#bd-meas">실측</a></li>
+        <li><a href="#bd-dither">디더</a></li>
+        <li><a href="#bd-scale">정수 배율</a></li>
+      </ol>
+    </li>
     <li><a href="#limits">사양상 한계</a></li>
   </ol>
 </nav>
@@ -286,12 +555,29 @@ footer {
   <div class="rd">
     <p>
       직렬 8단 구성이다. 앞 단의 출력이 뒤 단의 입력이 되므로 배치 순서가
-      최종 음색을 결정한다. 마스터링 단은 배치와 무관하게 항상 최종단이다.
+      최종 음색을 결정한다. 마스터링 단은 제작 체인의 최종단이다. 그 뒤에는 재생 매체를 모형화하는 VINYL · ATMOS만 재생 단계로 둘 수 있다.
     </p>
     <div class="blk">입력 ─▶ <b>COMP</b> ─▶ <b>BBE</b> ─▶ <b>TUBE</b> ─▶ <b>EXCITER</b> ─▶ <b>SG</b> ─▶ <b>VINYL</b> ─▶ <b>ATMOS</b> ─▶ <b>MASTER</b> ─▶ 출력
-        └─ 각 단 진입 직전 입력 게인 <i>±24 dB</i> ─┘        <i>고정 최종단</i></div>
+        └─ 각 단 진입 직전 입력 게인 <i>±24 dB</i> ─┘        <i>제작의 최종단</i></div>
   </div>
 
+  <div class="rd"><p>재생 단계 — MASTER 뒤에는 VINYL · ATMOS만 둘 수 있다. LP는 마스터 음원으로 래커를 깎아 재생하므로 표면 잡음 · 크래클 · 팝 · 휨 · 회전 흔들림이 마스터링 뒤에 더해지고, Atmos의 공간 렌더링은 마스터가 끝난 뒤 재생 장치에서 일어난다. 이 두 단을 MASTER 앞에 두면 재생 잡음까지 대역 압축과 리미터를 거쳐 실제와 다르게 눌리고 부풀려진다. 처리 순서는 카드 순서를 MASTER 앞(제작)과 뒤(재생 단계)로 나눈 하나의 함수가 실시간 · 내보내기 양쪽에 같게 정한다. CEILING 보장은 MASTER 출력까지이며, 재생 단계를 거친 신호는 CEILING을 넘을 수 있다.</p>
+<p><strong>MACRO %</strong> — 카드 맨 위의 MACRO는 그 카드의 주요 손잡이를 가장 약한 위치(0%)와 기준 설계값(100%) 사이에서 선형으로 함께 옮기고, 슬라이더 눈금에 맞춰 반올림한다. 손잡이 값만 옮기므로 처리 비용은 늘지 않는다. 화면 설정 파일은 문서 순서대로 값을 넣으므로 MACRO가 먼저 옮기고, 저장된 손잡이 값이 그 위에 들어간다.</p>
+<div class="tw"><table>
+<thead><tr><th>카드</th><th>MACRO가 옮기는 손잡이 (0% → 100%)</th><th>처음 상태</th></tr></thead>
+<tbody>
+<tr><td>COMPRESSOR</td><td>THRESHOLD 0 → −18 dB · RATIO 1 → 4 · MAKEUP 0 → 4 dB</td><td>50% · 켬</td></tr>
+<tr><td>BBE</td><td>LO CONTOUR 0 → 40 · PROCESS 0 → 60 · HI DEF 0 → 50</td><td>40% · 켬</td></tr>
+<tr><td>VACUUM TUBE</td><td>DRIVE 0 → 30 · MIX 0 → 50</td><td>100% · 끔</td></tr>
+<tr><td>EXCITER</td><td>DRIVE 0 → 40 · MIX 0 → 35</td><td>80% · 켬</td></tr>
+<tr><td>SOUNDGOODIZER</td><td>AMOUNT 0 → 50 · LOW / MID / HI SAT 0 → 60 / 50 / 40</td><td>65% · 켬</td></tr>
+<tr><td>VINYL RECORD</td><td>S/N 75 → 60 dB · CRACKLE 0 → 8 · POPS 0 → 10 · WARP 0 → 0.5 · ECCENTRICITY 0 → 0.1 · PLAYS 0 → 100 · WOW &amp; FLUTTER 0.01 → 0.08 · RUMBLE −80 → −65 dB</td><td>100% · 끔</td></tr>
+<tr><td>DOLBY ATMOS</td><td>SPACE 0 → 60 · HEIGHT 0 → 45 · DEPTH 0 → 50 · REVERB 0 → 35 · OBJECT MIX 0 → 40 · DRY/WET 0 → 60</td><td>100% · 끔</td></tr>
+<tr><td>MASTERING CHAIN</td><td>대역 압축비 1 → 2 · 3 · 2 · STEREO WIDTH 100 → 110%</td><td>95% · 켬</td></tr>
+</tbody>
+</table></div>
+<p>0%는 '효과 없음'이 아니라 손잡이들이 가장 약하게 작용하는 위치다. 곡 하나(ref9)로 카드를 홀로 0%에 켠 소리와 모두 끈 소리를 시간 정렬 · 레벨 맞춤 뒤 비교하면, COMPRESSOR · EXCITER는 잔차 −50.4 · −59.6 dB로 사실상 투명하다. BBE · SOUNDGOODIZER · MASTERING CHAIN은 레벨 −2.1 · −5.4 · −4.9 dB, 잔차 −2.0 · −3.2 · +0.7 dB로, 카드 구조(위상 보정망 · 대역 분할 · 리미터) 자체가 소리를 바꾼다. 소리를 완전히 빼려면 카드를 끈다.</p>
+<p>처음 상태를 정할 때 두 방식을 정답 음원 4곡(가운데 20초)으로 비교했다. 숫자를 처리 순서로 읽는 방식은 지금 순서와의 차이가 모든 지표에서 0.35 dB 이하라 숫자가 소리에 거의 영향을 주지 않았고, 다섯 카드를 기준 설계값으로 쌓아 고역 +4.2 dB · 라우드니스 −6.2 dB까지 갔다. 숫자를 MACRO로 읽는 방식은 저역 · 폭 효과(+2.2 dB대)를 거의 그대로 두면서 고역 +2.4 dB · 라우드니스 −4.9 dB로 덜 과장되었고, 카드의 세기를 바꾸는 데 만질 손잡이도 16개에서 5개로 준다.</p></div>
   <h3 id="chain-order">배치 순서의 근거</h3>
   <div class="rd">
     <div class="tw"><table>
@@ -341,7 +627,7 @@ footer {
       </li>
       <li>
         <strong>VINYL을 선두로.</strong> 부가 잡음이 이후 모든 비선형 단을 통과한다.
-        핑크 노이즈가 포화 단에서 배음을 만들어 잡음 스펙트럼이 고역으로 확장된다.
+        표면 잡음과 딸깍 소리가 포화 단에서 배음을 만들어 잡음 스펙트럼이 고역으로 확장된다.
       </li>
       <li>
         <strong>ATMOS를 MASTER 직전이 아닌 앞쪽으로.</strong> 잔향 성분이 대역 압축의
@@ -386,8 +672,8 @@ footer {
   <div class="unit" id="u-comp">
     <div class="unit-h"><h3>COMPRESSOR</h3><span class="tag">소프트니 피드포워드</span></div>
     <div class="rd">
-      <div class="blk">in ─▶ <b>압축기</b> ─▶ <b>메이크업</b> ─▶ out
-                 <i>10^(MAKE/20)</i></div>
+      <div class="blk">in ─▶ <b>압축기</b> ─▶ <b>상쇄</b> ─▶ <b>메이크업</b> ─▶ out
+                 <i>1 / 자동 메이크업</i>   <i>10^(MAKE/20)</i></div>
       <div class="tw"><table>
         <thead><tr><th>파라미터</th><th>범위</th><th>기본</th></tr></thead>
         <tbody>
@@ -400,10 +686,21 @@ footer {
         </tbody>
       </table></div>
       <p>
-        니가 10 dB이면 스레숄드 ±5 dB 구간에서 레시오가 1:1에서 설정값으로 점진 변화한다.
+        니는 스레숄드에서 <b>위쪽으로만</b> 펼쳐진다. 니 10 dB이면 −18 ~ −8 dB 구간에서
+        기울기가 1에서 1/레시오로 지수 곡선을 따라 바뀐다. 니를 스레숄드 양쪽으로 나누는
+        하드웨어 관례와 달라, 같은 숫자라도 압축이 시작되는 지점이 니의 절반만큼 높다.
         저역이 많은 소스에서 니를 좁히면 킥 타격마다 리덕션이 계단식으로 걸려
         펌핑이 두드러진다.
       </p>
+      <div class="nb">
+        <span class="t">자동 메이크업의 상쇄</span>
+        <p>
+          압축 소자는 규격상 문턱 아래의 신호까지 (1 / 곡선(1.0))<sup>0.6</sup>만큼 키운다.
+          기본값에서 +6.03 dB다. 같은 식으로 계산한 역수를 곧바로 곱해 문턱 아래 이득을 정확히 1로 만들고,
+          메이크업은 MAKEUP으로만 준다. 기본값에서 조용한 신호의 이득은 +4.0 dB이며,
+          입력 −42 / −24 / −12 / 0 dBFS의 출력은 −38.0 / −20.0 / −9.5 / −6.0 dBFS다.
+        </p>
+      </div>
       <p>
         게인 리덕션 표시는 리덕션 dB에 4를 곱한 백분율이다.
         표시가 가득 찬 상태는 약 25 dB 리덕션에 해당한다.
@@ -413,152 +710,158 @@ footer {
   </div>
 
   <div class="unit" id="u-bbe">
-    <div class="unit-h"><h3>BBE SONIC MAXIMIZER</h3><span class="tag">군지연 보정 + 셸빙</span></div>
+    <div class="unit-h"><h3>BBE SONIC MAXIMIZER</h3><span class="tag">군지연 정렬 + 셸빙</span></div>
     <div class="rd">
       <p>
-        저역을 올패스 2단으로 지연시킨 경로와 직통 경로를 합산한다.
-        올패스는 진폭 응답이 평탄하고 위상만 회전시키므로,
-        합산 시점에서 비로소 진폭 변화가 나타난다.
-        스피커의 저역 군지연을 상쇄하려는 원리다.
+        저역을 약 2.5 ms, 중역을 약 0.5 ms 고역보다 늦춰 고역의 어택이 먼저 오게 한다.
+        제조사는 이를 스피커의 위상 왜곡 보정이라고 설명하지만, 우퍼의 저역 차단과 크로스오버는 낮은 주파수일수록
+        군지연이 큰 최소 위상 특성이라 스피커는 이미 저역을 늦게 낸다. 이 지연은 스피커를 되돌리는 것이 아니라
+        고역을 앞세워 윤곽을 도드라지게 하는 처리다.
+        지연은 크기가 평탄한 올패스 두 단을 <b>직렬로</b> 거쳐 만든다.
       </p>
-      <div class="blk">in ┬─────────────────────────────────┐ <i>1.0</i>
-   └▶ <b>올패스1</b> ─▶ <b>올패스2</b> ─▶ <i>LO×0.6</i> ─┤
-                                     ▼
-                            <b>합산</b> <i>1/(1+LO×0.6)</i>
-                                     │
-                            <b>피킹</b> ─▶ <b>하이셸프</b> ─▶ out</div>
+      <div class="blk">in ─▶ <b>올패스</b> <i>220 Hz, Q 0.59</i> ─▶ <b>올패스</b> <i>1850 Hz, Q 1.47</i> ─▶ <b>로우셸프</b> <i>80 Hz</i> ─▶ <b>하이셸프</b> <i>3 kHz</i> ─▶ <b>하이셸프</b> <i>10 kHz</i> ─▶ out</div>
       <div class="tw"><table>
         <thead><tr><th>요소</th><th>사양</th></tr></thead>
         <tbody>
-          <tr><td>올패스 1단</td><td class="m">f = 80 + LO×200 Hz,  Q = 0.3 + LO×0.8</td></tr>
-          <tr><td>올패스 2단</td><td class="m">f = 40 + LO×100 Hz,  Q = 0.5 + LO×0.5</td></tr>
-          <tr><td>지연 경로 레벨</td><td class="m">LO × 0.6</td></tr>
-          <tr><td>합산 정규화</td><td class="m">1 / (1 + LO×0.6)</td></tr>
-          <tr><td>프레즌스</td><td class="m">피킹 3.2 kHz, Q 0.6, 최대 +9 dB</td></tr>
-          <tr><td>하이 데프</td><td class="m">하이셸프 8 kHz, 최대 +10 dB</td></tr>
+          <tr><td>올패스 1단</td><td class="m">220 Hz, Q 0.59</td></tr>
+          <tr><td>올패스 2단</td><td class="m">1850 Hz, Q 1.47</td></tr>
+          <tr><td>LO CONTOUR</td><td class="m">로우셸프 80 Hz, 0 ~ +10 dB</td></tr>
+          <tr><td>PROCESS</td><td class="m">하이셸프 3 kHz, 0 ~ +8 dB</td></tr>
+          <tr><td>HI DEFINITION</td><td class="m">하이셸프 10 kHz, 0 ~ +6 dB</td></tr>
         </tbody>
       </table></div>
-      <div class="nb">
-        <span class="t">합산 정규화의 의미</span>
+      <div class="tw"><table>
+        <thead><tr><th>주파수</th><th>50 Hz</th><th>100 Hz</th><th>200 Hz</th><th>500 Hz</th><th>1 kHz</th><th>2 kHz</th><th>5 kHz</th><th>10 kHz</th></tr></thead>
+        <tbody>
+          <tr><td>군지연</td><td class="m">2.58 ms</td><td class="m">2.54 ms</td><td class="m">1.97 ms</td><td class="m">0.61 ms</td><td class="m">0.36 ms</td><td class="m">0.48 ms</td><td class="m">0.03 ms</td><td class="m">0.01 ms</td></tr>
+        </tbody>
+      </table></div>
+      <p>
+        세 노브가 0이면 크기는 전 대역 0.0 dB이고 군지연만 위 표와 같다.
+        두 올패스의 중심과 Q는 목표 군지연(150 Hz 아래 2.5 ms, 0.4~1.5 kHz 0.5 ms, 5 kHz 위 0)에
+        최소제곱으로 맞춘 값이다. 2차 올패스의 군지연은 τ(0) = 2/(Q·ω₀)에서 출발해 ω₀ 부근에서 4Q/ω₀가 된다.
+      </p>
+      <div class="nb warn">
+        <span class="t">올패스를 원음에 더하지 않는 이유</span>
         <p>
-          지연 경로 레벨이 <code>LO×0.6</code>이므로 두 경로 합의 최대 진폭은
-          <code>1 + LO×0.6</code>이 된다. 합산 게인을 그 역수로 두면 LO CONTOUR를
-          올려도 전체 레벨이 변하지 않는다. 이 파라미터는 순수하게 군지연 특성만
-          바꾸도록 설계되었다.
+          올패스 출력을 원음에 g만큼 더하면 합의 크기가 |1 + g·e<sup>jφ</sup>|/(1 + g)가 되어,
+          위상이 −180°인 주파수에서 (1 − g)/(1 + g)로 떨어진다. 두 단이면 이런 골이 두 곳에 생긴다.
+          g = 0.6이면 −12 dB다. 이전 구성이 이 방식이라 LO CONTOUR 100에서 100~125 Hz와 315 Hz가 −9.3 dB였다.
+          직렬로 바꾼 지금은 LO CONTOUR 100이 31.5 Hz +9.7 dB, 63 Hz +7.0 dB, 100 Hz +3.1 dB로 매끄럽게 올린다.
         </p>
       </div>
       <p>
-        프레즌스의 3.2 kHz는 자음 명료도와 악기의 어택이 집중되는 대역이다.
-        Q 0.6은 약 2옥타브 폭이라 광대역으로 걸린다.
-        보컬 소스에서 +6 dB를 넘기면 치찰음이 동반 상승한다.
+        하드웨어는 고역 강조의 양을 신호에 따라 바꾸지만, 여기서는 고정 셸프다.
+        PROCESS의 3 kHz 셸프는 자음과 어택이 모인 대역을 넓게 올리고, 10 kHz 셸프는 그 위의 공기감을 맡는다.
+        보컬 소스에서 PROCESS를 +6 dB 넘게 올리면 치찰음이 함께 오른다.
       </p>
     </div>
   </div>
 
   <div class="unit" id="u-tube">
-    <div class="unit-h"><h3>VACUUM TUBE</h3><span class="tag">비대칭 포화 + 저역 우회</span></div>
+    <div class="unit-h"><h3>VACUUM TUBE</h3><span class="tag">12AX7 공통 캐소드 증폭단</span></div>
     <div class="rd">
       <p>
-        저역을 포화 경로에서 분리하는 병렬 구조다. 저역까지 포화시키면
-        인터모듈레이션 산물이 중역에 집중되어 명료도가 떨어지므로,
-        120 Hz 부근 이하를 따로 빼내 직통시킨다.
+        삼극관 한 개의 증폭단을 방정식으로 푼다. 곡선을 손으로 고르지 않고, 12AX7의 판 전류 식과
+        부하선, 그리드 전류, 밀러 입력 용량에서 전달 특성과 고역 한계를 얻는다.
+        DRIVE는 그리드에 걸리는 신호 전압, BIAS는 그리드 바이어스 전압이다.
       </p>
-      <div class="blk">in ┬▶ <b>LPF</b> <i>120+D×80</i> ──────────────────────────────────┐
-   │                                                       ▼
-   └▶ <b>HPF</b> <i>100+D×80</i> ─▶ <b>포화</b> ─▶ <b>로우셸프</b> ─▶ <b>하이셸프</b> ─▶ <b>피킹</b> ─▶ <i>0.3+MIX×0.7</i> ─▶ <b>합산</b> ─▶ <i>10^(OUT/20)</i> ─▶ out</div>
+      <div class="blk">in ┬▶ <b>밀러 LPF</b> <i>f<sub>M</sub></i> ─▶ <b>삼극관 곡선</b> <i>4x</i> ─▶ <b>HPF</b> <i>10 Hz</i> ─▶ <i>MIX</i> ────┐
+   └▶ <b>지연 정렬</b> <i>같은 4x 지연</i> ───────────────────────────▶ <i>1 − MIX</i> ─┴▶ <i>10^(OUT/20)</i> ─▶ out</div>
       <div class="tw"><table>
-        <thead><tr><th>요소</th><th>사양</th><th>목적</th></tr></thead>
+        <thead><tr><th>회로 상수</th><th>값</th><th>의미</th></tr></thead>
         <tbody>
-          <tr><td>저역 분리 LPF</td><td class="m">f = 120 + D×80 Hz, Q 0.5</td><td>우회 경로 확보</td></tr>
-          <tr><td>포화 전 HPF</td><td class="m">f = 100 + D×80 Hz, Q 0.5</td><td>저역 인터모듈레이션 억제</td></tr>
-          <tr><td>포화 후 로우셸프</td><td class="m">6 kHz, −(1 + D×4) dB</td><td>과잉 중고역 배음 억제</td></tr>
-          <tr><td>포화 후 하이셸프</td><td class="m">9 kHz, −(2 + D×6) dB</td><td>고차 배음 억제</td></tr>
-          <tr><td>저역 보상</td><td class="m">피킹 100 Hz, Q 0.8, +(1.5 + D×3) dB</td><td>HPF로 잃은 저역 회복</td></tr>
-          <tr><td>웨트 레벨</td><td class="m">0.3 + MIX×0.7</td><td>MIX 0에서도 30% 유지</td></tr>
+          <tr><td>관</td><td class="m">12AX7 (μ 100, x 1.4, k<sub>g1</sub> 1060, k<sub>p</sub> 600, k<sub>vb</sub> 300)</td><td>Koren 식의 계수</td></tr>
+          <tr><td>B+ / 판 부하</td><td class="m">250 V / 100 kΩ</td><td>부하선</td></tr>
+          <tr><td>소스 저항</td><td class="m">68 kΩ</td><td>그리드 전류가 흐를 때의 압착, 밀러 필터</td></tr>
+          <tr><td>그리드 전류</td><td class="m">I<sub>g</sub> = 0.5 mA/V<sup>1.5</sup> · V<sub>g</sub><sup>1.5</sup> (V<sub>g</sub> &gt; 0)</td><td>양의 그리드에서 흐름</td></tr>
+          <tr><td>극간 용량</td><td class="m">C<sub>gk</sub> 1.6 pF, C<sub>gp</sub> 1.7 pF</td><td>밀러 입력 용량</td></tr>
+          <tr><td>DRIVE</td><td class="m">0.1 · 100<sup>DRIVE</sup> V 봉우리 (0.1 ~ 10 V)</td><td>0 dBFS가 그리드에 거는 전압</td></tr>
+          <tr><td>BIAS</td><td class="m">−3 + 2.5 · BIAS V (−3 ~ −0.5 V)</td><td>동작점</td></tr>
         </tbody>
       </table></div>
-
-      <h4>전달 함수</h4>
-      <p>
-        삼극관의 비대칭 전달 특성을 근사한다. 음의 반주기에 1.15배 드라이브를 적용해
-        비대칭을 만든다. 대칭 포화는 홀수 배음만 생성하지만, 비대칭이면 짝수 배음이
-        나타난다. 2차 배음은 옥타브 관계라 협화음으로 들려 <em>따뜻함</em>으로 인지된다.
-      </p>
-      <div class="eq">d = 1 + DRIVE×1.2          <i>(1.0 ~ 2.2)</i>
-b = (BIAS−50)/100 × 0.15   <i>(−0.075 ~ +0.075)</i>
-
-          ⎧ tanh((x+b)·d)         (x+b ≥ 0)
-y(x) =  ⎨
-          ⎩ tanh((x+b)·d·<b>1.15</b>)   (x+b &lt; 0)
-
-출력 = y(x) / tanh(d)      <i>평균 게인 보상</i></div>
-      <p>
-        <code>tanh(d)</code>로 나누는 정규화가 없으면 드라이브를 올릴수록 출력이 줄어
-        A/B 비교가 왜곡된다.
-      </p>
+      <div class="eq">E<sub>1</sub> = (V<sub>p</sub>/k<sub>p</sub>) · ln(1 + exp(k<sub>p</sub>·(1/μ + V<sub>g</sub>/√(k<sub>vb</sub> + V<sub>p</sub>²))))
+I<sub>p</sub> = 2·E<sub>1</sub><sup>x</sup> / k<sub>g1</sub>   (E<sub>1</sub> &gt; 0)
+V<sub>p</sub> = B+ − I<sub>p</sub>·R<sub>p</sub>                              <i>부하선, 수치 해</i>
+y(x) = (V<sub>q</sub> − V<sub>p</sub>(V<sub>b</sub> + V<sub>d</sub>·x)) / (A·V<sub>d</sub>)    <i>반전 복원, 소신호 이득 1</i>
+f<sub>M</sub> = 1 / (2π·R<sub>s</sub>·(C<sub>gk</sub> + (1 + A)·C<sub>gp</sub>))</div>
       <div class="tw"><table>
-        <thead><tr><th>BIAS</th><th>2차</th><th>3차</th><th>성격</th></tr></thead>
+        <thead><tr><th>BIAS</th><th>그리드</th><th>판 전압</th><th>판 전류</th><th>이득 A</th><th>밀러 차단</th></tr></thead>
         <tbody>
-          <tr><td class="m">0</td><td class="m">−30.7 dB</td><td class="m">−22.8 dB</td><td>짝수 배음이 뚜렷</td></tr>
-          <tr><td class="m">50</td><td class="m">−39.9 dB</td><td class="m">−23.1 dB</td><td>3차가 17 dB 우세</td></tr>
-          <tr><td class="m">100</td><td class="m">−26.3 dB</td><td class="m">−23.9 dB</td><td>짝·홀이 비슷</td></tr>
+          <tr><td>0</td><td class="m">−3.00 V</td><td class="m">243.4 V</td><td class="m">0.066 mA</td><td class="m">15.8</td><td class="m">77.5 kHz</td></tr>
+          <tr><td>50</td><td class="m">−1.75 V</td><td class="m">200.3 V</td><td class="m">0.497 mA</td><td class="m">51.0</td><td class="m">26.0 kHz</td></tr>
+          <tr><td>100</td><td class="m">−0.50 V</td><td class="m">123.9 V</td><td class="m">1.261 mA</td><td class="m">68.3</td><td class="m">19.6 kHz</td></tr>
+        </tbody>
+      </table></div>
+      <div class="tw"><table>
+        <thead><tr><th>DRIVE / BIAS</th><th>2차</th><th>3차</th><th>기본파 이득</th><th>성격</th></tr></thead>
+        <tbody>
+          <tr><td>30 / 50 (기본)</td><td class="m">−33.7 dB</td><td class="m">−67.5 dB</td><td class="m">0.0 dB</td><td>짝수 배음이 34 dB 우세</td></tr>
+          <tr><td>50 / 50</td><td class="m">−25.6 dB</td><td class="m">−51.4 dB</td><td class="m">−0.1 dB</td><td>따뜻함이 뚜렷</td></tr>
+          <tr><td>100 / 50</td><td class="m">−18.8 dB</td><td class="m">−11.8 dB</td><td class="m">−7.6 dB</td><td>양쪽이 잘려 3차 우세</td></tr>
+          <tr><td>50 / 0</td><td class="m">−13.6 dB</td><td class="m">−38.1 dB</td><td class="m">+0.3 dB</td><td>차가운 바이어스, 2차 강함</td></tr>
+          <tr><td>50 / 100</td><td class="m">−38.0 dB</td><td class="m">−54.5 dB</td><td class="m">−0.1 dB</td><td>뜨거운 바이어스, 깨끗함</td></tr>
         </tbody>
       </table></div>
       <p>
-        실측값이다(입력 진폭 0.7, DRIVE 30). 짝수 배음의 실질적 제어자는 BIAS이며,
-        비대칭 계수 1.15는 BIAS 중앙에서도 짝수가 완전히 사라지지 않게 하는 보조다.
-        따뜻함을 원한다면 DRIVE보다 BIAS를 중앙에서 밀어내는 편이 직접적이다.
-        여기서 생기는 직류는 포화 직후 12 Hz 고역 통과가 차단한다.
-      </p>
-      <h4>앨리어싱 억제</h4>
-      <p>
-        포화는 4배 오버샘플링으로 처리하고, 그 앞에 <code>sr/3</code> 차단의
-        대역 제한 필터를 둔다. 두 조치의 근거는 이렇다.
-      </p>
-      <div class="eq">4배 오버샘플링 → 내부 레이트 4·sr, 내부 나이퀴스트 2·sr
-내부 나이퀴스트를 넘은 성분 f 는 4·sr − f 로 접힌다.
-다운샘플 후에도 남으려면  4·sr − f &lt; sr/2  →  <b>f &gt; 3.5·sr</b>
-
-입력 상한 fc 일 때 가청 앨리어싱 시작 차수 = 3.5·sr / fc
-
-fc = sr/2 (제한 없음) →  7.0차
-fc = sr/3 (대역 제한) → 10.5차</div>
-      <p>
-        입력 상한이 나이퀴스트인 한 시작 차수는 샘플레이트와 무관하게 항상 7차다.
-        <code>sr/3</code>으로 묶으면 10.5차로 밀려나며, 이 관계 역시 샘플레이트에
-        의존하지 않는다. tanh 포화에서 7차와 11차의 레벨 차는 약 9 dB이므로
-        잔류 앨리어싱이 그만큼 낮아진다.
+        1 kHz −6 dBFS 사인, MIX 100 %의 실측이며, 식으로 직접 계산한 값과 0.1 dB 안에서 같다.
+        BIAS 50의 동작점(판 200 V, 0.5 mA, 이득 51)은 12AX7을 100 kΩ 부하로 쓰는 전형적인 증폭단이다.
+        출력을 소신호 이득으로 나누므로 DRIVE를 올려도 작은 신호의 음량은 그대로이고 포화만 깊어진다.
+        직류는 곡선이 원점을 지나게 정의해 정적 성분이 없고, 신호에 따라 생기는 성분은 결합 콘덴서에 해당하는 10 Hz 고역 통과가 막는다.
       </p>
       <p>
-        차단점은 48 kHz에서 16 kHz, 96 kHz에서 32 kHz, 192 kHz에서 64 kHz가 된다.
-        TUBE는 포화 후 6 kHz와 9 kHz 셸빙으로 고역을 이미 크게 깎으므로
-        음색 변화가 거의 없다. EXCITER와 SOUNDGOODIZER 고역 밴드는 대역이
-        사라지지 않도록 차단점에 하한(각 대역 하단의 1.4배)을 둔다.
+        밀러 필터는 그리드 입력에 걸리므로 곡선 <b>앞</b>에 둔다. BIAS 50에서 48 kHz 기준 10 kHz −0.8 dB,
+        16 kHz −1.4 dB, 20 kHz −1.7 dB이며, 전 대역 응답(MIX 50 %)은 31.5 Hz −0.3 dB ~ 20 kHz −0.8 dB다.
+        원음 경로에는 포화 경로와 같은 오버샘플링 지연을 넣어, MIX를 어디에 두어도 두 경로가 표본 단위로 맞는다.
       </p>
+      <div class="nb">
+        <span class="t">앨리어싱</span>
+        <p>
+          포화 앞에 대역 제한 필터를 두지 않는다. MIX 100 %에서 신호 전체가 곡선을 지나므로,
+          실제 증폭단에 없는 16 kHz 차단이 되기 때문이다. DRIVE 60 이하에서는 고역 사인을 넣어도 앨리어싱이 기본파 대비 −119 dB 아래다.
+          DRIVE 100(그리드 10 V)은 고차 배음이 커서 −6 dBFS의 12 kHz 사인에서 −43 dB까지 올라온다(사양상 한계 참고).
+        </p>
+      </div>
     </div>
   </div>
 
   <div class="unit" id="u-exc">
     <div class="unit-h"><h3>EXCITER</h3><span class="tag">병렬 고역 배음 생성</span></div>
     <div class="rd">
-      <div class="blk">in ┬────────────────────────────────────────┐ <i>1.0</i>
-   └▶ <b>HPF</b> <i>FREQ</i> ─▶ <b>포화</b> ─▶ <b>BPF</b> <i>FREQ×1.5, Q0.8</i> ─▶ <i>MIX×0.5</i> ─┴▶ out</div>
-      <div class="eq">y(x) = tanh( x · (1 + DRIVE×<b>0.05</b>) · <b>3</b> )</div>
+      <div class="blk">in ┬───────────────────────────────────────────────────────────▶ <b>지연 정렬</b> ─┐ <i>1.0</i>
+   └▶ <b>HPF</b> <i>FREQ</i> ─▶ <b>LPF</b> <i>max(1.4·FREQ, sr/3)</i> ─▶ <b>포화</b> <i>4x</i> ─▶ <b>HPF</b> <i>FREQ</i> ─▶ <i>MIX×0.5</i> ─┴▶ out</div>
+      <div class="eq">y = f(D·u) / D,   D = 10^(1.2·DRIVE)   <i>(0 ~ 24 dB 구동)</i>
+f(u) = tanh(u)              (u ≥ 0)
+f(u) = <b>0.7</b>·tanh(u / 0.7)     (u &lt; 0)</div>
       <p>
-        고정 계수 3이 기본 드라이브를 결정하고, 사용자 파라미터는 그 위에 최대 5%만
-        더한다. 따라서 DRIVE의 영향은 제한적이고 실효 효과량은 MIX가 지배한다.
-        MIX 최대에서도 웨트 레벨은 0.5이므로 원음 대비 −6 dB로 합산된다.
+        f(D·u)/D 꼴이라 작은 신호의 선형 성분은 DRIVE와 무관하고, 같은 신호에서 배음만 커진다.
+        양과 음의 포화 한계가 +1과 −0.7로 달라 짝수 배음이 생긴다. 포화 뒤의 FREQ 고역 통과는
+        만든 배음은 그대로 두고 포화가 만든 저역 산물과 직류를 걷어 낸다.
+        MIX 최대에서 웨트 레벨은 0.5다.
+      </p>
+      <div class="tw"><table>
+        <thead><tr><th>DRIVE</th><th>0</th><th>25</th><th>50</th><th>75</th><th>100</th></tr></thead>
+        <tbody>
+          <tr><td>2차 (14 kHz)</td><td class="m">−68.9</td><td class="m">−58.1</td><td class="m">−50.1</td><td class="m">−48.5</td><td class="m">−54.8</td></tr>
+          <tr><td>3차 (21 kHz)</td><td class="m">−65.7</td><td class="m">−54.5</td><td class="m">−45.4</td><td class="m">−40.6</td><td class="m">−41.3</td></tr>
+        </tbody>
+      </table></div>
+      <p>
+        7 kHz −12 dBFS 사인, FREQ 6 kHz, MIX 100 %의 실측(dBFS)이다. 2차는 DRIVE 75 부근에서 가장 크다.
+        더 깊게 밀면 파형이 비대칭 사각파에 가까워지는데, 이는 대칭 사각파에 직류를 더한 것이라 짝수 배음이 다시 준다.
+        FREQ 아래는 건드리지 않는다. 기본값의 낮은 레벨 응답은 FREQ 부근이 −0.8 dB, 그 위가 최대 +1.3 dB로,
+        고역 통과 두 단의 위상이 만드는 사이드체인 고유의 모양이다.
       </p>
       <p>
-        BPF 중심을 하이패스 차단점의 1.5배에 두어 원음 대역과의 중첩을 줄인다.
-        다만 Q 0.6은 광대역이라 차단 특성이 완만하다.
+        포화 앞의 LPF는 사이드체인에만 걸린다. 4배 오버샘플링에서 가청 대역으로 접히는 배음의 차수를 7에서 10.5로 밀어내며,
+        16 kHz 위 성분의 배음은 어차피 가청 대역 밖이라 효과를 잃지 않는다.
       </p>
       <div class="nb">
         <span class="t">EXCITER와 대역 확장의 차이</span>
         <p>
           둘 다 고역을 만들지만 원리가 다르다. EXCITER는 통과 대역 내부 신호를
           비선형 왜곡시켜 그 배음을 더하는 것이고, 대역 확장은 스펙트럼 영역에서
-          누락된 대역을 식별해 전사하는 것이다. EXCITER는 원본에 고역이 남아 있어야
+          누락된 대역을 식별해 원음 윗대역을 옮겨 채우는 것이다. EXCITER는 원본에 고역이 남아 있어야
           작동하지만, 대역 확장은 고역이 완전히 잘린 소스에서도 작동한다.
         </p>
       </div>
@@ -568,21 +871,20 @@ fc = sr/3 (대역 제한) → 10.5차</div>
   <div class="unit" id="u-sg">
     <div class="unit-h"><h3>SOUNDGOODIZER</h3><span class="tag">3대역 병렬 포화</span></div>
     <div class="rd">
-      <div class="blk">in ┬──────────────────────────────────────┐ <i>1.0</i>
-   ├▶ <b>LPF</b> <i>loFreq</i> ──▶ <b>포화</b> ─▶ <i>LOW×0.7</i> ┐    │
-   ├▶ <b>BPF</b> <i>중심, loQ</i> ▶ <b>포화</b> ─▶ <i>MID×0.5</i> ┼─▶ <i>AMT×0.6</i> ┤
-   └▶ <b>HPF</b> <i>hiFreq</i> ──▶ <b>포화</b> ─▶ <i>HI×0.4</i>  ┘    │
-                                              ▼
-                              <b>합산</b> <i>1/(1+AMT×0.3)</i>
-                                              │
-                              <b>피킹 2.5kHz</b> ─▶ <b>압축기</b> ─▶ out</div>
+      <div class="blk">in ┬▶ <b>AP</b> <i>lo</i> ─▶ <b>AP</b> <i>hi</i> ─▶ <b>지연 정렬</b> ───────────────────────────────────▶ <i>1.0</i> ─┐
+   ├▶ <b>LR-LP</b> <i>lo</i> ─▶ <b>AP</b> <i>hi</i> ────────────▶ <b>포화</b> ─▶ <i>LOW×0.7</i> ┐                         │
+   ├▶ <b>LR-HP</b> <i>lo</i> ─▶ <b>LR-LP</b> <i>hi</i> ─────────▶ <b>포화</b> ─▶ <i>MID×0.5</i> ┼▶ <b>HPF</b> <i>12 Hz</i> ▶ <i>AMT×0.6</i> ┤
+   └▶ <b>LR-HP</b> <i>lo</i> ─▶ <b>LR-HP</b> <i>hi</i> ─▶ <b>LPF</b> ─▶ <b>포화</b> ─▶ <i>HI×0.4</i>  ┘                         ▼
+                                                            <b>합산</b> <i>1/(1+AMT×0.3)</i>
+                                                                         │
+                                         <b>피킹 2.5kHz</b> ─▶ <b>압축기</b> ─▶ <b>상쇄</b> ─▶ <b>M/S 폭</b> ─▶ out</div>
       <div class="tw"><table>
-        <thead><tr><th>프리셋</th><th>성격</th><th>분할점</th><th>대역 Q</th><th>드라이브</th></tr></thead>
+        <thead><tr><th>프리셋</th><th>성격</th><th>분할점</th><th>드라이브 (저 / 중 / 고)</th></tr></thead>
         <tbody>
-          <tr><td class="n">A</td><td>Warm &amp; Punchy</td><td class="m">250 Hz / 4 kHz</td><td class="m">0.7 / 0.8</td><td class="m">0.40</td></tr>
-          <tr><td class="n">B</td><td>Bright &amp; Airy</td><td class="m">180 Hz / 6 kHz</td><td class="m">0.6 / 1.0</td><td class="m">0.55</td></tr>
-          <tr><td class="n">C</td><td>Full &amp; Rich</td><td class="m">300 Hz / 3.5 kHz</td><td class="m">0.8 / 0.7</td><td class="m">0.50</td></tr>
-          <tr><td class="n">D</td><td>Crispy &amp; Detailed</td><td class="m">200 Hz / 8 kHz</td><td class="m">0.6 / 1.2</td><td class="m">0.60</td></tr>
+          <tr><td class="n">A</td><td>Warm &amp; Punchy</td><td class="m">250 Hz / 4 kHz</td><td class="m">0.40 / 0.34 / 0.28</td></tr>
+          <tr><td class="n">B</td><td>Bright &amp; Airy</td><td class="m">180 Hz / 6 kHz</td><td class="m">0.55 / 0.47 / 0.39</td></tr>
+          <tr><td class="n">C</td><td>Full &amp; Rich</td><td class="m">300 Hz / 3.5 kHz</td><td class="m">0.50 / 0.43 / 0.35</td></tr>
+          <tr><td class="n">D</td><td>Crispy &amp; Detailed</td><td class="m">200 Hz / 8 kHz</td><td class="m">0.60 / 0.51 / 0.42</td></tr>
         </tbody>
       </table></div>
 
@@ -592,51 +894,66 @@ fc = sr/3 (대역 제한) → 10.5차</div>
         두 함수 모두 기함수라 블렌딩만으로는 홀수 배음만 나온다.
         짝수 배음은 <code>b = 0.08 × SAT</code>의 바이어스가 만든다.
       </p>
-      <div class="tw"><table>
-        <thead><tr><th>SAT</th><th>2차</th><th>3차</th><th>4차</th></tr></thead>
-        <tbody>
-          <tr><td class="m">0.2</td><td class="m">−38.0 dB</td><td class="m">−17.2 dB</td><td class="m">−44.7 dB</td></tr>
-          <tr><td class="m">0.6</td><td class="m">−28.9 dB</td><td class="m">−17.8 dB</td><td class="m">−35.3 dB</td></tr>
-          <tr><td class="m">1.0</td><td class="m">−26.7 dB</td><td class="m">−20.4 dB</td><td class="m">−33.6 dB</td></tr>
-        </tbody>
-      </table></div>
-      <p>
-        실측값이다(8192점 DFT, 입력 진폭 0.7, DRIVE 0.4).
-        SAT를 올리면 짝수 배음이 따라 올라와 두께가 생긴다.
-        바이어스가 만드는 직류는 저역 밴드 포화 직후의 12 Hz 고역 통과가 제거한다.
-      </p>
-      <div class="eq">k = 1 + SAT×2.5      d = 1 + DRIVE×1.5      xd = x·d
+      <div class="eq">k = 1 + SAT×2.5      d = 1 + DRIVE×1.5      xd = (x + b)·d,   b = 0.08×SAT
 
 soft  = xd / (1 + |xd|·k)        <i>짝수 배음 우세</i>
 cubic = xd − xd³/(3k)            <i>홀수 배음 우세</i>
 
-y = soft·(1 − SAT×0.3) + cubic·(SAT×0.3)
-출력 = clamp(y, −1, +1)</div>
+f(x) = clamp(soft·(1 − SAT×0.3) + cubic·(SAT×0.3), −1, +1)
+출력 = f(x) − f(0)                <i>입력 0에서 출력 0</i></div>
+      <div class="tw"><table>
+        <thead><tr><th>SAT</th><th>2차</th><th>3차</th><th>4차</th></tr></thead>
+        <tbody>
+          <tr><td class="m">0.2</td><td class="m">−37.8 dB</td><td class="m">−17.2 dB</td><td class="m">−44.4 dB</td></tr>
+          <tr><td class="m">0.6</td><td class="m">−28.8 dB</td><td class="m">−17.8 dB</td><td class="m">−35.2 dB</td></tr>
+          <tr><td class="m">1.0</td><td class="m">−26.7 dB</td><td class="m">−20.4 dB</td><td class="m">−33.5 dB</td></tr>
+        </tbody>
+      </table></div>
+      <p>
+        곡선 자체의 값이다(8192점 DFT, 입력 진폭 0.7, DRIVE 0.4).
+        SAT를 올리면 짝수 배음이 따라 올라와 두께가 생긴다.
+        동작점 이동이 만드는 직류 가운데 입력이 0일 때의 몫은 곡선에서 f(0)을 빼 없애고,
+        신호에 따라 변하는 몫은 세 대역을 합친 직후의 12 Hz 고역 통과가 제거한다.
+        무음 입력의 출력은 정확히 0이다.
+      </p>
       <div class="tw"><table>
         <thead><tr><th>후단</th><th>사양</th></tr></thead>
         <tbody>
           <tr><td>다이내믹 EQ</td><td class="m">피킹 2.5 kHz, Q 0.7, +AMOUNT×3 dB</td></tr>
           <tr><td>출력 압축</td><td class="m">스레숄드 −10 − AMOUNT×8 dB, 레시오 2:1</td></tr>
-          <tr><td></td><td class="m">어택 3 ms, 릴리즈 80 + STEREO×220 ms, 니 6 dB</td></tr>
+          <tr><td></td><td class="m">어택 3 ms, 릴리즈 200 ms, 니 6 dB</td></tr>
+          <tr><td>자동 메이크업 상쇄</td><td class="m">AMOUNT 50에서 −3.35 dB, 100에서 −4.55 dB</td></tr>
         </tbody>
       </table></div>
+      <p>
+        2.5 kHz 강조는 외이도의 1/4 파장 공명(약 3.4 kHz)과 귓바퀴 반사가 2~5 kHz를 10~15 dB 키워
+        귀가 가장 예민해지는 대역을 겨냥한다. 같은 에너지를 더해도 이 대역이 가장 크게 들린다.
+      </p>
       <h4>대역 분할</h4>
       <p>
-        Linkwitz-Riley 4차 상보 분할이다. 버터워스 2차(Q 0.707)를 2단으로 쌓아
-        분할점에서 −6 dB로 만나게 한다. 세 대역의 진폭 합이 전 대역에서 1이 된다.
+        Linkwitz-Riley 4차 상보 분할이다. 버터워스 2차(선형 Q 0.7071)를 2단으로 쌓아
+        분할점에서 −6 dB로 만나게 한다. Web Audio 명세는 lowpass·highpass의 Q를 dB로 해석하므로 실제 입력값은 −3.01 dB다.
+        0.707을 그대로 넣으면 선형 1.085가 되어 합이 분할점에서 +7.4 dB 부푼다.
+        저역 대역에 위쪽 분할점의 올패스를 걸어 트리로 짜면 세 대역의 합이 AP(lo)·AP(hi)가 되어 크기가 정확히 1이다.
       </p>
-      <div class="eq">저역 = LR-LP(loFreq)
-중역 = LR-HP(loFreq) → LR-LP(hiFreq)
-고역 = LR-HP(hiFreq)
-
-|LP| = 1/(1+w⁴)    |HP| = w⁴/(1+w⁴)    w = f/fc
-|LP| + |HP| = 1    <i>모든 주파수에서</i></div>
+      <div class="eq">저역 = LR-LP(lo) · AP(hi)
+중역 = LR-HP(lo) · LR-LP(hi)
+고역 = LR-HP(lo) · LR-HP(hi)
+합   = AP(lo) · AP(hi)       |합| = 1,  분할점에서 위상 −180°</div>
+      <div class="nb warn">
+        <span class="t">원음 경로의 올패스</span>
+        <p>
+          대역 합은 크기가 1이어도 위상이 돌아 있다. 처리한 대역을 원음에 병렬로 더하면 분할점에서 대역 합이
+          원음과 반대 위상이 되어 상쇄된다(250 Hz −2.3 dB). 원음 경로에 같은 AP(lo)·AP(hi)와 같은 오버샘플링 지연을 걸어
+          두 경로를 맞춘다. 네 모드 모두 낮은 레벨 응답이 20 Hz~20 kHz에서 ±1.3 dB 이내이며, 봉우리는 2.5 kHz 강조다.
+        </p>
+      </div>
       <div class="nb ok">
         <span class="t">이전 구성과의 차이</span>
         <p>
           예전에는 LPF + BPF + HPF 병렬이라 합산 응답이 평탄하지 않았다.
           프리셋 A 기준으로 합이 0.91에서 1.57까지 흔들렸고,
-          2 kHz 부근이 약 +4 dB 부풀어 있었다. 지금은 전 대역에서 1.000이다.
+          2 kHz 부근이 약 +4 dB 부풀어 있었다.
         </p>
       </div>
       <div class="nb ok">
@@ -651,120 +968,215 @@ y = soft·(1 − SAT×0.3) + cubic·(SAT×0.3)
   </div>
 
   <div class="unit" id="u-vinyl">
-    <div class="unit-h"><h3>VINYL RECORD</h3><span class="tag">고역 감쇠 + 부가 잡음</span></div>
+    <div class="unit-h"><h3>VINYL RECORD</h3><span class="tag">커팅에서 재생까지의 물리 모형</span></div>
     <div class="rd">
-      <div class="blk">in ─▶ <b>LPF</b> <i>20000−WEAR×8000</i> ─▶ <b>하이셸프</b> <i>8kHz, −WEAR×4dB</i> ─▶ out
-                                            ▲
-          핑크 노이즈 ─▶ <i>CRACKLE×0.03</i> ────┘</div>
+      <div class="blk">in ─▶ <b>엘립티컬 EQ</b> <i>S HP 150 Hz</i> ─┬──────────────────────────────▶ (+) 홈
+                                    ├─▶ <b>후행 에코</b> <i>1회전 뒤</i> ─────────────▶ ┤
+                                    └─▶ <b>RIAA 기록</b> ─▶ <b>V·dV/dt</b> ─▶ <b>RIAA 재생</b> ─▶ <b>HP 1k</b> ─▶ ┤
+    표면 잡음 · 크래클 · 팝 · 스크래치 · 럼블 ─▶ <b>RIAA 재생+IEC</b> ─────────────▶ ┘
+(+) 홈 ─▶ <b>주사 손실</b> <i>LP, 반경 따라</i> ─▶ <b>카트리지 공진</b> ─▶ <b>와우·플러터</b> ─▶ <b>누화</b> ─▶ out</div>
+      <p>
+        음원 위에 잡음을 얹는 효과가 아니라 레코드가 만들어지고 읽히는 과정을 따라간다.
+        실시간 엔진과 렌더링 엔진이 같은 빌더로 이 블록을 만든다.
+      </p>
       <div class="tw"><table>
-        <thead><tr><th>요소</th><th>사양</th></tr></thead>
+        <thead><tr><th>구분</th><th>파라미터</th><th>범위 · 기본</th><th>모형에서의 작용</th></tr></thead>
         <tbody>
-          <tr><td>대역 제한</td><td class="m">LPF 20 kHz → 12 kHz (WEAR 0 → 1)</td></tr>
-          <tr><td>고역 감쇠</td><td class="m">하이셸프 8 kHz, 0 ~ −4 dB</td></tr>
-          <tr><td>잡음 레벨</td><td class="m">CRACKLE × 0.03 (최대 −30.5 dB)</td></tr>
-          <tr><td>잡음 스펙트럼</td><td class="m">핑크 (−3 dB/oct)</td></tr>
+          <tr><td rowspan="9">레코드</td><td>SPEED</td><td class="m">33⅓ / 45 rpm</td><td>선속도·회전 주기·면 길이</td></tr>
+          <tr><td>TRACK POS</td><td class="m">0 ~ 100 % · 30</td><td>곡이 놓인 반경 구간</td></tr>
+          <tr><td>SURFACE S/N</td><td class="m">40 ~ 75 dB · 60</td><td>표면 잡음 RMS = −S/N dBFS</td></tr>
+          <tr><td>CRACKLE</td><td class="m">0 ~ 40 /s · 8</td><td>고운 먼지 딸깍의 밀도</td></tr>
+          <tr><td>POPS</td><td class="m">0 ~ 120 /min · 10</td><td>굵은 먼지 딸깍의 밀도, 회전마다 1 ~ 4회 반복</td></tr>
+          <tr><td>SCRATCH</td><td class="m">−60 ~ −10 dBFS · 없음</td><td>회전마다 같은 자리의 긁힘 최댓값</td></tr>
+          <tr><td>WARP</td><td class="m">0 ~ 3 mm · 0.5</td><td>수직 속도 2π·f<sub>rot</sub>·h</td></tr>
+          <tr><td>ECCENTRICITY</td><td class="m">0 ~ 0.5 mm · 0.10</td><td>편심 와우 e/r</td></tr>
+          <tr><td>PLAYS</td><td class="m">0 ~ 1000 회 · 100</td><td>마모 w = 1 − e<sup>−n/300</sup></td></tr>
+          <tr><td rowspan="3">턴테이블</td><td>WOW &amp; FLUTTER</td><td class="m">0.01 ~ 0.30 % · 0.08</td><td>벨트 표류와 모터 떨림의 RMS</td></tr>
+          <tr><td>RUMBLE</td><td class="m">−80 ~ −40 dB · −65</td><td>럼블 RMS (0 dBFS 대비)</td></tr>
+          <tr><td>ARM RESONANCE</td><td class="m">6 ~ 16 Hz · 10</td><td>톤암 공진 피킹 (Q 2, +8 dB)</td></tr>
+          <tr><td rowspan="4">카트리지</td><td>STYLUS</td><td class="m">원뿔 · 타원 · 마이크로라인</td><td>반경 15.2 · 7.6 · 2.8 µm</td></tr>
+          <tr><td>SEPARATION</td><td class="m">15 ~ 35 dB · 25</td><td>1 kHz 누설, 고역에서 약 +8 dB</td></tr>
+          <tr><td>AZIMUTH</td><td class="m">0 ~ 3° · 0.5</td><td>tan θ만큼 평탄한 누설 추가</td></tr>
+          <tr><td>LOAD CAP</td><td class="m">100 ~ 470 pF · 200</td><td>MM 코일 RLC 공진</td></tr>
         </tbody>
       </table></div>
       <p>
-        잡음은 Voss-McCartney 방식의 핑크 노이즈 근사다. 서로 다른 시정수를 가진
-        6개의 1차 저역 통과 성분을 백색 잡음에 걸어 합산해
-        −3 dB/oct 기울기를 만든다. 백색 잡음을 그대로 쓰면 고역이 과도해
-        먼지·흠집 잡음의 스펙트럼과 맞지 않는다.
-      </p>
-      <p>
-        WEAR는 LPF 차단점과 셸빙 감쇠를 동시에 움직인다.
-        차단점 이동은 12 kHz까지이므로 가청 대역 상단에 직접 작용한다.
-      </p>
-      <h4>피치 변조 (WOBBLE)</h4>
-      <p>
-        중심 지연 6 ms의 가변 지연을 두 개의 정현파로 변조한다.
-        와우는 33⅓ rpm의 회전 주기인 0.556 Hz, 플러터는 4.2 Hz다.
-      </p>
-      <div class="eq">피치 편차 = 변조 진폭 A × 2πf
-
-와우   f = 0.556 Hz,  A = WOBBLE × 0.9 ms  → 최대 ±0.31%
-플러터 f = 4.2 Hz,    A = WOBBLE × 0.06 ms → 최대 ±0.16%</div>
-      <p>
-        실측 LP 플레이어의 와우·플러터는 대체로 ±0.1 ~ ±0.3% 범위이므로
-        최대 설정이 상태가 나쁜 기기에 해당한다.
+        모든 손잡이는 실제 턴테이블·카트리지·레코드 사양서에 적히는 물리량이다.
+        레벨 기준은 0 dBFS = 1 kHz에서 홈 속도 10 cm/s로 둔다. 마모의 시정수 300회는
+        바늘 상태와 침압에 따라 달라지는 모형 가정이다.
       </p>
 
-      <h4>채널 누화 (CROSSTALK)</h4>
-      <div class="eq">교차 게인 x = CROSSTALK × 0.35
-합산 보정 n = 1/(1+x)
+      <h4>RIAA 곡선</h4>
+      <div class="eq">재생 H(s) = (1 + sT2) / ((1 + sT1)(1 + sT3))
+T1 = 3180 µs (50.05 Hz)   T2 = 318 µs (500.5 Hz)   T3 = 75 µs (2122 Hz)
+IEC 저역 차단 T4 = 7950 µs (20.02 Hz) — 잡음 경로</div>
+      <p>
+        잡음과 딸깍 소리는 홈 안에서 생기므로 재생 곡선을 거친다.
+        디지털화에는 고역 보정 영점을 넣어 쌍선형 변환의 나이퀴스트 영점을 없앴다.
+        가청 대역 최대 오차는 44.1 kHz 0.27 dB, 48 kHz 0.18 dB, 96 kHz 이상 0.01 dB 미만이다.
+      </p>
 
-출력 L = n·L + n·x·R
-출력 R = n·R + n·x·L</div>
+      <h4>엘립티컬 EQ와 후행 에코</h4>
+      <p>
+        커팅 단계에서 150 Hz 아래의 좌우 차이(S 성분)를 2차 고역 통과로 없앤다.
+        저역의 역상 성분은 홈을 수직으로 크게 흔들어 바늘이 튀므로 실제 마스터링에서 늘 거치는 과정이다.
+        후행 에코는 다음 홈이 누른 자국으로, 한 회전 뒤(33⅓ rpm 1.8초, 45 rpm 1.33초)에
+        <span class="m">−54 + 14·w dB</span>로 섞인다(w는 마모도). 선행 에코는 앞을 내다봐야 해서 실시간과 같은 결과를 낼 수 없어 넣지 않았다.
+      </p>
+
+      <h4>주사 손실 (STYLUS · PLAYS · TRACK POS · SPEED)</h4>
+      <div class="eq">f_c = v / λe,   v = 2π·r(t)·rpm/60,   λe = 10.7 µm × (r_s / 7.6 µm) × (1 + 1.5·w)
+r(t) : 146 mm → 60 mm (한 면 22분, 45 rpm 15분)</div>
       <div class="tw"><table>
-        <thead><tr><th>CROSSTALK</th><th>누설량</th><th>비고</th></tr></thead>
+        <thead><tr><th>10 kHz 손실, 타원형</th><th>w 0</th><th>w 0.4</th><th>w 1</th></tr></thead>
         <tbody>
-          <tr><td class="m">0</td><td class="m">완전 분리</td><td>디지털 소스</td></tr>
-          <tr><td class="m">25</td><td class="m">−21.2 dB</td><td>양호한 카트리지</td></tr>
-          <tr><td class="m">50</td><td class="m">−15.1 dB</td><td>일반적 수준</td></tr>
-          <tr><td class="m">100</td><td class="m">−9.1 dB</td><td>분리도가 나쁜 상태</td></tr>
+          <tr><td>바깥 홈 (0.51 m/s)</td><td class="m">−0.37 dB</td><td class="m">—</td><td class="m">—</td></tr>
+          <tr><td>안쪽 홈 (0.21 m/s)</td><td class="m">−2.01 dB</td><td class="m">−4.44 dB</td><td class="m">−8.40 dB</td></tr>
         </tbody>
       </table></div>
       <p>
-        합산 보정으로 누화를 올려도 전체 레벨이 커지지 않는다.
-        누화가 증가하면 사이드 성분이 상쇄되어 스테레오 폭이 좁아진다.
+        임계 감쇠 2차 저역 통과로 근사하고, 10 kHz 감쇠가 표본화 주파수와 무관하게 같도록 사전 왜곡한다.
+        15 kHz는 44.1·48 kHz에서 나이퀴스트에 가까워 2 ~ 5 dB 더 깎인다.
+      </p>
+
+      <h4>트레이싱 왜곡</h4>
+      <div class="eq">D2 ∝ r_s · V · ω / v²   →   V · dV/dt 로 구현
+K(t) = 0.006 × (r_s / 7.6 µm) × (0.51 / v(t))² × (1 + 2·w)</div>
+      <div class="tw"><table>
+        <thead><tr><th>2차 배음, 타원형, w 0.4</th><th>바깥 홈</th><th>안쪽 홈</th></tr></thead>
+        <tbody>
+          <tr><td>1 kHz −10 dBFS</td><td class="m">0.12 %</td><td class="m">0.69 %</td></tr>
+          <tr><td>4 kHz −10 dBFS</td><td class="m">0.76 %</td><td class="m">4.49 %</td></tr>
+          <tr><td>8 kHz −20 dBFS</td><td class="m">0.96 %</td><td class="m">5.63 %</td></tr>
+        </tbody>
+      </table></div>
+      <p>
+        기록 곡선을 거친 홈 속도에 곱을 걸어 고역이 강조된 실제 홈의 왜곡을 만든다.
+        안쪽 홈에서 치찰음이 찌그러지는 레코드의 고질적 현상이 그대로 나타나며, 45 rpm에서는 약 45% 줄어든다.
+      </p>
+
+      <h4>속도 흔들림 (ECCENTRICITY · WOW &amp; FLUTTER)</h4>
+      <div class="eq">편심   Δf/f = e / r(t)             e = 0.21 mm → 바깥 ±0.14 %, 안쪽 ±0.35 %
+표류   0.05 ~ 0.8 Hz 대역 잡음      ┐ 합성 RMS = WOW &amp; FLUTTER 값
+떨림   4 ~ 12 Hz 대역 잡음          ┘ (표류 : 떨림 = 1 : 2)
+지연선 중심 12 ms, 0.30 %에서 최대 지연 편차 2.5 ms</div>
+      <p>
+        편심은 회전 주파수(33⅓ rpm 0.556 Hz, 45 rpm 0.75 Hz)로 돌며, 같은 편심이라도 반경이 작을수록
+        비율이 커져 곡이 안쪽으로 갈수록 음정이 더 흔들린다. 표류와 떨림은 피치 편차로 만든 뒤 적분해 지연 변화로 바꾼다.
+      </p>
+
+      <h4>홈 안의 소리</h4>
+      <div class="tw"><table>
+        <thead><tr><th>재료</th><th>생성</th><th>목표 레벨</th></tr></thead>
+        <tbody>
+          <tr><td>표면 잡음</td><td>좌우 상관 0.2 백색 잡음 → RIAA 재생</td><td class="m">RMS = −S/N + 12·w dBFS</td></tr>
+          <tr><td>크래클</td><td>초당 40의 고정 흐름에서 순위로 골라 담음, 파레토 α 1.6, 폭 20 ~ 60 µs</td><td class="m">중앙값 −40 dBFS</td></tr>
+          <tr><td>팝</td><td>곡 전체의 사건 목록을 개별 예약, α 1.3, 폭 150 ~ 600 µs, 회전마다 1 ~ 4회</td><td class="m">중앙값 −28 dBFS</td></tr>
+          <tr><td>스크래치</td><td>회전마다 같은 각도, 겹 펄스</td><td class="m">SCRATCH 값</td></tr>
+          <tr><td>럼블</td><td>3 ~ 28 Hz 수직 우세 + 톤암 공진</td><td class="m">RMS = RUMBLE 값 (공진 제외)</td></tr>
+          <tr><td>휨</td><td>회전 주파수 정현파, 수직(L−R)</td><td class="m">1 mm → −40 dBFS (33⅓)</td></tr>
+        </tbody>
+      </table></div>
+      <p>
+        백색 잡음이 재생 곡선을 지나면 500 Hz ~ 2 kHz가 평탄하고 양옆이 −6 dB/oct로 기우는
+        레코드 특유의 표면 잡음이 된다. 짧은 충격은 75 µs 극을 지나며 둥근 "톡"으로 바뀐다.
+        레벨은 재료를 만든 뒤 재생 곡선을 실제로 통과시켜 측정해 맞춘다.
+        모든 재료는 씨앗을 고정한 난수로 만들고 곡 시간에 맞춰 시작하므로, 재생과 내보내기에서
+        같은 자리에 같은 딸깍 소리가 난다. 밀도를 올리면 기존 사건은 그대로 두고 새 사건만 더해진다.
+        팝은 드문 사건이라 짧은 루프에 담으면 같은 딸깍이 되풀이되는 게 들리므로 곡 전체에 걸쳐 따로 예약한다.
+      </p>
+
+      <h4>카트리지 (SEPARATION · AZIMUTH · LOAD CAP)</h4>
+      <div class="eq">누설(f) = L1k·(0.579 + 2.149·HP₁(f, 5 kHz)) + tan θ,   L1k = 10^(−SEP/20)
+합산 보정 n = 1 / (1 + 평탄 누설)</div>
+      <div class="tw"><table>
+        <thead><tr><th>분리도 · 방위각</th><th>1 kHz</th><th>10 kHz</th><th>20 kHz</th></tr></thead>
+        <tbody>
+          <tr><td>35 dB · 0°</td><td class="m">−35.2 dB</td><td class="m">−27.0 dB</td><td class="m">−26.4 dB</td></tr>
+          <tr><td>25 dB · 0.5°</td><td class="m">−24.2 dB</td><td class="m">−16.7 dB</td><td class="m">−16.2 dB</td></tr>
+          <tr><td>15 dB · 3°</td><td class="m">−14.1 dB</td><td class="m">−7.2 dB</td><td class="m">−6.7 dB</td></tr>
+        </tbody>
+      </table></div>
+      <p>
+        MM 카트리지는 코일 인덕턴스와 포노 입력의 부하 용량이 공진해 고역에 봉우리와 차단을 만든다.
+        코일 0.5 H · 600 Ω, 부하 47 kΩ로 두면
+      </p>
+      <div class="eq">H(s) = 1 / (LC s² + (L/R_L + R_c C) s + 1 + R_c/R_L)</div>
+      <div class="tw"><table>
+        <thead><tr><th>부하 용량</th><th>공진</th><th>10 kHz</th><th>15 kHz</th><th>20 kHz</th></tr></thead>
+        <tbody>
+          <tr><td>100 pF</td><td class="m">22.5 kHz</td><td class="m">−0.4 dB</td><td class="m">−1.2 dB</td><td class="m">−2.6 dB</td></tr>
+          <tr><td>200 pF</td><td class="m">15.9 kHz</td><td class="m">+0.9 dB</td><td class="m">−0.1 dB</td><td class="m">−3.2 dB</td></tr>
+          <tr><td>300 pF</td><td class="m">13.0 kHz</td><td class="m">+2.0 dB</td><td class="m">−0.5 dB</td><td class="m">−5.6 dB</td></tr>
+          <tr><td>470 pF</td><td class="m">10.4 kHz</td><td class="m">+3.3 dB</td><td class="m">−3.4 dB</td><td class="m">−9.6 dB</td></tr>
+        </tbody>
+      </table></div>
+      <p>
+        바이쿼드 저역 통과로 옮기면 나이퀴스트 영점 때문에 48 kHz에서 20 kHz가 9 dB 넘게 더 깎인다.
+        극은 정합 z 변환(z = e<sup>sT</sup>)으로 옮겨 공진을 보존하고, 분자는 100 Hz ~ 20 kHz의 dB 오차가
+        최소가 되도록 맞춘다. 가청 대역 최대 오차는 44.1 kHz 0.21 dB, 48 kHz 0.13 dB, 192 kHz 0.00 dB다.
       </p>
     </div>
   </div>
 
   <div class="unit" id="u-atmos">
-    <div class="unit-h"><h3>DOLBY ATMOS</h3><span class="tag">합성 임펄스 응답 + 선행음</span></div>
+    <div class="unit-h"><h3>DOLBY ATMOS</h3><span class="tag">방의 음향 모형</span></div>
     <div class="rd">
       <p>
-        4갈래 병렬 구조다. 직접음, 초기 반사, 후기 잔향, 선행음 경로가 각각
-        레벨을 거쳐 합산된다. 2채널 내에서의 공간 시뮬레이션이며
-        객체 기반 다채널 규격과는 무관하다.
+        음원이 직육면체 방 안에서 울리는 과정을 계산한다. 직접음은 원음 그대로 두고,
+        벽·바닥·천장에서 온 초기 반사와 확산 잔향을 물리식으로 만들어 더한다.
+        2채널 안에서의 공간 모형이며 객체 기반 다채널 규격과는 무관하다.
       </p>
-      <div class="blk">in ┬▶ <i>1−MIX</i> ─────────────────────────────────┐
-   ├▶ <b>컨볼루션</b> ─▶ <b>하이셸프</b> <i>8k, H×6dB</i> ─▶ <i>MIX·REV·0.50</i> ┤
-   ├▶ <b>컨볼루션</b> ─▶ <i>MIX·REV·0.25</i> ─────────────────┼─▶ out
-   └▶ L <i>0 ms</i> ┐
-      R <i>1+OBJ×4 ms</i> ┴▶ <i>MIX·OBJ·0.25</i> ─────────────┘</div>
-
-      <h4>임펄스 응답 구성</h4>
-      <div class="eq">RT60 = 프리셋값 × (0.4 + SPACE×0.8)
-IR 길이 = RT60 + 0.5 초</div>
+      <div class="blk">in ┬───────────────────────────────────────────────────────▶ <i>1.0</i> ─┐ <i>직접음</i>
+   ├▶ <b>초기 반사</b> <i>영상원, 두 음원 × 두 귀</i> ─▶ <i>MIX</i> ────────────────┼─▶ out
+   └▶ <b>확산 잔향</b> <i>주파수별 감쇠, 두 음원 × 두 귀</i> ─▶ <i>MIX·2·REV·r·e^(−0.02r/T)</i> ┘</div>
       <div class="tw"><table>
-        <thead><tr><th>씬</th><th>기준 RT60</th><th>SPACE 0 ~ 1 실효</th><th>초기 반사 대표값</th></tr></thead>
+        <thead><tr><th>장면</th><th>치수 (SPACE 60)</th><th>흡음률 α</th><th>잔향 시간 125 / 1k / 8k Hz</th><th>임계 거리</th><th>혼합 시간</th></tr></thead>
         <tbody>
-          <tr><td class="n">STUDIO</td><td class="m">0.4 s</td><td class="m">0.16 ~ 0.48 s</td><td class="m">8 ms</td></tr>
-          <tr><td class="n">CLUB</td><td class="m">0.9 s</td><td class="m">0.36 ~ 1.08 s</td><td class="m">15 ms</td></tr>
-          <tr><td class="n">CINEMA</td><td class="m">1.8 s</td><td class="m">0.72 ~ 2.16 s</td><td class="m">22 ms</td></tr>
-          <tr><td class="n">CONCERT</td><td class="m">2.4 s</td><td class="m">0.96 ~ 2.88 s</td><td class="m">35 ms</td></tr>
-          <tr><td class="n">STADIUM</td><td class="m">3.2 s</td><td class="m">1.28 ~ 3.84 s</td><td class="m">55 ms</td></tr>
+          <tr><td>STUDIO</td><td class="m">7.6 × 5.4 × 3.2 m</td><td class="m">0.37</td><td class="m">0.28 / 0.28 / 0.23 s</td><td class="m">1.24 m</td><td class="m">12 ms</td></tr>
+          <tr><td>CLUB</td><td class="m">21.6 × 16.2 × 5.4 m</td><td class="m">0.29</td><td class="m">0.80 / 0.79 / 0.52 s</td><td class="m">2.77 m</td><td class="m">43 ms</td></tr>
+          <tr><td>CINEMA</td><td class="m">27.0 × 19.4 × 9.7 m</td><td class="m">0.40</td><td class="m">0.82 / 0.81 / 0.53 s</td><td class="m">4.49 m</td><td class="m">71 ms</td></tr>
+          <tr><td>CONCERT</td><td class="m">43.2 × 27.0 × 19.4 m</td><td class="m">0.29</td><td class="m">2.10 / 2.02 / 0.87 s</td><td class="m">6.00 m</td><td class="m">150 ms</td></tr>
+          <tr><td>STADIUM</td><td class="m">162 × 119 × 43 m</td><td class="m">0.40</td><td class="m">4.14 / 3.84 / 1.10 s</td><td class="m">26.4 m</td><td class="m">150 ms</td></tr>
         </tbody>
       </table></div>
       <div class="tw"><table>
-        <thead><tr><th>성분</th><th>지연</th><th>레벨</th></tr></thead>
+        <thead><tr><th>노브</th><th>물리량</th></tr></thead>
         <tbody>
-          <tr><td>직접음</td><td class="m">0 ms</td><td class="m">1.00</td></tr>
-          <tr><td>초기 반사 10개</td><td class="m">7, 13, 17, 23, 31, 41, 53, 67, 79, 97 ms</td><td class="m">0.85 → 0.24</td></tr>
-          <tr><td>좌우 편차</td><td class="m">—</td><td class="m">L 1.1−0.01i,  R 0.9+0.01i</td></tr>
-          <tr><td>천장 반사</td><td class="m">6 + HEIGHT×12 ms</td><td class="m">HEIGHT × 0.55</td></tr>
-          <tr><td>후방 반사</td><td class="m">40 + DEPTH×60 ms</td><td class="m">DEPTH × 0.45</td></tr>
+          <tr><td>SPACE</td><td>방의 모든 치수 0.6 ~ 1.4배. 잔향 시간과 반사 지연이 함께 변한다.</td></tr>
+          <tr><td>DEPTH</td><td>음원과 청취자 거리 r = 1 + DEPTH·(0.7·길이 − 1) m. 멀수록 직접음에 비해 잔향이 커진다.</td></tr>
+          <tr><td>HEIGHT</td><td>천장·바닥 반사 0 ~ 2배, 머리 위 반사의 8 kHz 강조 0 ~ +8 dB.</td></tr>
+          <tr><td>OBJECT</td><td>옆벽 반사 0 ~ 2배. 음원의 폭(양이 상관도)을 조절한다.</td></tr>
+          <tr><td>REVERB</td><td>확산 잔향 0 ~ 2배.</td></tr>
+          <tr><td>MIX</td><td>반사와 잔향 전체의 양. 직접음은 항상 원음 그대로다.</td></tr>
         </tbody>
       </table></div>
+      <p>HEIGHT·OBJECT·REVERB의 50 %는 방의 물리적 값이다. 위 표는 처음 열었을 때의 SPACE 60 기준이다. 씬 버튼을 누르면 SPACE·HEIGHT·DEPTH·REVERB·OBJECT도 씬마다 정해진 값으로 바뀌어, 1 kHz 잔향 시간이 STUDIO(SPACE 25) 0.21 s · CLUB(SPACE 55) 0.76 s · CINEMA(SPACE 75) 0.90 s · CONCERT(SPACE 85) 2.37 s · STADIUM(SPACE 95) 4.73 s가 된다.</p>
+      <div class="eq">잔향 시간 (Eyring)   T(f) = 0.161·V / (−S·ln(1 − α) + 4·m(f)·V)     <i>m(f): 공기 흡음, 20 °C 50 %RH</i>
+임계 거리            r<sub>c</sub> = √(0.161·V / (16π·T))
+반사 에너지 / 직접음  (r / r<sub>c</sub>)² · e^(−0.04·r/T)                   <i>Barron 수정 이론</i>
+반사 한 번의 진폭     √(1 − α), 거리 r<sub>0</sub>/d, 공기 흡음 e^(−m·(d − r<sub>0</sub>)/2)
+두 귀 결맞음         sin(kd) / (kd),  d = 0.18 m</div>
       <p>
-        초기 반사 지연값이 모두 소수인 것은 의도된 설계다.
-        지연값 사이에 정수배 관계가 있으면 특정 주파수에서 반사음이 동상으로 합산되어
-        콤 필터링이 발생한다. 소수로 구성하면 그 공진이 분산된다.
+        흡음률이 0.2를 넘는 방에서는 Sabine 식이 잔향 시간을 과대평가하므로(α 0.4에서 약 28 %)
+        반사마다 에너지가 (1 − α)로 준다고 보는 Eyring 식을 쓴다. 영상원 반사와 같은 가정이라 초기 반사와 잔향이 이어진다.
+        초기 반사는 혼합 시간의 1.5배까지 도착하는 영상원을 차수와 무관하게 모두 넣고,
+        확산 잔향은 주파수마다 정확한 감쇠율로 합성한다. 둘은 0.5 ~ 1.5배 혼합 시간 구간에서 에너지를 나눠 이어진다.
+        같은 설정은 언제나 같은 응답을 만든다.
       </p>
-      <p>
-        천장 반사 지연 6~18 ms는 2~6 m 높이의 천장에서 오는 1차 반사에 해당한다.
-        후방 반사 40~100 ms는 7~34 m 거리의 뒷벽에 대응하며,
-        50 ms를 넘어서면 선행음 융합 한계를 벗어나 별개의 반향으로 인지되기 시작한다.
-      </p>
+      <div class="tw"><table>
+        <thead><tr><th>검증</th><th>결과</th></tr></thead>
+        <tbody>
+          <tr><td>잔향 시간 (옥타브 대역 적분 기댓값 대비)</td><td class="m">대부분 5 % 안, 저역 최대 10 %</td></tr>
+          <tr><td>반사+잔향 에너지 (Barron 수정 이론 대비)</td><td class="m">−0.4 ~ −0.9 dB</td></tr>
+          <tr><td>두 귀 결맞음 125 / 500 / 1k Hz</td><td class="m">0.96 / 0.54 / 0.04 (이론 0.97 / 0.60 / 0.00)</td></tr>
+          <tr><td>OBJECT 0 / 50 / 100의 초기 양이 상관도</td><td class="m">0.40 / 0.27 / 0.20</td></tr>
+        </tbody>
+      </table></div>
       <div class="nb">
-        <span class="t">선행음 경로</span>
+        <span class="t">모노 호환성</span>
         <p>
-          우측 채널만 1~5 ms 지연시킨다. 이 범위는 선행음 효과가 작동하는 구간이라
-          에코가 아닌 정위 이동으로 인지된다. 다만 모노 합산 시 이 지연이
-          <code>1/(2τ)</code> 간격의 콤 필터를 만든다. τ = 3 ms이면 약 167 Hz 간격으로
-          딥이 생긴다. OBJECT MIX를 올린 상태에서는 모노 호환성 확인이 필요하다.
+          실제 방처럼 바닥과 벽의 반사가 원음과 더해져 빗살 모양의 요철을 만든다. 채널 하나만 늦추는 별도의 선행음 경로는 없다.
         </p>
       </div>
     </div>
@@ -775,9 +1187,16 @@ IR 길이 = RT60 + 0.5 초</div>
     <div class="rd">
       <p>
         Linkwitz-Riley 4차 특성으로 4대역 분할한다.
-        버터워스 2차(Q = 0.707)를 직렬 2단으로 구성해 −24 dB/oct 기울기를 얻고,
-        분할점에서 −6 dB로 만나 합산 시 평탄한 응답이 된다.
+        버터워스 2차(선형 Q 0.7071, 명세 입력값 −3.01 dB)를 직렬 2단으로 구성해 −24 dB/oct 기울기를 얻는다.
+        교차점이 셋이면 인접 대역끼리만 나눠서는 합이 전역통과가 되지 않아 약 411 Hz에 −1.22 dB 골이 생긴다.
+        그래서 트리 구조로 짠다. 저역 쪽 대역에 위쪽 교차점의 전역통과를, 고역 쪽 대역에 아래쪽 고역 통과를 더하면
+        합이 AP(120)·AP(500)·AP(5k)가 되어 크기가 정확히 1이다.
       </p>
+      <div class="eq">대역 1 = LP²(120) · AP(500) · AP(5k)
+대역 2 = HP²(120) · LP²(500) · AP(5k)
+대역 3 = HP²(120) · HP²(500) · LP²(5k)
+대역 4 = HP²(120) · HP²(500) · HP²(5k)
+합     = AP(120) · AP(500) · AP(5k)      |합| = 1</div>
       <div class="tw"><table>
         <thead><tr><th>대역</th><th>범위</th><th>스레숄드</th><th>레시오</th><th>어택</th><th>릴리즈</th><th>니</th></tr></thead>
         <tbody>
@@ -801,8 +1220,11 @@ IR 길이 = RT60 + 0.5 초</div>
         각각 4:1, 3:1에서 멈춘다.
       </p>
       <p>
-        밴드 1 출력에만 0.95 배율이 걸려 있다. 저역이 합산 후 과도해지는 것을
-        미리 −0.45 dB 낮춰 보정하는 값이다.
+        각 대역 압축기 뒤에는 압축 소자가 규격상 거는 자동 메이크업을 상쇄하는 이득이 붙어 있다.
+        기본값에서 대역 1~4의 자동 메이크업은 +5.68 / +5.43 / +6.93 / +5.90 dB로,
+        그대로 두면 압축이 걸리지 않는 조용한 신호까지 대역마다 다르게 커져 중역이 1.7 dB 도드라진다.
+        상쇄한 뒤 낮은 레벨 응답은 31.5 Hz ~ 20 kHz에서 0.0 dB다.
+        합이 정확히 평탄하므로 저역 대역에만 따로 거는 보정은 두지 않는다.
       </p>
       <h4>리미터</h4>
       <div class="tw"><table>
@@ -812,13 +1234,13 @@ IR 길이 = RT60 + 0.5 초</div>
           <tr><td>레시오</td><td class="m">20:1</td></tr>
           <tr><td>어택 / 릴리즈</td><td class="m">1 ms / 50 ms</td></tr>
           <tr><td>니</td><td class="m">0 dB (하드)</td></tr>
+          <tr><td>자동 메이크업 상쇄</td><td class="m">천장 −0.3 dB에서 −0.17 dB</td></tr>
         </tbody>
       </table></div>
       <h4>브릭월 세이프티</h4>
       <p>
-        압축기 기반 리미터는 룩어헤드가 없어 어택(1 ms)보다 짧은 피크를 놓치고,
-        레시오도 20:1이라 무한대가 아니다. 그래서 체인 최종단에 천장 기준으로
-        정규화한 소프트 클리퍼를 둔다.
+        압축기 기반 리미터는 레시오가 20:1이라 천장을 넘는 양의 1/20이 그대로 남는다.
+        그래서 체인 최종단에 천장 기준으로 정규화한 소프트 클리퍼를 둔다.
       </p>
       <div class="eq">정규화 x = 입력 / 10^(CEILING/20)
 
@@ -828,12 +1250,30 @@ IR 길이 = RT60 + 0.5 초</div>
 
 출력 = y × 10^(CEILING/20)</div>
       <p>
-        0.85 아래는 완전 선형이라 착색이 없고, 그 위는 1.0에 점근하므로
-        아무리 큰 입력이 들어와도 출력이 천장을 넘지 않는다.
-        4배 오버샘플링으로 클리핑 앨리어싱을 억제한다.
+        0.85 아래는 완전 선형이라 착색이 없고, 그 위는 1.0에 점근한다.
+        곡선은 4배 오버샘플링으로 적용해 클리핑 앨리어싱을 줄인다. 그런데 원래 표본률로 내리는
+        저역 통과 필터가 잘린 모서리를 복원하면서 천장을 넘는 봉우리가 다시 생긴다(Gibbs 현상).
+        곡선이 1을 넘지 않는 것만으로는 출력이 천장 아래라는 보장이 되지 않는다.
+        그래서 원래 표본률에서 천장으로 한 번 더 묶는다.
+      </p>
+      <div class="blk">x ─▶ <b>소프트 클리퍼</b> <i>4x</i> ─▶ <b>천장 묶음</b> <i>±10^(CEILING/20), 원래 표본률</i> ─▶ out</div>
+      <div class="tw"><table>
+        <thead><tr><th>최악 조건 (천장 −0.3 dBFS)</th><th>묶음 없이</th><th>묶음 뒤</th></tr></thead>
+        <tbody>
+          <tr><td>100 Hz 사각파 0 dBFS, OUTPUT +12 dB</td><td class="m">+0.32 dBFS</td><td class="m">−0.30 dBFS</td></tr>
+          <tr><td>임펄스열 +12 dBFS, OUTPUT +12 dB</td><td class="m">+2.97 dBFS</td><td class="m">−0.30 dBFS</td></tr>
+          <tr><td>40 Hz 사인 −6 dBFS, INPUT +24 dB</td><td class="m">−0.62 dBFS</td><td class="m">−0.62 dBFS</td></tr>
+          <tr><td>1 kHz 좌우 역상 −6 dBFS, 폭 200 %, OUTPUT +12 dB</td><td class="m">−0.50 dBFS</td><td class="m">−0.59 dBFS</td></tr>
+        </tbody>
+      </table></div>
+      <p>
+        넘침은 작고 드물어 마지막 묶음이 만드는 앨리어싱은 무시할 만하다.
+        보장하는 것은 <strong>표본</strong> 최댓값이다. 재생 장치의 재구성 필터가 표본 사이에서 만드는
+        봉우리(true peak)는 따로 계산하지 않는다.
       </p>
       <p>
-        배치는 스테레오 폭 조절 <strong>뒤</strong>다. 폭을 넓히면 사이드 성분이
+        배치는 스테레오 폭 조절과 출력 게인 <strong>뒤</strong>, 체인의 가장 끝이다.
+        출력 게인을 올려도 천장을 넘지 않는 것은 이 때문이다. 폭을 넓히면 사이드 성분이
         더해져 피크가 다시 상승하므로, 그 앞에 두면 천장 보장이 깨진다.
       </p>
       <div class="nb">
@@ -870,23 +1310,27 @@ w = STEREO WIDTH / 100     <i>(0 = 모노, 1 = 원본, 2 = 사이드 2배)</i></
   <h2><span class="n">03</span>대역 확장</h2>
   <div class="rd">
     <p>
-      손실 압축으로 제거된 고역을 하모닉 전사로 합성한다.
-      단시간 푸리에 변환 영역에서 동작하며, 프레임 길이 4096,
-      홉 1024(75% 중첩), 한 창을 사용한다.
+      손실 압축으로 제거된 고역을 원음 윗대역의 주파수 이동 복사로 채우고,
+      그 포락선을 원음 스펙트럼의 기울기를 이어 그린 곡선에 맞춘다.
+      원음은 바꾸지 않고 곡선보다 모자란 에너지만 더한다.
+      보간도 브라우저에 맡기지 않고 직접 계산한다(입력 나이퀴스트의 99.5%까지 평탄, 200 dB).
     </p>
+    <div class="blk">원본 ─▶ <b>업샘플</b> ─▶ <b>컷오프·기울기</b> ─▶ <b>이동 복사</b> ─▶ <b>포락선·결</b> ─▶ <b>보충</b> ─▶ <b>DSP 체인</b> ─▶ 출력
+        <i>Kaiser sinc</i>                     <i>SSB</i>           <i>외삽 · γ</i>        <i>원음 + 합성분</i></div>
     <div class="tw"><table>
       <thead><tr><th>항목</th><th>96 kHz</th><th>192 kHz</th></tr></thead>
       <tbody>
-        <tr><td>주파수 분해능</td><td class="m">23.4 Hz</td><td class="m">46.9 Hz</td></tr>
-        <tr><td>프레임 시간 길이</td><td class="m">42.7 ms</td><td class="m">21.3 ms</td></tr>
-        <tr><td>홉 시간 간격</td><td class="m">10.7 ms</td><td class="m">5.3 ms</td></tr>
+        <tr><td>프레임 길이</td><td class="m">2048 (21.3 ms)</td><td class="m">4096 (21.3 ms)</td></tr>
+        <tr><td>홉</td><td class="m">512 (5.3 ms)</td><td class="m">1024 (5.3 ms)</td></tr>
+        <tr><td>주파수 분해능</td><td class="m">46.9 Hz</td><td class="m">46.9 Hz</td></tr>
+        <tr><td>컷오프 판정 분해능</td><td class="m">23.4 Hz</td><td class="m">23.4 Hz</td></tr>
         <tr><td>표현 가능 상한</td><td class="m">48 kHz</td><td class="m">96 kHz</td></tr>
       </tbody>
     </table></div>
     <p>
-      192 kHz에서는 같은 프레임 길이가 시간상 절반이 되므로 시간 분해능이 높아지는
-      대신 주파수 분해능이 절반으로 떨어진다. 저역 배음 구조의 식별력이 낮아지지만,
-      대역 확장이 관심을 두는 영역은 고역이라 실무상 문제가 되지 않는다.
+      프레임 길이를 시간으로 고정해 두 레이트의 시간·주파수 분해능을 같게 했다.
+      창은 Hann, 중첩은 75%다. 복원은 DSP 체인 앞에서 하므로 LIVE와 내보내기의 순서가 같고,
+      체인 끝 MASTERING의 천장이 복원 뒤까지 지켜진다.
     </p>
   </div>
 
@@ -912,7 +1356,56 @@ w = STEREO WIDTH / 100     <i>(0 = 모노, 1 = 원본, 2 = 사이드 2배)</i></
       악기의 배음 포락선은 대체로 −6 ~ −12 dB/oct 기울기를 가진다.
       부호화가 만든 절벽은 이보다 훨씬 가파르며, 이 불연속이
       가청 대역 밖에 있더라도 경계 부근의 인접 대역 인지에 영향을 준다.
+      비트가 빠듯하면 부호화기가 최상단 대역을 프레임마다 버렸다 살렸다 하므로,
+      차단점 바로 아래가 시간에 따라 깜빡이기도 한다.
     </p>
+  </div>
+
+  <h3 id="sbr-up">표본률 변환</h3>
+  <div class="rd">
+    <p>
+      Kaiser 창을 씌운 sinc로 입력을 보간한다. 방향에 따라 두 갈래이며, 통과대역을 가르는 날카로운 거름은
+      두 배 ~ 네 배 표본률에서 겹쳐 저장 FFT 합성곱으로 한 번 걸고, 나머지는 거울상이 멀리 있는 짧은 다상 단이 맡는다.
+      다상 단은 출력/입력 레이트의 기약분수 L/M에서 위상 L개를 모두 미리 계산한다(44.1 → 96 kHz는 320/147).
+    </p>
+    <div class="tw"><table>
+      <thead><tr><th>항목</th><th>올림 (보간)</th><th>내림</th></tr></thead>
+      <tbody>
+        <tr><td>목표</td><td>원본을 그대로 옮김 — 비용 무관</td><td>원본을 지키며 효율 우선</td></tr>
+        <tr><td>통과대역</td><td class="m">입력 나이퀴스트 × 0.995까지 평탄</td><td class="m">출력 나이퀴스트 × 0.98까지 평탄</td></tr>
+        <tr><td>저지대역</td><td class="m">입력 나이퀴스트부터 200 dB (β = 21.08)</td><td class="m">출력 나이퀴스트부터 180 dB (β = 18.88)</td></tr>
+        <tr><td>날카로운 거름</td><td class="m">입력 × 2 표본률, 10,701탭 (44.1 kHz)</td><td class="m">출력 × 2 ~ × 4 표본률</td></tr>
+        <tr><td>짧은 단</td><td>뒤에 다상 단 하나</td><td>입력 ≥ 출력 × 4면 앞에 반감 단, 뒤에 다상 단</td></tr>
+        <tr><td>가중 · 계산 정밀도</td><td colspan="2">배정밀도, 선형 위상, 시간 정렬 오차 0표본</td></tr>
+      </tbody>
+    </table></div>
+    <p>
+      짧은 다상 단은 차단을 단의 입력 나이퀴스트에, 저지 시작을 단의 입력 표본률 − 내용 상한에 둔다. 첫 거울상이 저지대역 안에 있어야
+      위상마다 직류 이득을 1로 맞추는 정규화가 통과대역 이득을 틀지 않는다. 같은 입력을 libsoxr(SoX)와 대조한 값은 다음과 같다.
+    </p>
+    <div class="tw"><table>
+      <thead><tr><th>변환 · 항목</th><th>이 프로그램</th><th>SoX VHQ (28비트 · 95%)</th><th>SoX 최고 설정</th></tr></thead>
+      <tbody>
+        <tr><td>44.1 → 96, 21.9 kHz 응답</td><td class="m">0.0000 dB</td><td class="m">−71.4 dB</td><td class="m">−0.0075 dB (33비트 · 99.5%)</td></tr>
+        <tr><td>44.1 → 96 / 384, 거울상 최대</td><td class="m">−166.8 / −170.8 dBc</td><td class="m">−168.7 / −172.0 dBc</td><td class="m">−166.6 / −168.8 dBc</td></tr>
+        <tr><td>96 → 44.1, 21.6 kHz 응답</td><td class="m">0.0000 dB</td><td class="m">−13.5 dB</td><td class="m">−0.0042 dB (28비트 · 98%)</td></tr>
+        <tr><td>96 / 48 / 384 → 44.1, 에일리어싱 최대</td><td class="m">−164.8 / −159.4 / −168.7 dBc</td><td class="m">−164.8 / −159.4 / −170.6 dBc</td><td class="m">같음</td></tr>
+        <tr><td>997 Hz 잔차 최대 (올림 / 내림)</td><td class="m">−180.5 / −179.7 dBc</td><td class="m">−180.7 / −180.0 dBc</td><td class="m">−180.4 / −179.6 dBc</td></tr>
+      </tbody>
+    </table></div>
+    <p>
+      단 사이 버퍼는 배정밀도라 반올림은 마지막에 한 번뿐이고, 다상 단은 입력을 블록마다 여백과 함께 옮겨 담아 전체를 복사하지 않는다. float32 중간 버퍼 때와 메모리 · 속도가 같고(±7%), 192 → 48 kHz 에일리어싱이 −149.7에서 −158.1 dBc로 SoX와 같아졌다. 실제 Chromium에서 96 kHz 24비트 파일을 44.1 kHz로 내리면 1 kHz는 0.00 dB, 30 kHz 사인이 접힐 자리(14.1 kHz)는 −171.2 dBc다.
+      10초 모노 처리 시간은 올림 0.29 ~ 0.45 s, 내림 0.27 ~ 0.48 s다.
+    </p>
+    <div class="nb warn">
+      <span class="t">브라우저 변환에 맡기지 않는 이유</span>
+      <p>
+        재생 노드가 표본률이 다른 버퍼를 읽을 때의 변환 품질은 명세가 정하지 않는다.
+        선형 보간으로 구현된 환경에서는 응답이 sinc²이 되어 44.1 kHz 원본의
+        5 · 10 · 16 kHz가 −0.37 · −1.49 · −3.94 dB 깎이고, 원래 나이퀴스트 위에
+        윗옥타브 대비 −12 ~ −25 dB의 거울상이 남는다. 확장을 끄면 이 거울상이 그대로 출력된다.
+      </p>
+    </div>
   </div>
 
   <h3 id="sbr-detect">컷오프 판정</h3>
@@ -923,8 +1416,8 @@ w = STEREO WIDTH / 100     <i>(0 = 모노, 1 = 원본, 2 = 사이드 2배)</i></
     </p>
     <ol>
       <li>
-        <strong>평균 스펙트럼 수집.</strong> 파일 전체에서 최소 20개 지점을 표본
-        추출해 진폭 스펙트럼을 평균한다.
+        <strong>평균 스펙트럼 수집.</strong> 파일 전체에 고르게 퍼진 64개 지점을 채널마다 골라
+        진폭과 파워를 평균한다.
       </li>
       <li>
         <strong>평활과 dB 변환.</strong> 9빈 이동 평균 후 dB로 변환한다.
@@ -935,14 +1428,26 @@ w = STEREO WIDTH / 100     <i>(0 = 모노, 1 = 원본, 2 = 사이드 2배)</i></
         대부분의 음악에서 에너지가 집중되고 부호화기가 가장 보존하는 대역이다.
       </li>
       <li>
-        <strong>1차 탐색.</strong> 상한은 샘플레이트의 1/4이다.
-        업샘플링으로 생긴 빈 영역을 탐색 대상에서 제외한다.
+        <strong>1차 탐색.</strong> 상한은 원본 나이퀴스트와 목표 나이퀴스트 중 낮은 쪽이다.
+        그 위는 원본에 처음부터 없던 자리다.
         여기서 하강하며 연속 12빈 평균이 <code>기준 − 30 dB</code>를 넘는
         최초 지점을 차단점으로 본다.
       </li>
       <li>
         <strong>절벽 검증.</strong> 차단점 위 12빈이 아래보다 15 dB 이상 낮지 않으면
         절벽이 아니라고 판단하고, 인접 12빈 평균차가 20 dB를 넘는 지점을 재탐색한다.
+      </li>
+      <li>
+        <strong>확장 여부.</strong> 차단점이 목표 나이퀴스트의 95% 이상이면 확장하지 않는다.
+        원본이 이미 고해상도라 채울 대역이 없는 경우다.
+      </li>
+      <li>
+        <strong>기울기 적합.</strong> 차단점의 0.5 ~ 0.85배를 1/12옥타브 대역으로 나눠,
+        로그 주파수에 대한 대역 레벨(dB)의 직선을 구한다. −24 ~ 0 dB/oct로 제한한다.
+      </li>
+      <li>
+        <strong>전이 시작.</strong> 차단점에서 하강하며 평균 파워가 적합선의 −1.5 dB 안에 드는
+        첫 지점이다(차단점의 0.8 ~ 1배). 부호화기의 전이대와 깜빡이는 최상단 대역이 여기서 시작한다.
       </li>
     </ol>
     <div class="tw"><table>
@@ -951,96 +1456,201 @@ w = STEREO WIDTH / 100     <i>(0 = 모노, 1 = 원본, 2 = 사이드 2배)</i></
         <tr><td class="m">−30 dB</td><td class="m">1/31.6</td><td>실질 신호 유무 판정. 이 아래는 누설·잡음 수준</td></tr>
         <tr><td class="m">−15 dB</td><td class="m">1/5.6</td><td>절벽 여부 검증</td></tr>
         <tr><td class="m">−20 dB</td><td class="m">1/10</td><td>재탐색 시 급락 기준</td></tr>
+        <tr><td class="m">−1.5 dB</td><td class="m">1/1.19</td><td>전이 시작. 적합선 기준</td></tr>
       </tbody>
     </table></div>
   </div>
 
-  <h3 id="sbr-harm">배음 전사</h3>
+  <h3 id="sbr-shift">주파수 이동 복사</h3>
   <div class="rd">
     <p>
-      차단점 아래의 잔존 성분을 정수배 주파수 위치로 복사한다.
-      차수별 레벨은 고정 비율을 따르고 사용자 파라미터가 전체를 스케일링한다.
+      전이 시작 아래 한 옥타브 남짓 [c/2, f<sub>lo</sub>]를 원천으로 삼아,
+      원천 전체를 일정 간격씩 위로 옮긴 패치로 목표 나이퀴스트까지 덮는다.
+    </p>
+    <div class="eq">패치 간격 = 원천 폭 W − 겹침 v,     v = max(8빈, W/4)
+P<sub>m</sub>[k] = Σ<sub>p</sub> w<sub>p</sub>(k) · X<sub>m</sub>[k − s<sub>p</sub>] · i<sup>s<sub>p</sub>·m</sup>     <i>(홉 R = N/4)</i></div>
+    <p>
+      빈 번호에 일정한 수를 더하는 이동이므로 한 파티셜의 주엽 전체가 함께 옮겨져 모양이 보존된다.
+      프레임마다 곱하는 i<sup>s·m</sup>은 이어 붙인 프레임이 하나의 연속 변조가 되게 하는 위상 회전이다.
+      결과는 원천 대역을 s·Δf만큼 옮긴 단측파대(SSB) 변조와 같고, 곱하는 값이 1, i, −1, −i뿐이라 반올림 오차가 없다.
+      이웃 패치는 서로 다른 원천 빈에서 와 상관이 없으므로, 겹친 구간을 전력 상보(cos, sin) 가중으로 잇는다.
     </p>
     <div class="tw"><table>
-      <thead><tr><th>차수</th><th>2</th><th>4</th><th>8</th><th>16</th><th>32</th><th>64</th><th>128</th></tr></thead>
+      <thead><tr><th>컷오프 16 kHz</th><th>96 kHz</th><th>192 kHz</th></tr></thead>
       <tbody>
-        <tr><td>레벨</td><td class="m">1/2</td><td class="m">1/4</td><td class="m">1/8</td><td class="m">1/16</td><td class="m">1/32</td><td class="m">1/64</td><td class="m">1/128</td></tr>
-        <tr><td>dB</td><td class="m">−6</td><td class="m">−12</td><td class="m">−18</td><td class="m">−24</td><td class="m">−30</td><td class="m">−36</td><td class="m">−42</td></tr>
+        <tr><td>원천</td><td class="m">8.0 ~ 15.9 kHz</td><td class="m">8.0 ~ 15.9 kHz</td></tr>
+        <tr><td>패치 간격 / 겹침</td><td class="m">5.9 / 2.0 kHz</td><td class="m">5.9 / 2.0 kHz</td></tr>
+        <tr><td>패치 수</td><td class="m">6</td><td class="m">14</td></tr>
       </tbody>
     </table></div>
-    <p>
-      차수가 2배 될 때마다 −6 dB다. 주파수 축 로그 스케일에서 옥타브당 −6 dB 기울기에
-      해당하며, 현악기·관악기 배음 포락선의 전형적인 감쇠율과 일치한다.
-      이 때문에 합성된 고역이 원본 배음 구조의 연장선처럼 들린다.
-    </p>
-    <div class="eq">전체 스케일 = <b>0.5 + HF_SYNTH</b>     <i>(0.5 ~ 1.5, 최대 9.5 dB 범위)</i>
-
-차수 n의 유효 구간 = [ 차단점 × n/2 ,  차단점 × n ]</div>
-    <p>
-      구간이 연속되도록 설계되어 있다. 차수 2는 차단점부터 그 2배까지,
-      차수 4는 2배부터 4배까지를 담당한다. 슬라이더를 0으로 내려도
-      스케일이 0.5이므로 합성이 완전히 꺼지지는 않는다.
-    </p>
     <div class="nb warn">
-      <span class="t">위상 처리의 근사</span>
+      <span class="t">정수배 전사를 쓰지 않는 이유</span>
       <p>
-        전사 시 원본 빈의 위상을 그대로 사용한다. 엄밀하게는 주파수가 n배가 되면
-        위상도 n배가 되어야 시간 영역에서 배음 관계가 유지된다.
-        이 보정을 하지 않으므로 합성 성분은 원음과 위상이 정합되지 않는다.
-        해당 대역이 위상 인지 한계(약 1.5 kHz 이상에서는 파형 위상 감지 불가) 밖이라
-        청감상 문제로 드러나지 않지만, 원리적으로는 근사다.
+        이전 방식은 원천 빈 j를 jk로 옮겼다(k = 2, 4, … 128).
+        목표 구간에서 k칸마다 한 빈만 채워지므로 옥타브마다 성분 밀도가 절반이 되고,
+        모든 옥타브가 같은 원천 옥타브를 1/k로 되풀이해 경계마다 레벨이 튀었다(최대 4.2 dB).
+        반송파가 빈 중심에 묶여 k ≥ 4에서는 프레임 사이 위상이 어긋나 홉 주기로 +20 dB의 진폭 변조도 생겼다.
+        스펙트로그램에서 옥타브마다 결이 다른 계단 층으로 보이던 원인이다.
+      </p>
+    </div>
+    <p>
+      이동량이 기본음의 정수배가 아니면 옮긴 파티셜은 배음 격자에서 벗어난다. 16 kHz의 청각 필터(ERB 약 1.75 kHz)에는
+      파티셜 여럿이 함께 들어와 개별 위치보다 포락선의 주기가 음높이를 전하고, 단측파대 이동은 그 주기를 보존한다.
+      시간 구조도 그대로 옮겨져, 클릭 앞으로 번진 고역이 이전 방식의 −14.9 dB에서 −37.8 dB가 됐다.
+    </p>
+    <p>
+      위치까지 맞추려고, 한 음이 도드라지는 틀에서는 패치의 이동량을 그 음의 f<sub>0</sub>의 정수배로 맞춘다(f0 동기).
+      옮긴 배음이 (k + n)f<sub>0</sub>에 놓이고 간격은 f<sub>0</sub> 그대로다. f<sub>0</sub>는 원천 대역의 음 봉우리
+      (양옆 골보다 6 dB 이상, 순간 주파수가 0.5빈 안으로 3틀 이상 이어진 봉우리) 간격의 중앙값을 최소제곱으로 다듬어 구하고,
+      봉우리의 70% 이상이 그 정수배(±0.1) 위에 있을 때만 쓴다. 놓쳐도 8틀 동안 앞의 값을 붙든다. 회전은 소수 빈 이동량만큼 패치마다 누적한다.
+    </p>
+    <div class="eq">Δ<sub>p</sub> = round(s<sub>p</sub>Δf / f<sub>0</sub>) · f<sub>0</sub>,     θ<sub>p</sub>(m) = θ<sub>p</sub>(m−1) + (π/2)·Δ<sub>p</sub>/Δf     <i>f<sub>0</sub> ≤ vΔf/2</i></div>
+    <div class="tw"><table>
+      <thead><tr><th>44.1 kHz(16 kHz 차단) → 96 kHz</th><th>이동만</th><th>f0 동기</th></tr></thead>
+      <tbody>
+        <tr><td>한 음 220 Hz — 배음 격자 위 (±10 Hz)</td><td class="m">0%</td><td class="m">100%</td></tr>
+        <tr><td>한 음 — 채워진 배음 번호 16.5 ~ 24 / 24 ~ 40 kHz</td><td class="m">0/35 · 0/72</td><td class="m">34/35 · 72/72</td></tr>
+        <tr><td>두 음 220 · 277.18 Hz — ±10 / ±20 Hz</td><td class="m">26.1 · 45.3%</td><td class="m">32.2 · 49.8%</td></tr>
+        <tr><td>딸깍이 만든 복원분의 앞 번짐</td><td class="m">−31.8 dB</td><td class="m">−31.2 dB</td></tr>
+        <tr><td>채움 에너지 차 · 1/3옥타브 흔들림</td><td class="m">기준 · 0.14 dB</td><td class="m">0.1 dB 이내 · 0.14 dB</td></tr>
+      </tbody>
+    </table></div>
+    <div class="nb warn">
+      <span class="t">봉우리 단위 정수배 전치도 쓰지 않는 이유</span>
+      <p>
+        봉우리마다 주파수를 T배 하는 전치(Laroche–Dolson 1999, MPEG USAC eSBR)도 한 음의 격자 적중은 100%지만,
+        새 배음이 T번째마다만 채워져(17/35 · 30/72) 위의 층 문제를 되살리고, 봉우리마다 다른 양을 옮겨 틀 안의 시각이 깨진다.
+        과도음 틀에서 음 봉우리를 예측으로 잇는 보완을 더해도 딸깍만의 앞 번짐이 −28.7 dB로, 같은 때의 f0 동기(−31.2 dB)보다 나빴다.
       </p>
     </div>
   </div>
 
-  <h3 id="sbr-xf">교차 특성</h3>
-  <div class="rd">
+  <h3 id="sbr-seam">이음매</h3>
     <p>
-      원음과 합성음의 경계를 코사인 곡선으로 교차시킨다.
-      교차 시작점은 차단점의 75% 지점이다.
-    </p>
-    <div class="eq">t  = (k − 시작점) / (차단점 − 시작점)
-원음 가중 = 0.5 + 0.5·cos(π·t)     <i>1 → 0</i>
-합성 가중 = 1 − 원음 가중          <i>0 → 1</i></div>
-    <p>
-      가중치의 합이 1인 진폭 보존 교차다. 상관관계가 없는 두 신호를 섞을 때는
-      제곱합이 1인 전력 보존 교차가 적절하지만, 여기서는 합성음이 원음에서
-      파생되어 상관관계가 있으므로 진폭 보존이 맞다.
-      전력 보존을 쓰면 교차 중앙에서 약 3 dB 융기가 발생한다.
-    </p>
-    <p>
-      배음 차수 사이의 경계도 각 구간을 25% 침범하며 교차한다.
-      중첩 없이 이어 붙이면 경계마다 진폭 딥이 생기고,
-      주기적인 딥은 금속성 착색으로 들린다.
-    </p>
-  </div>
-
-  <h3 id="sbr-sm">스펙트럼 평활</h3>
-  <div class="rd">
-    <p>
-      합성 구간의 진폭에 가우시안 커널을 적용한다.
-      전사 과정에서 원본의 협대역 피크가 그대로 복사되면
-      고역에 고립된 정현파 성분으로 남아 금속성 울림을 만든다.
+      모자람 D² = r(k)·max(0, T² − ⟨|X|²⟩)에서 원음의 힘 ⟨|X|²⟩는 차단점을 넘지 않게 평균하고, 전이 구간 안에서는 ±2빈으로 좁힌다.
+      무게 r(k)는 전이 구간 앞쪽 4분의 1에서 0 → 1로 오르고 그 위는 1이다. 이전 판은 r을 차단점까지 천천히 올려 가운데가
+      (1 − r)⟨|X|²⟩ + rT²로 목표에 못 미쳤고, ±330 Hz 안팎의 넓은 평균이 차단점과 전이 윗부분의 급경사를 가로질러 원음을 부풀려 잡았다.
+      실제 코덱으로 압축한 30초 음악을 실제 Chromium에서 96 kHz로 업스케일해, 이음매 양옆 추세선 대비 딥 · 피크를 1/24옥타브로 쟀다.
     </p>
     <div class="tw"><table>
-      <thead><tr><th>SMOOTH</th><th>커널 반경</th><th>표준편차</th><th>탭 수</th><th>적용률</th><th>청감</th></tr></thead>
+      <thead><tr><th>실제 코덱 음원 → 96 kHz</th><th>곡 평균 딥 / 피크, 이전 → 지금</th><th>1초 블록 딥 중앙 · 최악 5%, 이전 → 지금</th></tr></thead>
       <tbody>
-        <tr><td class="m">0</td><td class="m">—</td><td class="m">—</td><td class="m">—</td><td class="m">0%</td><td>평활 없음. 또렷하나 피크 잔존</td></tr>
-        <tr><td class="m">20</td><td class="m">2</td><td class="m">0.92</td><td class="m">5</td><td class="m">20%</td><td>경미</td></tr>
-        <tr><td class="m">40</td><td class="m">2</td><td class="m">1.24</td><td class="m">5</td><td class="m">40%</td><td>기본. 대부분의 소스에 적정</td></tr>
-        <tr><td class="m">60</td><td class="m">3</td><td class="m">1.56</td><td class="m">7</td><td class="m">60%</td><td>거친 합성음 정돈</td></tr>
-        <tr><td class="m">80</td><td class="m">3</td><td class="m">1.88</td><td class="m">7</td><td class="m">80%</td><td>상당히 매끈</td></tr>
-        <tr><td class="m">100</td><td class="m">4</td><td class="m">2.20</td><td class="m">9</td><td class="m">100%</td><td>최대. 고역 질감이 무뎌짐</td></tr>
+        <tr><td>MP3 128 kbps</td><td class="m">−1.2 / +0.0 → +0.0 / +0.3 dB</td><td class="m">−1.0 · −2.0 → −0.2 · −0.8 dB</td></tr>
+        <tr><td>AAC 96 kbps</td><td class="m">−2.8 / +0.1 → −0.1 / +0.4 dB</td><td class="m">−1.3 · −2.0 → −0.2 · −0.9 dB</td></tr>
+        <tr><td>MP3 64 kbps</td><td class="m">−2.7 / −0.1 → −0.8 / +1.3 dB</td><td class="m">−2.3 · −4.3 → −1.0 · −2.4 dB</td></tr>
       </tbody>
     </table></div>
     <p>
-      평활은 진폭에만 적용하고 위상은 보존한다.
-      위상까지 평활하면 시간 영역에서 임펄스가 퍼져 트랜지언트가 뭉개진다.
+      64 kbps에 남은 값은 옮겨 붙인 원음의 굴곡(이음매 밖에서도 ±1.6 dB)과, 원음이 아직 제 레벨인 전이 아래쪽에서 틀마다 모자람만 채우는 치우침이다. 앞쪽을 줄이면 원음이 사라지는 쪽이 다시 파여 둘은 맞바꿈 관계다.
     </p>
     <p>
-      합성량이 클수록 돌출 피크도 많아지므로 SMOOTH를 함께 올리는 것이 일반적이다.
-      SYNTH 70 이상에서 심벌에 금속성이 들리면 SYNTH를 내리기 전에
-      SMOOTH를 먼저 올려 볼 가치가 있다.
+      곡 평균이 평평해도 틀마다는 계단이 생길 수 있다. MP3는 틀의 약 6%(128 kbps) ~ 3분의 1(64 kbps)에서 차단점 아래 최상단을 통째로 비우는데,
+      이전 판은 채우기 시작점을 곡 전체의 전이 시작점에 고정해 그 구멍을 원음으로 두었다. 이제 틀마다 전이 시작 아래로 내려가며 목표보다 30 dB 이상 낮은 빈이
+      4빈 넘게 이어지면 구멍으로 보고, 거기서부터(차단점의 75%까지) 무게 없이 다 채운다. 틀마다 이음매 양옆 직선 추세 대비 복원 쪽 − 원음 쪽 차이의 상위 5%가
+      MP3 128 kbps +9.9 → +4.8 dB, 64 kbps +42.6 → +8.8 dB로 줄었다(AAC 96 kbps는 구멍이 없어 +5.5 dB 그대로). 원음 최상단이 센 과도음 틀에서 복원 쪽이
+      한 계단 낮게 붙는 하위 5%(−2 ~ −8 dB)는 남는다.
+    </p>
+
+    <h3 id="sbr-mirror">조각의 반복 무늬</h3>
+    <p>
+      모든 조각이 같은 원천 [kA, kB]를 옮기면 원천 안의 무늬가 조각 간격마다 되풀이된다. 일부 조각은 원천 창을 뒤집어(목표 빈 k ← 원천 빈 c − k의 켤레,
+      틀마다 c만큼 회전) 붙이고, 넷째 조각부터 원천 창을 원천 폭의 ⅙ 안에서 아래로 민다. 뒤집을 조각은 √2 − 1, 밀 양은 황금비 수열로 정하고 첫 조각은 그대로 둔다.
+      c를 f0의 정수배로 맞추면 뒤집힌 배음도 격자에 놓이고, 과도음은 켤레와 회전이 상쇄되어 같은 시각에 놓인다.
+    </p>
+    <div class="tw"><table>
+      <thead><tr><th>MP3 128k 업스케일</th><th>잔결 자기상관 최대 (2 ~ 40 kHz 간격), 3.0.21 → 지금</th></tr></thead>
+      <tbody>
+        <tr><td>44.1 → 176.4 / 352.8 kHz</td><td class="m">0.46 / 0.55 → 0.10 / 0.12</td></tr>
+        <tr><td>48 → 192 / 384 kHz</td><td class="m">0.51 / 0.64 → 0.08 / 0.13</td></tr>
+        <tr><td>한 음 f0 동기 · 두 음 ±10 / ±20 Hz</td><td class="m">100% · 32.2 / 49.8 → 32.5 / 53.2%</td></tr>
+        <tr><td>1/3옥타브 연속성 · 딸깍만의 앞 번짐</td><td class="m">0.14 → 0.12 dB · −31.2 → −32.0 dB</td></tr>
+      </tbody>
+    </table></div>
+    <p>밀기만(⅓ · ½ · ⅔)으로는 0.3 안팎에서 멈추고 원천이 내려갈수록 번짐 · 연속성이 나빠졌으며, 거울만으로는 0.26 · 0.29였다. 둘째 조각부터 밀면(3.0.22) 두 음 ±20 Hz 47.2%, 번짐 −31.0 dB로 조금 나빠져 넷째 조각부터로 옮겼다. 이음매는 3.0.21과 ±0.1 dB 안에서 오르내립니다(MP3 64 kbps 틀별 계단 중앙 · 상위 5% +0.1 dB, 곡 평균 피크 +0.01 dB로 조금 크고, 딥 · 1초 블록 중앙은 조금 작음). 첫 조각과 전이 구간은 3.0.21과 같고, 차이는 측정 추세선이 걸치는 차단점의 1.5 ~ 1.8배 대역의 윗조각에서 온다.</p>
+
+    <h3 id="sbr-truth">정답 시험</h3>
+    <p>
+      무손실 원본(FLAC 96 kHz · 24비트)의 40초를 44.1 kHz로 내려 MP3 128k · MP3 96k · AAC 128k로 압축하고, 보간과 복원만 거쳐 96 kHz로 올린 결과를 원본과 비교했다.
+      LSD는 43 ms 틀마다 차단점 ~ 22 kHz의 dB 차이의 제곱평균제곱근, 청감 근사 오차는 이음매 주변 ERB 대역의 10 ms 음량(에너지^0.23) 차이다.
+    </p>
+    <div class="tw"><table>
+      <thead><tr><th>3.0.23 → 3.0.24</th><th>MP3 128k</th><th>MP3 96k</th><th>AAC 128k</th></tr></thead>
+      <tbody>
+        <tr><td>LSD (차단 ~ 22 kHz)</td><td class="m">16.5 → 11.0 dB</td><td class="m">15.9 → 11.6 dB</td><td class="m">14.9 → 11.0 dB</td></tr>
+        <tr><td>20 ~ 22 kHz 레벨 치우침</td><td class="m">+13.4 → +1.7 dB</td><td class="m">+14.5 → −0.1 dB</td><td class="m">+10.2 → +3.1 dB</td></tr>
+        <tr><td>전이 구간 · 차단 위 1 kHz 치우침</td><td class="m">+2.6 · +2.8 → −0.3 · −0.1 dB</td><td class="m">+2.5 · +3.0 → +0.1 · +0.7 dB</td><td class="m">+1.6 · +2.3 → −0.8 · −0.1 dB</td></tr>
+        <tr><td>이음매 계단 오차 (정답 대비 치우침)</td><td class="m">+3.4 → +2.3 dB</td><td class="m">+1.2 → +2.0 dB</td><td class="m">+5.7 → +4.5 dB</td></tr>
+        <tr><td>청감 근사 오차</td><td class="m">78.2 → 33.8%</td><td class="m">63.4 → 27.6%</td><td class="m">84.4 → 38.2%</td></tr>
+      </tbody>
+    </table></div>
+    <p>
+      전이 구간은 원음(정답 대비 0.87 · 0.89)과 빈마다 필요한 채움(0.37 · 0.38)의 합이 이미 1을 넘어, 더하기만으로는 곡 평균이 +0.9 ~ 1.0 dB 높게 남는다.
+      교차는 곡 평균을 맞추는 대신 틀별 계단 오차를 키웠고, 청감 근사 오차는 세 방식이 1%p 안이라 원음을 절반까지만 내리는 부분 교차를 택했다.
+      지킬 조건: 한 음 f0 동기 100%, 두 음 ±10 / ±20 Hz 51.6 / 60.0%, 딸깍만의 번짐 −34.1 dB, 반복 무늬 0.08 ~ 0.13.
+      더 넓힌 코덱의 LSD(3.0.23 → 3.0.24): MP3 VBR −V 6 15.8 → 11.9 dB, Vorbis −q 2 16.7 → 12.2 dB, Opus 32k 15.0 → 13.7 dB.
+      Opus는 차단점이 20 kHz라 S자가 차단점에서 시작해 20 ~ 22 kHz가 +7 dB 남짓 높다(자연 감쇠는 절대 주파수에 매여 있다).
+      LIVE의 복원 버퍼는 내보내기와 같은 변환 · 복원을 거쳐 표본 단위로 같다(HD 88.2 · UHD 176.4 kHz, 최대 차이 0).
+    </p>
+
+    <h3 id="sbr-env">포락선 외삽</h3>
+  <div class="rd">
+    <p>
+      옮긴 소리의 크기는 원천 대역의 모양이 아니라, 원음 스펙트럼의 기울기를 이어 그린 곡선 하나가 정한다.
+      패치의 경계가 레벨에 드러나지 않는 이유다.
+    </p>
+    <div class="eq">목표 T(f) [dB] = L<sub>m</sub> + ᾱ<sub>m</sub>·x − 1.5·max(0, x)² + 20·log<sub>10</sub>(0.5 + SYNTH)
+x  = log<sub>2</sub>(f / 차단점)
+ᾱ<sub>m</sub> = 전역 기울기 + 0.5 × (프레임 기울기 − 전역 기울기)     <i>±6 dB/oct 안, 50 ms 평활</i>
+L<sub>m</sub> = 이 프레임의 원천 대역 레벨을 ᾱ<sub>m</sub>로 차단점까지 연장한 값</div>
+    <p>
+      기울기를 프레임마다 절반만 따라가게 해, 밝은 순간에는 확장도 밝아지되 짧은 프레임의 적합 오차가
+      포락선을 흔들지 않게 했다. 목표선은 연장선에서 출발해 전이 구간에서는 원음의 실제 꺾임(전이 시작 바로 아래의 국소 기울기와 출발 레벨 차)을 따르고, 차단점 위에서는 코사인 S자로 30 dB를 1옥타브에 걸쳐 떨어진 뒤 나란히 간다. 시작 기울기가 0이라 이음매에 절벽이 없다. SYNTH 50이 이 곡선이고, 50 아래는 전체를 낮추며 50 위는 옥타브당 −3 dB의 거의 평탄한 선 쪽으로 옮겨 간다. 전이 구간은 부분 교차(원음 코사인 롤오프, 최저 절반 · 합성 페이드)다. 음악 끝(KNEE 2, AUTO는 목표선이 차단점보다 42 dB 낮아지는 곳, 24 ~ 48 kHz)부터 2옥타브에 걸쳐 30 dB를 더 줄이고, 합성분은 나이퀴스트의 70%부터 코사인으로 줄여 나이퀴스트에서 0이 된다. 스테레오는 가운데 · 옆으로 복원하고 옆 합성분에 +6 dB를 곱한다. 결 고르기(강도 12 × SMOOTH)는 치는 순간에는 걸지 않고, 음이 뚜렷한 틀(원음 대역 평탄도 0.15 ~ 0.45)에는 AUTO %가 정한 강도(0.1 ~ 0.25)를 쓴다. AUTO는 무손실 원본 네 곡의 조합 전체 측정에서 두 곡 이상이 모두 좋아진 규칙(저역 기울기 ≤ −14.8 dB/oct → ATTACK −3 dB, 국소 기울기 > −21.9 dB/oct → KNEE 차단점 + 0.5 kHz)과 교차검증한 결 고르기 강도를 비율만큼 건다(기본 75%: 정답 점수 합계 −4.58, 딸깍 −33.9 dB, 두 음 적중 50.1%). 프리셋 판은 기준 탭이 AUTO %를, 나머지 탭(밝기 · 질감 · 공간 · 음악 종류 · 초고역)이 AUTO 값에 대한 가감을 정하며 탭마다 하나씩 골라 더한다. 출력 등급은 HD(88.2 · 96) · ULTRA HD(176.4 · 192) · eXtreme HD(352.8 · 384 kHz)이고 파일 꼬리표는 _HD · _UHD · _XHD다.</p>
+    <div class="tw"><table>
+      <thead><tr><th>SYNTH</th><th>곡선 대비</th><th>의미</th></tr></thead>
+      <tbody>
+        <tr><td class="m">0</td><td class="m">—</td><td>확장하지 않고 업샘플만</td></tr>
+        <tr><td class="m">50</td><td class="m">0 dB</td><td>원음 기울기의 연장선 위. ULTRA · eXtreme HD 기본</td></tr>
+        <tr><td class="m">60</td><td class="m">+0.8 dB</td><td>HD 기본</td></tr>
+        <tr><td class="m">100</td><td class="m">+3.5 dB</td><td>최대</td></tr>
+      </tbody>
+    </table></div>
+    <p>
+      채우는 양은 원음이 이미 가진 에너지를 먼저 빼고 정한다.
+    </p>
+    <div class="eq">채울 파워 = r(k) · max(0, T² − 원음 파워의 국소 평균)
+r(k) = 전이 시작에서 0, 차단점에서 1로 오르는 올림 코사인, 그 위는 1
+출력 = 원음 + 합성분</div>
+    <p>
+      전이 시작 아래는 원음이 한 표본도 바뀌지 않는다. 부호화기의 전이대와,
+      최상단 대역이 비는 프레임에서는 빈 만큼만 채워진다. 원음과 합성이 같은 자리에서 겹쳐 두꺼워지지 않는다.
+    </p>
+  </div>
+
+  <h3 id="sbr-sm">결 평탄화</h3>
+  <div class="rd">
+    <p>
+      옮긴 스펙트럼의 미세 구조(국소 평균에 대한 비)에 지수 γ를 걸어 위로 갈수록 음의 봉우리를 눕힌다.
+      결과는 국소 평균 파워가 1이 되도록 다시 맞추므로 레벨은 목표 곡선만이 정한다. SMOOTH가 이 속도를 정한다.
+    </p>
+    <div class="eq">γ(x) = 1 / (1 + 3 · SMOOTH · max(0, x))     <i>차단점에서 γ = 1</i></div>
+    <div class="tw"><table>
+      <thead><tr><th>SMOOTH</th><th>+½ oct</th><th>+1 oct</th><th>+1.58 oct</th><th>+2.58 oct</th><th>청감</th></tr></thead>
+      <tbody>
+        <tr><td class="m">0</td><td class="m">1</td><td class="m">1</td><td class="m">1</td><td class="m">1</td><td>원천의 결 그대로. 음 봉우리가 높은 곳까지 남음</td></tr>
+        <tr><td class="m">35</td><td class="m">0.66</td><td class="m">0.49</td><td class="m">0.38</td><td class="m">0.27</td><td>ULTRA · eXtreme HD 기본</td></tr>
+        <tr><td class="m">40</td><td class="m">0.63</td><td class="m">0.45</td><td class="m">0.35</td><td class="m">0.24</td><td>HD 기본. 대부분의 소스에 적정</td></tr>
+        <tr><td class="m">70</td><td class="m">0.49</td><td class="m">0.32</td><td class="m">0.23</td><td class="m">0.16</td><td>컷오프가 낮은 소스의 금속성 억제</td></tr>
+        <tr><td class="m">100</td><td class="m">0.40</td><td class="m">0.25</td><td class="m">0.17</td><td class="m">0.11</td><td>최대. 위쪽이 거의 고른 잡음</td></tr>
+      </tbody>
+    </table></div>
+    <p>
+      진폭에만 적용하고 위상은 보존한다. 시간 구조가 그대로 남아 트랜지언트가 뭉개지지 않는다.
+      차단점에서 γ = 1이라 결이 원음과 이어지고, 위로 갈수록 배음보다 잡음이 우세해지는
+      실제 악기의 경향과 같은 방향으로 바뀐다.
+    </p>
+    <p>
+      컷오프가 낮을수록 옮긴 파티셜의 비조화가 드러나기 쉬우므로 SMOOTH를 함께 올리는 것이 일반적이다.
+      심벌에 금속성이 들리면 SYNTH를 내리기 전에 SMOOTH를 먼저 올려 볼 가치가 있다.
     </p>
   </div>
 
@@ -1051,17 +1661,40 @@ w = STEREO WIDTH / 100     <i>(0 = 모노, 1 = 원본, 2 = 사이드 2배)</i></
       처리 전후 RMS를 비교해 증가분만 되돌린다.
     </p>
     <div class="eq">처리 후 RMS &gt; 원본 RMS × 1.01  인 경우에만
-    전체에 (원본 RMS / 처리 후 RMS) 적용
-
-이후 |x| &gt; 0.99 인 표본을 ±0.99로 클램프</div>
+    전체에 (원본 RMS / 처리 후 RMS) 적용</div>
     <p>
       1% 여유를 둔 단방향 보정이다. 커진 경우만 줄이고 작아진 경우는 두므로,
       기능을 켜고 끌 때 음량 차이가 최소화되어 A/B 비교가 공정해진다.
       레벨을 맞추지 않으면 단순히 커진 소리를 개선으로 오인하게 된다.
     </p>
     <p>
-      클램프는 0.99에서 하드 클리핑이다. 정합 후에도 피크가 남는 경우를 대비한
-      최종 보호이며, 정상 동작에서는 거의 개입하지 않는다.
+      표본을 따로 자르지 않는다. 복원이 체인 앞에 있으므로 봉우리는 체인 끝 MASTERING의 천장이 관리한다.
+      이전에는 체인 뒤에서 복원해 천장을 넘을 수 있었고, 이를 ±0.99 하드 클리핑으로 막았다.
+    </p>
+  </div>
+
+  <h3 id="sbr-meas">실측</h3>
+  <div class="rd">
+    <p>
+      정답을 아는 192 kHz 합성 음악(현·금관·베이스·하이햇·방 잡음)을 44.1 kHz로 내리고
+      16 kHz에서 잘라 96 kHz로 복원했다.
+    </p>
+    <div class="tw"><table>
+      <thead><tr><th>항목</th><th>정답</th><th>이전 방식</th><th>현재</th></tr></thead>
+      <tbody>
+        <tr><td>인접 1/12옥타브 대역 차의 표준편차</td><td class="m">0.26 dB</td><td class="m">1.05 dB</td><td class="m">0.25 dB</td></tr>
+        <tr><td>최대 도약</td><td class="m">0.6 dB</td><td class="m">4.2 dB</td><td class="m">0.5 dB</td></tr>
+        <tr><td>원음 구간 12 ~ 14.4 kHz 변화</td><td class="m">—</td><td class="m">−4.9 dB</td><td class="m">0.00 dB</td></tr>
+        <tr><td>35 kHz 스펙트럼 평탄도</td><td class="m">−0.1 dB</td><td class="m">−6.7 dB</td><td class="m">−0.8 dB</td></tr>
+        <tr><td>홉 주기 진폭 변조 봉우리</td><td class="m">—</td><td class="m">+20 dB</td><td class="m">없음</td></tr>
+        <tr><td>확장 대역의 정답 대비 평균 오차</td><td class="m">—</td><td class="m">11.8 dB</td><td class="m">0.7 dB</td></tr>
+      </tbody>
+    </table></div>
+    <p>
+      컷오프 11 · 19.5 kHz, 192 kHz, 최상단 대역이 프레임마다 깜빡이는 원본까지 여덟 조건에서
+      표준편차는 0.22 ~ 0.29 dB(정답 0.14 ~ 0.27 dB, 이전 0.68 ~ 1.61 dB),
+      최대 도약은 0.5 ~ 1.0 dB(이전 2.2 ~ 7.0 dB)다. 깜빡이는 원본에서 최상단이 빈 프레임의
+      16 ~ 16.6 kHz가 정답보다 10 dB 넘게 빈 비율은 이전 96.5 %, 현재 9.4 %다.
     </p>
   </div>
 </section>
@@ -1182,11 +1815,12 @@ MP3 320k, 40대 청자 → [20 kHz, 15 kHz] = 없음</div>
     <div class="tw"><table>
       <thead><tr><th>소스</th><th>SYNTH</th><th>SMOOTH</th><th>근거</th></tr></thead>
       <tbody>
-        <tr><td>MP3 128 kbps</td><td class="m">60 ~ 75</td><td class="m">40 ~ 55</td><td>확장 구간이 넓고 상당 부분이 가청 영역</td></tr>
-        <tr><td>MP3 320 kbps</td><td class="m">40 ~ 55</td><td class="m">35 ~ 45</td><td>구간이 좁아 과도하면 이질감만 증가</td></tr>
-        <tr><td>AAC 256 kbps</td><td class="m">40 ~ 50</td><td class="m">40</td><td>차단이 완만해 절벽 판정이 불안정할 수 있음</td></tr>
-        <tr><td>오래된 아날로그 녹음</td><td class="m">50 ~ 65</td><td class="m">55 ~ 70</td><td>원본에 고역이 없던 것이라 평활을 높여 자연스럽게</td></tr>
-        <tr><td>무손실</td><td class="m">0 ~ 30</td><td class="m">—</td><td>가청 이득 없음. 보관 포맷 변환 목적일 때만</td></tr>
+        <tr><td>MP3 64 ~ 96 kbps</td><td class="m">50 ~ 55</td><td class="m">55 ~ 70</td><td>원천이 낮아 옮긴 파티셜의 비조화가 드러나기 쉬움</td></tr>
+        <tr><td>MP3 128 kbps</td><td class="m">50 ~ 60</td><td class="m">35 ~ 50</td><td>확장 구간이 넓고 일부가 가청 영역. 50이 원음 기울기의 연장선</td></tr>
+        <tr><td>MP3 320 kbps</td><td class="m">50</td><td class="m">30 ~ 40</td><td>구간이 좁고 대부분 가청 밖. 곡선 위 그대로</td></tr>
+        <tr><td>AAC 256 kbps</td><td class="m">50</td><td class="m">35 ~ 40</td><td>차단이 완만해 절벽 판정이 불안정할 수 있음</td></tr>
+        <tr><td>오래된 아날로그 녹음</td><td class="m">45 ~ 50</td><td class="m">55 ~ 70</td><td>절벽이 아니라 완만한 감쇠라 연장선도 가파르게 이어짐</td></tr>
+        <tr><td>무손실</td><td class="m">0 ~ 50</td><td class="m">—</td><td>원본 나이퀴스트 위만 채움. 가청 이득 없음</td></tr>
       </tbody>
     </table></div>
 
@@ -1194,92 +1828,208 @@ MP3 320k, 40대 청자 → [20 kHz, 15 kHz] = 없음</div>
     <ol>
       <li>시간-주파수 표시로 전환하고 표시 범위를 96 kHz로 고정한다.</li>
       <li>확장을 끈 상태로 차단점을 확인한다. 절벽이 없으면 확장 대상이 아니다.</li>
-      <li>확장을 켜고 채워진 영역의 질감을 관찰한다. 하부 무늬와 연속되면 정상이고, 무관한 균일 대역이면 SYNTH가 과도하다.</li>
+      <li>확장을 켜고 채워진 영역을 관찰한다. 차단점에서 레벨과 무늬가 끊김 없이 이어지고 위로 갈수록 고르게 옅어지면 정상이다. 경계에 밝은 띠가 보이면 SYNTH가 높다(50이 연장선).</li>
       <li>레벨을 정합한 상태에서 청감 비교한다. 심벌·하이햇·치찰음 구간을 중점적으로 듣는다.</li>
       <li>차이가 식별되지 않으면 해당 소스에 확장이 불필요하다고 판단한다.</li>
     </ol>
 
     <h3>과도 설정의 징후</h3>
     <ul>
-      <li><strong>심벌의 금속성 착색.</strong> 합성 배음이 원본과 조화하지 못하는 상태. SMOOTH를 올리거나 SYNTH를 내린다.</li>
+      <li><strong>심벌의 금속성 착색.</strong> 옮긴 파티셜의 음 봉우리가 높은 곳까지 도드라진 상태. SMOOTH를 올리거나 SYNTH를 내린다.</li>
       <li><strong>치찰음의 경직.</strong> 6~10 kHz 대역에 합성 성분이 과다. 차단점 판정이 낮게 잡혔을 가능성.</li>
-      <li><strong>무음 구간의 배경 잡음.</strong> 잔존 잡음 성분까지 전사된 상태. SYNTH를 내린다.</li>
+      <li><strong>무음 구간의 배경 잡음.</strong> 원음의 잔존 잡음까지 연장선으로 이어 그린 상태. SYNTH를 50 아래로 내린다.</li>
     </ul>
 
     <h3>다른 단과의 상호작용</h3>
     <p>
-      대역 확장과 EXCITER를 동시에 강하게 걸면 고역이 중복 강조된다.
-      두 처리가 같은 대역을 다르게 만들어내므로 합산 시 예측이 어렵다.
+      대역 확장은 체인 앞에서 원음에 한다. 따라서 EXCITER를 강하게 걸면
+      확장된 고역까지 다시 포화시켜 고역이 중복 강조된다.
       확장 효과를 판정할 때는 EXCITER를 포함한 다른 단을 모두 끄는 것이 좋다.
     </p>
     <p>
-      BBE의 HI DEF는 8 kHz 이상을 셸빙으로 들어올린다.
-      확장으로 새로 만든 성분까지 함께 증폭하므로, 확장을 켠 상태에서는
+      BBE의 HI DEF는 10 kHz 이상을 셸빙으로 들어올린다.
+      확장으로 새로 채운 성분도 체인을 지나며 함께 증폭되므로, 확장을 켠 상태에서는
       평소보다 낮은 값이 적절하다.
     </p>
   </div>
 </section>
 
 <!-- ============ 7 ============ -->
+<section id="bitdepth">
+  <h2><span class="n">07</span>비트 깊이와 출력</h2>
+  <div class="rd">
+    <p>
+      내보내기의 비트 깊이는 표본률과 따로 고른다. 16 · 24bit는 정수 PCM, 32bit는 IEEE float다.
+      16bit 이하 정수 원본을 그보다 깊게 쓰면 표본률 변환에 앞서, 원본 표본률에서 비트 깊이 향상을 거친다.
+      격자는 원본에만 있기 때문이다. 처리 순서는 향상 → 변환 → 복원 → 체인 → 인코딩이다.
+    </p>
+    <h3 id="bd-grid">격자 판별</h3>
+    <p>
+      b비트 정수 원본은 디코딩 뒤에도 모든 표본이 k/S 꼴이다. S는 디코더의 관례를 따른다.
+      Chromium은 음수를 2<sup>b−1</sup>, 양수를 2<sup>b−1</sup>−1로 나눠 ±1.0을 정수 범위 양 끝에 맞추고,
+      두 부호를 모두 2<sup>b−1</sup>로 나누는 구현도 있다. 부호마다 두 후보를 따로 시험해, 고르게 훑은 약 40만 표본에서
+      0이 아닌 것의 99.9%가 한 격자의 0.005 LSB 안에 들면 그 깊이로 판정한다(8 → 16 → 24 순).
+      2<sup>b−1</sup>−1로 나눈 값은 float32에 정확히 담기지 않아 허용 폭을 둔다.
+      24bit는 float32의 가수 정밀도가 격자 간격과 같아 2<sup>23</sup> 배율만 본다. 손실 압축과 float 원본은 격자가 없다.
+    </p>
+    <div class="eq">칸   C<sub>q</sub> = [ q − Δ/2 , q + Δ/2 ]        <i>Δ = 1/S, 부호별 S₊ · S₋</i>
+판정   | q·S − round(q·S) | ≤ 0.005 LSB     <i>부호별로 0이 아닌 표본의 99.9% 이상</i></div>
+    <h3 id="bd-deq">일관 재구성</h3>
+    <p>
+      디더 없이 반올림한 원본이라면 원래 값은 반드시 칸 안에 있었다(TPDF 디더 원본은 ±1.5 LSB까지 벗어날 수 있어 칸은 보수적 근사다). 칸과 모순되지 않는 추정을 일관 추정이라 한다(Thao · Vetterli 1994).
+      STFT(N = 2048, 홉 512, √Hann 분석 · 합성)에서 반올림 오차를 분산 Δ²/12의 백색 잡음으로 보고 위너 이득을 건다.
+      사전 SNR은 결정 유도 방식(Ephraim · Malah 1984)으로 시간 평활해 빈마다 켜졌다 꺼지는 음악적 잡음을 억제한다.
+    </p>
+    <div class="eq">잡음 전력(빈당)   P<sub>n</sub> = (Δ²/12) · Σw² = (Δ²/12) · N/2
+사후 SNR   γ<sub>k</sub> = |Y<sub>k</sub>|² / P<sub>n</sub>
+사전 SNR   ξ<sub>k</sub>(t) = α · G<sub>k</sub>(t−1)² · γ<sub>k</sub>(t−1) + (1−α) · max(γ<sub>k</sub>(t) − 1, 0)     <i>α = 0.98</i>
+이득   G<sub>k</sub> = max( ξ<sub>k</sub> / (1 + ξ<sub>k</sub>), 0.1 )
+사영   x̃ = min( max( x̂, q − Δ/2 ), q + Δ/2 )
+혼합   y = q + r · (x̃ − q)     <i>r = REFINE / 100</i></div>
+    <p>
+      칸은 볼록집합이라 혼합한 값도 칸 안에 있고, 결과는 원본에서 최대 ½ LSB다. 0이 64표본 넘게 이어지는 디지털 무음은 0으로 둔다.
+      사영과 필터를 번갈아 되풀이하는 방식(POCS)은 쓰지 않는다. 디더 없이 반올림한 원본에서는 2회째부터 오차가 커진다.
+    </p>
+    <h3 id="bd-shaped">셰이핑 원본</h3>
+    <p>
+      노이즈 셰이핑 디더는 오차 되먹임 q<sub>n</sub> = round(s<sub>n</sub> − Σ F<sub>j</sub>e<sub>n−j</sub> + d<sub>n</sub>)으로 반올림 잡음을
+      |1 − F(e<sup>iω</sup>)|² 모양으로 고역에 몬다(Wannamaker 1992). 오차가 칸을 여러 LSB 벗어나고 평탄 잡음 가정도 틀리므로,
+      잡음 모양을 추정해 주파수마다 다른 잡음 세기를 쓴다. 모든 채널의 틀별 스펙트럼(7빈 평활)을 보관하고 빈마다 10% 백분위를 구한다
+      (최소 통계법 계열, Martin 2001). 틀별 스펙트럼은 추정에만 쓰고 향상 전에 놓는다.
+    </p>
+    <div class="eq">잡음 세기   P̂<sub>k</sub> = L<sub>k</sub> / 0.4915     <i>L<sub>k</sub>: 7빈 평활 주기도의 10% 백분위, 배율은 백색 잡음 실측</i>
+판별   P̂(15–19.5 kHz) ≥ 10·P<sub>flat</sub>  이고  ≥ 3·P̂(3–5 kHz)     <i>P<sub>flat</sub> = (Δ²/12)·N/2</i>
+사용   P<sub>k</sub> = 평활 P̂<sub>k</sub> (8 kHz 위),  min(P̂<sub>k</sub>, P<sub>flat</sub>) (아래)
+칸   [q − KΔ, q + KΔ],   K = min(16, ⌈3σ⌉),   σ² = (2/N²)(P<sub>0</sub> + P<sub>N/2</sub> + 2ΣP<sub>k</sub>) / Δ²</div>
+    <p>
+      평탄 원본은 판별에 걸리지 않아 이전과 같다(±½ LSB). 실제 Chromium에서 F-가중 셰이핑 16비트 WAV를 24비트로 내보내면
+      오차 바닥이 −77.9 → −97.1 dBFS(19.2 dB)이고, 원본에서 벗어난 최대량은 정확히 K = 13 LSB다. 이전 판은 0.04 dB였다.
+    </p>
+
+    <h3 id="bd-meas">실측</h3>
+    <div class="tw"><table>
+      <thead><tr><th>참값을 아는 신호 → 16bit → 향상 (REFINE 100)</th><th>디더 없음</th><th>TPDF</th><th>Lipshitz 5차</th><th>F-가중 9차</th><th>개선 E-가중 9차</th></tr></thead>
+      <tbody>
+        <tr><td>성긴 음악 (−20 → −100 dBFS)</td><td class="m">6.8 dB</td><td class="m">6.3 dB</td><td class="m">18.7 dB</td><td class="m">19.2 dB</td><td class="m">18.3 dB</td></tr>
+        <tr><td>같은 음악 + 녹음 잡음 −110 dBFS</td><td class="m">6.2 dB</td><td class="m">5.8 dB</td><td class="m">18.2 dB</td><td class="m">18.9 dB</td><td class="m">18.2 dB</td></tr>
+        <tr><td>조용히 이어지는 음 −60 dBFS</td><td class="m">10.4 dB</td><td class="m">6.4 dB</td><td class="m">19.5 dB</td><td class="m">19.7 dB</td><td class="m">18.6 dB</td></tr>
+        <tr><td>촘촘한 음악 (배음 음 + 분홍 잡음 40%)</td><td class="m">0.4 dB</td><td class="m">1.3 dB</td><td class="m">2.4 dB</td><td class="m">3.3 dB</td><td class="m">4.3 dB</td></tr>
+        <tr><td>칸의 폭 K (추정 σ)</td><td class="m">½</td><td class="m">½</td><td class="m">7 (2.0)</td><td class="m">13 (4.2)</td><td class="m">16 (7.1)</td></tr>
+      </tbody>
+    </table></div>
+    <p>
+      음악의 이득을 막는 것은 칸의 폭이 아니라 분리다. 칸을 넓혀도 음악은 1.5 dB에 머물지만 사인은 17 dB까지 오른다.
+      잡음과 같은 세기로 같은 빈에 겹친 음악 성분까지 깎이기 때문이다. 디더 없이 반올림한 원본은 오차가 이미 칸 안에 고르게 퍼져 있어,
+      칸 안에서 신호와 무관하게 움직이는 추정은 오차 분산을 Δ²/12에서 Δ²/6으로 키울 수 있다. 4분 스테레오의 처리 시간은 Chromium에서 6.4 s다.
+    </p>
+    <h3 id="bd-dither">디더</h3>
+    <p>
+      정수로 쓸 때는 반올림 전에 TPDF 디더 d = u₁ − u₂ (u<sub>i</sub> ~ U[0, 1), 단위 LSB)를 더한다.
+      전체 오차의 1 · 2차 모멘트가 신호와 독립이 되고 분산은 Δ²/4다(Lipshitz · Wannamaker · Vanderkooy 1992).
+      원본 단위로 0.005 LSB 안에서 격자 위에 있는 표본은 디더 없이 정수로 쓴다. 난수는 시작값을 고정한 xorshift32라 출력이 결정적이다.
+    </p>
+    <div class="eq">16bit 출력의 오차 바닥   √(Δ²/4) = 2⁻¹⁶ → −96.3 dBFS      <i>디더 없음 √(Δ²/12) → −101.1 dBFS</i></div>
+    <h3 id="bd-scale">정수 배율</h3>
+    <div class="tw"><table>
+      <thead><tr><th>조건</th><th>음수 배율</th><th>양수 배율</th></tr></thead>
+      <tbody>
+        <tr><td>원본 격자 없음, 또는 출력이 원본보다 얕음</td><td class="m">2<sup>b−1</sup></td><td class="m">2<sup>b−1</sup> − 1</td></tr>
+        <tr><td>원본 격자 b₀ ≤ 출력 b</td><td class="m">S₋ · 2<sup>b−b₀</sup></td><td class="m">S₊ · 2<sup>b−b₀</sup></td></tr>
+      </tbody>
+    </table></div>
+    <p>
+      기본 배율은 Chromium 디코딩의 역이다. 모든 모듈을 끄고 원본과 같은 깊이로 쓰면 원본과 비트 단위로 같다
+      (실제 Chromium 종단 시험에서 100%). 16bit를 24bit로 넓힐 때는 원본 격자 위의 표본을 원본 정수의 256배로 정확히 쓰고,
+      향상으로 칸 안에서 움직인 값만 24bit에서 디더를 더해 반올림한다. 격자 위 판정을 원본 단위로 하는 것은
+      k/32767의 float32 반올림 오차가 24bit 단위로 0.4 LSB까지 커지기 때문이다.
+      이전 판은 두 부호 모두 2<sup>b−1</sup>−1배 해서 −6 dBFS를 넘는 음수 표본이 1 LSB씩 0 쪽으로 어긋났다.
+    </p>
+  </div>
+</section>
+
 <section id="limits">
-  <h2><span class="n">07</span>사양상 한계</h2>
+  <h2><span class="n">08</span>사양상 한계</h2>
   <div class="rd">
     <h3>설계상 타협</h3>
     <ul>
       <li>
-        <strong>포화 단의 잔류 앨리어싱 — 약 −80 dBFS.</strong>
-        4배 오버샘플링과 입력 대역 제한으로 발생 차수를 10.5차까지 밀어냈다.
-        아래 <a href="#alias-budget">잔류량 산정</a>에 수치를 명시했다.
+        <strong>포화 단의 앨리어싱 — 드라이브를 끝까지 올렸을 때 측정에 잡힌다.</strong>
+        오버샘플링은 재생 엔진이 허용하는 최대인 4배다. EXCITER와 SOUNDGOODIZER 고역은 포화 경로에만
+        입력 대역 제한을 두어 발생 차수를 10.5차까지 밀어냈고, TUBE는 음색을 지키려고 대역 제한을 두지 않는다.
+        아래 <a href="#alias-budget">실측</a>에 수치를 적었다.
         더 줄일 수단은 있으나 채택하지 않았으며, 그 판단 근거도 함께 적었다.
+      </li>
+      <li>
+        <strong>대역 확장의 외삽 — 옮겨 오는 것은 원천 대역의 소리다.</strong>
+        원천 대역과 실제 고역의 악기 구성이 다르면 그 비율까지는 되살리지 못한다.
+        차단점 위의 S자 감쇠(30 dB · 1옥타브)는 무손실 원본 한 곡으로 정한 잠정값이라, 고역이 더 뻗는 녹음에서는 실제보다 낮게, 더 일찍 꺾이는 녹음에서는 높게 그려질 수 있다.
+        차단점은 파일 전체에서 하나로 정하므로, 대역폭이 구간마다 크게 바뀌는 VBR 파일에서
+        전이 시작보다 더 낮게 끊긴 구간은 그 사이가 빈 채로 남는다.
+      </li>
+      <li>
+        <strong>배음 격자 맞춤은 한 음이 도드라질 때뿐이다.</strong>
+        여러 음이 섞여 한 f<sub>0</sub>로 설명되지 않는 틀은 원래 이동량을 쓰므로 옮긴 파티셜이 비조화다(두 음 시험 격자 위 32%).
+        21 ms 창에서 1 ~ 2빈으로 붙은 배음은 음 봉우리로 가려지지 않는다.
+      </li>
+      <li>
+        <strong>비트 깊이 향상의 폭은 내용에 달려 있다 — 성긴 음악 약 1비트(셰이핑 원본 약 3비트), 촘촘한 음악 0.1 ~ 0.7비트.</strong>
+        잡음과 같은 빈에 겹친 음악 성분은 분리할 수 없다. 셰이핑 판별은 조용한 순간의 바닥으로 하므로, 고역이 늘 크게 깔리고 중역은 조용한 드문 곡을 잘못 볼 수 있으며 그때 달라지는 양도 ±16 LSB 안이다
+        (<a href="#bd-meas">실측</a>). 희소성 기반 역양자화(Brauer 외 2016, Záviška 외 2021)는 변환을 수십 회 넘게
+        되풀이하는 반복 알고리즘이라 곡 단위 브라우저 처리에 맞지 않아 채택하지 않았다. 손실 압축 원본에는 격자가 없어 적용되지 않는다.
       </li>
     </ul>
 
-    <h3 id="alias-budget">잔류 앨리어싱 산정</h3>
+    <h3 id="alias-budget">앨리어싱 실측</h3>
     <p>
-      "완전 제거 불가"로만 적으면 쓸모가 없으므로 실제 크기를 계산해 둔다.
-      기준은 중간 드라이브의 tanh 포화와 일반적인 음악 스펙트럼이다.
+      "완전 제거 불가"로만 적으면 쓸모가 없으므로 실제 크기를 재 둔다.
+      배음이나 그 접힌 위치와 겹치지 않는 주파수의 사인을 넣고, 가청 대역 안에서 배음이 아닌 성분의 전력을
+      기본파 대비로 쟀다(48 kHz).
     </p>
-    <div class="eq">가청 앨리어싱 시작 차수 n = 3.5·sr / fc = 10.5   <i>(fc = sr/3)</i>
-
-16 kHz 성분의 중역 대비 레벨          −35 dB   <i>일반적 음악 스펙트럼</i>
-그 성분의 10.5차 배음 레벨            −45 dB   <i>tanh 포화</i>
-────────────────────────────────────────────
-접혀 들어오는 산물의 절대 레벨        <b>약 −80 dBFS</b></div>
+    <div class="eq">4배 오버샘플링에서 접힌 성분이 남을 조건   n·f &gt; 3.5·sr
+가청 앨리어싱 시작 차수 n = 3.5·sr / fc      <i>fc: 포화 입력의 상한</i>
+fc = sr/2 (대역 제한 없음) → 7차        fc = sr/3 (대역 제한) → 10.5차</div>
+    <div class="tw"><table>
+      <thead><tr><th>설정</th><th>5 kHz, −6 dBFS</th><th>12 kHz, −6 dBFS</th><th>16 kHz, −12 dBFS</th></tr></thead>
+      <tbody>
+        <tr><td>TUBE DRIVE 60, MIX 100</td><td class="m">−126 dB</td><td class="m">−125 dB</td><td class="m">−120 dB</td></tr>
+        <tr><td>TUBE DRIVE 100, MIX 100</td><td class="m">−53 dB</td><td class="m">−43 dB</td><td class="m">−49 dB</td></tr>
+        <tr><td>EXCITER DRIVE 100, MIX 100</td><td class="m">−101 dB</td><td class="m">−55 dB</td><td class="m">−63 dB</td></tr>
+        <tr><td>SOUNDGOODIZER D, AMOUNT·SAT 100</td><td class="m">−82 dB</td><td class="m">−53 dB</td><td class="m">−59 dB</td></tr>
+      </tbody>
+    </table></div>
+    <p>
+      가장 나쁜 값은 고역에 큰 사인을 넣고 드라이브를 끝까지 올린 경우다. TUBE DRIVE 100은 그리드를 10 V로 미는
+      강한 클리핑이라 고차 배음이 크다. 실제 음악에서 12 ~ 16 kHz 성분은 중역보다 30 ~ 40 dB 낮으므로,
+      같은 설정에서 접혀 들어오는 산물은 대략 −70 ~ −90 dBFS다. TUBE DRIVE 60 이하에서는 측정 한계에 가깝다.
+    </p>
     <div class="tw"><table>
       <thead><tr><th>비교 대상</th><th>레벨</th></tr></thead>
       <tbody>
-        <tr><td>잔류 앨리어싱</td><td class="m">−80 dBFS</td></tr>
+        <tr><td>극단 설정에서 음악의 앨리어싱</td><td class="m">−70 ~ −90 dBFS</td></tr>
         <tr><td>16비트 양자화 잡음 바닥</td><td class="m">−96 dBFS</td></tr>
         <tr><td>조용한 청취 환경의 암소음</td><td class="m">−60 ~ −70 dBFS 상당</td></tr>
       </tbody>
     </table></div>
-    <p>
-      양자화 바닥보다는 위지만 실제 청취 환경의 암소음보다 10 dB 이상 아래다.
-      드라이브를 최대로 올리고 16 kHz 부근에 에너지가 몰린 소스를 쓰는
-      극단적 조건에서만 측정에 잡히는 수준이다.
-    </p>
 
     <h4>더 줄이는 수단과 채택하지 않은 이유</h4>
     <p>
       체인 전체를 목표 레이트의 배수에서 렌더한 뒤 내리면 시작 차수가
-      배수만큼 밀린다. 구현해서 측정한 결과는 이렇다.
+      배수만큼 밀린다. 비용은 이렇다.
     </p>
     <div class="tw"><table>
-      <thead><tr><th>내부 렌더</th><th>시작 차수</th><th>잔류량</th><th>렌더 시간</th><th>피크 메모리</th></tr></thead>
+      <thead><tr><th>내부 렌더</th><th>시작 차수 (대역 제한 경로)</th><th>렌더 시간</th><th>피크 메모리</th></tr></thead>
       <tbody>
-        <tr><td class="m">1배 (현재)</td><td class="m">10.5차</td><td class="m">−80 dBFS</td><td class="m">기준</td><td class="m">220 MB</td></tr>
-        <tr><td class="m">2배</td><td class="m">21차</td><td class="m">−93 dBFS</td><td class="m">2배</td><td class="m">439 MB</td></tr>
-        <tr><td class="m">4배</td><td class="m">42차</td><td class="m">−106 dBFS</td><td class="m">4배</td><td class="m">879 MB</td></tr>
+        <tr><td class="m">1배 (현재)</td><td class="m">10.5차</td><td class="m">기준</td><td class="m">220 MB</td></tr>
+        <tr><td class="m">2배</td><td class="m">21차</td><td class="m">2배</td><td class="m">439 MB</td></tr>
+        <tr><td class="m">4배</td><td class="m">42차</td><td class="m">4배</td><td class="m">879 MB</td></tr>
       </tbody>
     </table></div>
     <p>5분 스테레오 48 kHz 기준. 채택하지 않은 이유는 세 가지다.</p>
     <ul>
       <li>
-        <strong>이득이 가장 필요 없는 곳에만 적용된다.</strong>
-        HD는 96 kHz, ULTRA HD는 192 kHz라 배수를 곱하면 브라우저 상한인
-        192 kHz를 넘는다. 실제로 배수를 쓸 수 있는 것은 16비트 표준 출력뿐인데,
-        그쪽은 양자화 바닥이 −96 dBFS라 −80을 −93으로 내려봐야 바닥에 묻힌다.
-        정작 정밀도가 높은 HD·UHD 경로에는 적용할 수 없다.
+        <strong>렌더 비용이 배수만큼 는다.</strong>
+        렌더 시간과 메모리가 배수에 비례하고, 표본률이 높은 출력일수록 여유가 없다.
+        Chromium의 오프라인 렌더 상한이 768 kHz라 384 kHz 출력은 두 배가 한계다.
       </li>
       <li>
         <strong>리샘플 단계가 1회에서 2회로 늘어난다.</strong>
@@ -1297,8 +2047,8 @@ MP3 320k, 40대 청자 → [20 kHz, 15 kHz] = 없음</div>
       <span class="t">설계 방침</span>
       <p>
         측정에 잡히는 수치를 명시하고 그대로 두는 편이,
-        들리지 않는 값을 더 깎으려고 새 아티팩트와 비용을 들이는 것보다 낫다고 판단했다.
-        더 낮은 잔류량이 필요한 작업이라면 HD 또는 ULTRA HD로 내보내면 된다.
+        극단 설정에서만 잡히는 값을 더 깎으려고 새 아티팩트와 비용을 들이는 것보다 낫다고 판단했다.
+        더 낮은 잔류량이 필요한 작업이라면 표본률 96 · 192 · 384로 내보내면 된다.
         그쪽은 나이퀴스트가 멀어 같은 조건에서 시작 차수가 훨씬 높다.
       </p>
     </div>
@@ -1327,6 +2077,7 @@ MP3 320k, 40대 청자 → [20 kHz, 15 kHz] = 없음</div>
     <p>
       판독에 실패하거나 8 ~ 192 kHz 범위를 벗어나면 장치 기본값으로 되돌아간다.
     </p>
+
   </div>
 </section>
 
@@ -1431,6 +2182,60 @@ MP3 320k, 40대 청자 → [20 kHz, 15 kHz] = 없음</div>
     var href = a.getAttribute('href');
     if (href === '#') { e.preventDefault(); toTop(); }
   });
+})();
+</script>
+<script>
+/* ============================================================
+   화면 색 고르기 — 상단 이동 바 오른쪽의 자동 · 야간 · 주간
+   ------------------------------------------------------------
+   고른 값은 이 브라우저에 기억해(asde.theme) 프로그램과 모든 문서에
+   같이 적용한다. 자동이면 data-theme을 두지 않아 컴퓨터의 다크 · 라이트
+   설정을 따른다. 그리기 전 적용은 <head>의 짧은 스크립트가 맡고,
+   여기서는 스위치를 붙이고 누른 값을 저장한다.
+   ============================================================ */
+(function () {
+  var KEY = 'asde.theme', root = document.documentElement;
+  var nav = document.querySelector('.hub-nav');
+  if (!nav || nav.querySelector('.hn-theme')) return;
+
+  function stored() {
+    try { var t = localStorage.getItem(KEY); return (t === 'dark' || t === 'light') ? t : 'auto'; }
+    catch (e) { return 'auto'; }                            // 저장소가 막힌 환경 — 이번 방문 동안만 적용된다
+  }
+
+  var OPTS = [
+    ['auto',  '자동', '자동 — 컴퓨터의 다크 · 라이트 설정을 따릅니다'],
+    ['dark',  '야간', '야간 — 늘 어두운 야간 콘솔(다크 모드)'],
+    ['light', '주간', '주간 — 늘 밝은 주간 콘솔(라이트 모드)']
+  ];
+  var box = document.createElement('div');
+  box.className = 'hn-theme';
+  box.setAttribute('role', 'group');
+  box.setAttribute('aria-label', '화면 색');
+  var btns = OPTS.map(function (o) {
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'hn-theme-btn';
+    b.textContent = o[1];
+    b.title = o[2];
+    b.setAttribute('data-choice', o[0]);
+    b.addEventListener('click', function () { choose(o[0], true); });
+    box.appendChild(b);
+    return b;
+  });
+
+  function choose(t, save) {
+    if (t === 'auto') root.removeAttribute('data-theme');
+    else root.setAttribute('data-theme', t);
+    btns.forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-choice') === t ? 'true' : 'false'); });
+    if (!save) return;
+    try { if (t === 'auto') localStorage.removeItem(KEY); else localStorage.setItem(KEY, t); } catch (e) {}
+  }
+
+  nav.appendChild(box);
+  choose(stored(), false);
+  // 다른 창(탭)에서 바꾸면 이 창도 따라간다
+  window.addEventListener('storage', function (e) { if (e.key === KEY || e.key === null) choose(stored(), false); });
 })();
 </script>
 </body>
