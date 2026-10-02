@@ -1092,11 +1092,15 @@ K(t) = 0.006 × (r_s / 7.6 µm) × (0.51 / v(t))² × (1 + 2·w)</div>
       <div class="tw"><table>
         <thead><tr><th>분리도 · 방위각</th><th>1 kHz</th><th>10 kHz</th><th>20 kHz</th></tr></thead>
         <tbody>
-          <tr><td>35 dB · 0°</td><td class="m">−35.2 dB</td><td class="m">−27.0 dB</td><td class="m">−26.4 dB</td></tr>
-          <tr><td>25 dB · 0.5°</td><td class="m">−24.2 dB</td><td class="m">−16.7 dB</td><td class="m">−16.2 dB</td></tr>
-          <tr><td>15 dB · 3°</td><td class="m">−14.1 dB</td><td class="m">−7.2 dB</td><td class="m">−6.7 dB</td></tr>
+          <tr><td>35 dB · 0°</td><td class="m">−37.3 dB</td><td class="m">−27.0 dB</td><td class="m">−26.3 dB</td></tr>
+          <tr><td>25 dB · 0.5°</td><td class="m">−25.9 dB</td><td class="m">−16.5 dB</td><td class="m">−15.8 dB</td></tr>
+          <tr><td>15 dB · 3°</td><td class="m">−14.7 dB</td><td class="m">−6.1 dB</td><td class="m">−5.4 dB</td></tr>
         </tbody>
       </table></div>
+      <p>
+        평탄 성분과 고역 통과 성분은 따로 반대 채널에 더해지므로 위상째 합쳐진다. 그래서 1 kHz 누설은 L1k보다 약 2.2 dB 작고,
+        10 kHz는 1 kHz보다 약 10 dB 크다(표는 48 kHz에서 이 식으로 계산한 값, 직접음 대비).
+      </p>
       <p>
         MM 카트리지는 코일 인덕턴스와 포노 입력의 부하 용량이 공진해 고역에 봉우리와 차단을 만든다.
         코일 0.5 H · 600 Ω, 부하 47 kΩ로 두면
@@ -1632,15 +1636,15 @@ r(k) = 전이 시작에서 0, 차단점에서 1로 오르는 올림 코사인, �
       옮긴 스펙트럼의 미세 구조(국소 평균에 대한 비)에 지수 γ를 걸어 위로 갈수록 음의 봉우리를 눕힌다.
       결과는 국소 평균 파워가 1이 되도록 다시 맞추므로 레벨은 목표 곡선만이 정한다. SMOOTH가 이 속도를 정한다.
     </p>
-    <div class="eq">γ(x) = 1 / (1 + 3 · SMOOTH · max(0, x))     <i>차단점에서 γ = 1</i></div>
+    <div class="eq">γ(x) = 1 / (1 + 12 · SMOOTH · max(0, x))     <i>차단점에서 γ = 1, SMOOTH는 0 ~ 1</i></div>
     <div class="tw"><table>
       <thead><tr><th>SMOOTH</th><th>+½ oct</th><th>+1 oct</th><th>+1.58 oct</th><th>+2.58 oct</th><th>청감</th></tr></thead>
       <tbody>
         <tr><td class="m">0</td><td class="m">1</td><td class="m">1</td><td class="m">1</td><td class="m">1</td><td>원천의 결 그대로. 음 봉우리가 높은 곳까지 남음</td></tr>
-        <tr><td class="m">35</td><td class="m">0.66</td><td class="m">0.49</td><td class="m">0.38</td><td class="m">0.27</td><td>ULTRA · eXtreme HD 기본</td></tr>
-        <tr><td class="m">40</td><td class="m">0.63</td><td class="m">0.45</td><td class="m">0.35</td><td class="m">0.24</td><td>HD 기본. 대부분의 소스에 적정</td></tr>
-        <tr><td class="m">70</td><td class="m">0.49</td><td class="m">0.32</td><td class="m">0.23</td><td class="m">0.16</td><td>컷오프가 낮은 소스의 금속성 억제</td></tr>
-        <tr><td class="m">100</td><td class="m">0.40</td><td class="m">0.25</td><td class="m">0.17</td><td class="m">0.11</td><td>최대. 위쪽이 거의 고른 잡음</td></tr>
+        <tr><td class="m">10</td><td class="m">0.62</td><td class="m">0.45</td><td class="m">0.34</td><td class="m">0.24</td><td>AUTO 0%</td></tr>
+        <tr><td class="m">40</td><td class="m">0.29</td><td class="m">0.17</td><td class="m">0.12</td><td class="m">0.07</td><td>AUTO 75% — HD · ULTRA · eXtreme HD 기본</td></tr>
+        <tr><td class="m">50</td><td class="m">0.25</td><td class="m">0.14</td><td class="m">0.10</td><td class="m">0.06</td><td>AUTO 100%</td></tr>
+        <tr><td class="m">100</td><td class="m">0.14</td><td class="m">0.08</td><td class="m">0.05</td><td class="m">0.03</td><td>최대. 위쪽이 거의 고른 잡음</td></tr>
       </tbody>
     </table></div>
     <p>
