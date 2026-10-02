@@ -6496,7 +6496,7 @@ function drawSpectrum() {
     document.getElementById('vuR').style.height = (vuPct * (0.9 + Math.random() * 0.2)) + '%';
 
     // Comp GR meter
-    const compNode = liveDSP.compressor;
+    const compNode = liveDSP.compBlock && liveDSP.compBlock.comp;   // 압축기는 COMPRESSOR 블록 안에 있다
     if (compNode && document.getElementById('compOn').checked) {
       const gr = Math.max(0, -compNode.reduction) * 4;
       document.getElementById('compMeter').style.width = Math.min(100, gr) + '%';
@@ -8092,7 +8092,8 @@ async function exportAudio() {
           setOverlayProg(Math.round(28 + chProg * 30),
             '고해상도 복원 합성 중... ' + Math.min(100,Math.round(chProg*100)) + '%',
             HD_PROGRESS_MSGS[Math.min(msgIdx, HD_PROGRESS_MSGS.length-1)]);
-        }
+        },
+        restoreOpts(pick.restore)   // 복원 손잡이(KNEE · ATTACK · SUSTAIN · WIDTH · AUTO) — LIVE와 같은 값으로
       );
     }
 
@@ -8131,7 +8132,7 @@ async function exportAudio() {
           if (_ENABLED_MAP[mod.id] && _EFFECT_MSGS[mod.id]) {
             _EFFECT_MSGS[mod.id].forEach(function(m){ _dspDetails.push(m); });
           }
-        }, restoreOpts(pick.restore));
+        });
       }
     }
     if (_dspDetails.length === 0) _dspDetails.push('▸ DSP 처리 중...');
@@ -8957,12 +8958,17 @@ drawTubeViz();
       }
     }
 
+    var liveFlipped = false;
     live.forEach(function (pair) {
       if (pair[0].checked !== pair[1]) {
         pair[0].checked = pair[1];
         pair[0].dispatchEvent(new Event('change', { bubbles: true }));
+        liveFlipped = true;
       }
     });
+    // LIVE가 켜진 채 그대로면 change가 일어나지 않아, 불러온 복원 손잡이가 미리듣기에 반영되지 않는다.
+    // 한 번 더 불러 둔다 — 다시 만들지는 setLiveHDMode가 캐시 키(손잡이 · 파일)를 비교해 정한다
+    if (!liveFlipped && typeof liveHDMode !== 'undefined' && liveHDMode !== 'off' && typeof setLiveHDMode === 'function') setLiveHDMode(liveHDMode);
   }
 
   function stamp() {
