@@ -2086,7 +2086,7 @@ body::after, body::before { display: none; }          /* 주사선·네온 번�
   color: color-mix(in srgb, var(--cap) var(--cap-ink), var(--text)); background: color-mix(in srgb, var(--cap) var(--cap-tint), var(--panel2));
 }
 .module.on .module-name[data-pos]::before { color: var(--on-cap); background: var(--cap); }
-.module-sub { font-family: var(--font-body); font-size: var(--fs-xs); color: var(--muted); opacity: 1; margin-left: 0; }
+.module-sub { font-family: var(--font-body); font-size: var(--fs-xs); color: var(--muted); opacity: 1; margin-left: 0; word-break: keep-all; overflow-wrap: anywhere; }
 .module-body { padding: 14px 16px 16px; }
 .module.folded > .module-body { display: none; }
 .module.folded > .module-header { border-bottom-color: transparent; }
@@ -2102,6 +2102,24 @@ body::after, body::before { display: none; }          /* 주사선·네온 번�
   transform: translateY(-2px) rotate(45deg); transition: transform .15s;
 }
 .module.folded .mod-fold::before { transform: translateX(-1px) rotate(-45deg); }
+
+/* 늘이기 단추 — 위아래 꺾쇠 두 개(늘이기), 늘인 카드는 안쪽을 향한 꺾쇠(줄이기). 타일에서 내용이 넘치는 카드 · 늘인 카드에만 보인다 */
+.mod-grow {
+  width: 22px; height: 22px; display: none; place-items: center; padding: 0; margin-right: -4px; cursor: pointer;
+  background: transparent; border: 1px solid transparent; border-radius: 5px; color: var(--muted); position: relative;
+}
+.mod-grow:hover { border-color: var(--border-hi); color: var(--text); }
+.mod-grow:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
+.mod-grow::before, .mod-grow::after {
+  content: ''; position: absolute; left: 50%; width: 6px; height: 6px; margin-left: -4px;
+  border-left: 2px solid currentColor; border-top: 2px solid currentColor;
+}
+.mod-grow::before { top: 3px; transform: rotate(45deg); }
+.mod-grow::after { bottom: 3px; transform: rotate(225deg); }
+.module.grown .mod-grow::before { top: -1px; transform: rotate(225deg); }
+.module.grown .mod-grow::after { bottom: -1px; transform: rotate(45deg); }
+.dsp-grid.tiles > .module.fx-ovf:not(.folded) .mod-grow,
+.dsp-grid.tiles > .module.grown:not(.folded) .mod-grow { display: grid; }
 
 /* 켜짐 스위치 — 빛나는 사각 단추 */
 .led-toggle input {
@@ -2411,11 +2429,15 @@ canvas.peq-vis.mon-vis { height: clamp(170px, 30vh, 280px); margin: 0; cursor: d
 .dsp-grid.tiles { grid-auto-rows: auto; row-gap: 16px; align-items: start; --fx-tile-h: 385px; }   /* MACRO 줄 한 칸만큼 높임 — 넘치는 카드는 그대로 셋 */
 .dsp-grid.tiles > .module:not(.hd-module) { height: var(--fx-tile-h, 350px); display: flex; flex-direction: column; }
 .dsp-grid.tiles > .module.folded:not(.hd-module) { height: auto; }
+.dsp-grid.tiles > .module.grown:not(.hd-module) { height: auto; }       /* 늘인 카드 — 내용 높이만큼, 그 줄만 길어진다 */
 .dsp-grid.tiles > .module:not(.hd-module) > .module-header { flex: 0 0 auto; }
 .dsp-grid.tiles > .module:not(.hd-module) > .module-body { flex: 1 1 auto; min-height: 0; overflow: hidden; }
 /* 켜진 카드만 안에서 스크롤한다. 넘치는 카드는 켜짐 · 꺼짐과 상관없이 스크롤바 자리를 늘 비워 켜고 꺼도 내용이 움찔하지 않는다 */
 .dsp-grid.tiles > .module.on:not(.hd-module) > .module-body { overflow-y: auto; }
 .dsp-grid.tiles > .module.fx-ovf:not(.hd-module) > .module-body { scrollbar-gutter: stable; }
+/* 넘치는 카드의 본문을 끝까지 굴린 뒤 더 굴려도 화면으로 넘기지 않는다. 넘기면 화면이 올라가 카드 아래쪽이
+   위에 붙은 이동 바 · 재생 줄 밑으로 들어가, 아래쪽 손잡이를 누르면 재생 줄이 눌렸다 */
+.dsp-grid.tiles > .module.on.fx-ovf:not(.hd-module) > .module-body { overscroll-behavior: contain; }
 /* 스크롤바 22px — 화살표 없이. 평소엔 손잡이 양옆을 비워 가볍게, 올리면 폭을 꽉 채운다 */
 .dsp-grid.tiles > .module > .module-body::-webkit-scrollbar { width: 22px; }
 .dsp-grid.tiles > .module > .module-body::-webkit-scrollbar-button { display: none; width: 0; height: 0; }
@@ -10977,6 +10999,42 @@ drawTubeViz();
       if (m && m.classList.contains('module')) setFold(m, true);
     });
   } catch (e) {}
+
+  // ── 카드 늘이기 ───────────────────────────────────────────
+  // 넓은 화면의 카드는 같은 높이의 타일이라, 손잡이가 많은 카드(VINYL은 내용이 타일의 약 2.8배)는 본문 안에서 굴려야 한다.
+  // 이 단추를 누르면 그 카드만 내용 높이만큼 늘어나 손잡이를 한 번에 다 보며 고칠 수 있다. 같은 줄의 다른 카드는 그대로이고
+  // 줄만 길어지므로 자리로 읽는 처리 순서는 그대로다. 단추는 내용이 넘치는 카드(또는 늘인 카드)에만 보이고, 고른 상태는 이 브라우저에 남는다
+  var GROW_KEY = 'asde.ui.grown';
+  function setGrow(mod, on) {
+    mod.classList.toggle('grown', on);
+    var b = mod.querySelector('.mod-grow');
+    if (b) {
+      b.setAttribute('aria-pressed', on ? 'true' : 'false');
+      b.setAttribute('aria-label', nameOf(mod) + (on ? ' 타일 높이로 줄이기' : ' 내용만큼 늘이기'));
+      b.title = on ? '타일 높이로 줄이기' : '내용만큼 늘이기 — 손잡이를 한 번에 다 봅니다';
+    }
+  }
+  function saveGrow() {
+    try {
+      localStorage.setItem(GROW_KEY, JSON.stringify(Array.prototype.map.call(
+        grid.querySelectorAll('.module.grown'), function (m) { return m.id; })));
+    } catch (e) {}
+  }
+  Array.prototype.forEach.call(grid.querySelectorAll('.module:not(.hd-module)'), function (m) {
+    var right = m.querySelector('.module-header-right');
+    if (!right) return;
+    var b = el('button', 'mod-grow');
+    b.type = 'button';
+    b.addEventListener('click', function () { setGrow(m, !m.classList.contains('grown')); saveGrow(); });
+    right.insertBefore(b, right.firstChild);
+    setGrow(m, false);
+  });
+  try {
+    (JSON.parse(localStorage.getItem(GROW_KEY) || '[]') || []).forEach(function (id) {
+      var m = document.getElementById(id);
+      if (m && m.classList.contains('module') && !m.classList.contains('hd-module')) setGrow(m, true);
+    });
+  } catch (e) {}
   if (foldAll) foldAll.addEventListener('click', function () {
     var mods = grid.querySelectorAll('.module');
     var fold = grid.querySelectorAll('.module.folded').length !== mods.length;
@@ -11631,14 +11689,22 @@ drawTubeViz();
   // 화면 스크롤 이어가기 — 켜진 카드 밖에서 휠을 굴리기 시작하면 휠이 0.4초 멈출 때까지 켜진 카드 본문이 휠을 받지 않게 비켜 둔다.
   // 화면이 올라가며 켜진 카드가 커서 밑으로 지나가도 화면 스크롤이 끊기지 않는다(브라우저의 매끄러운 스크롤 그대로).
   // 켜진 카드 안에서 굴리기 시작했으면 그 카드를 굴린다
-  var latchT = 0;
+  var latchT = 0, latchX = 0, latchY = 0;
+  function unlatch() { clearTimeout(latchT); grid.classList.remove('scroll-latch'); }
   window.addEventListener('wheel', function (e) {
     if (!tiles()) return;
+    latchX = e.screenX; latchY = e.screenY;
     var t = e.target, inOn = t && t.closest && t.closest('.dsp-grid.tiles > .module.on > .module-body');
     if (inOn && !grid.classList.contains('scroll-latch')) return;
     if (!grid.classList.contains('scroll-latch')) grid.classList.add('scroll-latch');
     clearTimeout(latchT);
-    latchT = setTimeout(function () { grid.classList.remove('scroll-latch'); }, 400);
+    latchT = setTimeout(unlatch, 400);
+  }, { capture: true, passive: true });
+  // 손을 움직이면(포인터가 실제로 6 px 넘게 옮겨 가면) 0.4초를 기다리지 않고 곧바로 푼다. 화면을 굴린 직후 카드로 옮겨
+  // 굴리거나 손잡이를 누르면 그 카드가 받는다. 화면이 굴러 내용이 커서 밑을 지나갈 때 오는 움직임 알림은 화면 좌표가 그대로라 풀지 않는다
+  window.addEventListener('pointermove', function (e) {
+    if (!grid.classList.contains('scroll-latch')) return;
+    if (Math.abs(e.screenX - latchX) + Math.abs(e.screenY - latchY) > 6) unlatch();
   }, { capture: true, passive: true });
 
   // 저장 표시 — 처리 순서(HD 복원 → 체인 → MASTERING)를 따라 카드와 흐름 지도 노드가 두 번 깜빡인다.
