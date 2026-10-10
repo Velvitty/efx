@@ -1087,19 +1087,21 @@ K(t) = 0.006 × (r_s / 7.6 µm) × (0.51 / v(t))² × (1 + 2·w)</div>
       </p>
 
       <h4>카트리지 (SEPARATION · AZIMUTH · LOAD CAP)</h4>
-      <div class="eq">누설(f) = L1k·(0.579 + 2.149·HP₁(f, 5 kHz)) + tan θ,   L1k = 10^(−SEP/20)
+      <div class="eq">누설(f) = L1k·(a + b·HP₁(f, 5 kHz)) + tan θ,   L1k = 10^(−SEP/20)
 합산 보정 n = 1 / (1 + 평탄 누설)</div>
       <div class="tw"><table>
         <thead><tr><th>분리도 · 방위각</th><th>1 kHz</th><th>10 kHz</th><th>20 kHz</th></tr></thead>
         <tbody>
-          <tr><td>35 dB · 0°</td><td class="m">−37.3 dB</td><td class="m">−27.0 dB</td><td class="m">−26.3 dB</td></tr>
-          <tr><td>25 dB · 0.5°</td><td class="m">−25.9 dB</td><td class="m">−16.5 dB</td><td class="m">−15.8 dB</td></tr>
-          <tr><td>15 dB · 3°</td><td class="m">−14.7 dB</td><td class="m">−6.1 dB</td><td class="m">−5.4 dB</td></tr>
+          <tr><td>35 dB · 0°</td><td class="m">−35.0 dB</td><td class="m">−27.0 dB</td><td class="m">−26.4 dB</td></tr>
+          <tr><td>25 dB · 0.5°</td><td class="m">−23.8 dB</td><td class="m">−16.5 dB</td><td class="m">−15.9 dB</td></tr>
+          <tr><td>15 dB · 3°</td><td class="m">−12.8 dB</td><td class="m">−6.1 dB</td><td class="m">−5.5 dB</td></tr>
         </tbody>
       </table></div>
       <p>
-        평탄 성분과 고역 통과 성분은 따로 반대 채널에 더해지므로 위상째 합쳐진다. 그래서 1 kHz 누설은 L1k보다 약 2.2 dB 작고,
-        10 kHz는 1 kHz보다 약 10 dB 크다(표는 48 kHz에서 이 식으로 계산한 값, 직접음 대비).
+        평탄 성분과 고역 통과 성분은 따로 반대 채널에 더해지므로 위상째 합쳐진다. 그래서 a, b는 그 표본률의 디지털 고역 통과의
+        복소 응답으로 |a + b·HP₁(1 kHz)| = 1, |a + b·HP₁(10 kHz)| = 2.5가 되게 푼다(48 kHz에서 a = 0.874, b = 1.832).
+        1 kHz 누설은 정확히 L1k, 10 kHz는 그보다 7.96 dB 크다. 크기만 더해 맞춘 예전 계수 0.579 · 2.149는 1 kHz 누설이
+        L1k보다 약 2.3 dB 작았다(표는 48 kHz에서 실제 누화 노드로 잰 값, 직접음 대비).
       </p>
       <p>
         MM 카트리지는 코일 인덕턴스와 포노 입력의 부하 용량이 공진해 고역에 봉우리와 차단을 만든다.
