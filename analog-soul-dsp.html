@@ -4635,17 +4635,24 @@ function buildVinylChain(ac, rpm45) {
   // ── 입력과 엘립티컬 EQ ──────────────────────────────────────────
   // 커팅 단계에서 150 Hz 아래의 좌우 차이를 없앤다. 저역의 역상 성분은
   // 홈을 수직으로 크게 흔들어 바늘이 튀기 때문에 실제 마스터링에서 늘 거친다.
+  // 옆(L−R) 성분만 고역 통과로 거르면 그 위상 회전 때문에 가운데와 옆이 어긋나 중역에서도 좌우가 섞인다
+  // (2차 150 Hz 하나: 왼쪽만 넣으면 오른쪽으로 300 Hz −8 dB, 1 kHz −19 dB). 그래서 옆은 LR4 고역 통과
+  // (버터워스 2차 둘), 가운데는 같은 위상의 2차 전역통과(= LR4 저역 + 고역)로 보내 두 성분의 위상을 맞춘다.
+  // 교차점 위에는 크기 차만 남아(1 kHz −72 dB), 아래로는 옆 성분이 옥타브당 24 dB로 줄어든다.
   V.in = G(1);
   const esp = ac.createChannelSplitter(2), emg = ac.createChannelMerger(2);
   const mL = G(0.5), mR = G(0.5), sL = G(0.5), sR = G(-0.5), mid = G(1), side = G(1);
-  const sHP = ac.createBiquadFilter(); sHP.type = 'highpass'; sHP.frequency.value = 150; sHP.Q.value = Q_BUTTER;
+  const sHP1 = ac.createBiquadFilter(), sHP2 = ac.createBiquadFilter(), mAP = ac.createBiquadFilter();
+  sHP1.type = sHP2.type = 'highpass'; sHP1.frequency.value = sHP2.frequency.value = 150; sHP1.Q.value = sHP2.Q.value = Q_BUTTER;
+  mAP.type = 'allpass'; mAP.frequency.value = 150; mAP.Q.value = Math.SQRT1_2;
   const sPos = G(1), sNeg = G(-1);
   V.in.connect(esp);
   esp.connect(mL, 0); esp.connect(mR, 1); mL.connect(mid); mR.connect(mid);
   esp.connect(sL, 0); esp.connect(sR, 1); sL.connect(side); sR.connect(side);
-  side.connect(sHP); sHP.connect(sPos); sHP.connect(sNeg);
-  mid.connect(emg, 0, 0); sPos.connect(emg, 0, 0);
-  mid.connect(emg, 0, 1); sNeg.connect(emg, 0, 1);
+  side.connect(sHP1); sHP1.connect(sHP2); sHP2.connect(sPos); sHP2.connect(sNeg);
+  mid.connect(mAP);
+  mAP.connect(emg, 0, 0); sPos.connect(emg, 0, 0);
+  mAP.connect(emg, 0, 1); sNeg.connect(emg, 0, 1);
 
   // ── 홈 신호 합류점 ──────────────────────────────────────────────
   const groove = G(1);
