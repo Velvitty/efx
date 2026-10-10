@@ -1712,6 +1712,7 @@ canvas.tube-vis {
   --log-past: #9ca6ae;    /* 진행 기록의 지난 줄 */
 
   /* 처리기 캡 색 — 앞판에 쓰는 색 */
+  --cap-peq: #8bbf62;     /* 잎 초록 */
   --cap-comp: #8da9c4;    /* 강철 파랑 */
   --cap-bbe: #4db6a9;     /* 청록 */
   --cap-tube: #e8904a;    /* 진공관 주황 */
@@ -1722,7 +1723,7 @@ canvas.tube-vis {
   --cap-master: #cfd6dc;  /* 은색 */
   --cap-hd: #a78bea;      /* 복원 보라 */
   /* 계기창 위에 켜지는 캡 색 — 어두운 창이라 두 모드 모두 밝은 값 */
-  --lit-comp: #8da9c4; --lit-bbe: #4db6a9; --lit-tube: #e8904a; --lit-exc: #d8bc4c; --lit-sg: #c977a9;
+  --lit-peq: #8bbf62; --lit-comp: #8da9c4; --lit-bbe: #4db6a9; --lit-tube: #e8904a; --lit-exc: #d8bc4c; --lit-sg: #c977a9;
   --lit-vinyl: #c67078; --lit-atmos: #6c9be0; --lit-master: #cfd6dc; --lit-hd: #a78bea;
   --cap: var(--amber-fill);
   --cap-lit: #f0b545;
@@ -1767,7 +1768,7 @@ canvas.tube-vis {
     --veil: rgba(233,237,240,0.94); --veil-solid: rgba(233,237,240,0.97); --veil-clear: rgba(233,237,240,0);
     --modal-veil: rgba(218,224,228,0.97); --leave-veil: rgba(40,50,58,0.4); --decline-bg: rgba(223,228,232,0.99);
     --transport-bg: rgba(238,241,243,0.94); --log-past: #535f6a;
-    --cap-comp: #32597b; --cap-bbe: #115f58; --cap-tube: #864215; --cap-exc: #695304; --cap-sg: #87386c;
+    --cap-peq: #3d6b22; --cap-comp: #32597b; --cap-bbe: #115f58; --cap-tube: #864215; --cap-exc: #695304; --cap-sg: #87386c;
     --cap-vinyl: #96303d; --cap-atmos: #2b5497; --cap-master: #4c5760; --cap-hd: #5b42ae;
   }
 }
@@ -1792,11 +1793,12 @@ canvas.tube-vis {
     --veil: rgba(233,237,240,0.94); --veil-solid: rgba(233,237,240,0.97); --veil-clear: rgba(233,237,240,0);
     --modal-veil: rgba(218,224,228,0.97); --leave-veil: rgba(40,50,58,0.4); --decline-bg: rgba(223,228,232,0.99);
     --transport-bg: rgba(238,241,243,0.94); --log-past: #535f6a;
-    --cap-comp: #32597b; --cap-bbe: #115f58; --cap-tube: #864215; --cap-exc: #695304; --cap-sg: #87386c;
+    --cap-peq: #3d6b22; --cap-comp: #32597b; --cap-bbe: #115f58; --cap-tube: #864215; --cap-exc: #695304; --cap-sg: #87386c;
     --cap-vinyl: #96303d; --cap-atmos: #2b5497; --cap-master: #4c5760; --cap-hd: #5b42ae;
 }
 
 /* 처리기마다 캡 색 — 카드와 신호 흐름 노드가 같은 값을 쓴다 */
+#mod-peq,     .flow-node[data-mod="mod-peq"]     { --cap: var(--cap-peq); --cap-lit: var(--lit-peq); }
 #mod-comp,    .flow-node[data-mod="mod-comp"]    { --cap: var(--cap-comp); --cap-lit: var(--lit-comp); }
 #mod-bbe,     .flow-node[data-mod="mod-bbe"]     { --cap: var(--cap-bbe); --cap-lit: var(--lit-bbe); }
 #mod-tube,    .flow-node[data-mod="mod-tube"]    { --cap: var(--cap-tube); --cap-lit: var(--lit-tube); }
@@ -2160,6 +2162,85 @@ canvas.crackle-vis, canvas.tube-vis { background: var(--screen); border: 1px sol
 .sg-mode-btn.active, .atmos-scene-btn.active { color: var(--on-cap); background: var(--cap); border-color: var(--cap); box-shadow: none; }
 #sgModeDesc { font-family: var(--font-body); color: var(--muted); }
 
+/* ── 파라메트릭 EQ — 계기창 그래프 · 대역 단추 · 편집 줄 · 큰 편집 창 ── */
+canvas.peq-vis {
+  display: block; width: 100%; height: 96px; margin: 2px 0 8px; cursor: crosshair; touch-action: none;
+  background: var(--screen); border: 1px solid var(--screen-edge); border-radius: var(--r-screen);
+}
+canvas.peq-vis:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
+canvas.peq-vis.big { height: clamp(220px, 42vh, 430px); margin: 0 0 8px; flex: 0 0 auto; }
+.peq-bar { display: flex; align-items: flex-start; gap: 6px; margin-bottom: 6px; }
+.peq-chips { flex: 1 1 auto; display: flex; flex-wrap: wrap; gap: 4px; min-width: 0; min-height: 24px; }
+.peq-chip, .peq-add, .peq-open, .peq-del {
+  height: 24px; min-width: 24px; padding: 0 6px; display: inline-grid; place-items: center; cursor: pointer; user-select: none;
+  font-family: var(--font-legend); font-size: var(--fs-xs); font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: 0.02em;
+  color: var(--muted); background: var(--bg2); border: 1px solid var(--border-hi); border-radius: var(--r-ctl);
+}
+.peq-chip:hover, .peq-add:hover:not(:disabled), .peq-open:hover { color: var(--text); border-color: var(--cap); }
+.peq-chip.sel { color: var(--on-cap); background: var(--cap); border-color: var(--cap); }
+.peq-chip.off { border-style: dashed; }
+.peq-chip.off:not(.sel) { color: var(--dim); }
+.peq-add { font-size: var(--fs-md); }
+.peq-add:disabled { opacity: 0.35; cursor: default; }
+.peq-open { padding: 0 10px; letter-spacing: 0.04em; }
+.peq-del { width: 24px; padding: 0; background: transparent; }
+.peq-table .peq-del { width: 26px; height: 26px; }
+.peq-del:hover { color: var(--danger-text); border-color: var(--danger-edge); }
+.peq-chip:focus-visible, .peq-add:focus-visible, .peq-open:focus-visible, .peq-del:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
+.peq-ed { display: grid; gap: 5px; }
+.peq-ed-row { display: flex; align-items: center; gap: 6px; }
+.peq-led .led-btn { width: 32px; height: 20px; }
+.peq-ed .peq-led .led-btn { height: 18px; }
+.peq-ed select, .peq-ed input[type=number], .peq-table select, .peq-table input[type=number] {
+  height: 26px; padding: 0 6px; font-family: var(--font-legend); font-size: var(--fs-sm); font-weight: 600; font-variant-numeric: tabular-nums;
+  color: var(--text); background: var(--bg2); border: 1px solid var(--border-hi); border-radius: var(--r-ctl);
+}
+.peq-ed select, .peq-ed input[type=number] { height: 24px; }
+.peq-ed select[data-k="type"] { flex: 1 1 auto; min-width: 0; }
+.peq-ed select[data-k="slope"] { flex: 0 1 104px; min-width: 0; }
+.peq-ed input[type=number], .peq-table input[type=number] { -moz-appearance: textfield; appearance: textfield; }
+.peq-ed input[type=number] { width: 54px; min-width: 0; }
+.peq-ed .peq-num { flex: 0 1 auto; min-width: 0; }
+.peq-ed input[type=number]::-webkit-inner-spin-button, .peq-ed input[type=number]::-webkit-outer-spin-button,
+.peq-table input[type=number]::-webkit-inner-spin-button, .peq-table input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+.peq-ed :is(select, input):disabled, .peq-table :is(select, input):disabled { opacity: 0.45; }
+.peq-ed :is(select, input):focus-visible, .peq-table :is(select, input):focus-visible { outline: 2px solid var(--amber); outline-offset: 1px; }
+.peq-ed :is(select, input):hover:not(:disabled), .peq-table :is(select, input):hover:not(:disabled) { border-color: var(--cap); }
+.peq-num { display: inline-flex; align-items: center; gap: 4px; font-family: var(--font-legend); font-size: var(--fs-xs); letter-spacing: 0.04em; color: var(--muted); }
+.peq-num > i { font-style: normal; }
+.peq-empty { margin: 4px 0; font-size: var(--fs-xs); color: var(--muted); }
+.peq-help { margin: 6px 0 0; font-size: var(--fs-xs); line-height: 1.4; color: var(--muted); }
+.peq-sr { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+html.peq-modal-open { overflow: hidden; }
+dialog.peq-modal {
+  --cap: var(--cap-peq); --cap-lit: var(--lit-peq);
+  width: min(1120px, calc(100vw - 24px)); max-width: none; max-height: calc(100vh - 24px); margin: auto; padding: 0;
+  font-family: var(--font-body); color: var(--text); background: var(--panel);
+  border: 1px solid var(--border-hi); border-radius: var(--r-card); box-shadow: var(--modal-shadow);
+}
+dialog.peq-modal::backdrop { background: rgba(8,11,14,0.72); }
+.peq-modal-box { display: flex; flex-direction: column; max-height: calc(100vh - 26px); padding: 14px 16px 16px; box-sizing: border-box; }
+.peq-modal-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
+.peq-modal-title { margin: 0; font-family: var(--font-legend); font-size: var(--fs-md); font-weight: 700; letter-spacing: 0.06em; }
+.peq-count { font-family: var(--font-legend); font-size: var(--fs-xs); color: var(--muted); font-variant-numeric: tabular-nums; }
+.peq-modal-gap { flex: 1 1 auto; }
+.peq-modal-head .btn { padding: 6px 12px; }
+.peq-modal-head .btn:disabled { cursor: default; }
+#peqReset.armed { border-color: var(--danger-edge); color: var(--danger-text); }
+.peq-table-wrap { flex: 1 1 auto; min-height: 96px; overflow: auto; margin-top: 10px; border: 1px solid var(--border); border-radius: 8px; }
+.peq-table { width: 100%; border-collapse: collapse; font-size: var(--fs-sm); }
+.peq-table th, .peq-table td { padding: 5px 8px; text-align: left; white-space: nowrap; border-bottom: 1px solid var(--border); }
+.peq-table thead th {
+  position: sticky; top: 0; z-index: 1; background: var(--panel2);
+  font-family: var(--font-legend); font-size: var(--fs-xs); font-weight: 600; letter-spacing: 0.04em; color: var(--muted);
+}
+.peq-table tbody th { width: 2.6em; font-family: var(--font-legend); font-weight: 700; font-variant-numeric: tabular-nums; color: var(--muted); }
+.peq-table tbody tr:last-child > * { border-bottom: 0; }
+.peq-table tr.sel { background: color-mix(in srgb, var(--cap) 13%, transparent); }
+.peq-table tr.sel th { color: var(--text); }
+.peq-table tr.off :is(select, input[type=number]) { color: var(--muted); }
+.peq-table input[type=number] { width: 84px; }
+
 /* ── 고해상도 복원 ────────────────────────────────────────── */
 .hd-badge { letter-spacing: 0.04em; border-radius: 999px; padding: 2px 9px; white-space: nowrap; }
 .hd-badge.hd { background: color-mix(in srgb, var(--blue) 12%, transparent); color: color-mix(in srgb, var(--blue) var(--cap-ink), var(--text)); border: 1px solid color-mix(in srgb, var(--blue) 40%, transparent); }
@@ -2504,7 +2585,7 @@ html, body { overflow-x: clip; }
   <div class="header">
     <div class="logo">
       <h1>ANALOG SOUL</h1>
-      <sub>DSP ENGINE v3.0</sub>
+      <sub>DSP ENGINE v3.1</sub>
     </div>
     <div class="header-meters">
       <div>
@@ -2607,7 +2688,40 @@ html, body { overflow-x: clip; }
 
   <div class="dsp-grid" id="dspGrid">
 
-    <!-- BBE SONIC MAXIMIZER -->
+    <!-- PARAMETRIC EQ — 기본 순서 맨 앞. 선형으로 음색을 고르는 단이라, 깎아 낼 성분(웅웅거림 · 저역 잡음)이
+         뒤의 압축기 검출과 포화를 먼저 움직이지 않게 앞에 둔다. 압축 뒤의 음색을 다듬으려면 COMP 뒤로 옮긴다. -->
+    <div class="module" id="mod-peq" draggable="true">
+      <div class="module-header"><span class="drag-handle" title="드래그하여 순서 변경"></span>
+        <div style="display:flex;align-items:baseline;gap:6px">
+          <div class="module-name">PARAMETRIC EQ</div>
+          <div class="module-sub">대역 최대 20개</div>
+        </div>
+        <div class="module-header-right">
+          <label class="led-toggle"><input type="checkbox" id="peqOn"><div class="led-btn"></div></label>
+        </div>
+      </div>
+      <div class="module-body">
+        <div class="slider-row macro-row">
+          <span class="slider-label">MACRO</span>
+          <input type="range" id="peqMacro" min="0" max="100" value="100" step="1">
+          <span class="slider-val" id="peqMacroV">100 %</span>
+        </div>
+        <div class="slider-row in-gain">
+          <span class="slider-label">INPUT GAIN</span>
+          <input type="range" id="peqIn" min="-24" max="24" value="0" step="0.5">
+          <span class="slider-val" id="peqInV">0.0</span>
+        </div>
+        <canvas class="peq-vis" id="peqVis" tabindex="0" role="application" aria-roledescription="EQ 그래프" aria-describedby="peqHelp"></canvas>
+        <div class="peq-bar">
+          <button type="button" class="peq-add" id="peqAdd" title="대역 추가 (1 kHz 벨)">＋</button>
+          <div class="peq-chips" id="peqChips" role="listbox" aria-label="EQ 대역"></div>
+          <button type="button" class="peq-open" id="peqOpen" title="크게 편집">크게</button>
+        </div>
+        <div class="peq-edit" id="peqEdit"></div>
+        <p class="peq-help" id="peqHelp">두 번 눌러 추가 · 점을 끌어 조정 · 점 위 휠로 Q<span class="peq-sr"> · 오른쪽 단추로 삭제. 키보드: ←→ 주파수, ↑↓ 이득, PgUp · PgDn Q, [ ] 대역 이동, Insert 추가, Delete 삭제, 스페이스 켜고 끄기, Enter 크게 편집</span></p>
+      </div>
+    </div>
+
     <div class="module" id="mod-comp" draggable="true">
       <div class="module-header"><span class="drag-handle" title="드래그하여 순서 변경"></span>
         <div style="display:flex;align-items:baseline;gap:6px">
@@ -3306,7 +3420,7 @@ html, body { overflow-x: clip; }
       </div>
       <div class="export-btn-wrap">
         <button class="btn danger" id="resetBtn">✕ 초기화</button>
-        <span>파일 및 설정 초기화</span>
+        <span>파일 · INPUT GAIN 되돌리기</span>
       </div>
     </div>
 
@@ -3319,6 +3433,28 @@ html, body { overflow-x: clip; }
   </div>
 
 </div>
+
+<!-- PARAMETRIC EQ 큰 편집 창 -->
+<dialog class="peq-modal" id="peqModal" aria-labelledby="peqModalTitle">
+  <div class="peq-modal-box">
+    <div class="peq-modal-head">
+      <h2 class="peq-modal-title" id="peqModalTitle">PARAMETRIC EQ</h2>
+      <label class="led-toggle" title="EQ 켜기 · 끄기 (카드의 스위치와 같습니다)"><input type="checkbox" data-k="power" aria-label="EQ 켜짐"><span class="led-btn"></span></label>
+      <span class="peq-count" id="peqCount"></span>
+      <span class="peq-modal-gap"></span>
+      <button type="button" class="btn" id="peqPlay" hidden>▶ 재생</button>
+      <button type="button" class="btn" id="peqAddBig">＋ 대역</button>
+      <button type="button" class="btn" id="peqReset">처음 상태로</button>
+      <button type="button" class="btn" id="peqClose">닫기</button>
+    </div>
+    <canvas class="peq-vis big" id="peqVisBig" tabindex="0" role="application" aria-roledescription="EQ 그래프" aria-describedby="peqHelpBig"></canvas>
+    <p class="peq-help" id="peqHelpBig">두 번 눌러 대역 추가 · 점을 끌어 주파수와 이득(Shift는 세밀하게) · 점 위에서 휠로 Q(가파른 컷은 기울기) · 점을 두 번 눌러 켜고 끄기 · 오른쪽 단추로 삭제. 키보드: ←→ 주파수, ↑↓ 이득, PgUp · PgDn Q, [ ] 대역 이동, Insert 추가, Delete 삭제, 스페이스 켜고 끄기. 재생 중에는 EQ 앞(선)과 뒤(면)의 스펙트럼을 겹쳐 그립니다. 스펙트럼은 1 kHz를 기준으로 옥타브당 +3 dB 기울여, 분홍 잡음이 평평하게 보입니다.</p>
+    <div class="peq-table-wrap"><table class="peq-table" id="peqTable">
+      <thead><tr><th scope="col">번호</th><th scope="col">켜짐</th><th scope="col">종류</th><th scope="col">주파수 (Hz)</th><th scope="col">이득 (dB)</th><th scope="col">Q</th><th scope="col">기울기</th><th scope="col"><span class="peq-sr">삭제</span></th></tr></thead>
+      <tbody></tbody>
+    </table></div>
+  </div>
+</dialog>
 
 <!-- Processing overlay -->
 <div class="overlay" id="overlay">
@@ -3613,8 +3749,8 @@ async function loadFile(file) {
 }
 
 // ---- Toggle module active state ----
-const modMap = { bbeOn:'bbe', tubeOn:'tube', vinylOn:'vinyl', exciterOn:'exciter', sgOn:'sg', atmosOn:'atmos', compOn:'comp', masterOn:'master' };
-['bbeOn','tubeOn','vinylOn','exciterOn','sgOn','atmosOn','compOn','masterOn'].forEach(id => {
+const modMap = { peqOn:'peq', bbeOn:'bbe', tubeOn:'tube', vinylOn:'vinyl', exciterOn:'exciter', sgOn:'sg', atmosOn:'atmos', compOn:'comp', masterOn:'master' };
+['peqOn','bbeOn','tubeOn','vinylOn','exciterOn','sgOn','atmosOn','compOn','masterOn'].forEach(id => {
   const mod = id.replace('On','');
   const el = document.getElementById(id);
   el.addEventListener('change', function() {
@@ -3882,7 +4018,7 @@ bindSlider('bitRefine','bitRefineV');
 
 // 모듈별 INPUT GAIN — dB 표기 (+는 명시)
 const dbFmt = v => (parseFloat(v) > 0 ? '+' : '') + parseFloat(v).toFixed(1);
-['compIn','bbeIn','tubeIn','excIn','sgIn','vinylIn','atmosIn','masterIn']
+['peqIn','compIn','bbeIn','tubeIn','excIn','sgIn','vinylIn','atmosIn','masterIn']
   .forEach(id => bindSlider(id, id + 'V', dbFmt));
 
 function onParamChange() {
@@ -5563,6 +5699,111 @@ function buildMasterBlock(ac) {
 }
 
 
+// ============================================================
+// 파라메트릭 EQ — 대역 최대 20개
+// ------------------------------------------------------------
+// 대역마다 Web Audio BiquadFilterNode를 하나 또는 여럿 직렬로 잇는다.
+//   벨 · 로우 셸프 · 하이 셸프 · 노치: 바이쿼드 하나(peaking · lowshelf · highshelf · notch)
+//   로우 컷 · 하이 컷: 기울기 12 · 24 · 36 · 48 dB/oct = 버터워스 2 · 4 · 6 · 8차를 2차 단 1 ~ 4개로 나눈다.
+//     12 dB/oct는 Q로 공진을 정하고, 그보다 가파르면 단마다 버터워스 Q(1 / (2 sin((2k − 1)π / 2n)))를 쓴다.
+// MACRO(깊이)는 벨 · 셸프의 이득에만 곱한다. 0 %면 평탄해지고 컷 · 노치는 그대로 남는다.
+// 꺼진 대역은 체인에서 뺀다. 켜진 대역이 없으면 입력이 이득 1로 그대로 나간다(표본이 바뀌지 않는다).
+// 화면의 응답 곡선도 같은 종류 · 같은 값의 BiquadFilterNode에서 getFrequencyResponse로 얻으므로 소리와 그림이 같다.
+// ============================================================
+const PEQ_MAX = 20;
+const PEQ_FMIN = 20, PEQ_FMAX = 20000, PEQ_GMAX = 24, PEQ_QMIN = 0.1, PEQ_QMAX = 18;
+const PEQ_KIND = { bell: 'peaking', lowshelf: 'lowshelf', highshelf: 'highshelf', notch: 'notch', lowcut: 'highpass', highcut: 'lowpass' };
+const PEQ_SLOPES = [12, 24, 36, 48];
+function peqIsCut(t)   { return t === 'lowcut' || t === 'highcut'; }
+function peqHasGain(t) { return t === 'bell' || t === 'lowshelf' || t === 'highshelf'; }
+function peqHasQ(b)    { return b.type === 'bell' || b.type === 'notch' || (peqIsCut(b.type) && (+b.slope || 12) === 12); }
+// 버터워스 n차를 2차 단으로 나눈 단별 Q(선형)
+function butterQs(n) { const q = []; for (let k = 1; k <= n / 2; k++) q.push(1 / (2 * Math.sin((2 * k - 1) * Math.PI / (2 * n)))); return q; }
+// 대역 하나를 화면 · 소리의 허용 범위 안으로 정돈한다
+function peqClean(b) {
+  const t = PEQ_KIND[b && b.type] ? b.type : 'bell';
+  const f = Math.min(PEQ_FMAX, Math.max(PEQ_FMIN, +b.freq || 1000));
+  const g = Math.min(PEQ_GMAX, Math.max(-PEQ_GMAX, +b.gain || 0));
+  const q = Math.min(PEQ_QMAX, Math.max(PEQ_QMIN, +b.q || Math.SQRT1_2));
+  const s = PEQ_SLOPES.indexOf(+b.slope) >= 0 ? +b.slope : 12;
+  return { type: t, freq: f, gain: g, q: q, slope: s, on: b.on !== false };
+}
+// 대역 목록 → 바이쿼드 단 목록. depth는 MACRO(0 ~ 1). 같은 순서 · 같은 값이 소리와 그림에 쓰인다
+function peqStages(bands, depth) {
+  const out = [], d = depth === undefined ? 1 : Math.max(0, Math.min(1, depth));
+  (bands || []).forEach(function (raw, i) {
+    if (!raw || raw.on === false) return;
+    const b = peqClean(raw), kind = PEQ_KIND[b.type];
+    if (peqIsCut(b.type)) {
+      // lowpass · highpass의 Q는 명세상 dB이므로 선형 Q를 dB로 바꿔 넣는다(Q_BUTTER와 같은 이유)
+      const qs = b.slope === 12 ? [b.q] : butterQs(b.slope / 6);
+      qs.forEach(function (q) { out.push({ band: i, kind: kind, f: b.freq, q: 20 * Math.log10(q), g: 0 }); });
+    } else {
+      out.push({ band: i, kind: kind, f: b.freq, q: b.q, g: peqHasGain(b.type) ? b.gain * d : 0 });
+    }
+  });
+  return out;
+}
+// 공용 빌더 — 실시간 · 렌더링 엔진이 같은 함수로 만들고 같은 set()으로 값을 넣는다.
+// opts.live: 실시간 — 값은 10 ms로 부드럽게 옮기고, 구조(대역 수 · 종류 · 기울기 · 켜짐)가 바뀌면
+//            새 체인을 만들어 20 ms 동안 교차해 바꾼다(필터 상태가 끊겨 딸깍이지 않게).
+// opts.analyse: 화면용 분석기(입력 · 출력)를 단다. 분석기는 소리 경로 밖에 있다.
+function buildPEQBlock(ac, opts) {
+  opts = opts || {};
+  // 체인 끝들은 내부 합류점(sum)에 모인 뒤 출력으로 나간다. 실시간 엔진은 체인을 다시 이을 때
+  // 블록의 출력(out)에서 나가는 연결만 끊으므로, 분석기를 sum에서 뽑아 두면 그대로 남는다.
+  const live = !!opts.live, input = ac.createGain(), sum = ac.createGain(), output = ac.createGain();
+  sum.connect(output);
+  const blk = { in: input, out: output, pre: null, post: null };
+  if (opts.analyse) {
+    const an = function () {
+      const a = ac.createAnalyser(); a.fftSize = 8192; a.smoothingTimeConstant = 0.75;
+      a.minDecibels = -110; a.maxDecibels = -10; return a;
+    };
+    blk.pre = an(); blk.post = an();
+    input.connect(blk.pre); sum.connect(blk.post);
+  }
+  let cur = null;    // 지금 체인 — { key, nodes, tail }
+  const keyOf = function (st) { return st.map(function (s) { return s.kind; }).join(','); };
+  function tune(node, s, smooth) {
+    if (node.type !== s.kind) node.type = s.kind;
+    const now = ac.currentTime;
+    [[node.frequency, s.f], [node.Q, s.q], [node.gain, s.g]].forEach(function (pv) {
+      const p = pv[0], v = pv[1];
+      if (!smooth) { p.value = v; return; }
+      if (p.cancelAndHoldAtTime) p.cancelAndHoldAtTime(now); else p.cancelScheduledValues(now);
+      p.setTargetAtTime(v, now, 0.01);
+    });
+  }
+  function make(st) {
+    const tail = ac.createGain(), nodes = [];
+    let x = input;
+    st.forEach(function (s) { const n = ac.createBiquadFilter(); tune(n, s, false); x.connect(n); x = n; nodes.push(n); });
+    x.connect(tail); tail.connect(sum);
+    return { key: keyOf(st), nodes: nodes, tail: tail };
+  }
+  function drop(c) {
+    try { input.disconnect(c.nodes.length ? c.nodes[0] : c.tail); } catch (e) {}
+    c.nodes.forEach(function (n) { try { n.disconnect(); } catch (e) {} });
+    try { c.tail.disconnect(); } catch (e) {}
+  }
+  blk.set = function (p) {
+    const q = p.peq || {}, st = peqStages(q.bands, q.depth), key = keyOf(st);
+    if (cur && cur.key === key) { cur.nodes.forEach(function (n, i) { tune(n, st[i], live); }); return; }
+    const old = cur;
+    cur = make(st);
+    if (!old) return;
+    if (!live) { drop(old); return; }
+    // 구조가 바뀌었다 — 옛 체인은 줄이고 새 체인은 키워 20 ms에 넘겨준다
+    const now = ac.currentTime, T = 0.02;
+    cur.tail.gain.setValueAtTime(0, now); cur.tail.gain.linearRampToValueAtTime(1, now + T);
+    old.tail.gain.cancelScheduledValues(now); old.tail.gain.setValueAtTime(old.tail.gain.value, now);
+    old.tail.gain.linearRampToValueAtTime(0, now + T);
+    setTimeout(function () { drop(old); }, 80);
+  };
+  return blk;
+}
+
 // 재생 단계 — MASTER 뒤에 놓을 수 있는 카드. 실제 LP는 마스터 음원으로 래커를 깎아 재생하고,
 // Atmos는 마스터가 끝난 뒤 듣는 기기에 맞춰 공간을 그리므로, 이 둘만 마스터링 뒤의 재생 매체를 흉내 낸다
 const POST_MASTER_OK = { 'mod-vinyl': true, 'mod-atmos': true };
@@ -5587,8 +5828,9 @@ function buildLiveChain() {
   nodes.inputGain = ac.createGain();
   nodes.inputGain.gain.value = 1.0;
 
-  // --- BBE · TUBE ---
+  // --- PARAMETRIC EQ · BBE · TUBE ---
   // 공용 빌더 — 렌더링 엔진과 같은 함수로 만들고 같은 set()으로 값을 넣는다
+  nodes.peqBlock  = buildPEQBlock(ac, { live: true, analyse: true });
   nodes.bbeBlock  = buildBBEBlock(ac);
   nodes.tubeBlock = buildTubeBlock(ac);
 
@@ -5610,6 +5852,7 @@ function buildLiveChain() {
   nodes.outputGain = ac.createGain();
 
   // 모듈별 INPUT GAIN — 각 이펙트 진입 직전에 삽입된다
+  nodes.inPeq     = ac.createGain();
   nodes.inBbe     = ac.createGain();
   nodes.inTube    = ac.createGain();
   nodes.inVinyl   = ac.createGain();
@@ -5645,6 +5888,7 @@ function buildLiveChain() {
 
 
 function connectLiveChain(nodes, ac) {
+  const peqEnabled    = document.getElementById('peqOn').checked;
   const bbeEnabled    = document.getElementById('bbeOn').checked;
   const tubeEnabled   = document.getElementById('tubeOn').checked;
   const vinylEnabled  = document.getElementById('vinylOn').checked;
@@ -5667,6 +5911,15 @@ function connectLiveChain(nodes, ac) {
   });
 
   let chain = nodes.inputGain;
+
+  // PARAMETRIC EQ
+  function applyPEQ() {
+    if (!peqEnabled) return;
+    // 입력 게인 → 공용 블록 (내부 배선은 빌더가 끝내 두었다)
+    chain.connect(nodes.inPeq); chain = nodes.inPeq;
+    chain.connect(nodes.peqBlock.in);
+    chain = nodes.peqBlock.out;
+  }
 
   // BBE
   function applyBBE() {
@@ -5746,6 +5999,7 @@ function connectLiveChain(nodes, ac) {
   // 예전에는 여기가 고정 순서였던 탓에, 드래그로 순서를 바꾸면
   // 듣는 소리와 내보낸 파일이 서로 달랐다.
   const LIVE_EFFECT_MAP = {
+    'mod-peq':     applyPEQ,
     'mod-bbe':     applyBBE,
     'mod-tube':    applyTube,
     'mod-vinyl':   applyVinyl,
@@ -5758,7 +6012,7 @@ function connectLiveChain(nodes, ac) {
   const split = chainSplit(LIVE_EFFECT_MAP), ordered = split.pre;
   // DOM을 읽지 못한 경우의 기본 순서
   if (ordered.length === 0 && split.post.length === 0) {
-    ordered.push(applyComp, applyBBE, applyTube, applyExciter, applySG, applyVinyl, applyAtmos);
+    ordered.push(applyPEQ, applyComp, applyBBE, applyTube, applyExciter, applySG, applyVinyl, applyAtmos);
   }
 
   ordered.forEach(function(fn) { fn(); });
@@ -5784,7 +6038,7 @@ function applyLiveDSP() {
 
   // 모듈별 INPUT GAIN — dB 슬라이더를 선형 배율로 반영
   const _inMap = {
-    inBbe: 'bbeIn', inTube: 'tubeIn', inVinyl: 'vinylIn', inExciter: 'excIn',
+    inPeq: 'peqIn', inBbe: 'bbeIn', inTube: 'tubeIn', inVinyl: 'vinylIn', inExciter: 'excIn',
     inSg: 'sgIn', inAtmos: 'atmosIn', inComp: 'compIn', inMaster: 'masterIn',
   };
   Object.keys(_inMap).forEach(function(nk) {
@@ -5797,6 +6051,7 @@ function applyLiveDSP() {
   // 공용 블록에 값을 넣는다 — 렌더링 엔진과 같은 값 읽기(getParams), 같은 set().
   // 곡선·응답 생성이 무거운 모듈은 켜져 있을 때만 갱신한다. 켜는 순간 이 함수가 다시 불린다.
   const P = getParams(null);
+  if (nodes.peqBlock  && P.peqEnabled)  nodes.peqBlock.set(P);
   if (nodes.bbeBlock  && P.bbeEnabled)  nodes.bbeBlock.set(P);
   if (nodes.tubeBlock && P.tubeEnabled) nodes.tubeBlock.set(P);
 
@@ -6583,6 +6838,7 @@ async function buildOfflineChain(offCtx, params) {
   // dspGrid 내 모듈들을 현재 DOM 순서대로 읽고,
   // mod-master는 항상 맨 마지막에 별도 처리 (고정)
   const EFFECT_MAP = {
+    'mod-peq':     'peq',
     'mod-bbe':     'bbe',
     'mod-tube':    'tube',
     'mod-vinyl':   'vinyl',
@@ -6595,12 +6851,17 @@ async function buildOfflineChain(offCtx, params) {
   const split = chainSplit(EFFECT_MAP), orderedEffects = split.pre, postEffects = split.post;
   // fallback: DOM이 없을 경우 기본 순서
   if (orderedEffects.length === 0 && postEffects.length === 0) {
-    orderedEffects.push('bbe','tube','vinyl','exciter','sg','atmos','comp');
+    orderedEffects.push('peq','comp','bbe','tube','exciter','sg','vinyl','atmos');
   }
 
   // ── 각 이펙트 처리 함수 ────────────────────────────────────────────────
   // 공용 블록을 만들어 값을 넣고 체인에 잇는다 — 실시간 엔진과 같은 빌더
   function useBlock(make) { const blk = make(ac); blk.set(params); chain.connect(blk.in); chain = blk.out; }
+
+  function applyPEQ() {
+    if (!params.peqEnabled) return;
+    useBlock(buildPEQBlock);
+  }
 
   function applyBBE() {
     if (!params.bbeEnabled) return;
@@ -6651,6 +6912,7 @@ async function buildOfflineChain(offCtx, params) {
   }
 
   const EFFECT_FN = {
+    'peq':     applyPEQ,
     'bbe':     applyBBE,
     'tube':    applyTube,
     'vinyl':   applyVinyl,
@@ -6662,11 +6924,11 @@ async function buildOfflineChain(offCtx, params) {
 
   // 이펙트별 입력 게인 — 켜져 있을 때만 체인에 삽입한다
   const EFFECT_IN_GAIN = {
-    'bbe': 'inBbe', 'tube': 'inTube', 'vinyl': 'inVinyl', 'exciter': 'inExciter',
+    'peq': 'inPeq', 'bbe': 'inBbe', 'tube': 'inTube', 'vinyl': 'inVinyl', 'exciter': 'inExciter',
     'sg': 'inSg', 'atmos': 'inAtmos', 'comp': 'inComp',
   };
   const EFFECT_ENABLED = {
-    'bbe': 'bbeEnabled', 'tube': 'tubeEnabled', 'vinyl': 'vinylEnabled',
+    'peq': 'peqEnabled', 'bbe': 'bbeEnabled', 'tube': 'tubeEnabled', 'vinyl': 'vinylEnabled',
     'exciter': 'excEnabled', 'sg': 'sgEnabled', 'atmos': 'atmosEnabled',
     'comp': 'compEnabled',
   };
@@ -6711,6 +6973,7 @@ function getParams(inputBuffer) {
   const inDb = id => Math.pow(10, parseFloat(document.getElementById(id).value) / 20);
   return {
     inputBuffer,
+    inPeq:     inDb('peqIn'),
     inBbe:     inDb('bbeIn'),
     inTube:    inDb('tubeIn'),
     inVinyl:   inDb('vinylIn'),
@@ -6719,6 +6982,10 @@ function getParams(inputBuffer) {
     inAtmos:   inDb('atmosIn'),
     inComp:    inDb('compIn'),
     inMaster:  inDb('masterIn'),
+    peqEnabled: document.getElementById('peqOn').checked,
+    // 대역 목록은 편집기(파라메트릭 EQ 스크립트)가 들고 있다. MACRO는 이득에 곱하는 깊이
+    peq: { depth: parseFloat(document.getElementById('peqMacro').value) / 100,
+           bands: (typeof peqBandsNow === 'function') ? peqBandsNow() : [] },
     bbeEnabled: document.getElementById('bbeOn').checked,
     bbeLo: parseFloat(document.getElementById('bbeLo').value)/100,
     bbeProc: parseFloat(document.getElementById('bbeProcess').value)/100,
@@ -8137,6 +8404,7 @@ async function exportAudio() {
     let _dspPct = _dspStart;
     // 활성화된 이펙트 순서 읽기
     const _EFFECT_MSGS = {
+      'mod-peq':     ['▸ EQ — 대역 다듬는 중...'],
       'mod-bbe':     ['▸ BBE — 저음 보강 중...', '▸ BBE — 위상 보정 중...', '▸ BBE — 고주파 선명도 올리는 중...'],
       'mod-tube':    ['▸ TUBE — 진공관 포화 먹이는 중...', '▸ TUBE — 홀수 배음 입히는 중...', '▸ TUBE — 저역 따뜻하게 물드는 중...'],
       'mod-vinyl':   ['▸ VINYL — 판 돌아가는 느낌 만드는 중...', '▸ VINYL — 표면 잡음 살짝 입히는 중...'],
@@ -8146,6 +8414,7 @@ async function exportAudio() {
       'mod-comp':    ['▸ COMP — 튀어나온 부분 눌러주는 중...', '▸ COMP — 조용한 부분 끌어올리는 중...'],
     };
     const _ENABLED_MAP = {
+      'mod-peq': params.peqEnabled,
       'mod-bbe': params.bbeEnabled, 'mod-tube': params.tubeEnabled,
       'mod-vinyl': params.vinylEnabled, 'mod-exciter': params.excEnabled,
       'mod-sg': params.sgEnabled, 'mod-atmos': params.atmosEnabled,
@@ -8316,7 +8585,7 @@ document.getElementById('resetBtn').addEventListener('click', () => {
   if (_pd) _pd.textContent = '—';
   if (_pw) _pw.textContent = '—';
   // 모듈별 INPUT GAIN 0dB 복원
-  ['compIn','bbeIn','tubeIn','excIn','sgIn','vinylIn','atmosIn','masterIn'].forEach(function(id){
+  ['peqIn','compIn','bbeIn','tubeIn','excIn','sgIn','vinylIn','atmosIn','masterIn'].forEach(function(id){
     var el = document.getElementById(id);
     var vl = document.getElementById(id + 'V');
     if (el) el.value = 0;
@@ -8841,6 +9110,792 @@ drawTubeViz();
 </script>
 <script>
 /* ============================================================
+   파라메트릭 EQ — 대역 편집과 그래프
+   ------------------------------------------------------------
+   대역 목록은 이 스크립트가 들고, getParams()가 peqBandsNow()로 읽어 간다.
+   편집하는 곳은 둘이다.
+     카드 — 작은 그래프, 대역 단추, 고른 대역의 편집 줄
+     큰 편집 창 — 큰 그래프, 모든 대역의 표
+   그래프의 응답 곡선은 소리를 내는 것과 같은 종류 · 같은 값의 BiquadFilterNode에서
+   getFrequencyResponse로 얻는다(peqStages를 함께 쓴다). 재생 중에는 EQ 앞(선)과 뒤(면)의
+   스펙트럼을 겹쳐 그린다. 편집 입력에는 id를 달지 않는다 — 프리셋은 대역 목록을 따로(peq) 담는다.
+   ============================================================ */
+(function () {
+  var card = document.getElementById('mod-peq');
+  if (!card) return;
+  var $ = function (id) { return document.getElementById(id); };
+  var onEl = $('peqOn'), macroEl = $('peqMacro'), macroV = $('peqMacroV'), inEl = $('peqIn');
+  var chipsEl = $('peqChips'), editEl = $('peqEdit'), addB = $('peqAdd'), openB = $('peqOpen');
+  var modal = $('peqModal'), countEl = $('peqCount'), tbody = modal.querySelector('tbody');
+  var addBigB = $('peqAddBig'), resetB = $('peqReset'), closeB = $('peqClose'), playB = $('peqPlay');
+  var powerEl = modal.querySelector('input[data-k="power"]'), mainPlay = $('playBtn'), transport = $('transportBar');
+
+  var TYPES = [['bell', '벨'], ['lowshelf', '로우 셸프'], ['highshelf', '하이 셸프'],
+               ['lowcut', '로우 컷'], ['highcut', '하이 컷'], ['notch', '노치']];
+  var TNAME = {}; TYPES.forEach(function (t) { TNAME[t[0]] = t[1]; });
+  // 처음 상태 — 평탄한 네 대역. 켜도 소리는 그대로이고, 점을 끌면 바로 쓸 수 있다
+  var DEFAULT_BANDS = [
+    { type: 'lowshelf',  freq: 80,    gain: 0, q: 0.71, slope: 12, on: true },
+    { type: 'bell',      freq: 400,   gain: 0, q: 1,    slope: 12, on: true },
+    { type: 'bell',      freq: 2500,  gain: 0, q: 1,    slope: 12, on: true },
+    { type: 'highshelf', freq: 10000, gain: 0, q: 0.71, slope: 12, on: true }
+  ];
+  var bands = DEFAULT_BANDS.map(peqClean), sel = 0;
+  // 세로 눈금 ±12 dB — 곡선이나 점이 11.5 dB를 넘으면 ±24 dB로 넓히고, 다시 들어오면 좁힌다(끄는 중에는 그대로)
+  var range = 12;
+
+  // ── 값 다듬기와 표기 ────────────────────────────────────
+  function sig3(v) {
+    if (!v) return 0;
+    var e = Math.floor(Math.log10(Math.abs(v)));
+    return e >= 2 ? Math.round(v / Math.pow(10, e - 2)) * Math.pow(10, e - 2)
+                  : Math.round(v * Math.pow(10, 2 - e)) / Math.pow(10, 2 - e);
+  }
+  function r1(v) { return Math.round(v * 10) / 10; }
+  function r2(v) { return Math.round(v * 100) / 100; }
+  function fmtF(f) {
+    if (f >= 1000) return (f / 1000).toFixed(2).replace(/\.?0+$/, '') + ' kHz';
+    return (f < 100 ? r1(f) : Math.round(f)) + ' Hz';
+  }
+  function fmtG(g) { return (g > 0 ? '+' : g < 0 ? '−' : '') + Math.abs(g).toFixed(1) + ' dB'; }
+  function fmtQ(q) { return q < 10 ? q.toFixed(2) : q.toFixed(1); }
+  function numOf(b, k) {
+    if (k === 'freq') return String(b.freq < 100 ? r1(b.freq) : Math.round(b.freq));
+    if (k === 'gain') return peqHasGain(b.type) ? String(r1(b.gain)) : '';
+    return peqHasQ(b) ? String(r2(b.q)) : '';
+  }
+  function depth() { return Math.max(0, Math.min(1, (parseFloat(macroEl.value) || 0) / 100)); }
+  // 화면의 점 높이 — MACRO(깊이)를 곱한, 실제로 걸리는 이득
+  function shownGain(b) { return peqHasGain(b.type) ? b.gain * depth() : 0; }
+  function describe(i) {
+    var b = bands[i]; if (!b) return '대역 없음';
+    var t = (i + 1) + '번 ' + TNAME[b.type] + ' ' + fmtF(b.freq);
+    if (peqHasGain(b.type)) t += ' ' + fmtG(b.gain);
+    if (peqHasQ(b)) t += ' Q ' + fmtQ(b.q);
+    if (peqIsCut(b.type)) t += ' ' + b.slope + ' dB/oct';
+    return t + (b.on ? '' : ' (꺼짐)');
+  }
+
+  // ── 바뀐 것을 알린다 ────────────────────────────────────
+  // 소리(재생 중이면 EQ 블록에 바로), 그림(다음 프레임), 표 · 편집 줄, 변경 표시
+  var pend = { draw: false, live: false }, raf = 0;
+  function pushLive() {
+    if (typeof isPlaying === 'undefined' || !isPlaying || !onEl.checked) return;
+    if (typeof liveDSP === 'undefined' || !liveDSP || !liveDSP.peqBlock) return;
+    liveDSP.peqBlock.set({ peq: { depth: depth(), bands: bands } });
+  }
+  function kick() { if (!raf) raf = requestAnimationFrame(frame); }
+  function redraw() { pend.draw = true; kick(); }
+  function changed(what, i) {
+    // 'value' — i번 대역의 값만, 'struct' — 대역 수 · 종류 · 기울기 · 켜짐, 'sel' — 고른 대역
+    if (what === 'struct') { renderChips(); renderEdit(); renderTable(); }
+    else if (what === 'sel') { markSel(); renderEdit(); }
+    else { i = i === undefined ? sel : i; syncRow(i); chipTitle(i); }
+    if (what !== 'sel') pend.live = true;
+    redraw();
+  }
+  // 설정이 바뀌었다는 표시(나가기 확인)는 문서의 input 이벤트로 잡힌다 — 끌기는 끝날 때 한 번 보낸다
+  function dirty() { card.dispatchEvent(new Event('input', { bubbles: true })); }
+
+  // ── 대역 더하기 · 지우기 · 고르기 ───────────────────────
+  var liveCard = mk('span', { class: 'peq-sr', 'aria-live': 'polite' }), liveBig = mk('span', { class: 'peq-sr', 'aria-live': 'polite' });
+  card.querySelector('.module-body').appendChild(liveCard);
+  modal.querySelector('.peq-modal-box').appendChild(liveBig);
+  function say(t) { (modal.open ? liveBig : liveCard).textContent = t; }
+  function note(t) { say(t); if (typeof setStatus === 'function') setStatus(t, 'warn'); }
+
+  // 비어 있는 곳 — 대역 주파수 사이(꺼진 대역도 자리로 친다, 양 끝 20 Hz · 20 kHz 포함)에서 로그 간격이 가장 넓은 곳의 가운데
+  function freeFreq() {
+    var fs = bands.map(function (b) { return b.freq; }).concat([PEQ_FMIN, PEQ_FMAX]).sort(function (a, b) { return a - b; });
+    if (fs.length === 2) return 1000;
+    var best = 0, at = 1000;
+    for (var k = 1; k < fs.length; k++) {
+      var gap = Math.log(fs[k] / fs[k - 1]);
+      if (gap > best) { best = gap; at = Math.sqrt(fs[k] * fs[k - 1]); }
+    }
+    return at;
+  }
+  function addBand(f, g) {
+    if (bands.length >= PEQ_MAX) { note('대역은 ' + PEQ_MAX + '개까지 둘 수 있습니다.'); return -1; }
+    bands.push(peqClean({ type: 'bell', freq: sig3(f === undefined ? freeFreq() : f), gain: r1(g || 0), q: 1, slope: 12, on: true }));
+    sel = bands.length - 1;
+    changed('struct'); dirty(); say(describe(sel) + ' 대역을 더했습니다.');
+    return sel;
+  }
+  function removeBand(i) {
+    if (!bands[i]) return;
+    var gone = describe(i);
+    bands.splice(i, 1);
+    if (sel >= bands.length) sel = bands.length - 1; else if (sel > i) sel--;
+    changed('struct'); dirty(); say(gone + ' 대역을 지웠습니다.');
+  }
+  function select(i) {
+    if (!bands[i] || i === sel) return;
+    sel = i; changed('sel');
+  }
+  // 종류를 바꾼다 — 벨의 높은 Q를 그대로 컷에 넘기면 차단 주파수에 큰 공진 봉우리가 생긴다.
+  // 컷으로 가면 Q를 버터워스 값 1/√2(화면 표시 0.71, 차단 주파수 −3.01 dB)로, 컷 · 셸프에서 벨 · 노치로 오면 1로 둔다
+  function retype(b, t) {
+    if (!TNAME[t] || t === b.type) return;
+    var wasPeak = b.type === 'bell' || b.type === 'notch', isPeak = t === 'bell' || t === 'notch';
+    if (peqIsCut(t) && !peqIsCut(b.type)) b.q = Math.SQRT1_2;
+    else if (isPeak && !wasPeak) b.q = 1;
+    b.type = t;
+  }
+  function toggleBand(i) {
+    var b = bands[i]; if (!b) return;
+    b.on = !b.on; changed('struct'); dirty(); say(describe(i));
+  }
+
+  // 값 바꾸기 — 키보드 · 휠 · 숫자 칸이 함께 쓴다. fine이면 잘게
+  function nudge(i, k, dir, fine) {
+    var b = bands[i]; if (!b) return false;
+    if (k === 'freq') b.freq = Math.min(PEQ_FMAX, Math.max(PEQ_FMIN, sig3(b.freq * Math.pow(2, dir / (fine ? 48 : 12)))));
+    else if (k === 'gain') { if (!peqHasGain(b.type)) return false; b.gain = Math.min(PEQ_GMAX, Math.max(-PEQ_GMAX, r1(b.gain + dir * (fine ? 0.1 : 0.5)))); }
+    else if (k === 'q') {
+      if (peqHasQ(b)) b.q = Math.min(PEQ_QMAX, Math.max(PEQ_QMIN, r2(b.q * Math.pow(fine ? 1.02 : 1.1, dir))));
+      else if (peqIsCut(b.type)) {           // 가파른 컷은 Q 대신 기울기를 한 칸씩
+        var s = PEQ_SLOPES.indexOf(b.slope) + dir;
+        if (s < 0 || s >= PEQ_SLOPES.length) return false;
+        b.slope = PEQ_SLOPES[s]; changed('struct'); return true;
+      } else return false;
+    }
+    changed('value', i); return true;
+  }
+
+  // ── DOM 도우미 ──────────────────────────────────────────
+  function mk(tag, attrs, kids) {
+    var e = document.createElement(tag);
+    if (attrs) Object.keys(attrs).forEach(function (a) {
+      if (attrs[a] === null || attrs[a] === undefined || attrs[a] === false) return;
+      if (a === 'text') e.textContent = attrs[a]; else e.setAttribute(a, attrs[a] === true ? '' : attrs[a]);
+    });
+    (kids || []).forEach(function (k) { if (k) e.appendChild(typeof k === 'string' ? document.createTextNode(k) : k); });
+    return e;
+  }
+  function ctlOn(i, b) {
+    var cb = mk('input', { type: 'checkbox', 'data-k': 'on', 'aria-label': (i + 1) + '번 대역 켜짐' });
+    cb.checked = b.on;
+    return mk('label', { class: 'led-toggle peq-led', title: '대역 켜기 · 끄기' }, [cb, mk('span', { class: 'led-btn' })]);
+  }
+  function ctlType(i, b) {
+    var s = mk('select', { 'data-k': 'type', 'aria-label': (i + 1) + '번 대역 종류' });
+    TYPES.forEach(function (t) { var o = mk('option', { value: t[0], text: t[1] }); if (t[0] === b.type) o.selected = true; s.appendChild(o); });
+    return s;
+  }
+  function ctlSlope(i, b) {
+    var cut = peqIsCut(b.type);
+    var s = mk('select', { 'data-k': 'slope', 'aria-label': (i + 1) + '번 대역 기울기', disabled: !cut, title: cut ? null : '로우 컷 · 하이 컷에만 씁니다' });
+    PEQ_SLOPES.forEach(function (v) { var o = mk('option', { value: String(v), text: v + ' dB/oct' }); if (v === b.slope) o.selected = true; s.appendChild(o); });
+    if (!cut) { s.appendChild(mk('option', { value: '', text: '—' })); s.value = ''; }
+    return s;
+  }
+  var NUM = {
+    freq: { name: '주파수', unit: 'Hz', min: PEQ_FMIN, max: PEQ_FMAX },
+    gain: { name: '이득', unit: 'dB', min: -PEQ_GMAX, max: PEQ_GMAX },
+    q:    { name: 'Q', unit: '', min: PEQ_QMIN, max: PEQ_QMAX }
+  };
+  function ctlNum(i, b, k) {
+    var on = k === 'freq' || (k === 'gain' ? peqHasGain(b.type) : peqHasQ(b)), d = NUM[k];
+    var why = k === 'gain' ? '벨 · 셸프에만 씁니다' : (peqIsCut(b.type) ? '12 dB/oct 컷에만 씁니다' : '셸프는 Q를 쓰지 않습니다');
+    var e = mk('input', { type: 'number', 'data-k': k, inputmode: 'decimal', step: 'any', min: d.min, max: d.max,
+                          'aria-label': (i + 1) + '번 대역 ' + d.name + (d.unit ? ' (' + d.unit + ')' : ''),
+                          disabled: !on, placeholder: on ? null : '—', title: on ? null : why });
+    e.value = numOf(b, k);
+    return e;
+  }
+  function ctlDel(i) {
+    return mk('button', { type: 'button', class: 'peq-del', 'data-k': 'del', 'aria-label': (i + 1) + '번 대역 지우기', title: '대역 지우기', text: '✕' });
+  }
+
+  // ── 카드: 대역 단추 ─────────────────────────────────────
+  function chipTitle(i) {
+    var c = chipsEl.children[i]; if (c && c.classList.contains('peq-chip')) c.title = describe(i);
+  }
+  function renderChips() {
+    chipsEl.textContent = '';
+    bands.forEach(function (b, i) {
+      chipsEl.appendChild(mk('span', { class: 'peq-chip' + (b.on ? '' : ' off') + (i === sel ? ' sel' : ''), role: 'option',
+        'aria-selected': i === sel ? 'true' : 'false', tabindex: i === sel ? '0' : '-1', 'data-i': i, title: describe(i), text: String(i + 1) }));
+    });
+    addB.disabled = addBigB.disabled = bands.length >= PEQ_MAX;
+    addB.title = bands.length >= PEQ_MAX ? '대역은 ' + PEQ_MAX + '개까지입니다' : '대역 추가 (빈 곳에 벨)';
+    countEl.textContent = '대역 ' + bands.length + ' / ' + PEQ_MAX;
+  }
+  function markSel() {
+    Array.prototype.forEach.call(chipsEl.children, function (c, i) {
+      c.classList.toggle('sel', i === sel); c.setAttribute('aria-selected', i === sel ? 'true' : 'false'); c.tabIndex = i === sel ? 0 : -1;
+    });
+    Array.prototype.forEach.call(tbody.children, function (tr) { tr.classList.toggle('sel', +tr.getAttribute('data-i') === sel); });
+  }
+  chipsEl.addEventListener('click', function (e) {
+    var c = e.target.closest('.peq-chip'); if (!c) return;
+    select(+c.getAttribute('data-i')); c.focus();
+  });
+  chipsEl.addEventListener('keydown', function (e) {
+    var n = bands.length; if (!n) return;
+    var to = { ArrowLeft: sel - 1, ArrowUp: sel - 1, ArrowRight: sel + 1, ArrowDown: sel + 1, Home: 0, End: n - 1 }[e.key];
+    if (to === undefined) {
+      if (e.key === 'Delete' || e.key === 'Backspace') { e.preventDefault(); removeBand(sel); var c0 = chipsEl.children[sel]; (c0 && c0.classList.contains('peq-chip') ? c0 : addB).focus(); }
+      return;
+    }
+    e.preventDefault();
+    select((to + n) % n);
+    var c = chipsEl.children[sel]; if (c) c.focus();
+  });
+
+  // ── 카드: 고른 대역의 편집 줄 · 큰 창: 모든 대역의 표 ──
+  function renderEdit() {
+    editEl.textContent = '';
+    var b = bands[sel];
+    if (!b) { editEl.appendChild(mk('p', { class: 'peq-empty', text: '대역이 없습니다. ＋를 누르거나 그래프를 두 번 눌러 더합니다.' })); return; }
+    var lab = function (k, ctl) { return mk('label', { class: 'peq-num' }, [mk('span', { text: NUM[k].name }), ctl, NUM[k].unit ? mk('i', { text: NUM[k].unit }) : null]); };
+    editEl.appendChild(mk('div', { class: 'peq-ed', 'data-i': sel }, [
+      mk('div', { class: 'peq-ed-row' }, [ctlOn(sel, b), ctlType(sel, b), ctlSlope(sel, b), ctlDel(sel)]),
+      mk('div', { class: 'peq-ed-row' }, [lab('freq', ctlNum(sel, b, 'freq')), lab('gain', ctlNum(sel, b, 'gain')), lab('q', ctlNum(sel, b, 'q'))])
+    ]));
+  }
+  function renderTable() {
+    countEl.textContent = '대역 ' + bands.length + ' / ' + PEQ_MAX;
+    if (!modal.open) return;               // 닫혀 있으면 열 때 만든다
+    tbody.textContent = '';
+    bands.forEach(function (b, i) {
+      tbody.appendChild(mk('tr', { 'data-i': i, class: (i === sel ? 'sel' : '') + (b.on ? '' : ' off') }, [
+        mk('th', { scope: 'row', text: String(i + 1) }),
+        mk('td', null, [ctlOn(i, b)]), mk('td', null, [ctlType(i, b)]), mk('td', null, [ctlNum(i, b, 'freq')]),
+        mk('td', null, [ctlNum(i, b, 'gain')]), mk('td', null, [ctlNum(i, b, 'q')]), mk('td', null, [ctlSlope(i, b)]), mk('td', null, [ctlDel(i)])
+      ]));
+    });
+    if (!bands.length) tbody.appendChild(mk('tr', null, [mk('td', { colspan: '8', class: 'peq-empty', text: '대역이 없습니다. ＋ 대역을 누르거나 그래프를 두 번 눌러 더합니다.' })]));
+  }
+  // 값만 바뀌면 칸 내용만 고친다(입력 중인 칸은 건드리지 않는다)
+  function syncRow(i) {
+    var b = bands[i]; if (!b) return;
+    [editEl, tbody].forEach(function (root) {
+      var row = root.querySelector('[data-i="' + i + '"]'); if (!row) return;
+      ['freq', 'gain', 'q'].forEach(function (k) {
+        var e = row.querySelector('input[data-k="' + k + '"]');
+        if (e && e !== document.activeElement && e.value !== numOf(b, k)) e.value = numOf(b, k);
+      });
+    });
+  }
+  // 다시 그린 뒤에도 같은 대역 · 같은 칸에 초점을 돌려준다
+  function keepFocus(root, fn) {
+    var a = document.activeElement, row = a && root.contains(a) ? a.closest('[data-i]') : null;
+    var k = row ? a.getAttribute('data-k') : null, i = row ? +row.getAttribute('data-i') : -1;
+    fn();
+    if (!row) return;
+    var r = root.querySelector('[data-i="' + Math.min(i, bands.length - 1) + '"]');
+    var t = r && (r.querySelector('[data-k="' + k + '"]:not(:disabled)') || r.querySelector('[data-k="type"]'));
+    if (t) t.focus(); else if (root === tbody) addBigB.focus(); else addB.focus();
+  }
+  function bindEditor(root) {
+    function at(e) { var r = e.target.closest('[data-i]'); return r ? +r.getAttribute('data-i') : -1; }
+    root.addEventListener('focusin', function (e) { var i = at(e); if (i >= 0 && i !== sel) { sel = i; markSel(); if (root !== editEl) renderEdit(); redraw(); } });
+    root.addEventListener('input', function (e) {
+      var t = e.target, k = t.getAttribute('data-k'), i = at(e), b = bands[i];
+      if (!b || !NUM[k]) return;
+      // 치는 중의 값(주파수 '1' → '10' → '100')이 잠깐씩 소리에 걸리지 않게, 범위 안의 값만 바로 반영한다
+      var v = parseFloat(t.value); if (!isFinite(v) || v < NUM[k].min || v > NUM[k].max) return;
+      b[k] = v;
+      changed('value', i);
+    });
+    root.addEventListener('change', function (e) {
+      var t = e.target, k = t.getAttribute('data-k'), i = at(e), b = bands[i];
+      if (!b) return;
+      if (NUM[k]) {                                               // 범위 밖이면 가장자리 값으로 맞춘다
+        var v = parseFloat(t.value);
+        if (isFinite(v)) { b[k] = Math.min(NUM[k].max, Math.max(NUM[k].min, v)); changed('value', i); }
+        t.value = numOf(b, k); dirty(); return;
+      }
+      if (k === 'on') b.on = t.checked;
+      else if (k === 'type') retype(b, t.value);
+      else if (k === 'slope') b.slope = +t.value || 12;
+      else return;
+      sel = i;
+      keepFocus(root, function () { changed('struct'); });
+      say(describe(i));
+    });
+    root.addEventListener('click', function (e) {
+      var t = e.target.closest('[data-k="del"]'); if (!t) return;
+      var i = at(e); keepFocus(root, function () { removeBand(i); });
+    });
+    // 숫자 칸의 ↑↓ — 주파수는 반음(Shift는 1/48 옥타브), 이득 0.5 dB(0.1), Q 10 %(2 %)
+    root.addEventListener('keydown', function (e) {
+      var t = e.target, k = t.getAttribute('data-k');
+      if (!NUM[k] || (e.key !== 'ArrowUp' && e.key !== 'ArrowDown')) return;
+      e.preventDefault();
+      var i = at(e);
+      if (nudge(i, k, e.key === 'ArrowUp' ? 1 : -1, e.shiftKey)) { t.value = numOf(bands[i], k); dirty(); }
+    });
+  }
+  bindEditor(editEl); bindEditor(tbody);
+
+  // ── 그래프 ──────────────────────────────────────────────
+  var LMIN = Math.log10(PEQ_FMIN), LSPAN = Math.log10(PEQ_FMAX) - LMIN;
+  var rootCS = getComputedStyle(document.documentElement);
+  var FONT = rootCS.getPropertyValue('--font-legend').trim() || '"Barlow Condensed", "Arial Narrow", sans-serif';
+  var LIT = getComputedStyle(card).getPropertyValue('--cap-lit').trim() || '#86b960';
+  var C = { grid: 'rgba(200,214,224,0.07)', grid2: 'rgba(200,214,224,0.15)', zero: 'rgba(200,214,224,0.32)',
+            label: 'rgba(196,208,218,0.66)', pre: 'rgba(214,224,232,0.34)', off: '#5d6a74', offText: '#93a0aa', ink: '#0d1216' };
+  function rgba(hex, a) {
+    var m = /^#?([0-9a-f]{6})$/i.exec(hex); if (!m) return hex;
+    var n = parseInt(m[1], 16); return 'rgba(' + (n >> 16) + ',' + ((n >> 8) & 255) + ',' + (n & 255) + ',' + a + ')';
+  }
+  var FG = [20, 30, 40, 50, 60, 70, 80, 90, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000, 20000];
+  var FL_BIG = [[20, '20'], [50, '50'], [100, '100'], [200, '200'], [500, '500'], [1000, '1k'], [2000, '2k'], [5000, '5k'], [10000, '10k'], [20000, '20k']];
+  var FL_MID = FL_BIG.slice(0, -1);
+  var FL_MINI = [[50, '50'], [100, '100'], [500, '500'], [1000, '1k'], [5000, '5k'], [10000, '10k']];
+
+  function fx(v, f) { return v.x0 + (Math.log10(f) - LMIN) / LSPAN * v.pw; }
+  function xf(v, x) { return Math.pow(10, LMIN + (x - v.x0) / v.pw * LSPAN); }
+  function gy(v, g) { return v.y0 + (1 - (g + range) / (2 * range)) * v.ph; }
+  function yg(v, y) { return range - (y - v.y0) / v.ph * 2 * range; }
+  function pos(v, b) {
+    var y = gy(v, Math.max(-range, Math.min(range, shownGain(b))));
+    return [fx(v, b.freq), y];
+  }
+  function db(m) { return 20 * Math.log10(m > 1e-6 ? m : 1e-6); }
+
+  function makeView(cv, big) {
+    var v = { cv: cv, big: big, c: cv.getContext('2d'), W: 0, H: 0, dpr: 0, hover: -1, drag: null, cursorF: 0, maxDb: 0, ptr: '' };
+    bindView(v);
+    return v;
+  }
+  function layout(v) {
+    var W = v.cv.clientWidth, H = v.cv.clientHeight, dpr = window.devicePixelRatio || 1;
+    if (W === v.W && H === v.H && dpr === v.dpr) return;
+    v.W = W; v.H = H; v.dpr = dpr;
+    v.cv.width = Math.round(W * dpr); v.cv.height = Math.round(H * dpr);
+    var padX = v.big ? 12 : 9;
+    v.x0 = padX; v.pw = Math.max(10, W - 2 * padX); v.y0 = v.big ? 12 : 8; v.ph = Math.max(10, H - v.y0 - (v.big ? 22 : 16));
+    var N = Math.max(96, Math.min(720, Math.round(v.pw / (v.big ? 1.5 : 2))));
+    v.freqs = new Float32Array(N);
+    for (var j = 0; j < N; j++) v.freqs[j] = Math.pow(10, LMIN + LSPAN * j / (N - 1));
+    v.tot = new Float32Array(N); v.one = new Float32Array(N); v.mag = new Float32Array(N); v.phs = new Float32Array(N);
+    v.sPre = new Float32Array(N); v.sPost = new Float32Array(N); v.k0 = null;
+  }
+
+  // 응답 — 화면용 BiquadFilterNode(재생과 같은 샘플레이트)에서 단마다 getFrequencyResponse를 곱한다
+  var probe = null;
+  function rateNow() { return (typeof audioCtx !== 'undefined' && audioCtx && audioCtx.sampleRate) || 48000; }
+  function probeAt(rate) {
+    if (!probe || probe.rate !== rate) {
+      var Off = window.OfflineAudioContext || window.webkitOfflineAudioContext;
+      probe = { rate: rate, ac: new Off(1, 128, rate), nodes: [] };
+    }
+    return probe;
+  }
+  function mul(v, st, out) {
+    var p = probeAt(rateNow()), N = v.freqs.length, j;
+    for (j = 0; j < N; j++) out[j] = 1;
+    for (var k = 0; k < st.length; k++) {
+      var s = st[k], n = p.nodes[k] || (p.nodes[k] = p.ac.createBiquadFilter());
+      n.type = s.kind; n.frequency.value = s.f; n.Q.value = s.q; n.gain.value = s.g;
+      n.getFrequencyResponse(v.freqs, v.mag, v.phs);
+      for (j = 0; j < N; j++) out[j] *= (v.mag[j] === v.mag[j] ? v.mag[j] : 1);
+    }
+  }
+  function response(v) {
+    var d = depth();
+    mul(v, peqStages(bands, d), v.tot);
+    var b = bands[sel];
+    if (b) mul(v, peqStages([{ type: b.type, freq: b.freq, gain: b.gain, q: b.q, slope: b.slope, on: true }], d), v.one);
+  }
+
+  // 스펙트럼 — EQ 블록의 분석기(앞 · 뒤). 1/6 옥타브 폭으로 평균한 세기에 옥타브당 +3 dB 기울임(1 kHz 기준)
+  var SPEC_LO = -96, SPEC_HI = -18, TILT = 3;
+  var spec = { pre: null, post: null, sumPre: null, sumPost: null, t: -1 };
+  function specSource() {
+    if (typeof isPlaying === 'undefined' || !isPlaying || !onEl.checked) return null;
+    if (typeof liveDSP === 'undefined' || !liveDSP || !liveDSP.peqBlock || !liveDSP.peqBlock.pre) return null;
+    return liveDSP.peqBlock;
+  }
+  function readSpec(blk, now) {
+    if (spec.t === now) return;                    // 한 프레임에 한 번만 읽는다(두 그래프가 함께 쓴다)
+    spec.t = now;
+    var n = blk.pre.frequencyBinCount;
+    if (!spec.pre || spec.pre.length !== n) {
+      spec.pre = new Float32Array(n); spec.post = new Float32Array(n);
+      spec.sumPre = new Float64Array(n + 1); spec.sumPost = new Float64Array(n + 1);
+    }
+    [[blk.pre, spec.pre, spec.sumPre], [blk.post, spec.post, spec.sumPost]].forEach(function (x) {
+      x[0].getFloatFrequencyData(x[1]);
+      var a = x[1], s = x[2]; s[0] = 0;
+      for (var k = 0; k < n; k++) s[k + 1] = s[k] + (a[k] > -200 ? Math.pow(10, a[k] / 10) : 0);
+    });
+    spec.rate = blk.pre.context.sampleRate; spec.n = n;
+  }
+  function specLine(v, sum, out) {
+    var N = v.freqs.length, binHz = spec.rate / 2 / spec.n, j;
+    if (!v.k0 || v.kRate !== spec.rate || v.kN !== spec.n) {
+      v.k0 = new Int32Array(N); v.k1 = new Int32Array(N); v.kRate = spec.rate; v.kN = spec.n;
+      var w = Math.pow(2, 1 / 12);
+      for (j = 0; j < N; j++) {
+        var k0 = Math.max(1, Math.round(v.freqs[j] / w / binHz)), k1 = Math.min(spec.n - 1, Math.round(v.freqs[j] * w / binHz));
+        v.k0[j] = k0; v.k1[j] = Math.max(k0, k1);
+      }
+    }
+    for (j = 0; j < N; j++) {
+      var p = (sum[v.k1[j] + 1] - sum[v.k0[j]]) / (v.k1[j] - v.k0[j] + 1);
+      out[j] = 10 * Math.log10(p > 1e-20 ? p : 1e-20) + TILT * Math.log2(v.freqs[j] / 1000);
+    }
+  }
+  function sy(v, L) { return v.y0 + (1 - (L - SPEC_LO) / (SPEC_HI - SPEC_LO)) * v.ph; }
+
+  function drawGrid(v) {
+    var c = v.c, j, x, y;
+    c.lineWidth = 1;
+    FG.forEach(function (f) {
+      x = Math.round(fx(v, f)) + 0.5;
+      c.strokeStyle = (f === 100 || f === 1000 || f === 10000) ? C.grid2 : C.grid;
+      c.beginPath(); c.moveTo(x, v.y0); c.lineTo(x, v.y0 + v.ph); c.stroke();
+    });
+    var step = range === 12 ? 3 : 6;
+    for (var g = -range; g <= range; g += step) {
+      y = Math.round(gy(v, g)) + 0.5;
+      c.strokeStyle = g === 0 ? C.zero : (g % (2 * step) === 0 ? C.grid2 : C.grid);
+      c.beginPath(); c.moveTo(v.x0, y); c.lineTo(v.x0 + v.pw, y); c.stroke();
+    }
+    c.font = '600 ' + (v.big ? 12 : 10.5) + 'px ' + FONT; c.fillStyle = C.label;
+    c.textAlign = 'center'; c.textBaseline = 'alphabetic';
+    // 주파수 숫자 — 그래프 폭에 맞춰 개수를 줄인다(휴대폰 폭에서 ‘10k 20k’가 붙지 않게)
+    (v.pw >= 640 ? FL_BIG : v.pw >= 420 ? FL_MID : FL_MINI).forEach(function (p) {
+      x = Math.max(v.x0 + 8, Math.min(v.x0 + v.pw - 9, fx(v, p[0])));
+      c.fillText(p[1], x, v.H - (v.big ? 6 : 4));
+    });
+    c.textAlign = 'left'; c.textBaseline = 'middle';
+    var labs = v.big ? [range, range / 2, 0, -range / 2, -range] : [range, 0, -range];
+    for (j = 0; j < labs.length; j++) {
+      y = Math.max(v.y0 + 6, Math.min(v.y0 + v.ph - 6, gy(v, labs[j])));
+      c.fillText((labs[j] > 0 ? '+' : labs[j] < 0 ? '−' : '') + Math.abs(labs[j]) + (j === 0 ? ' dB' : ''), v.x0 + 3, y);
+    }
+  }
+  function drawSpec(v) {
+    var c = v.c, N = v.freqs.length, j, bottom = v.y0 + v.ph;
+    specLine(v, spec.sumPost, v.sPost); specLine(v, spec.sumPre, v.sPre);
+    c.beginPath(); c.moveTo(fx(v, v.freqs[0]), bottom);
+    for (j = 0; j < N; j++) c.lineTo(fx(v, v.freqs[j]), Math.min(bottom, sy(v, v.sPost[j])));
+    c.lineTo(fx(v, v.freqs[N - 1]), bottom); c.closePath();
+    c.fillStyle = rgba(LIT, 0.1); c.fill();
+    c.beginPath();
+    for (j = 0; j < N; j++) { var y = Math.min(bottom, sy(v, v.sPre[j])); j ? c.lineTo(fx(v, v.freqs[j]), y) : c.moveTo(fx(v, v.freqs[j]), y); }
+    c.strokeStyle = C.pre; c.lineWidth = 1; c.stroke();
+  }
+  function drawCurves(v) {
+    var c = v.c, N = v.freqs.length, j, x, y, lo = v.y0 - 3, hi = v.y0 + v.ph + 3, y0 = gy(v, 0), b = bands[sel];
+    if (b) {
+      c.beginPath(); c.moveTo(fx(v, v.freqs[0]), y0);
+      for (j = 0; j < N; j++) c.lineTo(fx(v, v.freqs[j]), Math.max(lo, Math.min(hi, gy(v, db(v.one[j])))));
+      c.lineTo(fx(v, v.freqs[N - 1]), y0); c.closePath();
+      c.fillStyle = rgba(LIT, b.on && onEl.checked ? 0.2 : 0.08); c.fill();
+    }
+    var mx = 0;
+    c.beginPath();
+    for (j = 0; j < N; j++) {
+      var d = db(v.tot[j]); if (d > mx) mx = d;
+      x = fx(v, v.freqs[j]); y = Math.max(lo, Math.min(hi, gy(v, d)));
+      j ? c.lineTo(x, y) : c.moveTo(x, y);
+    }
+    c.strokeStyle = onEl.checked ? LIT : rgba(LIT, 0.45); c.lineWidth = v.big ? 2.2 : 1.7; c.stroke();
+    v.maxDb = mx;
+  }
+  function drawHandles(v) {
+    var c = v.c, R = v.big ? 8.5 : 7;
+    c.font = '700 ' + (v.big ? 11.5 : 10) + 'px ' + FONT; c.textAlign = 'center'; c.textBaseline = 'middle';
+    function one(i) {
+      var b = bands[i], p = pos(v, b), me = i === sel, lit = b.on ? LIT : C.off;
+      c.beginPath(); c.arc(p[0], p[1], R + (i === v.hover && !me ? 1 : 0), 0, 2 * Math.PI);
+      if (me) { c.fillStyle = lit; c.fill(); c.lineWidth = 2; c.strokeStyle = '#eef4f7'; c.stroke(); c.fillStyle = C.ink; }
+      else {
+        c.fillStyle = 'rgba(13,18,22,0.88)'; c.fill(); c.lineWidth = 1.6; c.strokeStyle = lit;
+        if (!b.on) c.setLineDash([2.5, 2.5]);
+        c.stroke(); c.setLineDash([]); c.fillStyle = b.on ? LIT : C.offText;
+      }
+      c.fillText(String(i + 1), p[0], p[1] + 0.5);
+    }
+    for (var i = 0; i < bands.length; i++) if (i !== sel) one(i);
+    if (bands[sel]) one(sel);
+  }
+  function drawText(v) {
+    var c = v.c, t = '', i = v.drag ? v.drag.i : (v.hover >= 0 ? v.hover : ((v.big || document.activeElement === v.cv) ? sel : -1));
+    c.font = '600 ' + (v.big ? 13 : 11) + 'px ' + FONT; c.textBaseline = 'top';
+    if (bands[i]) {
+      var b = bands[i];
+      t = (i + 1) + ' · ' + TNAME[b.type] + ' · ' + fmtF(b.freq);
+      if (peqHasGain(b.type)) t += ' · ' + fmtG(b.gain) + (depth() < 1 ? ' (적용 ' + fmtG(r1(shownGain(b))) + ')' : '');
+      if (peqHasQ(b)) t += ' · Q ' + fmtQ(b.q);
+      if (peqIsCut(b.type)) t += ' · ' + b.slope + ' dB/oct';
+      if (!b.on) t += ' · 꺼짐';
+    }
+    var right = onEl.checked ? '' : 'EQ 꺼짐 — 소리에 반영되지 않음';
+    if (v.big && v.cursorF && !v.drag) right = (right ? right + ' · ' : '') + fmtF(sig3(v.cursorF));
+    var pad = v.big ? 8 : 5, wl = 0, wr = 0, ty = v.y0 + 2, lx = v.x0 + (v.big ? 46 : 36);   // 왼쪽 위 dB 숫자 옆
+    if (right) { wr = c.measureText(right).width; }
+    if (t) {
+      // 오른쪽 글과 겹치면 왼쪽 글을 한 줄 아래로
+      wl = c.measureText(t).width;
+      var ly = (right && lx + wl + 3 * pad > v.x0 + v.pw - wr - 2 * pad) ? ty + (v.big ? 20 : 16) : ty;
+      c.fillStyle = 'rgba(13,18,22,0.78)'; c.fillRect(lx, ly - 2, wl + 2 * pad, v.big ? 18 : 15);
+      c.fillStyle = bands[i].on ? '#e6eef2' : C.offText; c.textAlign = 'left'; c.fillText(t, lx + pad, ly + 1);
+    }
+    if (right) {
+      c.fillStyle = 'rgba(13,18,22,0.78)'; c.fillRect(v.x0 + v.pw - wr - 2 * pad, ty - 2, wr + 2 * pad, v.big ? 18 : 15);
+      c.fillStyle = onEl.checked ? C.label : '#e0b25a'; c.textAlign = 'right'; c.fillText(right, v.x0 + v.pw - pad, ty + 1);
+    }
+  }
+  function draw(v, now) {
+    if (!v.cv.clientWidth || !v.cv.clientHeight) return false;
+    layout(v);
+    var c = v.c;
+    c.setTransform(v.dpr, 0, 0, v.dpr, 0, 0);
+    c.clearRect(0, 0, v.W, v.H);
+    drawGrid(v);
+    var blk = specSource();
+    if (blk) { readSpec(blk, now); drawSpec(v); }
+    response(v);
+    drawCurves(v);
+    drawHandles(v);
+    drawText(v);
+    return true;
+  }
+
+  var views = [], miniSeen = true;
+  function animating() {
+    return typeof isPlaying !== 'undefined' && isPlaying && onEl.checked && (modal.open || miniSeen);
+  }
+  function frame(now) {
+    raf = 0;
+    if (pend.live) { pend.live = false; pushLive(); }
+    var a = animating();
+    if (pend.draw || a) {
+      pend.draw = false;
+      var mx = 0, dragging = false, any = false;
+      views.forEach(function (v) {
+        if (v === views[0] && modal.open) return;      // 큰 창이 열려 있으면 가려진 카드 그래프는 쉰다
+        if (draw(v, now)) { any = true; mx = Math.max(mx, v.maxDb); }
+        if (v.drag) dragging = true;
+      });
+      // 눈금 넓히기 · 좁히기 — 끄는 중에는 그대로 둔다(손 밑의 점이 튀지 않게)
+      if (any && !dragging) {
+        var g = bands.reduce(function (m, b) { return Math.max(m, Math.abs(shownGain(b))); }, mx);
+        var want = g > 11.5 ? 24 : 12;
+        if (want !== range) { range = want; pend.draw = true; }
+      }
+    }
+    if (a || pend.draw) raf = requestAnimationFrame(frame);
+  }
+
+  // 점 찾기 — 고른 점을 먼저, 그다음 가까운 점
+  function hit(v, x, y) {
+    var R = v.big ? 13 : 11, best = -1, bd = R * R;
+    var s = bands[sel];
+    if (s) { var p = pos(v, s), d = (p[0] - x) * (p[0] - x) + (p[1] - y) * (p[1] - y); if (d <= bd) return sel; }
+    bands.forEach(function (b, i) {
+      var q = pos(v, b), e = (q[0] - x) * (q[0] - x) + (q[1] - y) * (q[1] - y);
+      if (e <= bd) { bd = e; best = i; }
+    });
+    return best;
+  }
+  function local(v, e) {
+    var r = v.cv.getBoundingClientRect();
+    return [e.clientX - r.left - v.cv.clientLeft, e.clientY - r.top - v.cv.clientTop];
+  }
+  function bindView(v) {
+    var cv = v.cv;
+    cv.addEventListener('pointerdown', function (e) {
+      v.ptr = e.pointerType;
+      if (e.button !== 0) return;
+      var p = local(v, e), i = hit(v, p[0], p[1]);
+      if (i < 0) return;
+      select(i);
+      var b = bands[i];
+      v.drag = { i: i, x: p[0], y: p[1], f: b.freq, g: b.gain, fine: e.shiftKey, moved: false };
+      try { cv.setPointerCapture(e.pointerId); } catch (er) {}
+      cv.style.cursor = 'grabbing';
+      e.preventDefault();                      // 글 선택 · 터치 스크롤 대신 끌기
+      cv.focus({ preventScroll: true });
+      redraw();
+    });
+    cv.addEventListener('pointermove', function (e) {
+      var p = local(v, e), d = v.drag;
+      if (!d) {
+        var h = hit(v, p[0], p[1]), moved = h !== v.hover;
+        v.cursorF = (p[0] >= v.x0 && p[0] <= v.x0 + v.pw) ? xf(v, p[0]) : 0;
+        if (moved) { v.hover = h; cv.style.cursor = h >= 0 ? 'grab' : 'crosshair'; }
+        if (v.big || moved) redraw();
+        return;
+      }
+      var b = bands[d.i]; if (!b) return;
+      if (e.shiftKey !== d.fine) { d.x = p[0]; d.y = p[1]; d.f = b.freq; d.g = b.gain; d.fine = e.shiftKey; }   // Shift를 누르고 떼면 그 자리에서 다시 잰다
+      var k = d.fine ? 0.2 : 1, dx = (p[0] - d.x) * k, dy = (p[1] - d.y) * k;
+      if (!d.moved && dx * dx + dy * dy < 4) return;
+      d.moved = true;
+      b.freq = Math.min(PEQ_FMAX, Math.max(PEQ_FMIN, sig3(xf(v, fx(v, d.f) + dx))));
+      var dep = depth();
+      if (peqHasGain(b.type) && dep > 0.001) {
+        var shown = Math.max(-range, Math.min(range, yg(v, gy(v, d.g * dep) + dy)));
+        b.gain = Math.min(PEQ_GMAX, Math.max(-PEQ_GMAX, r1(shown / dep)));
+      }
+      changed('value');
+    });
+    function end(e) {
+      if (!v.drag) return;
+      var moved = v.drag.moved, i = v.drag.i;
+      v.drag = null;
+      try { cv.releasePointerCapture(e.pointerId); } catch (er) {}
+      cv.style.cursor = v.hover >= 0 ? 'grab' : 'crosshair';
+      if (moved) { dirty(); say(describe(i)); }
+      redraw();
+    }
+    cv.addEventListener('pointerup', end);
+    cv.addEventListener('pointercancel', end);
+    cv.addEventListener('pointerleave', function () { if (!v.drag && (v.hover >= 0 || v.cursorF)) { v.hover = -1; v.cursorF = 0; redraw(); } });
+    cv.addEventListener('dblclick', function (e) {
+      var p = local(v, e), i = hit(v, p[0], p[1]);
+      if (i >= 0) { toggleBand(i); return; }
+      if (p[0] < v.x0 || p[0] > v.x0 + v.pw) return;
+      var dep = depth(), g = dep > 0.001 ? yg(v, p[1]) / dep : 0;
+      addBand(xf(v, p[0]), Math.max(-PEQ_GMAX, Math.min(PEQ_GMAX, g)));
+    });
+    // 오른쪽 단추로 지우기 — 터치의 길게 누르기로는 지우지 않는다(실수로 지우기 쉽다)
+    cv.addEventListener('contextmenu', function (e) {
+      var p = local(v, e), i = hit(v, p[0], p[1]);
+      if (i < 0) return;
+      e.preventDefault();
+      if (v.ptr !== 'touch') removeBand(i);
+    });
+    // 휠 — 점 위에서만 Q(가파른 컷은 기울기)를 바꾼다. 점 밖에서는 화면이 그대로 스크롤된다
+    // 마우스 휠 한 칸(50 px 이상)은 한 단계, 터치패드의 잔 움직임은 100 px씩 모아 한 단계
+    var acc = 0;
+    cv.addEventListener('wheel', function (e) {
+      if (v.drag) { e.preventDefault(); return; }
+      var p = local(v, e), i = hit(v, p[0], p[1]);
+      if (i < 0) return;
+      e.preventDefault();
+      var d = e.deltaY * (e.deltaMode === 1 ? 33 : e.deltaMode === 2 ? 400 : 1);
+      if (Math.abs(d) >= 50) acc = 0; else { acc += d; if (Math.abs(acc) < 100) return; d = acc; acc = 0; }
+      select(i);
+      if (nudge(i, 'q', d < 0 ? 1 : -1, e.shiftKey)) dirty();
+    }, { passive: false });
+    cv.addEventListener('keydown', function (e) {
+      var b = bands[sel], k = e.key, done = true, n = bands.length;
+      if (k === 'ArrowLeft' || k === 'ArrowRight') done = nudge(sel, 'freq', k === 'ArrowRight' ? 1 : -1, e.shiftKey);
+      else if (k === 'ArrowUp' || k === 'ArrowDown') done = nudge(sel, 'gain', k === 'ArrowUp' ? 1 : -1, e.shiftKey);
+      else if (k === 'PageUp' || k === 'PageDown') done = nudge(sel, 'q', k === 'PageUp' ? 1 : -1, e.shiftKey);
+      else if (k === '[' || k === ']') { if (n) { select((sel + (k === ']' ? 1 : -1) + n) % n); say(describe(sel)); } e.preventDefault(); return; }
+      else if (k === 'Home' || k === 'End') { if (n) { select(k === 'Home' ? 0 : n - 1); say(describe(sel)); } e.preventDefault(); return; }
+      else if (k === 'Delete' || k === 'Backspace') { if (b) removeBand(sel); e.preventDefault(); return; }
+      else if (k === 'Insert' || k === '+' || k === '=') { addBand(); e.preventDefault(); return; }
+      else if (k === ' ' || k === 'Spacebar') { if (b) toggleBand(sel); e.preventDefault(); return; }
+      else if (k === 'Enter' && !v.big) { openModal(); e.preventDefault(); return; }
+      else return;
+      e.preventDefault();
+      if (done && b) { dirty(); say(describe(sel)); }
+    });
+    cv.addEventListener('focus', redraw);
+    cv.addEventListener('blur', redraw);
+  }
+
+  var miniV = makeView($('peqVis'), false), bigV = makeView($('peqVisBig'), true);
+  views = [miniV, bigV];
+  if (window.ResizeObserver) { var ro = new ResizeObserver(redraw); ro.observe(miniV.cv); ro.observe(bigV.cv); }
+  else window.addEventListener('resize', redraw);
+  if (window.IntersectionObserver) new IntersectionObserver(function (es) {
+    miniSeen = es[es.length - 1].isIntersecting; if (miniSeen) redraw();
+  }).observe(miniV.cv);
+
+  // ── 큰 편집 창 ──────────────────────────────────────────
+  // <dialog>의 모달 열기 — 바깥은 브라우저가 비활성으로 두고, Esc로 닫힌다
+  var back = null;
+  function openModal() {
+    if (modal.open) return;
+    back = document.activeElement;
+    syncPower(); syncPlay();
+    if (modal.showModal) modal.showModal(); else modal.setAttribute('open', '');
+    document.documentElement.classList.add('peq-modal-open');
+    renderTable(); redraw();
+    bigV.cv.focus();
+  }
+  function closeModal() { if (modal.open) { if (modal.close) modal.close(); else modal.removeAttribute('open'); } }
+  modal.addEventListener('close', function () {
+    document.documentElement.classList.remove('peq-modal-open');
+    tbody.textContent = '';
+    redraw();
+    if (back && back.focus && document.contains(back)) back.focus(); else openB.focus();
+  });
+  // 바깥(어두운 막)을 눌러도 닫힌다 — 누른 곳과 뗀 곳이 모두 막일 때만
+  var downOnVeil = false;
+  modal.addEventListener('pointerdown', function (e) { downOnVeil = e.target === modal; });
+  modal.addEventListener('click', function (e) { if (downOnVeil && e.target === modal) closeModal(); downOnVeil = false; });
+  openB.addEventListener('click', openModal);
+  closeB.addEventListener('click', closeModal);
+  addB.addEventListener('click', function () { addBand(); });
+  addBigB.addEventListener('click', function () { addBand(); });
+  // 처음 상태로 — 지우는 일이라 한 번 더 눌러야 한다(3초 안에)
+  var armT = 0;
+  resetB.addEventListener('click', function () {
+    if (!resetB.classList.contains('armed')) {
+      resetB.classList.add('armed'); resetB.textContent = '한 번 더 누르면 되돌립니다';
+      clearTimeout(armT); armT = setTimeout(disarm, 3000); return;
+    }
+    disarm();
+    keepFocus(tbody, function () { bands = DEFAULT_BANDS.map(peqClean); sel = 0; changed('struct'); });
+    dirty(); say('처음 네 대역(평탄)으로 되돌렸습니다.');
+  });
+  function disarm() { clearTimeout(armT); resetB.classList.remove('armed'); resetB.textContent = '처음 상태로'; }
+
+  // 큰 창의 켜짐 스위치는 카드의 스위치를 그대로 누른다(재생 중 체인 교체 · 흐름 지도가 함께 따라온다)
+  function syncPower() { powerEl.checked = onEl.checked; }
+  powerEl.addEventListener('change', function () {
+    if (onEl.checked !== powerEl.checked) { onEl.checked = powerEl.checked; onEl.dispatchEvent(new Event('change', { bubbles: true })); }
+  });
+  onEl.addEventListener('change', function () { syncPower(); pend.live = true; redraw(); });
+  // 큰 창에서도 들으며 고칠 수 있게 — 재생 단추는 위쪽 재생 줄의 단추를 대신 누른다
+  function syncPlay() {
+    var has = !!(transport && transport.classList.contains('show'));
+    playB.hidden = !has;
+    playB.textContent = (typeof isPlaying !== 'undefined' && isPlaying) ? '❚❚ 멈춤' : '▶ 재생';
+  }
+  playB.addEventListener('click', function () { mainPlay.click(); });
+  new MutationObserver(function () { syncPlay(); redraw(); }).observe(mainPlay, { childList: true, characterData: true, subtree: true });
+  if (transport) new MutationObserver(syncPlay).observe(transport, { attributes: true, attributeFilter: ['class'] });
+
+  // MACRO — 벨 · 셸프 이득에 곱하는 깊이(엔진이 곱한다). 글 · 그림 · 소리를 함께 고친다
+  macroEl.addEventListener('input', function () { macroV.textContent = this.value + ' %'; redraw(); onParamChange(); });
+
+  // ── 밖에서 쓰는 손잡이 ─────────────────────────────────
+  // getParams()가 읽는 대역 목록(복사본)
+  window.peqBandsNow = function () {
+    return bands.map(function (b) { return { type: b.type, freq: b.freq, gain: b.gain, q: b.q, slope: b.slope, on: b.on }; });
+  };
+  // 프리셋이 저장 · 복원에 쓴다
+  window.asdePEQ = {
+    state: function () { return { bands: window.peqBandsNow() }; },
+    load: function (d) {
+      var arr = d && Array.isArray(d.bands) ? d.bands : [];
+      bands = arr.slice(0, PEQ_MAX).filter(function (b) { return b && typeof b === 'object'; }).map(peqClean);
+      sel = bands.length ? 0 : -1;
+      keepFocus(tbody, function () { changed('struct'); });
+    },
+    // EQ가 없던 판의 설정 — 대역 · 켜짐 · MACRO · INPUT GAIN을 처음 상태로
+    reset: function (all) {
+      bands = DEFAULT_BANDS.map(peqClean); sel = 0;
+      keepFocus(tbody, function () { changed('struct'); });
+      if (!all) return;
+      if (onEl.checked !== onEl.defaultChecked) { onEl.checked = onEl.defaultChecked; onEl.dispatchEvent(new Event('change', { bubbles: true })); }
+      [macroEl, inEl].forEach(function (el) {
+        if (el.value !== el.defaultValue) { el.value = el.defaultValue; el.dispatchEvent(new Event('input', { bubbles: true })); }
+      });
+    },
+    open: openModal, close: closeModal
+  };
+
+  renderChips(); renderEdit(); redraw();
+})();
+</script>
+<script>
+/* ============================================================
    프리셋 — 모듈 순서·켜짐 상태·전 노브 값을 저장하고 복원한다.
    음원은 포함하지 않는다. 파일(.json)과 브라우저 슬롯 두 경로.
    ============================================================ */
@@ -8883,6 +9938,9 @@ drawTubeViz();
     if (sg) d.sgMode = sg.getAttribute('data-mode');
     var sc = document.querySelector('.atmos-scene-btn.active');
     if (sc) d.atmosScene = sc.getAttribute('data-scene');
+
+    // 파라메트릭 EQ의 대역 목록 — 슬라이더가 아니라 따로 담는다
+    if (window.asdePEQ) d.peq = window.asdePEQ.state();
 
     return d;
   }
@@ -8944,6 +10002,13 @@ drawTubeViz();
     if (d.sgMode) {
       var mb = document.querySelector('.sg-mode-btn[data-mode="' + d.sgMode + '"]');
       if (mb) mb.click();
+    }
+
+    // 파라메트릭 EQ 대역. EQ가 없던 판(3.0.x)의 설정이면 EQ를 처음 상태(꺼짐 · 평탄한 네 대역 ·
+    // MACRO 100 % · INPUT GAIN 0)로 되돌려, 저장할 때의 소리를 그대로 낸다.
+    if (window.asdePEQ) {
+      if (d.peq && Array.isArray(d.peq.bands)) window.asdePEQ.load(d.peq);
+      else window.asdePEQ.reset(true);
     }
 
     // 2) 슬라이더. 저장된 값이 씬 프리셋 값을 이긴다.
@@ -9407,7 +10472,7 @@ drawTubeViz();
   var track = document.getElementById('flowTrack');
   if (!grid) return;
 
-  var SHORT = { 'mod-comp': 'COMP', 'mod-bbe': 'BBE', 'mod-tube': 'TUBE', 'mod-exciter': 'EXCITER',
+  var SHORT = { 'mod-peq': 'EQ', 'mod-comp': 'COMP', 'mod-bbe': 'BBE', 'mod-tube': 'TUBE', 'mod-exciter': 'EXCITER',
                 'mod-sg': 'SG', 'mod-vinyl': 'VINYL', 'mod-atmos': 'ATMOS', 'mod-master': 'MASTER' };
   var reduced = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
 
@@ -10051,6 +11116,11 @@ drawTubeViz();
     if (!ovfRaf) ovfRaf = requestAnimationFrame(function () { ovfRaf = 0; markOverflow(); });   // 접고 펼 때 넘침이 바뀐다
   }) : null;
   Array.prototype.forEach.call(grid.querySelectorAll('.module'), function (m) { syncInert(m); if (cro) cro.observe(m, { attributes: true, attributeFilter: ['class'] }); });
+  // 카드 안 내용의 높이가 바뀌어도(예: EQ 대역 단추가 두 줄이 될 때) 넘침을 다시 잰다
+  if (window.ResizeObserver) {
+    var bro = new ResizeObserver(function () { if (!ovfRaf) ovfRaf = requestAnimationFrame(function () { ovfRaf = 0; markOverflow(); }); });
+    Array.prototype.forEach.call(grid.querySelectorAll('.module:not(.hd-module) > .module-body > *'), function (c) { bro.observe(c); });
+  }
 
   // ── 프리셋 — 저장하면 깜빡이고, 불러오면 카드가 새 자리를 찾아간다 ──
   // 프리셋 코드(앱 본체)는 이 스크립트 없이도 돌아가야 하므로 이벤트만 보낸다.

@@ -261,7 +261,7 @@ footer {
   /* 앰버 면 */
   --c-amber-fill: #f0b545; --c-amber-fill-hi: #f6c464; --c-amber-deep: #c98f2c; --c-on-amber: #161c21;
   /* 캡 — 처리기마다 하나 */
-  --c-cap-comp: #8da9c4; --c-cap-bbe: #4db6a9; --c-cap-tube: #e8904a; --c-cap-exc: #d8bc4c; --c-cap-sg: #c977a9;
+  --c-cap-peq: #8bbf62; --c-cap-comp: #8da9c4; --c-cap-bbe: #4db6a9; --c-cap-tube: #e8904a; --c-cap-exc: #d8bc4c; --c-cap-sg: #c977a9;
   --c-cap-vinyl: #c67078; --c-cap-atmos: #6c9be0; --c-cap-master: #cfd6dc; --c-cap-hd: #a78bea;
   --c-cap-ink: 50%; --c-cap-tint: 12%; --c-on-cap: #161c21;
   /* 화면 — 두 모드 공통으로 어둡다. 그 안에 켜지는 색도 밝은 값 */
@@ -284,7 +284,7 @@ footer {
     --c-text: #1c242b; --c-muted: #46525c; --c-dim: #535f6a;
     --c-amber: #835208; --c-red: #ab3226; --c-green: #286a3d; --c-blue: #285e9a; --c-purple: #5e44b8; --c-teal: #115f58;
     --c-amber-fill: #eeae3d; --c-amber-fill-hi: #f3bd58; --c-amber-deep: #d4952b; --c-on-amber: #1c242b;
-    --c-cap-comp: #32597b; --c-cap-bbe: #115f58; --c-cap-tube: #864215; --c-cap-exc: #695304; --c-cap-sg: #87386c;
+    --c-cap-peq: #3d6b22; --c-cap-comp: #32597b; --c-cap-bbe: #115f58; --c-cap-tube: #864215; --c-cap-exc: #695304; --c-cap-sg: #87386c;
     --c-cap-vinyl: #96303d; --c-cap-atmos: #2b5497; --c-cap-master: #4c5760; --c-cap-hd: #5b42ae;
     --c-cap-ink: 80%; --c-cap-tint: 18%; --c-on-cap: #ffffff;
     --c-glow: #f4f6f8; --c-hilite: rgba(255,255,255,0.75); --c-shade: rgba(30,40,50,0.28);
@@ -298,7 +298,7 @@ footer {
   --c-text: #1c242b; --c-muted: #46525c; --c-dim: #535f6a;
   --c-amber: #835208; --c-red: #ab3226; --c-green: #286a3d; --c-blue: #285e9a; --c-purple: #5e44b8; --c-teal: #115f58;
   --c-amber-fill: #eeae3d; --c-amber-fill-hi: #f3bd58; --c-amber-deep: #d4952b; --c-on-amber: #1c242b;
-  --c-cap-comp: #32597b; --c-cap-bbe: #115f58; --c-cap-tube: #864215; --c-cap-exc: #695304; --c-cap-sg: #87386c;
+  --c-cap-peq: #3d6b22; --c-cap-comp: #32597b; --c-cap-bbe: #115f58; --c-cap-tube: #864215; --c-cap-exc: #695304; --c-cap-sg: #87386c;
   --c-cap-vinyl: #96303d; --c-cap-atmos: #2b5497; --c-cap-master: #4c5760; --c-cap-hd: #5b42ae;
   --c-cap-ink: 80%; --c-cap-tint: 18%; --c-on-cap: #ffffff;
   --c-glow: #f4f6f8; --c-hilite: rgba(255,255,255,0.75); --c-shade: rgba(30,40,50,0.28);
@@ -306,6 +306,9 @@ footer {
 }
 
 /* 처리기 캡 — 매뉴얼 · 쉬운 말은 data-cap, 가이드 · 사양서는 id로 잇는다 */
+:root:not(#_) [data-cap="peq"],
+:root:not(#_) #m-peq,
+:root:not(#_) #u-peq { --cap: var(--c-cap-peq); }
 :root:not(#_) [data-cap="comp"],
 :root:not(#_) #m-comp,
 :root:not(#_) #u-comp { --cap: var(--c-cap-comp); }
@@ -485,6 +488,7 @@ footer {
     </li>
     <li><a href="#units">처리 단 사양</a>
       <ol>
+        <li><a href="#u-peq">PARAMETRIC EQ</a></li>
         <li><a href="#u-comp">COMPRESSOR</a></li>
         <li><a href="#u-bbe">BBE</a></li>
         <li><a href="#u-tube">VACUUM TUBE</a></li>
@@ -533,7 +537,7 @@ footer {
   <p class="id">SIGNAL PROCESSING SPECIFICATION</p>
   <h1>ANALOG SOUL DSP ENGINE</h1>
   <p>
-    여덟 개 처리 단의 필터 특성, 전달 함수, 배음 생성 구조와
+    아홉 개 처리 단의 필터 특성, 전달 함수, 배음 생성 구조와
     대역 확장 알고리즘의 판정 기준 및 합성 규칙을 기술한다.
   </p>
 
@@ -554,18 +558,19 @@ footer {
   <h2><span class="n">01</span>신호 체인</h2>
   <div class="rd">
     <p>
-      직렬 8단 구성이다. 앞 단의 출력이 뒤 단의 입력이 되므로 배치 순서가
+      직렬 9단 구성이다. 앞 단의 출력이 뒤 단의 입력이 되므로 배치 순서가
       최종 음색을 결정한다. 마스터링 단은 제작 체인의 최종단이다. 그 뒤에는 재생 매체를 모형화하는 VINYL · ATMOS만 재생 단계로 둘 수 있다.
     </p>
-    <div class="blk">입력 ─▶ <b>COMP</b> ─▶ <b>BBE</b> ─▶ <b>TUBE</b> ─▶ <b>EXCITER</b> ─▶ <b>SG</b> ─▶ <b>VINYL</b> ─▶ <b>ATMOS</b> ─▶ <b>MASTER</b> ─▶ 출력
-        └─ 각 단 진입 직전 입력 게인 <i>±24 dB</i> ─┘        <i>제작의 최종단</i></div>
+    <div class="blk">입력 ─▶ <b>EQ</b> ─▶ <b>COMP</b> ─▶ <b>BBE</b> ─▶ <b>TUBE</b> ─▶ <b>EXCITER</b> ─▶ <b>SG</b> ─▶ <b>VINYL</b> ─▶ <b>ATMOS</b> ─▶ <b>MASTER</b> ─▶ 출력
+        └─ 각 단 진입 직전 입력 게인 <i>±24 dB</i> ─┘              <i>제작의 최종단</i></div>
   </div>
 
   <div class="rd"><p>재생 단계 — MASTER 뒤에는 VINYL · ATMOS만 둘 수 있다. LP는 마스터 음원으로 래커를 깎아 재생하므로 표면 잡음 · 크래클 · 팝 · 휨 · 회전 흔들림이 마스터링 뒤에 더해지고, Atmos의 공간 렌더링은 마스터가 끝난 뒤 재생 장치에서 일어난다. 이 두 단을 MASTER 앞에 두면 재생 잡음까지 대역 압축과 리미터를 거쳐 실제와 다르게 눌리고 부풀려진다. 처리 순서는 카드 순서를 MASTER 앞(제작)과 뒤(재생 단계)로 나눈 하나의 함수가 실시간 · 내보내기 양쪽에 같게 정한다. CEILING 보장은 MASTER 출력까지이며, 재생 단계를 거친 신호는 CEILING을 넘을 수 있다.</p>
-<p><strong>MACRO %</strong> — 카드 맨 위의 MACRO는 그 카드의 주요 손잡이를 가장 약한 위치(0%)와 기준 설계값(100%) 사이에서 선형으로 함께 옮기고, 슬라이더 눈금에 맞춰 반올림한다. 손잡이 값만 옮기므로 처리 비용은 늘지 않는다. 화면 설정 파일은 문서 순서대로 값을 넣으므로 MACRO가 먼저 옮기고, 저장된 손잡이 값이 그 위에 들어간다.</p>
+<p><strong>MACRO %</strong> — 카드 맨 위의 MACRO는 그 카드의 주요 손잡이를 가장 약한 위치(0%)와 기준 설계값(100%) 사이에서 선형으로 함께 옮기고, 슬라이더 눈금에 맞춰 반올림한다. 손잡이 값만 옮기므로 처리 비용은 늘지 않는다. 화면 설정 파일은 문서 순서대로 값을 넣으므로 MACRO가 먼저 옮기고, 저장된 손잡이 값이 그 위에 들어간다. PARAMETRIC EQ의 MACRO만은 손잡이를 옮기지 않고 벨 · 셸프의 이득에 곱하는 깊이다. 대역마다 값이 달라서다(<a href="#u-peq">처리 단 사양</a>).</p>
 <div class="tw"><table>
 <thead><tr><th>카드</th><th>MACRO가 옮기는 손잡이 (0% → 100%)</th><th>처음 상태</th></tr></thead>
 <tbody>
+<tr><td>PARAMETRIC EQ</td><td>옮기는 손잡이 없음 — 벨 · 셸프 이득에 0 → 1을 곱함 (컷 · 노치는 그대로)</td><td>100% · 끔</td></tr>
 <tr><td>COMPRESSOR</td><td>THRESHOLD 0 → −18 dB · RATIO 1 → 4 · MAKEUP 0 → 4 dB</td><td>50% · 켬</td></tr>
 <tr><td>BBE</td><td>LO CONTOUR 0 → 40 · PROCESS 0 → 60 · HI DEF 0 → 50</td><td>40% · 켬</td></tr>
 <tr><td>VACUUM TUBE</td><td>DRIVE 0 → 30 · MIX 0 → 50</td><td>100% · 끔</td></tr>
@@ -583,6 +588,10 @@ footer {
     <div class="tw"><table>
       <thead><tr><th>단</th><th>성격</th><th>배치 근거</th></tr></thead>
       <tbody>
+        <tr>
+          <td class="n">EQ</td><td>선형 음색 보정</td>
+          <td>깎아 낼 성분(웅웅거림 · 저역 잡음 등)이 뒤의 압축기 검출과 포화를 먼저 움직이지 않게 한다. 압축기는 검출 신호에 섞인 모든 성분에 반응하고, 비선형 단은 들어온 성분으로 배음 · 상호변조를 만든다.</td>
+        </tr>
         <tr>
           <td class="n">COMP</td><td>다이내믹스</td>
           <td>레벨 변동을 먼저 줄여야 뒤따르는 비선형 단의 동작점이 일정해진다. 포화량이 구간마다 달라지는 것을 막는다.</td>
@@ -621,6 +630,10 @@ footer {
     <h4>순서 변경의 음향적 결과</h4>
     <ul>
       <li>
+        <strong>EQ를 COMP 뒤로.</strong> 압축기가 EQ를 거치기 전의 신호를 검출하므로 EQ로 깎을 성분도
+        리덕션을 움직인다. 대신 EQ가 압축된 뒤의 음색을 다듬는다. 압축된 소리의 음색을 고치려면 이 배치를 쓴다.
+      </li>
+      <li>
         <strong>TUBE를 COMP 앞으로.</strong> 포화가 먼저 피크를 둥글게 만들어
         압축기에 들어가는 크레스트 팩터가 낮아진다. 같은 스레숄드에서 리덕션이 줄고
         결과적으로 더 단단한 어택이 남는다.
@@ -652,6 +665,7 @@ footer {
       <tbody>
         <tr><td class="n">TUBE · EXCITER · SG</td><td>비선형 소자의 동작점 이동. 포화 깊이와 배음 차수 분포가 바뀐다. 사실상 드라이브 제어와 등가.</td></tr>
         <tr><td class="n">COMP</td><td>스레숄드 상대 이동. +3 dB 입력은 스레숄드 −3 dB와 동일한 리덕션을 낳는다.</td></tr>
+        <tr><td class="n">EQ</td><td>선형 처리뿐이라 레벨만 변한다. 대역의 응답은 입력 레벨과 무관하다.</td></tr>
         <tr><td class="n">BBE · VINYL · ATMOS</td><td>선형 처리가 지배적이므로 레벨만 변한다.</td></tr>
         <tr><td class="n">MASTER</td><td>대역 압축기 4개의 스레숄드가 고정값이므로, 입력 게인이 전체 리덕션 깊이를 결정한다.</td></tr>
       </tbody>
@@ -667,6 +681,209 @@ footer {
       블록도에서 세로 분기는 병렬 경로를 뜻한다.
       필터 표기는 <code>종류(주파수, Q, 게인)</code> 형식이다.
     </p>
+  </div>
+
+  <div class="unit" id="u-peq">
+    <div class="unit-h"><h3>PARAMETRIC EQ</h3><span class="tag">최대 20대역 직렬 바이쿼드</span></div>
+    <div class="rd">
+      <div class="blk">in ─▶ <b>대역 1</b> ─▶ <b>대역 2</b> ─▶ … ─▶ <b>대역 n</b> ─▶ out     <i>목록 순서, n ≤ 20, 꺼진 대역은 빠짐</i>
+      <i>바이쿼드 1개 (24 · 36 · 48 dB/oct 컷은 2차 단 2 · 3 · 4개 직렬)</i>
+in ─▶ <b>이득 1</b> ─▶ out                                   <i>켜진 대역이 없을 때</i></div>
+      <p>
+        대역 하나가 Web Audio BiquadFilterNode 하나이고, 24 · 36 · 48 dB/oct 컷만 2차 단 여러 개로 나눈다.
+        대역은 목록 순서(만든 차례)대로 직렬로 잇고, 꺼진 대역은 체인에서 뺀다. 켜진 대역이 없으면 입력이
+        이득 1로 그대로 나가 표본이 바뀌지 않는다. 모든 단이 선형이다.
+      </p>
+      <div class="tw"><table>
+        <thead><tr><th>종류</th><th>노드 type</th><th>Q 파라미터</th></tr></thead>
+        <tbody>
+          <tr><td>벨</td><td class="m">peaking</td><td>선형 값 그대로</td></tr>
+          <tr><td>로우 셸프 · 하이 셸프</td><td class="m">lowshelf · highshelf</td><td>쓰지 않음 (명세가 무시)</td></tr>
+          <tr><td>로우 컷 · 하이 컷</td><td class="m">highpass · lowpass</td><td>dB로 바꿔 넣음. 12 dB/oct는 Q 손잡이, 그보다 가파르면 단별 버터워스 Q</td></tr>
+          <tr><td>노치</td><td class="m">notch</td><td>선형 값 그대로</td></tr>
+        </tbody>
+      </table></div>
+      <div class="tw"><table>
+        <thead><tr><th>파라미터</th><th>범위</th><th>적용</th></tr></thead>
+        <tbody>
+          <tr><td>대역 수</td><td class="m">0 ~ 20</td><td>—</td></tr>
+          <tr><td>주파수</td><td class="m">20 Hz ~ 20 kHz</td><td>모든 종류</td></tr>
+          <tr><td>이득</td><td class="m">±24 dB</td><td>벨 · 셸프</td></tr>
+          <tr><td>Q</td><td class="m">0.1 ~ 18</td><td>벨 · 노치 · 12 dB/oct 컷</td></tr>
+          <tr><td>기울기</td><td class="m">12 · 24 · 36 · 48 dB/oct</td><td>컷</td></tr>
+          <tr><td>MACRO</td><td class="m">0 ~ 100 %</td><td>벨 · 셸프의 이득에 곱함</td></tr>
+          <tr><td>INPUT GAIN</td><td class="m">−24 ~ +24 dB</td><td>카드 앞, 켜졌을 때만</td></tr>
+        </tbody>
+      </table></div>
+      <p>
+        범위 밖 값은 가장자리로 맞춘다. 처음 상태는 꺼짐 · MACRO 100 % · INPUT GAIN 0 dB이고,
+        평탄한 네 대역(로우 셸프 80 Hz · 벨 400 Hz Q 1 · 벨 2.5 kHz Q 1 · 하이 셸프 10 kHz, 모두 0 dB)을 둔다.
+        켜도 소리는 바뀌지 않는다.
+      </p>
+
+      <h4>계수</h4>
+      <p>
+        Web Audio 명세는 바이쿼드의 계수를 아래 식으로 정한다. 명세는 이 식을 Audio EQ Cookbook의 식에서 착안했다고 밝힌다.
+        이 카드가 쓰는 여섯 종류만 옮긴다. F<sub>s</sub>는 표본률, f<sub>0</sub>는 주파수, G는 이득(dB), Q는 노드의 Q 파라미터에 넣은 값이다.
+      </p>
+      <div class="eq">H(z) = (b<sub>0</sub>/a<sub>0</sub> + (b<sub>1</sub>/a<sub>0</sub>) z<sup>−1</sup> + (b<sub>2</sub>/a<sub>0</sub>) z<sup>−2</sup>)
+     / (1 + (a<sub>1</sub>/a<sub>0</sub>) z<sup>−1</sup> + (a<sub>2</sub>/a<sub>0</sub>) z<sup>−2</sup>)
+
+A = 10<sup>G/40</sup>              ω<sub>0</sub> = 2π f<sub>0</sub>/F<sub>s</sub>
+α<sub>Q</sub> = sin ω<sub>0</sub> / (2Q)      α<sub>Q<sub>dB</sub></sub> = sin ω<sub>0</sub> / (2·10<sup>Q/20</sup>)
+S = 1                  α<sub>S</sub> = (sin ω<sub>0</sub> / 2) √((A + 1/A)(1/S − 1) + 2)
+
+<b>peaking</b>     b<sub>0</sub> = 1 + α<sub>Q</sub> A         b<sub>1</sub> = −2 cos ω<sub>0</sub>        b<sub>2</sub> = 1 − α<sub>Q</sub> A
+            a<sub>0</sub> = 1 + α<sub>Q</sub>/A         a<sub>1</sub> = −2 cos ω<sub>0</sub>        a<sub>2</sub> = 1 − α<sub>Q</sub>/A
+<b>notch</b>       b<sub>0</sub> = 1                b<sub>1</sub> = −2 cos ω<sub>0</sub>        b<sub>2</sub> = 1
+            a<sub>0</sub> = 1 + α<sub>Q</sub>           a<sub>1</sub> = −2 cos ω<sub>0</sub>        a<sub>2</sub> = 1 − α<sub>Q</sub>
+<b>lowpass</b>     b<sub>0</sub> = (1 − cos ω<sub>0</sub>)/2   b<sub>1</sub> = 1 − cos ω<sub>0</sub>       b<sub>2</sub> = (1 − cos ω<sub>0</sub>)/2
+            a<sub>0</sub> = 1 + α<sub>Q<sub>dB</sub></sub>          a<sub>1</sub> = −2 cos ω<sub>0</sub>        a<sub>2</sub> = 1 − α<sub>Q<sub>dB</sub></sub>
+<b>highpass</b>    b<sub>0</sub> = (1 + cos ω<sub>0</sub>)/2   b<sub>1</sub> = −(1 + cos ω<sub>0</sub>)    b<sub>2</sub> = (1 + cos ω<sub>0</sub>)/2
+            a<sub>0</sub> = 1 + α<sub>Q<sub>dB</sub></sub>          a<sub>1</sub> = −2 cos ω<sub>0</sub>        a<sub>2</sub> = 1 − α<sub>Q<sub>dB</sub></sub>
+<b>lowshelf</b>    b<sub>0</sub> = A[(A+1) − (A−1) cos ω<sub>0</sub> + 2 α<sub>S</sub> √A]
+            b<sub>1</sub> = 2A[(A−1) − (A+1) cos ω<sub>0</sub>]
+            b<sub>2</sub> = A[(A+1) − (A−1) cos ω<sub>0</sub> − 2 α<sub>S</sub> √A]
+            a<sub>0</sub> = (A+1) + (A−1) cos ω<sub>0</sub> + 2 α<sub>S</sub> √A
+            a<sub>1</sub> = −2[(A−1) + (A+1) cos ω<sub>0</sub>]
+            a<sub>2</sub> = (A+1) + (A−1) cos ω<sub>0</sub> − 2 α<sub>S</sub> √A
+<b>highshelf</b>   b<sub>0</sub> = A[(A+1) + (A−1) cos ω<sub>0</sub> + 2 α<sub>S</sub> √A]
+            b<sub>1</sub> = −2A[(A−1) + (A+1) cos ω<sub>0</sub>]
+            b<sub>2</sub> = A[(A+1) + (A−1) cos ω<sub>0</sub> − 2 α<sub>S</sub> √A]
+            a<sub>0</sub> = (A+1) − (A−1) cos ω<sub>0</sub> + 2 α<sub>S</sub> √A
+            a<sub>1</sub> = 2[(A−1) − (A+1) cos ω<sub>0</sub>]
+            a<sub>2</sub> = (A+1) − (A−1) cos ω<sub>0</sub> − 2 α<sub>S</sub> √A</div>
+
+      <h4>로우 컷 · 하이 컷</h4>
+      <p>
+        명세는 lowpass · highpass의 Q를 dB로 해석한다(α<sub>Q<sub>dB</sub></sub>). 선형 Q를 20·log<sub>10</sub>(Q) dB로 바꿔 넣으면
+        α<sub>Q<sub>dB</sub></sub>가 선형 Q의 α<sub>Q</sub>와 같아진다. 다른 카드의 버터워스 단이 선형 0.7071 대신 −3.01 dB를 넣는 것과
+        같은 이유다. peaking · notch는 선형 Q를 그대로 넣는다.
+      </p>
+      <div class="eq">명세 입력값   Q<sub>dB</sub> = 20·log<sub>10</sub>(Q)                        <i>lowpass · highpass만</i>
+              α<sub>Q<sub>dB</sub></sub> = sin ω<sub>0</sub> / (2·10<sup>Q<sub>dB</sub>/20</sup>) = sin ω<sub>0</sub> / (2Q)
+단별 Q        Q<sub>k</sub> = 1 / (2 sin((2k − 1)π / 2n)),   k = 1 … n/2     <i>n = 기울기 / 6</i></div>
+      <p>
+        12 dB/oct는 2차 단 하나이고 Q가 공진을 정한다. 차단 주파수의 이득이 선형으로 Q와 같아,
+        Q 1/√2(버터워스, 칸에는 0.71)이면 −3.01 dB, Q 4면 +12.04 dB다. 24 · 36 · 48 dB/oct는 버터워스 4 · 6 · 8차를
+        2차 단 2 · 3 · 4개로 나눠 직렬로 잇고, Q 손잡이 대신 위 식의 단별 Q를 쓴다.
+      </p>
+      <div class="tw"><table>
+        <thead><tr><th>기울기</th><th>차수 · 단</th><th>단별 Q (선형)</th><th>명세 입력값 (dB)</th></tr></thead>
+        <tbody>
+          <tr><td class="m">12 dB/oct</td><td class="m">2차 · 1단</td><td class="m">Q 손잡이 (0.1 ~ 18)</td><td class="m">20·log<sub>10</sub>(Q)</td></tr>
+          <tr><td class="m">24 dB/oct</td><td class="m">4차 · 2단</td><td class="m">0.541 · 1.307</td><td class="m">−5.33 · +2.32</td></tr>
+          <tr><td class="m">36 dB/oct</td><td class="m">6차 · 3단</td><td class="m">0.518 · 0.707 · 1.932</td><td class="m">−5.72 · −3.01 · +5.72</td></tr>
+          <tr><td class="m">48 dB/oct</td><td class="m">8차 · 4단</td><td class="m">0.510 · 0.601 · 0.900 · 2.563</td><td class="m">−5.85 · −4.42 · −0.92 · +8.17</td></tr>
+        </tbody>
+      </table></div>
+      <p>
+        종류를 컷으로 바꾸면 Q를 버터워스 값 1/√2(칸에는 0.71)로, 컷 · 셸프에서 벨 · 노치로 바꾸면 1로 둔다.
+        높은 Q의 벨을 컷으로 바꿀 때 차단 주파수에 큰 공진 봉우리가 생기지 않게 하려는 것이다.
+      </p>
+
+      <h4>셸프</h4>
+      <p>
+        명세의 셸프는 S = 1로 두어 Q를 쓰지 않는다. 설정 주파수에서의 크기는 A = 10<sup>G/40</sup>, 곧 설정 이득의
+        절반(dB)이다. 로우 셸프 +4 dB · 100 Hz는 100 Hz에서 2.000 dB, 하이 셸프 −6 dB · 8 kHz는 8 kHz에서 −3.000 dB이고,
+        설정 주파수에서 멀어질수록 설정 이득에 다가간다.
+      </p>
+
+      <h4>MACRO — 깊이</h4>
+      <p>
+        다른 카드의 MACRO는 여러 손잡이를 함께 옮기지만, EQ는 대역마다 값이 달라 MACRO를 깊이로 둔다.
+        벨 · 셸프의 이득에만 곱하므로 0 %면 벨 · 셸프가 평탄해지고 컷 · 노치는 그대로 남는다.
+        그래프의 점도 (주파수, 이득 × MACRO)에 놓여 들리는 만큼의 높이를 보인다.
+      </p>
+      <div class="eq">걸리는 이득 = G · MACRO      <i>벨 · 셸프만. 컷 · 노치는 MACRO와 무관</i></div>
+
+      <h4>재생 중 바꾸기</h4>
+      <p>
+        주파수 · 이득 · Q는 시정수 10 ms로 새 값에 다가간다. 대역 수 · 종류 · 기울기 · 켜짐이 바뀌면 단 구성이 달라지므로
+        새 필터 열을 만들어 20 ms 동안 교차해 넘기고, 옛 열은 80 ms 뒤 정리한다. 필터 상태가 끊겨 딸깍이지 않게 하려는 것이다.
+      </p>
+      <div class="blk">in ┬▶ <b>옛 필터 열</b> ─▶ <i>1 → 0</i> ─┐
+   └▶ <b>새 필터 열</b> ─▶ <i>0 → 1</i> ─┴▶ out     <i>20 ms 직선 교차, 옛 열은 80 ms 뒤 정리</i></div>
+      <div class="eq">v(t) = v<sub>1</sub> + (v<sub>0</sub> − v<sub>1</sub>) · e<sup>−t/τ</sup>,   τ = 10 ms     <i>v<sub>0</sub>: 바꾸기 전 값, v<sub>1</sub>: 새 값</i></div>
+      <div class="tw"><table>
+        <thead><tr><th>1 kHz 사인, 진폭 0.5</th><th>표본 간 최대 변화</th></tr></thead>
+        <tbody>
+          <tr><td>바꾸지 않을 때</td><td class="m">0.065</td></tr>
+          <tr><td>구조 변경 (대역 추가 · 삭제) 중</td><td class="m">0.065</td></tr>
+          <tr><td>값 변경 (벨 0 → +12 dB)</td><td class="m">0.260</td></tr>
+        </tbody>
+      </table></div>
+      <p>
+        구조를 바꾸는 동안에도 표본 간 변화가 신호 자체의 최대 변화를 넘지 않는다.
+        값 변경의 0.260은 +12 dB로 신호가 4배가 된 몫이다.
+      </p>
+
+      <h4>두 엔진과 그래프</h4>
+      <p>
+        실시간 엔진과 렌더링 엔진이 같은 빌더로 이 블록을 만들고 같은 함수로 값을 넣는다. 실시간 블록은 화면용 분석기를
+        EQ 앞뒤에 달지만 분석기는 소리 경로 밖에 있어, 같은 값이면 두 블록의 출력이 표본 단위로 같다.
+      </p>
+      <p>
+        화면의 응답 곡선은 소리와 같은 단 목록으로 같은 종류 · 같은 값의 BiquadFilterNode를 만들어
+        <code>getFrequencyResponse</code>로 얻은 크기를 단마다 곱한 것이다. 재생 중인 표본률로 계산하고(재생 전에는 48 kHz),
+        이 노드들은 렌더링하지 않는 OfflineAudioContext 안에 둔다. 전체 응답은 굵은 선, 고른 대역의 응답은 옅은 면으로 그린다.
+      </p>
+      <div class="tw"><table>
+        <thead><tr><th>스펙트럼 (재생 중, EQ 켜짐)</th><th>값</th></tr></thead>
+        <tbody>
+          <tr><td>분석 지점</td><td>EQ 앞 (선) · EQ 뒤 (면)</td></tr>
+          <tr><td>변환 길이</td><td class="m">8192 (4096 빈)</td></tr>
+          <tr><td>시간 평활 계수</td><td class="m">0.75</td></tr>
+          <tr><td>주파수 평균</td><td class="m">1/6 옥타브 폭, 파워 평균</td></tr>
+          <tr><td>기울임</td><td class="m">옥타브당 +3 dB (1 kHz 기준)</td></tr>
+          <tr><td>표시 하한 / 상한</td><td class="m">−96 dB / −18 dB</td></tr>
+        </tbody>
+      </table></div>
+      <div class="eq">L(f) = 10·log<sub>10</sub>(평균 10<sup>X<sub>k</sub>/10</sup>) + 3·log<sub>2</sub>(f / 1 kHz)   <i>평균: f/2<sup>1/12</sup> ~ f·2<sup>1/12</sup> 빈, X<sub>k</sub>: 분석기 dB</i></div>
+      <p>
+        표시 범위는 빈 평균에 기울임을 더한 값이다. 옥타브당 +3 dB 기울임으로 분홍 잡음이 평평하게 보이며,
+        −20 dBFS RMS 분홍 잡음은 약 −62 dB로 그래프 높이의 44 % 근처에 놓인다.
+      </p>
+
+      <h4>잰 값</h4>
+      <p>
+        48 kHz에서 임펄스 응답을 DFT해 잰 값이다. 최대 차이는 출력 표본끼리의 비교다.
+      </p>
+      <div class="tw"><table>
+        <thead><tr><th>조건</th><th>잰 값</th></tr></thead>
+        <tbody>
+          <tr><td>벨 +6 dB · 1 kHz · Q 1.41</td><td class="m">중심 6.000 dB</td></tr>
+          <tr><td>벨 −9 dB · 250 Hz · Q 4</td><td class="m">중심 −9.000 dB</td></tr>
+          <tr><td>로우 셸프 +4 dB · 100 Hz</td><td class="m">100 Hz 2.000 dB · 20 Hz 4.00 dB</td></tr>
+          <tr><td>하이 셸프 −6 dB · 8 kHz</td><td class="m">8 kHz −3.000 dB</td></tr>
+          <tr><td>노치 3 kHz · Q 8</td><td class="m">중심 −119 dB · 1 kHz −0.009 dB</td></tr>
+          <tr><td>로우 컷 200 Hz, 12 · 24 · 36 · 48 dB/oct (12 dB/oct는 Q 0.7071)</td><td class="m">200 Hz 모두 −3.01 dB<br>100 Hz −12.3 · −24.1 · −36.1 · −48.2 dB</td></tr>
+          <tr><td>하이 컷 5 kHz, 24 dB/oct</td><td class="m">5 kHz −3.01 dB · 10 kHz −28.3 dB</td></tr>
+          <tr><td>MACRO 50 %, 벨 +6 dB</td><td class="m">+3.000 dB</td></tr>
+          <tr><td>MACRO 0 %, 컷 · 노치</td><td class="m">차단 주파수 −3.01 dB, 노치 깊이 그대로</td></tr>
+          <tr><td>대역 없음 · 꺼진 대역만 · 처음 네 평탄 대역</td><td class="m">입력과의 최대 차이 0</td></tr>
+          <tr><td>실시간용 블록(분석기 포함) 대 내보내기용 블록, 같은 값</td><td class="m">최대 차이 0</td></tr>
+          <tr><td>EQ만 켠 내보내기 체인 대 EQ 블록 단독</td><td class="m">최대 차이 0</td></tr>
+          <tr><td>그래프 대 소리, 모든 종류를 한 번에 (40 Hz ~ 20 kHz 36곳)</td><td class="m">최대 0.002 dB</td></tr>
+          <tr><td>그래프 대 소리, 모든 종류를 한 번에 (20 ~ 35 Hz, 사인 정상 상태)</td><td class="m">최대 0.001 dB</td></tr>
+          <tr><td>그래프 대 소리, 30 Hz 48 dB/oct 로우 컷 (20 ~ 30 Hz, 사인 정상 상태)</td><td class="m">96 kHz 최대 0.013 dB · 192 kHz 최대 0.055 dB, 고역 0</td></tr>
+        </tbody>
+      </table></div>
+      <p>
+        로우 컷의 한 옥타브 아래 값은 버터워스 이론과 같다. 초저역에서 그래프와 소리의 차이는 표본률이 높을수록 커지고,
+        임펄스 응답으로 재면 사인 정상 상태보다 크게 나온다(<a href="#limits">사양상 한계</a>).
+      </p>
+      <div class="nb">
+        <span class="t">설정 파일</span>
+        <p>
+          대역 목록은 슬라이더 · 토글과 따로 <code>peq: { bands: [{ type, freq, gain, q, slope, on }, …] }</code>로
+          설정 파일 · 슬롯에 담긴다. 불러올 때는 ATMOS 씬 → SG 모드 → EQ 대역 → 슬라이더 → 토글 → 카드 순서 → LIVE 순으로 넣는다.
+          MACRO · INPUT GAIN · 켜짐은 다른 손잡이처럼 슬라이더 · 토글로 담긴다. EQ가 없는 3.0의 설정을 불러오면
+          EQ를 처음 상태(꺼짐 · 평탄한 네 대역 · MACRO 100 % · INPUT GAIN 0 dB)로 되돌리고, 저장된 카드 순서에 EQ가 없으므로
+          EQ 카드는 맨 앞에 놓인다. 저장할 때의 소리가 그대로 난다.
+        </p>
+      </div>
+    </div>
   </div>
 
   <div class="unit" id="u-comp">
@@ -1986,6 +2203,14 @@ MP3 320k, 40대 청자 → [20 kHz, 15 kHz] = 없음</div>
         잡음과 같은 빈에 겹친 음악 성분은 분리할 수 없다. 셰이핑 판별은 조용한 순간의 바닥으로 하므로, 고역이 늘 크게 깔리고 중역은 조용한 드문 곡을 잘못 볼 수 있으며 그때 달라지는 양도 ±16 LSB 안이다
         (<a href="#bd-meas">실측</a>). 희소성 기반 역양자화(Brauer 외 2016, Záviška 외 2021)는 변환을 수십 회 넘게
         되풀이하는 반복 알고리즘이라 곡 단위 브라우저 처리에 맞지 않아 채택하지 않았다. 손실 압축 원본에는 격자가 없어 적용되지 않는다.
+      </li>
+      <li>
+        <strong>높은 표본률의 20 ~ 30 Hz에서는 소리가 EQ 그래프와 아주 조금 다르다 — 192 kHz에서 최대 0.055 dB.</strong>
+        그래프는 소리를 내는 것과 같은 종류 · 같은 값의 노드에서 <code>getFrequencyResponse</code>로 이론 응답을 얻는다.
+        사인 정상 상태로 재면 44.1 · 48 kHz는 20 Hz ~ 20 kHz 전 구간 0.002 dB 안이고, 극점이 낮은 필터(30 Hz 48 dB/oct 로우 컷)의
+        20 ~ 30 Hz에서 96 kHz 최대 0.013 dB, 192 kHz 최대 0.055 dB로 벌어진다. 40 Hz 위는 192 kHz에서도 0.004 dB 안이다.
+        임펄스 응답의 DFT로 재면 같은 구간이 더 크게(48 kHz 약 0.05 dB, 192 kHz 약 0.8 dB) 나오지만 정상 상태에는 없는 차이라,
+        긴 저역 꼬리에 쌓인 연산 잡음으로 본다(<a href="#u-peq">PARAMETRIC EQ</a>).
       </li>
     </ul>
 

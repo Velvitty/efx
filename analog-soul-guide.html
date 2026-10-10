@@ -318,7 +318,7 @@ footer {
   /* 앰버 면 */
   --c-amber-fill: #f0b545; --c-amber-fill-hi: #f6c464; --c-amber-deep: #c98f2c; --c-on-amber: #161c21;
   /* 캡 — 처리기마다 하나 */
-  --c-cap-comp: #8da9c4; --c-cap-bbe: #4db6a9; --c-cap-tube: #e8904a; --c-cap-exc: #d8bc4c; --c-cap-sg: #c977a9;
+  --c-cap-peq: #8bbf62; --c-cap-comp: #8da9c4; --c-cap-bbe: #4db6a9; --c-cap-tube: #e8904a; --c-cap-exc: #d8bc4c; --c-cap-sg: #c977a9;
   --c-cap-vinyl: #c67078; --c-cap-atmos: #6c9be0; --c-cap-master: #cfd6dc; --c-cap-hd: #a78bea;
   --c-cap-ink: 50%; --c-cap-tint: 12%; --c-on-cap: #161c21;
   /* 화면 — 두 모드 공통으로 어둡다. 그 안에 켜지는 색도 밝은 값 */
@@ -341,7 +341,7 @@ footer {
     --c-text: #1c242b; --c-muted: #46525c; --c-dim: #535f6a;
     --c-amber: #835208; --c-red: #ab3226; --c-green: #286a3d; --c-blue: #285e9a; --c-purple: #5e44b8; --c-teal: #115f58;
     --c-amber-fill: #eeae3d; --c-amber-fill-hi: #f3bd58; --c-amber-deep: #d4952b; --c-on-amber: #1c242b;
-    --c-cap-comp: #32597b; --c-cap-bbe: #115f58; --c-cap-tube: #864215; --c-cap-exc: #695304; --c-cap-sg: #87386c;
+    --c-cap-peq: #3d6b22; --c-cap-comp: #32597b; --c-cap-bbe: #115f58; --c-cap-tube: #864215; --c-cap-exc: #695304; --c-cap-sg: #87386c;
     --c-cap-vinyl: #96303d; --c-cap-atmos: #2b5497; --c-cap-master: #4c5760; --c-cap-hd: #5b42ae;
     --c-cap-ink: 80%; --c-cap-tint: 18%; --c-on-cap: #ffffff;
     --c-glow: #f4f6f8; --c-hilite: rgba(255,255,255,0.75); --c-shade: rgba(30,40,50,0.28);
@@ -355,7 +355,7 @@ footer {
   --c-text: #1c242b; --c-muted: #46525c; --c-dim: #535f6a;
   --c-amber: #835208; --c-red: #ab3226; --c-green: #286a3d; --c-blue: #285e9a; --c-purple: #5e44b8; --c-teal: #115f58;
   --c-amber-fill: #eeae3d; --c-amber-fill-hi: #f3bd58; --c-amber-deep: #d4952b; --c-on-amber: #1c242b;
-  --c-cap-comp: #32597b; --c-cap-bbe: #115f58; --c-cap-tube: #864215; --c-cap-exc: #695304; --c-cap-sg: #87386c;
+  --c-cap-peq: #3d6b22; --c-cap-comp: #32597b; --c-cap-bbe: #115f58; --c-cap-tube: #864215; --c-cap-exc: #695304; --c-cap-sg: #87386c;
   --c-cap-vinyl: #96303d; --c-cap-atmos: #2b5497; --c-cap-master: #4c5760; --c-cap-hd: #5b42ae;
   --c-cap-ink: 80%; --c-cap-tint: 18%; --c-on-cap: #ffffff;
   --c-glow: #f4f6f8; --c-hilite: rgba(255,255,255,0.75); --c-shade: rgba(30,40,50,0.28);
@@ -363,6 +363,9 @@ footer {
 }
 
 /* 처리기 캡 — 매뉴얼 · 쉬운 말은 data-cap, 가이드 · 사양서는 id로 잇는다 */
+:root:not(#_) [data-cap="peq"],
+:root:not(#_) #m-peq,
+:root:not(#_) #u-peq { --cap: var(--c-cap-peq); }
 :root:not(#_) [data-cap="comp"],
 :root:not(#_) #m-comp,
 :root:not(#_) #u-comp { --cap: var(--c-cap-comp); }
@@ -541,6 +544,7 @@ footer {
     </li>
     <li><a href="#modules">모듈 하나하나</a>
       <ol>
+        <li><a href="#m-peq">Parametric EQ</a></li>
         <li><a href="#m-comp">Compressor</a></li>
         <li><a href="#m-bbe">BBE</a></li>
         <li><a href="#m-tube">Vacuum Tube</a></li>
@@ -578,14 +582,14 @@ footer {
     <h1>ANALOG SOUL<br>DSP ENGINE</h1>
     <p class="edition">독학 가이드 · 초급에서 고급까지</p>
     <p class="lede">
-      브라우저에서 도는 오디오 처리 엔진입니다. 여덟 개 모듈을 원하는 순서로 쌓아 소리를
+      브라우저에서 도는 오디오 처리 엔진입니다. 아홉 개 모듈을 원하는 순서로 쌓아 소리를
       다듬고, 손실 압축으로 잘려나간 고역을 다시 합성해 원본보다 높은 표본률(48 ~ 384kHz)로 내보냅니다.
       파일은 기기 밖으로 나가지 않습니다.
     </p>
 
     <div class="schematic">
       <svg viewBox="0 0 950 112" role="img"
-           aria-label="신호 흐름도. 파일에서 시작해 COMP, BBE, TUBE, EXCITER, SG, VINYL, ATMOS를 차례로 지나 MASTER로 나간다. 앞의 일곱 모듈은 순서를 바꿀 수 있고 모듈마다 진입 직전에 입력 게인이 붙는다.">
+           aria-label="신호 흐름도. 파일에서 시작해 EQ, COMP, BBE, TUBE, EXCITER, SG, VINYL, ATMOS를 차례로 지나 MASTER로 나간다. 앞의 여덟 모듈은 순서를 바꿀 수 있고 모듈마다 진입 직전에 입력 게인이 붙는다.">
         <defs>
           <marker id="ar" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto">
             <path d="M0,0 L6,3 L0,6 z" fill="currentColor"/>
@@ -595,52 +599,56 @@ footer {
         <text x="0" y="52" font-family="IBM Plex Mono, monospace" font-size="12" fill="var(--mute)">파일</text>
 
         <g color="var(--rule)" stroke="currentColor" stroke-width="1.2" fill="none">
-          <line x1="40" y1="48" x2="92" y2="48" marker-end="url(#ar)"/>
-          <line x1="176" y1="48" x2="208" y2="48" marker-end="url(#ar)"/>
-          <line x1="292" y1="48" x2="324" y2="48" marker-end="url(#ar)"/>
-          <line x1="408" y1="48" x2="440" y2="48" marker-end="url(#ar)"/>
-          <line x1="524" y1="48" x2="556" y2="48" marker-end="url(#ar)"/>
-          <line x1="640" y1="48" x2="672" y2="48" marker-end="url(#ar)"/>
-          <line x1="756" y1="48" x2="788" y2="48" marker-end="url(#ar)"/>
+          <line x1="40" y1="48" x2="76" y2="48" marker-end="url(#ar)"/>
+          <line x1="154" y1="48" x2="178" y2="48" marker-end="url(#ar)"/>
+          <line x1="256" y1="48" x2="280" y2="48" marker-end="url(#ar)"/>
+          <line x1="358" y1="48" x2="382" y2="48" marker-end="url(#ar)"/>
+          <line x1="460" y1="48" x2="484" y2="48" marker-end="url(#ar)"/>
+          <line x1="562" y1="48" x2="586" y2="48" marker-end="url(#ar)"/>
+          <line x1="664" y1="48" x2="688" y2="48" marker-end="url(#ar)"/>
+          <line x1="766" y1="48" x2="790" y2="48" marker-end="url(#ar)"/>
         </g>
 
         <g font-family="IBM Plex Mono, monospace" font-size="11.5">
-          <rect x="92"  y="30" width="84" height="36" rx="3" fill="var(--card)" stroke="var(--rule)"/>
-          <text x="134" y="53" text-anchor="middle" fill="var(--ink)">COMP</text>
-          <rect x="208" y="30" width="84" height="36" rx="3" fill="var(--card)" stroke="var(--rule)"/>
-          <text x="250" y="53" text-anchor="middle" fill="var(--ink)">BBE</text>
-          <rect x="324" y="30" width="84" height="36" rx="3" fill="var(--card)" stroke="var(--rule)"/>
-          <text x="366" y="53" text-anchor="middle" fill="var(--ink)">TUBE</text>
-          <rect x="440" y="30" width="84" height="36" rx="3" fill="var(--card)" stroke="var(--rule)"/>
-          <text x="482" y="53" text-anchor="middle" fill="var(--ink)">EXCITER</text>
-          <rect x="556" y="30" width="84" height="36" rx="3" fill="var(--card)" stroke="var(--rule)"/>
-          <text x="598" y="53" text-anchor="middle" fill="var(--ink)">SG</text>
-          <rect x="672" y="30" width="84" height="36" rx="3" fill="var(--card)" stroke="var(--rule)"/>
-          <text x="714" y="53" text-anchor="middle" fill="var(--ink)">VINYL</text>
-          <rect x="788" y="30" width="84" height="36" rx="3" fill="var(--card)" stroke="var(--rule)"/>
-          <text x="830" y="53" text-anchor="middle" fill="var(--ink)">ATMOS</text>
+          <rect x="76" y="30" width="78" height="36" rx="3" fill="var(--card)" stroke="var(--rule)"/>
+          <text x="115" y="53" text-anchor="middle" fill="var(--ink)">EQ</text>
+          <rect x="178" y="30" width="78" height="36" rx="3" fill="var(--card)" stroke="var(--rule)"/>
+          <text x="217" y="53" text-anchor="middle" fill="var(--ink)">COMP</text>
+          <rect x="280" y="30" width="78" height="36" rx="3" fill="var(--card)" stroke="var(--rule)"/>
+          <text x="319" y="53" text-anchor="middle" fill="var(--ink)">BBE</text>
+          <rect x="382" y="30" width="78" height="36" rx="3" fill="var(--card)" stroke="var(--rule)"/>
+          <text x="421" y="53" text-anchor="middle" fill="var(--ink)">TUBE</text>
+          <rect x="484" y="30" width="78" height="36" rx="3" fill="var(--card)" stroke="var(--rule)"/>
+          <text x="523" y="53" text-anchor="middle" fill="var(--ink)">EXCITER</text>
+          <rect x="586" y="30" width="78" height="36" rx="3" fill="var(--card)" stroke="var(--rule)"/>
+          <text x="625" y="53" text-anchor="middle" fill="var(--ink)">SG</text>
+          <rect x="688" y="30" width="78" height="36" rx="3" fill="var(--card)" stroke="var(--rule)"/>
+          <text x="727" y="53" text-anchor="middle" fill="var(--ink)">VINYL</text>
+          <rect x="790" y="30" width="78" height="36" rx="3" fill="var(--card)" stroke="var(--rule)"/>
+          <text x="829" y="53" text-anchor="middle" fill="var(--ink)">ATMOS</text>
         </g>
 
         <g color="var(--signal)" stroke="currentColor" stroke-width="1" fill="none">
-          <path d="M92,22 L92,15 L872,15 L872,22"/>
+          <path d="M76,22 L76,15 L868,15 L868,22"/>
         </g>
-        <text x="482" y="11" text-anchor="middle" font-family="IBM Plex Mono, monospace"
+        <text x="472" y="11" text-anchor="middle" font-family="IBM Plex Mono, monospace"
               font-size="10.5" fill="var(--signal)">이 구간은 드래그로 순서 변경</text>
 
         <g font-family="IBM Plex Mono, monospace" font-size="9.5" fill="var(--mute)">
-          <text x="134" y="80" text-anchor="middle">in</text>
-          <text x="250" y="80" text-anchor="middle">in</text>
-          <text x="366" y="80" text-anchor="middle">in</text>
-          <text x="482" y="80" text-anchor="middle">in</text>
-          <text x="598" y="80" text-anchor="middle">in</text>
-          <text x="714" y="80" text-anchor="middle">in</text>
-          <text x="830" y="80" text-anchor="middle">in</text>
+          <text x="115" y="80" text-anchor="middle">in</text>
+          <text x="217" y="80" text-anchor="middle">in</text>
+          <text x="319" y="80" text-anchor="middle">in</text>
+          <text x="421" y="80" text-anchor="middle">in</text>
+          <text x="523" y="80" text-anchor="middle">in</text>
+          <text x="625" y="80" text-anchor="middle">in</text>
+          <text x="727" y="80" text-anchor="middle">in</text>
+          <text x="829" y="80" text-anchor="middle">in</text>
         </g>
-        <text x="482" y="99" text-anchor="middle" font-family="IBM Plex Mono, monospace"
+        <text x="472" y="99" text-anchor="middle" font-family="IBM Plex Mono, monospace"
               font-size="10.5" fill="var(--mute)">모듈마다 진입 직전에 INPUT GAIN</text>
 
         <g color="var(--hot)" stroke="currentColor" stroke-width="1.3" fill="none">
-          <line x1="872" y1="48" x2="896" y2="48" marker-end="url(#ar)"/>
+          <line x1="868" y1="48" x2="896" y2="48" marker-end="url(#ar)"/>
         </g>
         <text x="950" y="45" text-anchor="end" font-family="IBM Plex Mono, monospace"
               font-size="11.5" fill="var(--hot)">MASTER</text>
@@ -729,8 +737,8 @@ footer {
         <dd>재생과 정지, 진행 막대. 막대를 클릭하면 그 지점으로 이동합니다. 화면을 아래로 내려도 위쪽에 붙어 있습니다(휴대폰처럼 좁은 화면에서는 제자리).</dd>
         <dt>처리 체인</dt>
         <dd>
-          여덟 개 모듈이 카드로 놓여 있습니다. 카드 이름 앞 번호와 그 위의 신호 흐름 지도가 신호가 지나는 순서입니다.
-          흐름 지도의 노드나 모듈 머리의 손잡이를 끌어 순서를 바꿉니다. 넓은 화면에서는 카드가 같은 크기로 처리 순서대로 놓이고, 켜진 카드만 내용이 넘치면 카드 안에서 스크롤되며, 꺼진 카드는 배경으로 물러나 그 위에서는 휠이 화면을 굴립니다. 카드 맨 위의 MACRO 손잡이 하나로 그 카드의 주요 손잡이들을 가장 약한 위치(0%)부터 기준 설계값(100%)까지 함께 옮길 수 있고, 처음에는 COMPRESSOR 50% · BBE 40% · EXCITER 80% · SOUNDGOODIZER 65% · MASTERING CHAIN 95%가 켜져 있습니다.
+          아홉 개 모듈이 카드로 놓여 있습니다. 카드 이름 앞 번호와 그 위의 신호 흐름 지도가 신호가 지나는 순서입니다.
+          흐름 지도의 노드나 모듈 머리의 손잡이를 끌어 순서를 바꿉니다. 넓은 화면에서는 카드가 같은 크기의 3 × 3 타일로 처리 순서대로 놓이고, 켜진 카드만 내용이 넘치면 카드 안에서 스크롤되며, 꺼진 카드는 배경으로 물러나 그 위에서는 휠이 화면을 굴립니다. 카드 맨 위의 MACRO 손잡이 하나로 그 카드의 주요 손잡이들을 가장 약한 위치(0%)부터 기준 설계값(100%)까지 함께 옮길 수 있고, 처음에는 COMPRESSOR 50% · BBE 40% · EXCITER 80% · SOUNDGOODIZER 65% · MASTERING CHAIN 95%가 켜져 있습니다. PARAMETRIC EQ의 MACRO만은 손잡이를 함께 옮기지 않고 벨 · 셸프 대역의 이득에 곱하는 깊이(처음 100%)이며, EQ 카드는 꺼진 채로 시작합니다.
         </dd>
         <dt>내보내기</dt>
         <dd>표본률(44.1 · 48 · 96 · 192 · 384 — 44.1 계열 원본이면 44.1 · 48 · 88.2 · 176.4 · 352.8)과 비트 깊이(16 · 24 · 32)를 고르는 눈금 스위치 둘, 내보내기 버튼과 초기화 버튼.</dd>
@@ -745,6 +753,7 @@ footer {
         모든 모듈이 같은 구조입니다. 머리줄에 순서 번호와 이름, 접기 단추, 켜기 스위치가 있고, 본문 첫 줄이
         INPUT GAIN, 가는 선 아래로 그 모듈 고유의 노브들이 옵니다. 모듈마다 색이 하나 있어,
         켜진 모듈은 머리 위 막대와 스위치가 그 색으로 밝아지고 슬라이더의 홈도 값만큼 그 색으로 채워집니다.
+        PARAMETRIC EQ는 고유 노브 자리에 작은 그래프와 대역 단추 줄, 고른 대역의 편집 줄이 옵니다.
       </p>
     </div>
   </section>
@@ -762,14 +771,15 @@ footer {
       <div class="tw"><table>
         <thead><tr><th>위치</th><th>모듈</th><th>그 자리에 있는 이유</th></tr></thead>
         <tbody>
-          <tr><td class="mono">1</td><td>COMP</td><td>레벨을 먼저 고르게 만들어 뒤쪽 포화가 들쭉날쭉해지지 않게 합니다.</td></tr>
-          <tr><td class="mono">2</td><td>BBE</td><td>위상 보정은 원음에 가까운 깨끗한 신호에서 해야 의도대로 걸립니다.</td></tr>
-          <tr><td class="mono">3</td><td>TUBE</td><td>정돈된 신호 위에 배음을 입힙니다.</td></tr>
-          <tr><td class="mono">4</td><td>EXCITER</td><td>튜브 배음 위에 고역 공기감을 더합니다.</td></tr>
-          <tr><td class="mono">5</td><td>SG</td><td>전 대역의 밀도와 두께를 마무리로 정리합니다.</td></tr>
-          <tr><td class="mono">6</td><td>VINYL</td><td>음색 작업이 끝난 뒤 질감을 덮어야 자연스럽습니다.</td></tr>
-          <tr><td class="mono">7</td><td>ATMOS</td><td>공간은 완성된 소리 위에 펼쳐야 합니다.</td></tr>
-          <tr><td class="mono">8</td><td>MASTER</td><td>최종 균형과 음량 천장. 고정된 마지막입니다.</td></tr>
+          <tr><td class="mono">1</td><td>EQ</td><td>선형으로 음색을 고르는 단입니다. 깎아 낼 성분(웅웅거림 · 저역 잡음)이 뒤의 압축기 레벨 검출과 포화를 먼저 움직이지 않게 맨 앞에서 걷어 냅니다.</td></tr>
+          <tr><td class="mono">2</td><td>COMP</td><td>레벨을 먼저 고르게 만들어 뒤쪽 포화가 들쭉날쭉해지지 않게 합니다.</td></tr>
+          <tr><td class="mono">3</td><td>BBE</td><td>위상 보정은 원음에 가까운 깨끗한 신호에서 해야 의도대로 걸립니다.</td></tr>
+          <tr><td class="mono">4</td><td>TUBE</td><td>정돈된 신호 위에 배음을 입힙니다.</td></tr>
+          <tr><td class="mono">5</td><td>EXCITER</td><td>튜브 배음 위에 고역 공기감을 더합니다.</td></tr>
+          <tr><td class="mono">6</td><td>SG</td><td>전 대역의 밀도와 두께를 마무리로 정리합니다.</td></tr>
+          <tr><td class="mono">7</td><td>VINYL</td><td>음색 작업이 끝난 뒤 질감을 덮어야 자연스럽습니다.</td></tr>
+          <tr><td class="mono">8</td><td>ATMOS</td><td>공간은 완성된 소리 위에 펼쳐야 합니다.</td></tr>
+          <tr><td class="mono">9</td><td>MASTER</td><td>최종 균형과 음량 천장. 고정된 마지막입니다.</td></tr>
         </tbody>
       </table></div>
 
@@ -783,6 +793,7 @@ footer {
         <li><strong>TUBE를 COMP 앞으로.</strong> 포화된 피크를 압축이 잡아내므로 더 두껍고 단단해집니다.</li>
         <li><strong>VINYL을 맨 앞으로.</strong> 잡음과 흔들림까지 뒤쪽 모듈이 함께 처리해 훨씬 거칠어집니다.</li>
         <li><strong>EXCITER를 BBE 앞으로.</strong> BBE의 HI DEF가 만들어진 배음까지 함께 올려 더 화려해집니다.</li>
+        <li><strong>EQ를 COMP 뒤로.</strong> 압축된 뒤의 음색을 다듬습니다. 대신 깎으려던 성분도 압축기 검출에는 그대로 들어갑니다.</li>
       </ul>
 
       <div class="note">
@@ -804,6 +815,7 @@ footer {
         <li><strong>TUBE와 EXCITER.</strong> 파형을 찌그러뜨리는 방식이라 입력이 커질수록 포화가 깊어집니다. DRIVE를 그대로 두고 입력만 올려도 거칠어집니다.</li>
         <li><strong>COMP.</strong> 입력을 3dB 올리는 것은 THRESHOLD를 3dB 내리는 것과 사실상 같습니다. 압축량을 미세하게 손볼 때 편합니다.</li>
         <li><strong>BBE와 SG.</strong> 필터와 셸빙 위주라 입력 게인은 대체로 음량만 바꿉니다.</li>
+        <li><strong>EQ.</strong> 선형 처리라 입력 게인은 EQ의 소리를 바꾸지 않고 음량만 바꿉니다. 다만 EQ가 앞쪽에 있으면 뒤의 COMP · TUBE가 받는 레벨도 함께 달라집니다.</li>
       </ul>
       <div class="note">
         <span class="tag">−6dB의 뜻</span>
@@ -825,8 +837,141 @@ footer {
       </p>
     </div>
 
+    <div class="mod" id="m-peq">
+      <div class="mod-head"><h3>Parametric EQ</h3><span class="ko">대역 최대 20개</span><span class="slot">기본 1번</span></div>
+      <p>
+        주파수 대역마다 크기를 올리거나 내리고, 필요 없는 저역 · 고역을 깎아 냅니다. 이미 있는 성분의 크기만 바꾸고
+        새 성분은 만들지 않는 선형 처리라, 입력 레벨이 달라도 걸리는 모양이 같습니다.
+        깎아 낼 성분이 뒤의 압축과 포화를 먼저 움직이지 않도록 체인 맨 앞에 둡니다.
+      </p>
+      <p>
+        대역은 20개까지 두고, 카드의 작은 그래프나 큰 편집 창에서 점을 끌어 고칩니다. 처음에는 카드가 꺼져 있고
+        평탄한 네 대역(로우 셸프 80 Hz · 벨 400 Hz · 벨 2.5 kHz · 하이 셸프 10 kHz, 모두 0 dB)이 놓여 있어,
+        켜기만 해서는 출력이 입력과 표본 하나까지 같습니다. 점을 끌면 바로 쓸 수 있습니다.
+      </p>
+      <div class="tw"><table>
+        <thead><tr><th>종류</th><th>하는 일</th><th>쓰는 값</th></tr></thead>
+        <tbody>
+          <tr><td class="mono">벨</td><td>주파수를 가운데로 종 모양의 봉우리나 골을 만듭니다. 한 음역을 살리거나 거슬리는 울림을 누를 때.</td><td class="mono">주파수 · 이득 · Q</td></tr>
+          <tr><td class="mono">로우 셸프</td><td>주파수 아래를 통째로 올리거나 내립니다. 저음 전체의 양을 정할 때.</td><td class="mono">주파수 · 이득</td></tr>
+          <tr><td class="mono">하이 셸프</td><td>주파수 위를 통째로 올리거나 내립니다. 고음 전체의 밝기를 정할 때.</td><td class="mono">주파수 · 이득</td></tr>
+          <tr><td class="mono">로우 컷</td><td>주파수 아래를 깎아 냅니다(하이패스). 쓰지 않는 초저역이나 웅웅거림을 걷어 낼 때.</td><td class="mono">주파수 · 기울기 · Q(12 dB/oct만)</td></tr>
+          <tr><td class="mono">하이 컷</td><td>주파수 위를 깎아 냅니다(로우패스). 필요 없는 고역을 걷어 낼 때.</td><td class="mono">주파수 · 기울기 · Q(12 dB/oct만)</td></tr>
+          <tr><td class="mono">노치</td><td>주파수 한 곳을 깊고 좁게 파냅니다. 한 주파수에 박힌 잡음을 없앨 때.</td><td class="mono">주파수 · Q</td></tr>
+        </tbody>
+      </table></div>
+      <div class="tw"><table class="param">
+        <thead><tr><th>값</th><th>범위 · 기본</th><th>하는 일</th></tr></thead>
+        <tbody>
+          <tr><td>MACRO</td><td>0~100% · 100%</td><td>깊이. 벨 · 셸프의 이득에만 곱하고, 컷 · 노치는 그대로 둡니다.</td></tr>
+          <tr><td>주파수</td><td>20 Hz~20 kHz</td><td>벨 · 노치는 가운데, 셸프는 이득의 절반이 걸리는 곳, 컷은 차단 주파수입니다.</td></tr>
+          <tr><td>이득</td><td>−24~+24 dB · 0</td><td>올리거나 내리는 양. 벨 · 셸프만 씁니다.</td></tr>
+          <tr><td>Q</td><td>0.1~18 · 1</td><td>벨 · 노치에서는 폭이고, 클수록 좁고 뾰족합니다. 12 dB/oct 컷에서는 차단 주파수의 공진을 정합니다. 셸프는 쓰지 않습니다.</td></tr>
+          <tr><td>기울기</td><td>12 · 24 · 36 · 48 dB/oct</td><td>차단 주파수 너머에서 한 옥타브마다 깎는 양. 컷만 씁니다.</td></tr>
+        </tbody>
+      </table></div>
+      <p>
+        <strong>컷의 기울기와 Q.</strong> 12 dB/oct 컷은 2차 필터 하나라 Q가 차단 주파수 부근의 모양을 정합니다.
+        0.71(버터워스)이면 봉우리 없이 차단 주파수에서 −3 dB로 꺾이고, 올릴수록 차단 주파수에 공진 봉우리가 솟습니다(Q 4에서 +12 dB).
+        24 · 36 · 48 dB/oct는 버터워스 4 · 6 · 8차 필터를 2차 단 2 · 3 · 4개로 나눠 직렬로 잇고 단마다 Q를 정해 두므로 Q 칸이 쉽니다.
+        어느 기울기든 버터워스 모양이면(12 dB/oct는 Q 0.71) 차단 주파수에서 −3 dB이고, 200 Hz 로우 컷을 재면 한 옥타브 아래에서 −12.3 · −24.1 · −36.1 · −48.2 dB로 버터워스 이론값과 같습니다.
+        종류를 컷으로 바꾸면 Q가 0.71로, 컷 · 셸프에서 벨 · 노치로 바꾸면 1로 맞춰집니다. 높은 Q의 벨을 컷으로 바꿀 때 큰 공진이 생기지 않게 하려는 것입니다.
+        Q 칸의 숫자는 흔히 쓰는 선형 Q이고, 브라우저의 컷 필터가 Q를 dB로 받으므로 넣을 때 바꿉니다.
+      </p>
+      <p>
+        <strong>셸프와 노치.</strong> 셸프는 기울기 모양이 정해져 있어 Q를 쓰지 않습니다(Web Audio 명세가 셸프의 Q를 무시합니다).
+        설정한 주파수는 기울기의 한가운데라, 로우 셸프 +4 dB · 100 Hz는 100 Hz에서 +2 dB, 20 Hz에서 +4 dB가 걸립니다.
+        노치는 가운데를 사실상 소리가 없을 만큼 파내면서(3 kHz · Q 8에서 −119 dB) 조금 떨어진 곳은 거의 건드리지 않습니다(같은 설정의 1 kHz에서 −0.009 dB).
+      </p>
+      <p>
+        <strong>MACRO는 깊이입니다.</strong> 다른 카드의 MACRO는 여러 손잡이를 함께 옮기지만, EQ는 대역마다 값이 달라 벨 · 셸프의 이득에 같은 비율을 곱합니다.
+        50%면 +6 dB 벨이 +3 dB로 걸리고, 0%면 벨 · 셸프는 평탄해지되 컷 · 노치는 그대로 남습니다. 만든 보정을 모양 그대로 덜어 내 보며 양을 가늠할 때 씁니다.
+      </p>
+      <p>
+        재생 중에 값을 바꾸면 10 ms 시정수로 부드럽게 옮겨 가고, 대역을 더하거나 지우거나 종류 · 기울기 · 켜짐을 바꾸면 새 필터 열을 만들어
+        20 ms 동안 교차해 넘기므로 딸깍거리지 않습니다. 재생과 내보내기는 같은 필터 구성을 써서 들은 소리가 그대로 파일에 담깁니다.
+        대역 목록은 프리셋에 함께 담기고, EQ가 없던 이전 판(3.0)에서 저장한 프리셋을 불러오면 EQ는 처음 상태(꺼짐 · 평탄한 네 대역 · MACRO 100% · INPUT GAIN 0)로
+        맨 앞에 놓여 저장할 때의 소리가 그대로 납니다.
+      </p>
+
+      <h4>그래프 읽기</h4>
+      <p>
+        가로는 20 Hz~20 kHz의 로그 눈금, 세로는 ±12 dB입니다. 곡선이 +11.5 dB를 넘거나 점이 ±11.5 dB 밖으로 나가면 세로 눈금이 ±24 dB로 넓어지고,
+        다시 들어오면 좁아집니다. 점을 끄는 동안에는 손 밑의 점이 튀지 않게 눈금을 바꾸지 않습니다.
+        굵은 선이 모든 대역을 합친 응답, 옅은 면이 고른 대역 하나의 응답입니다. 이 곡선은 소리를 내는 것과 같은 종류 · 같은 값의 필터에서
+        재생 중인 표본률로(재생 전에는 48 kHz) 얻으므로, 모든 종류를 함께 걸어 재 보면 44.1 · 48 kHz에서는 20 Hz~20 kHz 전 구간에서 실제 소리와 0.002 dB 안으로 같습니다.
+        표본률을 높였을 때의 아주 낮은 구간은 아래 알려진 제한에 적었습니다.
+      </p>
+      <p>
+        번호가 적힌 동그라미가 대역입니다. 자리는 주파수와 이득 × MACRO, 곧 실제로 걸리는 높이이고, 컷 · 노치는 0 dB 선 위에 놓입니다.
+        고른 대역은 채운 동그라미, 꺼진 대역은 점선 동그라미입니다. 큰 그래프는 왼쪽 위에 고른 대역의 값을, 오른쪽 위에 커서가 가리키는 주파수를 쓰고,
+        EQ가 꺼져 있으면 ‘EQ 꺼짐 — 소리에 반영되지 않음’을 띄웁니다.
+      </p>
+      <p>
+        재생 중이고 EQ가 켜져 있으면 EQ 바로 앞의 스펙트럼이 선으로, 바로 뒤의 스펙트럼이 면으로 겹쳐 그려집니다.
+        1/6 옥타브 폭으로 평균하고 1 kHz를 기준으로 옥타브당 +3 dB 기울여 그리므로, 옥타브마다 에너지가 같은 분홍 잡음이 평평하게 보입니다.
+        눈금이 위쪽 스펙트럼 분석기와 다르니, 높이를 견주기보다 선과 면의 차이, 곧 EQ가 실제로 바꾼 만큼을 읽으세요.
+      </p>
+
+      <h4>다루는 법</h4>
+      <dl class="kv">
+        <dt>점 끌기</dt>
+        <dd>가로가 주파수, 세로가 이득(벨 · 셸프만)입니다. 끄는 중에 Shift를 누르면 1/5로 세밀해지고, Shift를 누르거나 떼는 순간 그 자리를 새 기준으로 삼아 점이 튀지 않습니다. MACRO가 0%면 세로로는 바뀌지 않습니다.</dd>
+        <dt>점 위에서 휠</dt>
+        <dd>Q를 10%씩, Shift를 누르면 2%씩 바꿉니다. 24 dB/oct 이상의 컷은 Q 대신 기울기를 한 칸씩 바꿉니다. 마우스 휠은 한 칸이 한 단계이고, 터치패드의 잔 움직임은 모아서 한 단계로 셉니다. 점 밖에서 굴리면 화면이 그대로 스크롤됩니다.</dd>
+        <dt>두 번 누르기 · 오른쪽 단추</dt>
+        <dd>빈 곳을 두 번 누르면 그 자리의 주파수 · 이득으로 벨이 생기고, 점을 두 번 누르면 그 대역이 꺼지고 켜집니다. 점에서 오른쪽 단추를 누르면 지웁니다. 터치로 길게 누르는 것으로는 지워지지 않습니다(실수 방지).</dd>
+        <dt>대역 단추 줄과 편집 줄</dt>
+        <dd>＋는 대역 사이가 로그 간격으로 가장 넓은 곳(양 끝 20 Hz · 20 kHz 포함)의 가운데에 0 dB 벨을 더합니다. 대역이 하나도 없으면 1 kHz에 놓고, 20개가 차면 쉽니다. 번호 단추는 만든 차례대로 붙고 주파수 순으로 다시 매기지 않으므로 끄는 중에 번호가 바뀌지 않습니다. 번호를 누르면 그 대역이 골라지고, 아래 편집 줄에 켜짐 불빛 · 종류 · 기울기 · 지우기(✕)와 주파수 · 이득 · Q 칸이 나옵니다. 번호 단추에서는 ←→(↑↓) · Home · End로 다른 대역을 고르고 Delete로 지웁니다.</dd>
+        <dt>숫자 칸</dt>
+        <dd>치는 동안에는 범위 안의 값만 바로 소리에 걸리므로, 주파수에 100을 치는 사이 1과 10이 잠깐씩 걸리지 않습니다. Enter를 누르거나 다른 곳으로 옮기면 범위 밖 값은 가장자리로 맞춰집니다. 칸 안의 ↑↓는 아래 그래프 키보드와 같은 단계입니다.</dd>
+      </dl>
+      <div class="tw"><table>
+        <thead><tr><th>그래프에 초점을 둔 키</th><th>하는 일</th></tr></thead>
+        <tbody>
+          <tr><td class="mono">← →</td><td>주파수를 반음씩(Shift는 1/48 옥타브)</td></tr>
+          <tr><td class="mono">↑ ↓</td><td>이득을 0.5 dB씩(Shift는 0.1 dB)</td></tr>
+          <tr><td class="mono">PgUp · PgDn</td><td>Q를 10%씩(Shift는 2%). 24 dB/oct 이상의 컷은 기울기를 한 칸씩</td></tr>
+          <tr><td class="mono">[ ]</td><td>이전 · 다음 대역 고르기</td></tr>
+          <tr><td class="mono">Home · End</td><td>처음 · 끝 대역 고르기</td></tr>
+          <tr><td class="mono">Insert (+ =)</td><td>대역 더하기</td></tr>
+          <tr><td class="mono">Delete · Backspace</td><td>고른 대역 지우기</td></tr>
+          <tr><td class="mono">스페이스</td><td>고른 대역 켜고 끄기</td></tr>
+          <tr><td class="mono">Enter</td><td>큰 편집 창 열기(카드 그래프에서)</td></tr>
+        </tbody>
+      </table></div>
+      <p>화면 낭독기에는 값을 바꿀 때마다 ‘3번 벨 1.23 kHz +3.0 dB Q 1.00’처럼 읽어 줍니다.</p>
+
+      <h4>큰 편집 창</h4>
+      <p>
+        ‘크게’ 단추를 누르거나 카드 그래프에서 Enter를 누르면 큰 편집 창이 열립니다. 화면 높이의 42%(220~430 px)인 큰 그래프 아래에
+        모든 대역의 표(번호 · 켜짐 · 종류 · 주파수 · 이득 · Q · 기울기 · 지우기)가 있고, 표에서 칸을 고르면 그 대역이 골라집니다.
+        넓은 화면의 카드에는 대역 9개까지 스크롤 없이 들어가고 10개부터는 번호 단추가 두 줄이 되어 카드 안에서 스크롤하므로, 대역이 많으면 이쪽이 편합니다.
+      </p>
+      <p>
+        머리줄에는 EQ 켜짐 스위치, 대역 수(‘대역 n / 20’), 재생 단추(파일을 올렸을 때), ‘＋ 대역’, ‘처음 상태로’, ‘닫기’가 있습니다.
+        켜짐 스위치는 카드의 스위치와 같은 것이라 창을 연 채 EQ를 켜고 끄며 비교할 수 있고, 재생 단추는 위쪽 재생 바의 단추를 대신 누릅니다.
+        ‘처음 상태로’는 3초 안에 한 번 더 눌러야 평탄한 네 대역으로 되돌립니다. Esc나 창 바깥의 어두운 막을 누르면 닫히고 초점은 창을 열기 전의 자리로 돌아오며,
+        창이 열린 동안 바깥 화면은 눌리지 않습니다.
+      </p>
+
+      <h4>쓰는 요령</h4>
+      <p>
+        흔히 쓰는 순서는 걷어 내기, 찾아 누르기, 살리기입니다. 로우 컷으로 쓰지 않는 초저역부터 걷어 내고,
+        거슬리는 울림은 Q 4~8의 좁은 벨을 크게 올린 채 주파수를 훑어 찾은 뒤 그 자리를 내립니다.
+        올리는 쪽은 Q 1 언저리로 넓고 얕게 거는 편이 자연스럽습니다. 한 주파수에 박힌 잡음은 노치로 파냅니다.
+      </p>
+      <div class="note hot">
+        <span class="tag">올린 만큼 뒤 모듈이 더 반응합니다</span>
+        <p>
+          EQ는 맨 앞이라 올린 대역이 뒤의 COMP 검출과 TUBE · EXCITER의 포화를 그만큼 더 움직입니다. 저역을 크게 올리면 압축이 저역에 끌려가기 쉽습니다.
+          또 대역을 올리면 음량이 커져 그냥 좋게 들리므로, 켜고 끄며 비교할 때는 INPUT GAIN으로 음량을 맞추세요.
+        </p>
+      </div>
+    </div>
+
     <div class="mod" id="m-comp">
-      <div class="mod-head"><h3>Compressor</h3><span class="ko">다이나믹스 제어</span><span class="slot">기본 1번</span></div>
+      <div class="mod-head"><h3>Compressor</h3><span class="ko">다이나믹스 제어</span><span class="slot">기본 2번</span></div>
       <p>
         큰 소리를 눌러 작은 소리와의 격차를 줄입니다. 결과적으로 전체를 더 크게 올릴 여유가 생깁니다.
         레벨을 고르게 만드는 것이 목적이라 체인 앞쪽에 둡니다.
@@ -849,7 +994,7 @@ footer {
     </div>
 
     <div class="mod" id="m-bbe">
-      <div class="mod-head"><h3>BBE Sonic Maximizer</h3><span class="ko">위상 보정과 존재감</span><span class="slot">기본 2번</span></div>
+      <div class="mod-head"><h3>BBE Sonic Maximizer</h3><span class="ko">위상 보정과 존재감</span><span class="slot">기본 3번</span></div>
       <p>
         BBE는 저역을 약 2.5 ms, 중역을 약 0.5 ms 늦춰 고역의 어택이 먼저 오게 합니다. 제조사는 이를 스피커의 위상 보정이라고 설명하지만,
         실제 스피커는 우퍼와 크로스오버 때문에 이미 저역을 늦게 내므로, 되돌린다기보다 고역을 앞세워 윤곽을 도드라지게 하는 처리입니다.
@@ -870,7 +1015,7 @@ footer {
     </div>
 
     <div class="mod" id="m-tube">
-      <div class="mod-head"><h3>Vacuum Tube</h3><span class="ko">짝수 하모닉 포화</span><span class="slot">기본 3번</span></div>
+      <div class="mod-head"><h3>Vacuum Tube</h3><span class="ko">짝수 하모닉 포화</span><span class="slot">기본 4번</span></div>
       <p>
         12AX7 진공관 증폭기 한 단을 실제 회로 방정식으로 계산합니다. 원음에 없던 2배, 3배 주파수가
         더해지면서 따뜻하고 두껍게 들리는데, 작게 걸면 2배음이 주로 생기고 세게 밀면 3배음이 늘어 거칠어집니다.
@@ -891,7 +1036,7 @@ footer {
     </div>
 
     <div class="mod" id="m-exciter">
-      <div class="mod-head"><h3>Exciter</h3><span class="ko">고역 하모닉 에어</span><span class="slot">기본 4번</span></div>
+      <div class="mod-head"><h3>Exciter</h3><span class="ko">고역 하모닉 에어</span><span class="slot">기본 5번</span></div>
       <p>
         지정한 주파수 위쪽만 따로 떼어내 배음을 만들고 다시 섞습니다. 고역을 그냥 올리는 EQ와 달리
         없던 성분을 만들어 넣기 때문에, 원래 고역이 부족한 소스에서도 반응이 있습니다.
@@ -915,7 +1060,7 @@ footer {
     </div>
 
     <div class="mod" id="m-sg">
-      <div class="mod-head"><h3>Soundgoodizer</h3><span class="ko">멀티밴드 하모닉 인핸서</span><span class="slot">기본 5번</span></div>
+      <div class="mod-head"><h3>Soundgoodizer</h3><span class="ko">멀티밴드 하모닉 인핸서</span><span class="slot">기본 6번</span></div>
       <p>
         저·중·고 세 대역을 나눠 각각 다른 세기로 포화시킨 뒤 다시 합칩니다.
         대역마다 필요한 처리가 다르다는 발상입니다. 네 개의 프리셋이 있습니다.
@@ -943,7 +1088,7 @@ footer {
     </div>
 
     <div class="mod" id="m-vinyl">
-      <div class="mod-head"><h3>Vinyl Record</h3><span class="ko">턴테이블 시뮬레이션</span><span class="slot">기본 6번</span></div>
+      <div class="mod-head"><h3>Vinyl Record</h3><span class="ko">턴테이블 시뮬레이션</span><span class="slot">기본 7번</span></div>
       <p>
         LP로 들을 때 따라오는 것들을 더합니다. 음질을 좋게 하는 모듈이 아니라
         의도적으로 결함을 넣는 모듈입니다.
@@ -987,7 +1132,7 @@ footer {
     </div>
 
     <div class="mod" id="m-atmos">
-      <div class="mod-head"><h3>Dolby Atmos</h3><span class="ko">공간 시뮬레이터</span><span class="slot">기본 7번</span></div>
+      <div class="mod-head"><h3>Dolby Atmos</h3><span class="ko">공간 시뮬레이터</span><span class="slot">기본 8번</span></div>
       <p>
         실제 Atmos 규격이 아니라, 두 채널 안에서 방의 울림을 계산하는 처리입니다.
         고른 방의 크기와 벽의 흡음에서 벽·바닥·천장 반사와 잔향을 계산해 넓이와 거리를 만듭니다. 원음은 그대로 두고 울림만 더합니다.
@@ -1396,7 +1541,8 @@ footer {
     <div class="reading">
       <p>
         왼쪽이 원음, 오른쪽이 처리된 소리입니다. 원음은 모든 모듈에 들어가기 직전에서 갈라낸
-        신호라 어떤 처리도 거치지 않았습니다.
+        신호라 어떤 처리도 거치지 않았습니다. EQ 바로 앞뒤의 스펙트럼은 이와 별도로 PARAMETRIC EQ 카드의 그래프에
+        겹쳐 그려집니다.
       </p>
 
       <h3>두 가지 보기</h3>
@@ -1582,6 +1728,15 @@ footer {
         판단이 끝난 뒤에 색을 입히세요.
       </p>
 
+      <h3>저역 잡음을 걷어 내고 압축하기</h3>
+      <p>
+        바람 소리나 바닥 진동처럼 들리지 않는 초저역이 섞인 녹음에서는 COMP가 그 저역에 반응해 필요 이상으로 누를 수 있습니다.
+        PARAMETRIC EQ를 켜고 1번 대역(로우 셸프 80 Hz)의 종류를 로우 컷으로 바꾼 뒤 주파수 40 Hz, 기울기 24 dB/oct로 둡니다.
+        목소리가 중심인 녹음이면 80 Hz 언저리까지 올려도 됩니다. EQ가 맨 앞이라 COMP는 걷어 낸 뒤의 신호를 봅니다.
+        COMP는 RATIO 3, THRESHOLD −20 정도에서 시작하고, 로우 컷 점을 두 번 눌러 끄고 켜며 COMP 머리줄의 막대를 비교해 보세요.
+        저역 잡음이 압축을 움직이고 있었다면 막대의 움직임이 달라집니다.
+      </p>
+
       <h3>밋밋한 녹음에 온기 더하기</h3>
       <p>
         TUBE를 DRIVE 35, BIAS 60, MIX 45로 켭니다. SG를 프리셋 A, AMOUNT 40으로 더합니다.
@@ -1646,6 +1801,16 @@ footer {
           바뀌는 것이 보입니다. 20kHz 위는 들리지 않으므로 귀로는 차이가 작을 수 있습니다.
           LIVE 모드에서는 슬라이더를 놓는 순간 다시 복원하므로 잠시 기다려야 합니다.
         </dd>
+        <dt>EQ를 켜도 소리가 그대로입니다</dt>
+        <dd>
+          처음 네 대역은 모두 0 dB라 켜기만 해서는 바뀌지 않습니다. 점을 끌어 이득을 주거나 대역의 종류를 바꾸세요.
+          MACRO가 0%면 벨 · 셸프는 평탄하게 걸립니다.
+        </dd>
+        <dt>EQ 그래프의 점이 움직이지 않습니다</dt>
+        <dd>
+          카드가 꺼져 있으면 본문이 눌리지 않으니 먼저 켜세요. 컷 · 노치는 이득이 없어 가로로만 움직이고,
+          MACRO가 0%면 벨 · 셸프도 세로로는 바뀌지 않습니다.
+        </dd>
         <dt>처리한 소리가 더 나쁩니다</dt>
         <dd>
           대개 과했기 때문입니다. 모든 값을 절반으로 줄이고 다시 들어보세요. 그래도 나쁘면
@@ -1674,6 +1839,12 @@ footer {
           결과물을 원본과 동일하다고 표시해 배포하면 안 됩니다.
         </li>
         <li><strong>Atmos는 상표가 뜻하는 규격이 아닙니다.</strong> 두 채널 안에서의 공간감 시뮬레이션입니다.</li>
+        <li>
+          <strong>높은 표본률의 20~30 Hz에서는 EQ 그래프와 소리가 아주 조금 다릅니다.</strong> 극점이 낮은 필터(로우 컷 · 저역 벨 · 셸프)에서 브라우저가 렌더링한 소리가 이론 응답과 조금 달라,
+          사인으로 재면 30 Hz 48 dB/oct 로우 컷에서 96 kHz 최대 0.013 dB, 192 kHz 최대 0.055 dB 차이가 납니다. 44.1 · 48 kHz는 20 Hz~20 kHz 전 구간 0.002 dB 안으로 같고, 40 Hz 위는 192 kHz에서도 0.004 dB 안입니다.
+        </li>
+        <li><strong>EQ는 대역 20개까지이고, 셸프의 기울기 모양(Q)은 고를 수 없습니다.</strong> Web Audio 명세가 셸프의 Q를 무시하기 때문입니다.</li>
+        <li><strong>꺼진 카드는 편집할 수 없습니다.</strong> 꺼진 카드는 본문이 눌리지 않으므로 EQ의 그래프 · 대역 단추 · ‘크게’도 카드를 켜야 쓸 수 있습니다. 처음 네 대역은 평탄해 켜도 소리는 그대로입니다.</li>
       </ul>
     </div>
   </section>
@@ -1707,8 +1878,28 @@ footer {
         <dd>파형을 주파수별 세기로 바꾸는 계산. 스펙트럼 그래프가 이것으로 그려집니다.</dd>
         <dt>STFT</dt>
         <dd>긴 소리를 짧게 잘라 각 조각에 FFT를 적용하는 방식. 시간에 따른 변화를 볼 수 있습니다.</dd>
+        <dt>분홍 잡음</dt>
+        <dd>옥타브마다 에너지가 같은 잡음. 로그 주파수 축에서 고르게 퍼져 있어, EQ 그래프의 스펙트럼은 이것이 평평하게 보이도록 기울여 그립니다.</dd>
         <dt>포화</dt>
         <dd>파형의 봉우리를 부드럽게 눌러 배음을 만드는 처리. 진공관과 테이프의 특성입니다.</dd>
+        <dt>선형 처리</dt>
+        <dd>입력 크기와 상관없이 같은 모양으로 걸리는 처리. 없던 주파수 성분을 만들지 않습니다. EQ가 여기 속하고, 포화와 압축은 아닙니다.</dd>
+        <dt>이퀄라이저 (EQ)</dt>
+        <dd>주파수 대역마다 크기를 올리거나 내리는 처리. 파라메트릭 EQ는 대역마다 주파수 · 이득 · Q를 직접 정합니다.</dd>
+        <dt>벨</dt>
+        <dd>정한 주파수를 가운데로 종 모양의 봉우리나 골을 만드는 대역. 피킹이라고도 합니다.</dd>
+        <dt>셸프</dt>
+        <dd>정한 주파수 아래(로우 셸프)나 위(하이 셸프)를 선반처럼 통째로 올리거나 내리는 대역.</dd>
+        <dt>로우 컷 · 하이 컷</dt>
+        <dd>정한 주파수 아래나 위를 깎아 내는 필터. 로우 컷은 하이패스, 하이 컷은 로우패스와 같은 말입니다.</dd>
+        <dt>노치</dt>
+        <dd>아주 좁은 폭을 깊게 파내는 필터. 한 주파수에 박힌 잡음을 없앨 때 씁니다.</dd>
+        <dt>Q</dt>
+        <dd>대역의 폭을 나타내는 값. 클수록 좁고 뾰족합니다. 2차 컷에서는 차단 주파수 부근의 공진(봉우리) 크기를 정합니다.</dd>
+        <dt>dB/oct</dt>
+        <dd>주파수가 한 옥타브(두 배) 멀어질 때마다 줄어드는 양. 컷의 가파름을 나타내고, 2차 필터 하나가 12 dB/oct입니다.</dd>
+        <dt>버터워스</dt>
+        <dd>통과대역이 봉우리 없이 가장 평평하도록 설계한 필터. 차단 주파수에서 −3 dB이고, 2차 필터 하나로 만들면 Q가 0.71입니다. 더 가파른 컷은 Q가 다른 2차 단 여럿을 이어 만듭니다.</dd>
         <dt>손실 압축</dt>
         <dd>덜 중요한 정보를 버려 용량을 줄이는 방식. mp3, AAC가 여기 속하고 버린 것은 돌아오지 않습니다.</dd>
       </dl>

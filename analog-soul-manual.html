@@ -710,6 +710,7 @@ body::before {
 
 /* v2.3 신규 표시 배지 */
 .badge-new.v23{ color:var(--blue); border-color:var(--blue); }
+.badge-new.v30{ color:var(--amber); border-color:var(--amber); }
 .badge-new{
   display:inline-block; vertical-align:middle; margin-left:6px;
   font-family:'Share Tech Mono',monospace; font-size:9.5px; letter-spacing:.1em;
@@ -788,7 +789,7 @@ body::before {
   /* 앰버 면 */
   --c-amber-fill: #f0b545; --c-amber-fill-hi: #f6c464; --c-amber-deep: #c98f2c; --c-on-amber: #161c21;
   /* 캡 — 처리기마다 하나 */
-  --c-cap-comp: #8da9c4; --c-cap-bbe: #4db6a9; --c-cap-tube: #e8904a; --c-cap-exc: #d8bc4c; --c-cap-sg: #c977a9;
+  --c-cap-peq: #8bbf62; --c-cap-comp: #8da9c4; --c-cap-bbe: #4db6a9; --c-cap-tube: #e8904a; --c-cap-exc: #d8bc4c; --c-cap-sg: #c977a9;
   --c-cap-vinyl: #c67078; --c-cap-atmos: #6c9be0; --c-cap-master: #cfd6dc; --c-cap-hd: #a78bea;
   --c-cap-ink: 50%; --c-cap-tint: 12%; --c-on-cap: #161c21;
   /* 화면 — 두 모드 공통으로 어둡다. 그 안에 켜지는 색도 밝은 값 */
@@ -811,7 +812,7 @@ body::before {
     --c-text: #1c242b; --c-muted: #46525c; --c-dim: #535f6a;
     --c-amber: #835208; --c-red: #ab3226; --c-green: #286a3d; --c-blue: #285e9a; --c-purple: #5e44b8; --c-teal: #115f58;
     --c-amber-fill: #eeae3d; --c-amber-fill-hi: #f3bd58; --c-amber-deep: #d4952b; --c-on-amber: #1c242b;
-    --c-cap-comp: #32597b; --c-cap-bbe: #115f58; --c-cap-tube: #864215; --c-cap-exc: #695304; --c-cap-sg: #87386c;
+    --c-cap-peq: #3d6b22; --c-cap-comp: #32597b; --c-cap-bbe: #115f58; --c-cap-tube: #864215; --c-cap-exc: #695304; --c-cap-sg: #87386c;
     --c-cap-vinyl: #96303d; --c-cap-atmos: #2b5497; --c-cap-master: #4c5760; --c-cap-hd: #5b42ae;
     --c-cap-ink: 80%; --c-cap-tint: 18%; --c-on-cap: #ffffff;
     --c-glow: #f4f6f8; --c-hilite: rgba(255,255,255,0.75); --c-shade: rgba(30,40,50,0.28);
@@ -825,7 +826,7 @@ body::before {
   --c-text: #1c242b; --c-muted: #46525c; --c-dim: #535f6a;
   --c-amber: #835208; --c-red: #ab3226; --c-green: #286a3d; --c-blue: #285e9a; --c-purple: #5e44b8; --c-teal: #115f58;
   --c-amber-fill: #eeae3d; --c-amber-fill-hi: #f3bd58; --c-amber-deep: #d4952b; --c-on-amber: #1c242b;
-  --c-cap-comp: #32597b; --c-cap-bbe: #115f58; --c-cap-tube: #864215; --c-cap-exc: #695304; --c-cap-sg: #87386c;
+  --c-cap-peq: #3d6b22; --c-cap-comp: #32597b; --c-cap-bbe: #115f58; --c-cap-tube: #864215; --c-cap-exc: #695304; --c-cap-sg: #87386c;
   --c-cap-vinyl: #96303d; --c-cap-atmos: #2b5497; --c-cap-master: #4c5760; --c-cap-hd: #5b42ae;
   --c-cap-ink: 80%; --c-cap-tint: 18%; --c-on-cap: #ffffff;
   --c-glow: #f4f6f8; --c-hilite: rgba(255,255,255,0.75); --c-shade: rgba(30,40,50,0.28);
@@ -833,6 +834,7 @@ body::before {
 }
 
 /* 처리기 캡 — 매뉴얼 · 쉬운 말은 data-cap, 가이드 · 사양서는 id로 잇는다 */
+:root:not(#_) [data-cap="peq"] { --cap: var(--c-cap-peq); }
 :root:not(#_) [data-cap="comp"],
 :root:not(#_) #m-comp,
 :root:not(#_) #u-comp { --cap: var(--c-cap-comp); }
@@ -995,6 +997,7 @@ body::before {
 }
 :root:not(#_) .badge-new.v23 { color: color-mix(in srgb, var(--c-blue) var(--c-cap-ink), var(--c-text)); border-color: color-mix(in srgb, var(--c-blue) 50%, transparent); background: color-mix(in srgb, var(--c-blue) 10%, transparent); }
 :root:not(#_) .badge-new.v24 { color: color-mix(in srgb, var(--c-purple) var(--c-cap-ink), var(--c-text)); border-color: color-mix(in srgb, var(--c-purple) 50%, transparent); background: color-mix(in srgb, var(--c-purple) 10%, transparent); }
+:root:not(#_) .badge-new.v30 { color: color-mix(in srgb, var(--c-amber) var(--c-cap-ink), var(--c-text)); border-color: color-mix(in srgb, var(--c-amber-fill) 50%, transparent); background: color-mix(in srgb, var(--c-amber-fill) 10%, transparent); }
 :root:not(#_) .inline-tag { font-family: var(--c-mono); font-size: .82em; border-radius: 5px; background: var(--c-bg2); border-color: var(--c-line); color: var(--c-text); }
 
 /* 바닥 — 통합 색인에는 없던 윗선 · 배치를 매뉴얼과 같은 값으로 */
@@ -1079,9 +1082,9 @@ body::before {
 <!-- ══════════ COVER ══════════ -->
 <div class="cover">
   <div class="cover-rule">
-    <span class="cover-rule-label">ANALOG SOUL DSP ENGINE — USER MANUAL v3.0</span>
+    <span class="cover-rule-label">ANALOG SOUL DSP ENGINE — USER MANUAL v3.1</span>
   </div>
-  <div class="cover-eyebrow">공식 사용 설명서 · Official User Manual · v3.0</div>
+  <div class="cover-eyebrow">공식 사용 설명서 · Official User Manual · v3.1</div>
   <div class="cover-title">ANALOG SOUL<br>DSP ENGINE</div>
   <div class="cover-sub">브라우저 기반 풀스택 오디오 마스터링 스위트</div>
   <div class="cover-desc">
@@ -1130,23 +1133,24 @@ body::before {
     <div class="toc">
       <div class="toc-title">CONTENTS</div>
       <ul class="toc-list">
-        <li><a href="#whatsnew">v2.3 개정 내역</a></li>
+        <li><a href="#whatsnew">v3.1 개정 내역</a></li>
         <li><a href="#overview">개요 및 핵심 특징</a></li>
         <li><a href="#howto">사용 방법 — 5단계</a></li>
         <li><a href="#input">입력 & 파일 지원</a></li>
         <li><a href="#monitor">모니터링 도구</a></li>
         <li><a href="#chain">처리 체인 시스템</a></li>
-        <li><a href="#comp">모듈 01 — 컴프레서</a></li>
-        <li><a href="#bbe">모듈 02 — BBE 소닉 맥시마이저</a></li>
-        <li><a href="#tube">모듈 03 — 진공관 포화</a></li>
-        <li><a href="#exciter">모듈 04 — 익사이터</a></li>
-        <li><a href="#sg">모듈 05 — 사운드구다이저</a></li>
-        <li><a href="#vinyl">모듈 06 — 바이닐 레코드</a></li>
-        <li><a href="#atmos">모듈 07 — 돌비 애트모스</a></li>
-        <li><a href="#master">모듈 08 — 마스터링 체인</a></li>
-        <li><a href="#hd">모듈 09 — HD 업스케일링</a></li>
+        <li><a href="#peq">모듈 01 — 파라메트릭 EQ</a> <span class="badge-new">v3.1</span></li>
+        <li><a href="#comp">모듈 02 — 컴프레서</a></li>
+        <li><a href="#bbe">모듈 03 — BBE 소닉 맥시마이저</a></li>
+        <li><a href="#tube">모듈 04 — 진공관 포화</a></li>
+        <li><a href="#exciter">모듈 05 — 익사이터</a></li>
+        <li><a href="#sg">모듈 06 — 사운드구다이저</a></li>
+        <li><a href="#vinyl">모듈 07 — 바이닐 레코드</a></li>
+        <li><a href="#atmos">모듈 08 — 돌비 애트모스</a></li>
+        <li><a href="#master">모듈 09 — 마스터링 체인</a></li>
+        <li><a href="#hd">모듈 10 — HD 업스케일링</a></li>
         <li><a href="#preset">프리셋 — 설정 보관</a> <span class="badge-new v24">v2.4</span></li>
-        <li><a href="#export">내보내기 — 표본률 · 비트 깊이</a> <span class="badge-new">v3.0</span></li>
+        <li><a href="#export">내보내기 — 표본률 · 비트 깊이</a> <span class="badge-new v30">v3.0</span></li>
         <li><a href="#tips">활용 팁</a></li>
       </ul>
     </div>
@@ -1158,17 +1162,27 @@ body::before {
     <div class="section-num">RELEASE NOTES</div>
     <div class="section-title">개정 내역</div>
     <div class="deco-bar"></div>
-    <p class="section-lead">이 매뉴얼은 v3.0 기준입니다. 판별로 달라진 항목은 다음과 같습니다. 빌드마다의 세부 변경은 <code>README.md</code>의 변경 이력에 있습니다.</p>
+    <p class="section-lead">이 매뉴얼은 v3.1 기준입니다. 판별로 달라진 항목은 다음과 같습니다. 빌드마다의 세부 변경은 <code>README.md</code>의 변경 이력에 있습니다.</p>
 
     <div class="callout">
       <p>
-        본문 곳곳에 <span class="badge-new">v3.0</span> <span class="badge-new v24">v2.4</span> <span class="badge-new v23">v2.3</span>
+        본문 곳곳에 <span class="badge-new">v3.1</span> <span class="badge-new v30">v3.0</span> <span class="badge-new v24">v2.4</span> <span class="badge-new v23">v2.3</span>
         배지를 달아 어느 판에서 들어온 기능인지 표시했습니다.
         배지가 없는 내용은 최초 판부터 있던 것입니다.
       </p>
     </div>
 
-    <h3 class="sub-title">v3.0 — 현재 판</h3>
+    <h3 class="sub-title">v3.1 — 현재 판</h3>
+    <table class="spec-table">
+      <tr><th>구분</th><th>항목</th></tr>
+      <tr><td>신규</td><td>PARAMETRIC EQ 카드 — 대역 최대 20개 · 종류 여섯 가지(벨 · 로우 셸프 · 하이 셸프 · 로우 컷 · 하이 컷 · 노치) · 주파수 20 Hz ~ 20 kHz, 이득 ±24 dB, Q 0.1 ~ 18, 컷 기울기 12 · 24 · 36 · 48 dB/oct(24 이상은 버터워스 4 · 6 · 8차) · MACRO는 벨 · 셸프 이득의 깊이 · 처음에는 꺼져 있고 평탄한 네 대역이라 켜도 소리가 그대로 · 켜진 대역이 없으면 표본이 바뀌지 않음 · 재생 중에 고쳐도 딸깍이지 않음(값은 10 ms로 옮기고, 대역 구성이 바뀌면 20 ms 교차) · 재생과 내보내기가 같은 블록을 써서 같은 소리</td></tr>
+      <tr><td>화면</td><td>EQ 그래프 — 번호 점을 끌어 주파수 · 이득을 고침(Shift는 1/5로 세밀하게) · 점 위 휠로 Q(가파른 컷은 기울기) · 빈 곳을 두 번 눌러 벨 추가 · 점을 두 번 눌러 켜고 끄기 · 오른쪽 단추로 지우기 · 키보드로도 모든 조작 · 곡선은 소리를 내는 것과 같은 필터에서 얻음(40 Hz ~ 20 kHz에서 소리와의 차이 최대 0.002 dB) · 재생 중 EQ 앞(선)과 뒤(면)의 스펙트럼(1 kHz 기준 옥타브당 +3 dB 기울임) · 세로 눈금 ±12 dB, 11.5 dB를 넘으면 ±24 dB · 큰 편집 창 — 큰 그래프와 모든 대역의 표, 창 안의 켜짐 스위치 · 재생 단추 · ＋ 대역 · 처음 상태로(3초 안에 한 번 더), Esc나 바깥을 눌러 닫기</td></tr>
+      <tr><td>순서</td><td>기본 처리 순서의 맨 앞에 EQ — EQ → COMP → BBE → TUBE → EXCITER → SG → VINYL → ATMOS → MASTER · 카드 아홉 장, 넓은 화면에서 3 × 3</td></tr>
+      <tr><td>프리셋</td><td>설정 파일 · 슬롯에 EQ 대역 목록을 함께 담음 · 3.0에서 저장한 설정을 불러오면 EQ를 처음 상태(꺼짐 · 평탄한 네 대역 · MACRO 100% · INPUT GAIN 0 dB)로 되돌려 저장할 때의 소리를 그대로 내고, EQ 카드는 맨 앞에 놓임</td></tr>
+      <tr><td>문서</td><td>PARAMETRIC EQ 절을 모듈 01로 추가(뒤의 모듈 번호가 하나씩 밀림) · 그래프와 큰 편집 창의 마우스 · 키보드 조작표</td></tr>
+    </table>
+
+    <h3 class="sub-title">v3.0</h3>
     <table class="spec-table">
       <tr><th>구분</th><th>항목</th></tr>
       <tr><td>화면</td><td>녹음 콘솔 채널 스트립 방식의 새 디자인(청회색 앞판, 처리기별 색, Barlow 글꼴) · 글자 크기 확대(대부분 8~10 px → 12~15 px) · 주사선과 발광 효과 제거 · 컴퓨터의 다크·라이트 설정을 따라 야간 콘솔·주간 콘솔로 자동 전환(계기창은 두 모드 모두 어둡게) · 모든 글자가 바탕과 4.5:1 이상 대비</td></tr>
@@ -1219,7 +1233,7 @@ body::before {
     <div class="deco-bar"></div>
     <p class="section-lead">
       ANALOG SOUL DSP ENGINE은 웹 브라우저 하나로 구동되는 프로페셔널급 오디오 처리 도구입니다.
-      단일 HTML 파일 안에 8개의 DSP 모듈, 실시간 시각화, 3종 고해상도 내보내기 기능이 모두 내장되어 있습니다.
+      단일 HTML 파일 안에 9개의 DSP 모듈, 실시간 시각화, 3종 고해상도 내보내기 기능이 모두 내장되어 있습니다.
     </p>
 
     <div class="feat-grid">
@@ -1248,8 +1262,8 @@ body::before {
       </div>
       <div class="feat-card">
         <span class="feat-icon">🎚️</span>
-        <div class="feat-name">8개 독립 DSP 모듈</div>
-        <div class="feat-desc">컴프레서, BBE, 진공관, 익사이터, 사운드구다이저, 바이닐, 돌비 애트모스, 마스터링 체인 — 각각 독립적으로 켜고 끌 수 있습니다.</div>
+        <div class="feat-name">9개 독립 DSP 모듈</div>
+        <div class="feat-desc">파라메트릭 EQ <span class="badge-new">v3.1</span>, 컴프레서, BBE, 진공관, 익사이터, 사운드구다이저, 바이닐, 돌비 애트모스, 마스터링 체인 — 각각 독립적으로 켜고 끌 수 있습니다.</div>
       </div>
       <div class="feat-card">
         <span class="feat-icon">↕️</span>
@@ -1293,22 +1307,22 @@ body::before {
       <div class="wf-step">
         <div class="wf-num">STEP 02</div>
         <div class="wf-title">모듈 켜기 & 파라미터 조정</div>
-        <div class="wf-desc">각 모듈 오른쪽 상단의 LED 토글 스위치를 눌러 켜세요. 슬라이더를 조정하면 실시간으로 소리가 바뀝니다. ▶ PLAY를 눌러 들으면서 조정하면 더욱 직관적입니다. 처리 체인 위 신호 흐름 지도의 불빛을 눌러도 같은 스위치가 켜집니다. <span class="badge-new">v3.0</span></div>
+        <div class="wf-desc">각 모듈 오른쪽 상단의 LED 토글 스위치를 눌러 켜세요. 슬라이더를 조정하면 실시간으로 소리가 바뀝니다. ▶ PLAY를 눌러 들으면서 조정하면 더욱 직관적입니다. 처리 체인 위 신호 흐름 지도의 불빛을 눌러도 같은 스위치가 켜집니다. <span class="badge-new v30">v3.0</span></div>
       </div>
       <div class="wf-step">
         <div class="wf-num">STEP 03</div>
         <div class="wf-title">처리 순서 배치</div>
-        <div class="wf-desc">모듈 헤더 왼쪽의 점선 핸들을 드래그하거나, 처리 체인 위 신호 흐름 지도에서 노드를 끌어 놓으면 모듈 순서를 바꿀 수 있습니다. 흐름 지도에서 노드를 끄는 동안에는 다른 노드가 옆으로 비켜 가 놓일 자리가 비고, 놓으면 그 노드와 아래 카드들이 새 자리로 미끄러져 갑니다. 카드를 직접 끌면 그 자리에 점선 빈칸이 생겨 커서를 따라가고, 놓은 카드는 놓은 자리에서 빈칸으로 미끄러져 들어갑니다. 넓은 화면에서는 카드가 같은 크기로 처리 순서대로 놓이고, 켜진 카드는 내용이 넘치면 카드 안에서 스크롤하며, 꺼진 카드는 손잡이가 눌리지 않는 배경으로 물러납니다. 켜진 카드 밖에서 화면을 굴리기 시작하면 휠이 멈출 때까지 화면이 계속 굴러갑니다. VINYL · ATMOS는 제목줄 아래 ‘처리 위치’에서 MASTER 뒤(재생 단계)로 옮길 수 있습니다. 마스터링이 끝난 소리를 LP로 재생하거나 듣는 기기에 맞춰 공간을 그리는 단계를 흉내 내며, CEILING 보장은 MASTER까지입니다. <span class="badge-new">v3.0</span> 예를 들어 컴프레서를 앞에 두면 레벨을 안정시킨 후 색채 이펙트가 적용됩니다. 마스터링 체인은 제작의 마지막 단에 고정됩니다. 그 뒤의 재생 단계에는 VINYL · ATMOS만 둘 수 있습니다.</div>
+        <div class="wf-desc">모듈 헤더 왼쪽의 점선 핸들을 드래그하거나, 처리 체인 위 신호 흐름 지도에서 노드를 끌어 놓으면 모듈 순서를 바꿀 수 있습니다. 흐름 지도에서 노드를 끄는 동안에는 다른 노드가 옆으로 비켜 가 놓일 자리가 비고, 놓으면 그 노드와 아래 카드들이 새 자리로 미끄러져 갑니다. 카드를 직접 끌면 그 자리에 점선 빈칸이 생겨 커서를 따라가고, 놓은 카드는 놓은 자리에서 빈칸으로 미끄러져 들어갑니다. 넓은 화면에서는 카드가 같은 크기로 처리 순서대로 놓이고, 켜진 카드는 내용이 넘치면 카드 안에서 스크롤하며, 꺼진 카드는 손잡이가 눌리지 않는 배경으로 물러납니다. 켜진 카드 밖에서 화면을 굴리기 시작하면 휠이 멈출 때까지 화면이 계속 굴러갑니다. VINYL · ATMOS는 제목줄 아래 ‘처리 위치’에서 MASTER 뒤(재생 단계)로 옮길 수 있습니다. 마스터링이 끝난 소리를 LP로 재생하거나 듣는 기기에 맞춰 공간을 그리는 단계를 흉내 내며, CEILING 보장은 MASTER까지입니다. <span class="badge-new v30">v3.0</span> 예를 들어 컴프레서를 앞에 두면 레벨을 안정시킨 후 색채 이펙트가 적용됩니다. 마스터링 체인은 제작의 마지막 단에 고정됩니다. 그 뒤의 재생 단계에는 VINYL · ATMOS만 둘 수 있습니다. 처음 순서는 PARAMETRIC EQ가 맨 앞이고(EQ → COMP → BBE → TUBE → EXCITER → SG → VINYL → ATMOS → MASTER), 넓은 화면에서는 이 아홉 장이 3 × 3으로 놓입니다. <span class="badge-new">v3.1</span></div>
       </div>
       <div class="wf-step">
         <div class="wf-num">STEP 04</div>
         <div class="wf-title">HD 업스케일 설정 (선택)</div>
-        <div class="wf-desc">화면 하단 HD RESTORATION 모듈에서 HF SYNTH 강도와 SMOOTH 값을 설정합니다. 이 설정은 원본보다 높은 표본률로 내보낼 때만 적용되며(나가는 표본률이 96kHz 이하면 HD, 176.4 · 192kHz면 ULTRA HD, 352.8 · 384kHz면 eXtreme HD 설정), 같거나 낮을 때는 영향을 주지 않습니다. 같은 모듈의 BIT DEPTH 열에서 비트 깊이 향상의 세기(REFINE)와 디더를 정합니다. <span class="badge-new">v3.0</span></div>
+        <div class="wf-desc">화면 하단 HD RESTORATION 모듈에서 HF SYNTH 강도와 SMOOTH 값을 설정합니다. 이 설정은 원본보다 높은 표본률로 내보낼 때만 적용되며(나가는 표본률이 96kHz 이하면 HD, 176.4 · 192kHz면 ULTRA HD, 352.8 · 384kHz면 eXtreme HD 설정), 같거나 낮을 때는 영향을 주지 않습니다. 같은 모듈의 BIT DEPTH 열에서 비트 깊이 향상의 세기(REFINE)와 디더를 정합니다. <span class="badge-new v30">v3.0</span></div>
       </div>
       <div class="wf-step">
         <div class="wf-num">STEP 05</div>
         <div class="wf-title">내보내기</div>
-        <div class="wf-desc">EXPORT 섹션에서 SAMPLE RATE(44.1 · 48 · 96 · 192 · 384, 44.1 계열 원본이면 44.1 · 48 · 88.2 · 176.4 · 352.8 — 파일을 올리면 원본 값에 맞춰지고 그 눈금 아래에 (원본)이 붙음)와 BIT DEPTH(16 · 24 · 32)를 고르고 내보내기 단추를 누릅니다. 단추 아래에 처리 경로가 표시되며, 처리가 끝나면 파일이 자동으로 다운로드됩니다. <span class="badge-new">v3.0</span></div>
+        <div class="wf-desc">EXPORT 섹션에서 SAMPLE RATE(44.1 · 48 · 96 · 192 · 384, 44.1 계열 원본이면 44.1 · 48 · 88.2 · 176.4 · 352.8 — 파일을 올리면 원본 값에 맞춰지고 그 눈금 아래에 (원본)이 붙음)와 BIT DEPTH(16 · 24 · 32)를 고르고 내보내기 단추를 누릅니다. 단추 아래에 처리 경로가 표시되며, 처리가 끝나면 파일이 자동으로 다운로드됩니다. <span class="badge-new v30">v3.0</span></div>
       </div>
     </div>
   
@@ -1318,7 +1332,7 @@ body::before {
         <a href="#preset">프리셋</a> 영역의 빠른 슬롯을 <strong>0.6초 길게 누르면</strong> 현재 설정이 그대로 들어갑니다. 카드들이 차례로 깜빡이면 담긴 것입니다.
         다른 설정을 시도하다 되돌아오고 싶을 때 짧게 누르면 그 상태로 복귀합니다.
       </p>
-<p>카드 맨 위의 <strong>MACRO</strong> 손잡이는 그 카드의 주요 손잡이들을 가장 약한 위치(0%)와 기준 설계값(100%) 사이에서 함께 옮깁니다. COMPRESSOR는 THRESHOLD 0 → −18 dB · RATIO 1 → 4 · MAKEUP 0 → 4 dB, BBE는 LO CONTOUR · PROCESS · HI DEF를 0에서 40 · 60 · 50까지, EXCITER는 DRIVE · MIX를 0에서 40 · 35까지, SOUNDGOODIZER는 AMOUNT와 세 대역 SAT을, MASTERING CHAIN은 세 대역 압축비(1:1부터)와 STEREO WIDTH(100%부터)를 옮깁니다. VACUUM TUBE · VINYL RECORD · DOLBY ATMOS도 같은 방식입니다. 값은 슬라이더 눈금에 맞춰 반올림되고, 손잡이를 직접 만진 뒤에는 MACRO를 다시 움직일 때까지 그 값이 남습니다. 처음 상태는 COMPRESSOR 50% · BBE 40% · EXCITER 80% · SOUNDGOODIZER 65% · MASTERING CHAIN 95%(켬), 나머지 셋은 MACRO 100%(끔)입니다. 0%는 '효과 없음'이 아닙니다. BBE · SOUNDGOODIZER · MASTERING CHAIN은 카드 구조 자체가 레벨과 음색을 바꾸므로, 소리를 완전히 빼려면 카드를 끕니다.</p>
+<p>카드 맨 위의 <strong>MACRO</strong> 손잡이는 그 카드의 주요 손잡이들을 가장 약한 위치(0%)와 기준 설계값(100%) 사이에서 함께 옮깁니다. COMPRESSOR는 THRESHOLD 0 → −18 dB · RATIO 1 → 4 · MAKEUP 0 → 4 dB, BBE는 LO CONTOUR · PROCESS · HI DEF를 0에서 40 · 60 · 50까지, EXCITER는 DRIVE · MIX를 0에서 40 · 35까지, SOUNDGOODIZER는 AMOUNT와 세 대역 SAT을, MASTERING CHAIN은 세 대역 압축비(1:1부터)와 STEREO WIDTH(100%부터)를 옮깁니다. VACUUM TUBE · VINYL RECORD · DOLBY ATMOS도 같은 방식입니다. 값은 슬라이더 눈금에 맞춰 반올림되고, 손잡이를 직접 만진 뒤에는 MACRO를 다시 움직일 때까지 그 값이 남습니다. PARAMETRIC EQ만은 대역마다 값이 달라, 손잡이를 옮기는 대신 모든 벨 · 셸프의 이득에 같은 비율을 곱하는 <strong>깊이</strong>로 씁니다(0%면 벨 · 셸프는 평탄해지고 컷 · 노치는 그대로 남음). <span class="badge-new">v3.1</span> 처음 상태는 COMPRESSOR 50% · BBE 40% · EXCITER 80% · SOUNDGOODIZER 65% · MASTERING CHAIN 95%(켬), 나머지 넷은 MACRO 100%(끔)입니다. 0%는 '효과 없음'이 아닙니다. BBE · SOUNDGOODIZER · MASTERING CHAIN은 카드 구조 자체가 레벨과 음색을 바꾸므로, 소리를 완전히 빼려면 카드를 끕니다.</p>
       <p>
         여러 곡에 같은 처리를 하거나 다른 기기에서 이어 작업하려면
         <strong>화면 설정 저장</strong>으로 파일을 만들어 두면 됩니다.
@@ -1339,7 +1353,7 @@ body::before {
       <tr><td>채널</td><td>모노 / 스테레오 모두 지원</td></tr>
       <tr><td>샘플레이트</td><td>제한 없음 (브라우저 Web Audio API가 지원하는 모든 샘플레이트)</td></tr>
       <tr><td>파일 로드 후 표시 정보</td><td>파일명, 샘플레이트(SR), 채널 수, 총 재생시간</td></tr>
-      <tr><td>파일 초기화</td><td>✕ 초기화 버튼으로 파일 및 모든 설정 리셋</td></tr>
+      <tr><td>파일 초기화</td><td>✕ 초기화 버튼은 재생을 멈추고 불러온 파일 · 스펙트럼 표시 · HD LIVE 미리듣기를 비우며, 모든 카드의 INPUT GAIN을 0으로 되돌립니다. 다른 손잡이 · 카드 스위치 · 순서 · EQ 대역은 그대로 둡니다. 모든 값을 처음 상태로 되돌리려면 <a href="#preset">프리셋</a>의 비어 있는 슬롯을 누릅니다.</td></tr>
     </table>
     <div class="callout blue">
       <p><strong>개인정보 보호:</strong> 업로드된 음원은 서버로 전송되지 않습니다. 파일은 브라우저 메모리에서만 처리되며, 탭을 닫으면 완전히 삭제됩니다.</p>
@@ -1376,7 +1390,7 @@ body::before {
 
     <div class="callout">
       <p>
-        <strong>화면 색 <span class="badge-new">v3.0</span></strong> —
+        <strong>화면 색 <span class="badge-new v30">v3.0</span></strong> —
         기본(자동)은 컴퓨터의 다크·라이트 설정을 따릅니다. 다크 모드에서는 어두운 야간 콘솔, 라이트 모드에서는 밝은 주간 콘솔로 그려지며,
         설정을 바꾸면 열어 둔 화면도 바로 바뀝니다. 상단 이동 바 오른쪽의 <strong>자동 · 야간 · 주간</strong>으로 직접 고를 수도 있고, 고른 것은 이 브라우저에 기억되어 프로그램과 모든 문서에 같이 적용됩니다. 스펙트럼·곡선·미터 같은 계기창은 두 모드 모두 어둡게 두어,
         그래프의 색과 눈금이 어느 쪽에서든 같게 보입니다.
@@ -1410,6 +1424,13 @@ body::before {
         <div class="feat-name">L/R VU 미터</div>
         <div class="feat-desc">
           화면 우측 상단에 항시 표시되는 좌/우 채널 레벨 미터. 초록→노랑→빨강으로 레벨 상태를 직관적으로 표현합니다. RMS 기반으로 계산되어 실제 체감 음량에 가깝습니다.
+        </div>
+      </div>
+      <div class="feat-card">
+        <span class="feat-icon">〰️</span>
+        <div class="feat-name">EQ 그래프 · 앞뒤 스펙트럼 <span class="badge-new">v3.1</span></div>
+        <div class="feat-desc">
+          PARAMETRIC EQ 카드의 그래프는 가로가 20 Hz ~ 20 kHz 로그 눈금, 세로가 ±12 dB이고, 곡선의 봉우리나 점의 높이가 11.5 dB를 넘으면 ±24 dB로 넓어집니다. 굵은 선이 전체 응답, 옅은 면이 고른 대역의 응답입니다. 재생 중이고 EQ가 켜져 있으면 <strong>EQ 앞(선)과 뒤(면)의 스펙트럼</strong>을 겹쳐 그려, 깎고 올린 결과가 바로 보입니다. 스펙트럼은 1/6 옥타브 폭으로 평균하고 1 kHz를 기준으로 옥타브당 +3 dB 기울여, 분홍 잡음이 평평하게 보입니다.
         </div>
       </div>
       <div class="feat-card">
@@ -1482,6 +1503,11 @@ body::before {
       </div>
       <div class="flow-arrow">→</div>
       <div class="flow-node">
+        <div class="flow-box optional">EQ</div>
+        <div class="flow-label">on/off</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node">
         <div class="flow-box optional">COMP</div>
         <div class="flow-label">on/off</div>
       </div>
@@ -1529,15 +1555,25 @@ body::before {
 
     <table class="spec-table">
       <tr><th>기능</th><th>설명</th></tr>
+      <tr><td>기본 순서 <span class="badge-new">v3.1</span></td><td>처음 순서는 EQ → COMP → BBE → TUBE → EXCITER → SG → VINYL → ATMOS → MASTER입니다. 카드는 아홉 장이고(그 앞에 고해상도 복원), 넓은 화면에서는 3 × 3으로 놓입니다. PARAMETRIC EQ도 다른 카드처럼 끌어 옮길 수 있지만, MASTER 뒤 재생 단계에는 VINYL · ATMOS만 들어가므로 MASTER 앞에서만 움직입니다.</td></tr>
       <tr><td>모듈 순서 변경</td><td>헤더의 점선 핸들을 드래그 앤 드롭. 드래그 중 삽입 위치 표시선(주황 바)이 나타납니다.</td></tr>
       <tr><td>모듈 켜기/끄기</td><td>각 모듈 우측 상단 LED 토글. 꺼진 모듈은 체인에서 완전히 제외됩니다.</td></tr>
-      <tr><td>신호 흐름 지도 <span class="badge-new">v3.0</span></td><td>처리 체인 위에 원음부터 출력까지 현재 순서를 한 줄로 보여 줍니다. 노드를 끌면 순서가 바뀌고, 불빛을 누르면 켜고 끄며, 이름을 누르면 그 카드로 이동합니다. 키보드로는 노드 이름에 초점을 두고 Alt+←/→로 한 칸씩 옮깁니다. 끄는 동안에는 다른 노드가 옆으로 비켜 가 놓일 자리가 비고(여러 줄일 때는 앰버 표시선으로 자리를 보여 줌), 끄는 중에 Esc를 누르면 모두 제자리로 돌아갑니다. 순서를 바꾸면 흐름 지도 노드와 아래 카드들이 같은 스프링으로 새 자리로 미끄러져 갑니다(컴퓨터의 동작 줄이기 설정이면 곧바로 자리를 바꿈). 창이 좁으면 촘촘한 한 줄이나 여러 줄로 바뀝니다. HD 복원과 MASTER는 자리가 고정되어 끌 수 없으며, 양 끝의 원음·출력처럼 점선 테두리로 그려집니다. MASTER 바로 뒤의 청록 ‘재생’ 경계부터가 재생 단계이며, VINYL · ATMOS만 들어갈 수 있습니다. HD 복원 노드는 LIVE가 켜져 있을 때 밝아집니다.</td></tr>
-      <tr><td>카드 번호 · 접기 <span class="badge-new">v3.0</span></td><td>카드 이름 앞 번호가 처리 순서입니다. 머리줄의 꺾쇠 단추로 카드를 접고 펴며, 흐름 지도 위의 모두 접기 단추로 한꺼번에 접습니다. 접은 상태는 새로고침 뒤에도 남고, 접어도 처리에는 영향이 없습니다.</td></tr>
+      <tr><td>신호 흐름 지도 <span class="badge-new v30">v3.0</span></td><td>처리 체인 위에 원음부터 출력까지 현재 순서를 한 줄로 보여 줍니다. 노드를 끌면 순서가 바뀌고, 불빛을 누르면 켜고 끄며, 이름을 누르면 그 카드로 이동합니다. 키보드로는 노드 이름에 초점을 두고 Alt+←/→로 한 칸씩 옮깁니다. 끄는 동안에는 다른 노드가 옆으로 비켜 가 놓일 자리가 비고(여러 줄일 때는 앰버 표시선으로 자리를 보여 줌), 끄는 중에 Esc를 누르면 모두 제자리로 돌아갑니다. 순서를 바꾸면 흐름 지도 노드와 아래 카드들이 같은 스프링으로 새 자리로 미끄러져 갑니다(컴퓨터의 동작 줄이기 설정이면 곧바로 자리를 바꿈). 창이 좁으면 촘촘한 한 줄이나 여러 줄로 바뀝니다. HD 복원과 MASTER는 자리가 고정되어 끌 수 없으며, 양 끝의 원음·출력처럼 점선 테두리로 그려집니다. MASTER 바로 뒤의 청록 ‘재생’ 경계부터가 재생 단계이며, VINYL · ATMOS만 들어갈 수 있습니다. HD 복원 노드는 LIVE가 켜져 있을 때 밝아집니다.</td></tr>
+      <tr><td>카드 번호 · 접기 <span class="badge-new v30">v3.0</span></td><td>카드 이름 앞 번호가 처리 순서입니다. 머리줄의 꺾쇠 단추로 카드를 접고 펴며, 흐름 지도 위의 모두 접기 단추로 한꺼번에 접습니다. 접은 상태는 새로고침 뒤에도 남고, 접어도 처리에는 영향이 없습니다.</td></tr>
       <tr><td>내보내기 시 순서 반영</td><td>화면에 보이는 순서 그대로 OfflineAudioContext로 렌더링됩니다.</td></tr>
       <tr><td>마스터링 모듈 위치</td><td>제작의 마지막에 고정 — 뒤에는 재생 단계(VINYL · ATMOS)만. 드래그 이동 불가.</td></tr>
       <tr><td>실시간 핫스왑</td><td>재생 중 파라미터/순서 변경 시 오디오 체인이 즉시 재빌드됩니다. 재생이 끊기지 않습니다.</td></tr>
       <tr><td>재생 순서 반영 <span class="badge-new v23">v2.3</span></td><td>실시간 재생도 화면 순서를 그대로 따릅니다. 내보낸 파일과 듣는 소리가 일치합니다.</td></tr>
     </table>
+
+    <div class="callout">
+      <p>
+        <strong>EQ가 맨 앞인 이유 <span class="badge-new">v3.1</span></strong> —
+        EQ는 선형으로 음색을 고르는 단입니다. 맨 앞에 두면 깎아 낼 성분(웅웅거림 · 저역 잡음 등)이 뒤의 압축기 검출과 포화를 먼저 움직이지 않습니다.
+        압축기는 검출 신호에 섞인 모든 성분에 반응하고, TUBE · EXCITER · SG 같은 비선형 단은 들어온 성분으로 배음과 상호변조를 만들기 때문입니다.
+        압축된 뒤의 음색을 다듬고 싶으면 EQ 카드를 COMP 뒤로 옮기면 됩니다(카드를 끌거나 흐름 지도에서).
+      </p>
+    </div>
 
     <div class="callout ok">
       <p>
@@ -1563,6 +1599,7 @@ body::before {
       <tr><th>모듈</th><th>INPUT GAIN의 효과</th></tr>
       <tr><td>TUBE · EXCITER · SG</td><td>파형을 찌그러뜨려 효과를 내므로 세게 넣을수록 포화가 깊어집니다. DRIVE를 건드리지 않고 이것만 올려도 성격이 달라집니다.</td></tr>
       <tr><td>COMPRESSOR</td><td>입력을 3 dB 올리는 것은 THRESHOLD를 3 dB 내리는 것과 사실상 같습니다. 압축량을 미세하게 손볼 때 편합니다.</td></tr>
+      <tr><td>PARAMETRIC EQ <span class="badge-new">v3.1</span></td><td>선형 처리라 음량만 바뀌고 음색은 그대로입니다.</td></tr>
       <tr><td>BBE · VINYL · ATMOS</td><td>선형 처리가 지배적이라 대체로 음량만 변합니다.</td></tr>
       <tr><td>MASTERING</td><td>4대역 압축기의 스레숄드가 고정값이므로 입력 게인이 전체 리덕션 깊이를 결정합니다.</td></tr>
     </table>
@@ -1577,15 +1614,195 @@ body::before {
     </div>
   </div>
 
-  <!-- ══════════ MOD 01: COMP ══════════ -->
+  <!-- ══════════ MOD 01: PEQ ══════════ -->
+  <hr class="divider">
+  <div class="section" id="peq">
+    <div class="section-num">MODULE 01</div>
+    <div class="section-title">파라메트릭 EQ — PARAMETRIC EQ <span class="badge-new">v3.1</span></div>
+    <div class="deco-bar"></div>
+    <div class="module-card" data-cap="peq">
+      <div class="mc-header">
+        <span class="mc-num">MOD-01</span>
+        <span class="mc-name">PARAMETRIC EQ</span>
+        <span class="mc-sub">대역 최대 20개</span>
+      </div>
+      <div class="mc-body">
+        <div>
+          <div class="mc-what">
+            주파수마다 소리를 깎거나 올려 <strong>음색을 고르는</strong> 파라메트릭 이퀄라이저입니다. 대역을 최대 20개까지 두고, 대역마다 종류 · 주파수 · 이득 · Q(컷은 기울기)를 정합니다. 카드의 그래프에서 번호가 적힌 점을 끌어 고치고, <strong>크게</strong>를 누르면 큰 그래프와 모든 대역의 표가 있는 편집 창이 열립니다.<br><br>
+            처음에는 <strong>꺼져</strong> 있고 평탄한 네 대역(① 로우 셸프 80 Hz ② 벨 400 Hz · Q 1 ③ 벨 2.5 kHz · Q 1 ④ 하이 셸프 10 kHz, 모두 0 dB)이 놓여 있어, 켜도 소리가 바뀌지 않고 점을 끌면 바로 쓸 수 있습니다. 꺼진 동안에는 다른 카드처럼 본문이 눌리지 않으므로 먼저 켭니다.<br><br>
+            대역마다 필터를 두고 목록 순서대로 잇습니다. 24 · 36 · 48 dB/oct 컷은 버터워스 4 · 6 · 8차를 2차 필터 2 · 3 · 4개로 나눠 잇습니다. 꺼진 대역은 체인에서 빠지고, 켜진 대역이 없으면 입력이 그대로 나가 <strong>표본이 하나도 바뀌지 않습니다</strong>.<br><br>
+            <strong>MACRO</strong>는 다른 카드와 달리 <strong>깊이</strong>입니다. 대역마다 값이 달라 손잡이를 함께 옮기는 대신, 모든 벨 · 셸프의 이득에 같은 비율을 곱합니다. 0%면 벨 · 셸프는 평탄해지고 컷 · 노치는 그대로 남습니다.<br><br>
+            그래프의 곡선은 소리를 내는 것과 같은 종류 · 같은 값의 필터에서 얻으므로 <strong>보이는 곡선이 곧 들리는 소리</strong>입니다. 재생 중에는 EQ 앞(선)과 뒤(면)의 스펙트럼을 겹쳐 그립니다.
+          </div>
+        </div>
+        <div class="mc-params">
+          <div class="param-row"><span class="param-name">MACRO</span><span class="param-range">0~100%</span><span class="param-desc">깊이. 벨 · 셸프의 이득에 곱함. 기본 100%</span></div>
+          <div class="param-row"><span class="param-name">대역</span><span class="param-range">최대 20개</span><span class="param-desc">＋ · 그래프 두 번 누르기 · Insert로 추가. 번호는 만든 차례</span></div>
+          <div class="param-row"><span class="param-name">종류</span><span class="param-range">6가지</span><span class="param-desc">벨 · 로우 셸프 · 하이 셸프 · 로우 컷 · 하이 컷 · 노치</span></div>
+          <div class="param-row"><span class="param-name">주파수</span><span class="param-range">20 Hz~20 kHz</span><span class="param-desc">벨 · 노치는 가운데, 셸프는 모서리, 컷은 차단 주파수</span></div>
+          <div class="param-row"><span class="param-name">이득</span><span class="param-range">±24 dB</span><span class="param-desc">벨 · 셸프만. 셸프는 모서리에서 설정의 절반</span></div>
+          <div class="param-row"><span class="param-name">Q</span><span class="param-range">0.1~18</span><span class="param-desc">벨 · 노치 · 12 dB/oct 컷만. 벨 · 노치는 클수록 좁고, 컷은 0.71이 버터워스</span></div>
+          <div class="param-row"><span class="param-name">기울기</span><span class="param-range">12~48 dB/oct</span><span class="param-desc">로우 컷 · 하이 컷만. 12 · 24 · 36 · 48 네 가지, 24 이상은 버터워스 4 · 6 · 8차</span></div>
+          <div class="param-row"><span class="param-name">켜짐</span><span class="param-range">대역마다</span><span class="param-desc">꺼진 대역은 체인에서 빠지고 그래프에 점선 동그라미로 남음</span></div>
+        </div>
+        <div class="mc-badge-row">
+          <span class="mc-badge amber">대역 최대 20개</span>
+          <span class="mc-badge amber">그래프에서 끌어 편집</span>
+          <span class="mc-badge amber">EQ 앞뒤 스펙트럼</span>
+          <span class="mc-badge amber">큰 편집 창</span>
+          <span class="mc-badge">버터워스 4 · 6 · 8차 컷</span>
+          <span class="mc-badge">곡선 = 실제 소리</span>
+          <span class="mc-badge">독립 ON/OFF</span>
+          <span class="mc-badge">체인 순서 변경 가능</span>
+        </div>
+      </div>
+    </div>
+
+    <h3 class="sub-title">카드 구성</h3>
+    <p>
+      카드에는 MACRO · INPUT GAIN 아래에 작은 그래프가 있고, 그 아래에 <strong>대역 단추 줄</strong>(＋ · 번호 단추 · 크게)과
+      고른 대역의 <strong>편집 줄</strong>(켜짐 불빛 · 종류 · 기울기 · ✕, 주파수 · 이득 · Q 칸)이 있습니다.
+      번호는 대역을 만든 차례입니다. 주파수 순으로 다시 매기지 않으므로 점을 끄는 동안 번호가 바뀌지 않습니다.
+      넓은 화면에서 대역 9개까지는 카드 안에 스크롤 없이 들어가고, 10개부터는 대역 단추가 두 줄이 되어 카드 안에서 스크롤합니다.
+      대역이 많을 때는 모든 대역을 표로 보는 큰 편집 창이 편합니다.
+    </p>
+
+    <h3 class="sub-title">대역 종류</h3>
+    <table class="spec-table">
+      <tr><th>종류</th><th>쓰는 값</th><th>하는 일</th></tr>
+      <tr><td>벨</td><td>주파수 · 이득 · Q</td><td>주파수를 가운데로 그 둘레를 올리거나 깎습니다. Q가 클수록 좁습니다.</td></tr>
+      <tr><td>로우&nbsp;셸프</td><td>주파수 · 이득</td><td>주파수 아래를 통째로 올리거나 깎습니다. 주파수(모서리)에서 설정의 절반이 걸립니다.</td></tr>
+      <tr><td>하이&nbsp;셸프</td><td>주파수 · 이득</td><td>주파수 위를 통째로 올리거나 깎습니다. 주파수(모서리)에서 설정의 절반이 걸립니다.</td></tr>
+      <tr><td>로우&nbsp;컷</td><td>주파수 · 기울기 · Q</td><td>주파수 아래를 걸러 냅니다. Q는 12 dB/oct일 때만 씁니다.</td></tr>
+      <tr><td>하이&nbsp;컷</td><td>주파수 · 기울기 · Q</td><td>주파수 위를 걸러 냅니다. Q는 12 dB/oct일 때만 씁니다.</td></tr>
+      <tr><td>노치</td><td>주파수 · Q</td><td>주파수 한 곳을 깊게 파냅니다. Q가 클수록 좁습니다.</td></tr>
+    </table>
+    <p>
+      종류를 로우 컷 · 하이 컷으로 바꾸면 Q를 버터워스 값 0.71로, 컷 · 셸프에서 벨 · 노치로 바꾸면 Q를 1로 둡니다.
+      높은 Q의 벨을 그대로 컷으로 바꾸면 차단 주파수에 큰 공진 봉우리가 생기기 때문입니다(12 dB/oct 컷에서 Q 4면 차단 주파수가 +12 dB).
+      셸프는 Q를 쓰지 않습니다. 브라우저 필터 규격이 셸프의 Q를 무시하기 때문입니다. 범위 밖의 값은 가장자리 값으로 맞춥니다.
+    </p>
+
+    <h3 class="sub-title">그래프 읽기</h3>
+    <p>
+      가로는 20 Hz ~ 20 kHz 로그 눈금, 세로는 ±12 dB입니다. 곡선의 봉우리나 점의 높이가 11.5 dB를 넘으면 ±24 dB로 넓어지고, 다시 들어오면 좁아집니다.
+      점을 끄는 동안에는 눈금을 바꾸지 않아 손 밑의 점이 튀지 않습니다. 굵은 선이 전체 응답, 옅은 면이 고른 대역의 응답이며,
+      곡선은 재생 중인 표본률로 계산합니다(재생 전에는 48 kHz).
+    </p>
+    <p>
+      점은 번호가 적힌 동그라미이고, 높이는 이득에 MACRO를 곱한 값 — <strong>실제로 들리는 만큼</strong>입니다.
+      컷 · 노치의 점은 0 dB 선 위에 놓이고, 꺼진 대역은 점선 동그라미, 고른 대역은 채운 동그라미로 그립니다.
+      큰 그래프는 왼쪽 위에 고른 대역의 값을, 오른쪽 위에 커서가 가리키는 주파수를 씁니다. 카드 그래프는 점 위에 커서를 두거나 끄는 동안,
+      또는 그래프에 초점이 있을 때 값을 씁니다. MACRO가 100%보다 낮으면 실제로 걸리는 이득을 ‘(적용 +3.0 dB)’처럼 함께 쓰고,
+      EQ가 꺼져 있으면 ‘EQ 꺼짐 — 소리에 반영되지 않음’이 뜹니다.
+    </p>
+    <p>
+      재생 중이고 EQ가 켜져 있으면 EQ 앞(선)과 뒤(면)의 스펙트럼을 겹쳐 그립니다.
+      1/6 옥타브 폭으로 평균하고 1 kHz를 기준으로 옥타브당 +3 dB 기울여, 분홍 잡음이 평평하게 보입니다.
+    </p>
+
+    <h3 class="sub-title">마우스로 다루기</h3>
+    <p>그래프의 조작은 카드 그래프와 큰 그래프가 같습니다.</p>
+    <table class="spec-table">
+      <tr><th>조작</th><th>동작</th></tr>
+      <tr><td>점&nbsp;끌기</td><td>가로로 주파수, 세로로 이득(벨 · 셸프)을 바꿉니다. MACRO가 0%면 세로로는 바뀌지 않습니다.</td></tr>
+      <tr><td>Shift&nbsp;+&nbsp;끌기</td><td>1/5로 세밀하게 움직입니다. 끄는 도중 Shift를 누르거나 떼면 그 자리에서 다시 잽니다.</td></tr>
+      <tr><td>점&nbsp;위에서&nbsp;휠</td><td>Q를 10%씩(Shift 2%) 바꾸고, 24 dB/oct 이상의 컷은 기울기를 한 칸씩 바꿉니다. 위로 굴리면 Q가 커지거나 기울기가 가팔라집니다. 마우스 휠 한 칸(50 px 이상)이 한 단계이고, 터치패드의 잔 움직임은 100 px씩 모아 한 단계로 셉니다. 점 밖에서 굴리면 Q는 그대로이고 화면이 스크롤됩니다.</td></tr>
+      <tr><td>빈&nbsp;곳&nbsp;두&nbsp;번&nbsp;누르기</td><td>누른 자리의 주파수 · 이득에 벨을 더합니다.</td></tr>
+      <tr><td>점&nbsp;두&nbsp;번&nbsp;누르기</td><td>그 대역을 켜고 끕니다.</td></tr>
+      <tr><td>점에서&nbsp;오른쪽&nbsp;단추</td><td>그 대역을 지웁니다. 터치 화면의 길게 누르기로는 지우지 않습니다(실수 방지).</td></tr>
+      <tr><td>＋&nbsp;·&nbsp;＋&nbsp;대역</td><td>꺼진 대역까지 모든 대역과 양 끝(20 Hz · 20 kHz) 사이에서 로그 간격이 가장 넓은 곳의 가운데에 0 dB · Q 1 벨을 더합니다. 대역이 하나도 없으면 1 kHz에 놓습니다. 20개가 차면 단추가 쉬고, 그래도 더하려 하면 상태바에 ‘대역은 20개까지 둘 수 있습니다.’가 뜹니다.</td></tr>
+      <tr><td>번호&nbsp;단추</td><td>누르면 그 대역을 고릅니다. 고른 대역의 값은 아래 편집 줄에서 바꿉니다.</td></tr>
+      <tr><td>크게</td><td>큰 편집 창을 엽니다.</td></tr>
+    </table>
+
+    <h3 class="sub-title">키보드로 다루기</h3>
+    <p>
+      그래프를 누르거나 Tab으로 초점을 옮기면 키보드로 고른 대역을 다룹니다.
+      그래프는 키보드로 다루는 응용 영역이라, 화면 낭독기는 바꿀 때마다 ‘3번 벨 1.23 kHz +3.0 dB Q 1.00’처럼 읽어 줍니다.
+    </p>
+    <table class="spec-table">
+      <tr><th>키 (그래프에 초점)</th><th>동작</th></tr>
+      <tr><td>← →</td><td>주파수를 반음씩 (Shift는 1/48 옥타브)</td></tr>
+      <tr><td>↑ ↓</td><td>이득을 0.5 dB씩 (Shift는 0.1 dB)</td></tr>
+      <tr><td>PgUp · PgDn</td><td>Q를 10%씩 (Shift는 2%). 24 dB/oct 이상의 컷은 기울기를 한 칸씩</td></tr>
+      <tr><td>[ ]</td><td>이전 · 다음 대역 고르기</td></tr>
+      <tr><td>Home · End</td><td>처음 · 끝 대역 고르기</td></tr>
+      <tr><td>Insert · + · =</td><td>대역 더하기 (＋와 같은 자리에)</td></tr>
+      <tr><td>Delete · Backspace</td><td>고른 대역 지우기</td></tr>
+      <tr><td>스페이스</td><td>고른 대역 켜고 끄기</td></tr>
+      <tr><td>Enter</td><td>큰 편집 창 열기 (카드 그래프에서)</td></tr>
+    </table>
+    <p>
+      대역 단추 줄에서는 ← →(↑ ↓) · Home · End로 대역을 옮겨 고르고, Delete(Backspace)로 지웁니다.
+      주파수 · 이득 · Q 칸에서는 ↑ ↓가 위 표와 같은 단계로 움직입니다. 숫자를 치는 동안에는 범위 안의 값만 바로 소리에 반영되므로,
+      주파수 100을 치는 도중의 1 · 10이 잠깐씩 걸리지 않습니다. Enter를 누르거나 다른 곳으로 옮기면 범위 밖의 값을 가장자리 값으로 맞춥니다.
+    </p>
+
+    <h3 class="sub-title">큰 편집 창</h3>
+    <p>
+      카드의 <strong>크게</strong>(또는 카드 그래프에서 Enter)를 누르면 화면 가운데에 큰 편집 창이 열립니다.
+      큰 그래프(화면 높이의 42%, 220 ~ 430 px)와 모든 대역의 표(번호 · 켜짐 · 종류 · 주파수 · 이득 · Q · 기울기 · 지우기)가 있고,
+      열리면 초점이 큰 그래프에 놓여 바로 키보드로 다룰 수 있습니다. 창이 열린 동안 바깥 화면은 눌리지 않습니다.
+      그래프의 마우스 · 키보드 조작은 위의 두 표와 같습니다.
+    </p>
+    <table class="spec-table">
+      <tr><th>창 머리</th><th>하는 일</th></tr>
+      <tr><td>켜짐&nbsp;스위치</td><td>카드의 켜기 스위치와 같습니다. 창을 연 채 EQ를 켜고 끄며 비교합니다.</td></tr>
+      <tr><td>대역&nbsp;n&nbsp;/&nbsp;20</td><td>지금 대역 수입니다.</td></tr>
+      <tr><td>▶&nbsp;재생</td><td>파일을 올리면 나타납니다. 위쪽 재생 줄의 단추를 대신 눌러, 창을 닫지 않고 들으며 고칩니다(재생 중에는 ❚❚ 멈춤).</td></tr>
+      <tr><td>＋&nbsp;대역</td><td>카드의 ＋와 같이 빈 곳에 벨을 더합니다.</td></tr>
+      <tr><td>처음&nbsp;상태로</td><td>대역 목록을 평탄한 네 대역으로 되돌립니다. 지우는 일이라 한 번 누르면 ‘한 번 더 누르면 되돌립니다’로 바뀌고, 3초 안에 다시 눌러야 실행됩니다. MACRO · INPUT GAIN · 켜짐은 그대로입니다.</td></tr>
+      <tr><td>닫기</td><td>창을 닫습니다. Esc를 누르거나 바깥의 어두운 막을 눌러도 닫힙니다.</td></tr>
+    </table>
+    <p>
+      표에서 칸을 고르면 그 대역이 골라지고, 종류를 바꿔도 초점은 같은 칸에 남습니다. 표의 숫자 칸은 카드의 칸과 같이 동작합니다.
+      창을 닫으면 초점은 창을 열었던 자리(‘크게’ 단추나 카드 그래프)로 돌아옵니다.
+    </p>
+
+    <div class="callout ok">
+      <p>
+        <strong>재생 중에 고쳐도 끊기지 않습니다 —</strong>
+        주파수 · 이득 · Q는 10 ms 시정수로 부드럽게 옮겨 가고, 대역 수 · 종류 · 기울기 · 켜짐이 바뀌면 새 필터 열을 만들어 20 ms 동안 교차해 넘깁니다.
+        필터 상태가 갑자기 끊기지 않아 딸깍 소리가 나지 않습니다. 1 kHz 사인(진폭 0.5)을 재생하며 대역을 더하고 지우는 동안에도
+        표본 사이의 최대 변화는 평소와 같은 0.065였습니다.
+      </p>
+      <p>
+        재생과 내보내기는 같은 함수로 EQ를 만들고 같은 값을 넣으므로, 같은 설정이면 두 경로의 EQ 출력이 표본 단위로 같습니다(최대 차이 0).
+      </p>
+    </div>
+
+    <h3 class="sub-title">잰 값</h3>
+    <table class="spec-table">
+      <tr><th>설정 (48 kHz, 임펄스 응답으로 잰 값)</th><th>결과</th></tr>
+      <tr><td>벨 +6 dB · 1 kHz · Q 1.41</td><td>1 kHz +6.000 dB</td></tr>
+      <tr><td>벨 −9 dB · 250 Hz · Q 4</td><td>250 Hz −9.000 dB</td></tr>
+      <tr><td>로우 셸프 +4 dB · 100 Hz</td><td>100 Hz +2.000 dB(설정의 절반) · 20 Hz +4.00 dB</td></tr>
+      <tr><td>하이 셸프 −6 dB · 8 kHz</td><td>8 kHz −3.000 dB</td></tr>
+      <tr><td>노치 3 kHz · Q 8</td><td>3 kHz −119 dB · 1 kHz −0.009 dB</td></tr>
+      <tr><td>로우 컷 200 Hz · 12 · 24 · 36 · 48 dB/oct</td><td>200 Hz 모두 −3.01 dB · 100 Hz −12.3 · −24.1 · −36.1 · −48.2 dB (버터워스 이론값과 같음)</td></tr>
+      <tr><td>하이 컷 5 kHz · 24 dB/oct</td><td>5 kHz −3.01 dB · 10 kHz −28.3 dB</td></tr>
+      <tr><td>MACRO 50% · 벨 +6 dB</td><td>+3.000 dB (MACRO 0%에서도 컷의 −3.01 dB와 노치의 깊이는 그대로)</td></tr>
+      <tr><td>대역 없음 · 꺼진 대역만 · 처음 네 평탄 대역</td><td class="green">입력과 출력의 차이 0 (표본 그대로)</td></tr>
+      <tr><td>그래프와 소리 (모든 종류를 함께 건 시험, 40 Hz ~ 20 kHz 36곳)</td><td class="green">최대 차이 0.002 dB</td></tr>
+      <tr><td>그래프와 소리 (같은 시험, 20 ~ 35 Hz 사인)</td><td class="green">최대 차이 0.001 dB</td></tr>
+    </table>
+    <p>
+      44.1 · 48 kHz에서는 20 Hz ~ 20 kHz 전 구간에서 그래프와 소리가 0.002 dB 안으로 같습니다. 표본률을 높이면 아주 낮은 소리(20 ~ 30 Hz)에서만
+      조금 벌어져, 30 Hz 48 dB/oct 로우 컷에서 96 kHz 최대 0.013 dB, 192 kHz 최대 0.055 dB입니다(사인으로 잰 값). 고역은 차이가 없습니다.
+    </p>
+  </div>
+
+  <!-- ══════════ MOD 02: COMP ══════════ -->
   <hr class="divider">
   <div class="section" id="comp">
-    <div class="section-num">MODULE 01</div>
+    <div class="section-num">MODULE 02</div>
     <div class="section-title">컴프레서 — COMPRESSOR</div>
     <div class="deco-bar"></div>
     <div class="module-card" data-cap="comp">
       <div class="mc-header">
-        <span class="mc-num">MOD-01</span>
+        <span class="mc-num">MOD-02</span>
         <span class="mc-name">COMPRESSOR</span>
         <span class="mc-sub">다이나믹스 제어</span>
       </div>
@@ -1631,15 +1848,15 @@ body::before {
     </p>
   </div>
 
-  <!-- ══════════ MOD 02: BBE ══════════ -->
+  <!-- ══════════ MOD 03: BBE ══════════ -->
   <hr class="divider">
   <div class="section" id="bbe">
-    <div class="section-num">MODULE 02</div>
+    <div class="section-num">MODULE 03</div>
     <div class="section-title">BBE 소닉 맥시마이저</div>
     <div class="deco-bar"></div>
     <div class="module-card" data-cap="bbe">
       <div class="mc-header">
-        <span class="mc-num">MOD-02</span>
+        <span class="mc-num">MOD-03</span>
         <span class="mc-name">BBE SONIC MAXIMIZER</span>
         <span class="mc-sub">위상 보정 + 존재감 강화</span>
       </div>
@@ -1682,15 +1899,15 @@ body::before {
     </p>
   </div>
 
-  <!-- ══════════ MOD 03: TUBE ══════════ -->
+  <!-- ══════════ MOD 04: TUBE ══════════ -->
   <hr class="divider">
   <div class="section" id="tube">
-    <div class="section-num">MODULE 03</div>
+    <div class="section-num">MODULE 04</div>
     <div class="section-title">진공관 포화 — VACUUM TUBE</div>
     <div class="deco-bar"></div>
     <div class="module-card" data-cap="tube">
       <div class="mc-header">
-        <span class="mc-num">MOD-03</span>
+        <span class="mc-num">MOD-04</span>
         <span class="mc-name">VACUUM TUBE SATURATION</span>
         <span class="mc-sub">짝수 하모닉 포화</span>
       </div>
@@ -1727,15 +1944,15 @@ body::before {
     </p>
   </div>
 
-  <!-- ══════════ MOD 04: EXCITER ══════════ -->
+  <!-- ══════════ MOD 05: EXCITER ══════════ -->
   <hr class="divider">
   <div class="section" id="exciter">
-    <div class="section-num">MODULE 04</div>
+    <div class="section-num">MODULE 05</div>
     <div class="section-title">익사이터 — EXCITER</div>
     <div class="deco-bar"></div>
     <div class="module-card" data-cap="exc">
       <div class="mc-header">
-        <span class="mc-num">MOD-04</span>
+        <span class="mc-num">MOD-05</span>
         <span class="mc-name">EXCITER</span>
         <span class="mc-sub">고역 하모닉 에어</span>
       </div>
@@ -1769,15 +1986,15 @@ body::before {
     </p>
   </div>
 
-  <!-- ══════════ MOD 05: SG ══════════ -->
+  <!-- ══════════ MOD 06: SG ══════════ -->
   <hr class="divider">
   <div class="section" id="sg">
-    <div class="section-num">MODULE 05</div>
+    <div class="section-num">MODULE 06</div>
     <div class="section-title">사운드구다이저 — SOUNDGOODIZER</div>
     <div class="deco-bar"></div>
     <div class="module-card" data-cap="sg">
       <div class="mc-header">
-        <span class="mc-num">MOD-05</span>
+        <span class="mc-num">MOD-06</span>
         <span class="mc-name">SOUNDGOODIZER</span>
         <span class="mc-sub">멀티밴드 하모닉 인핸서</span>
       </div>
@@ -1833,15 +2050,15 @@ body::before {
     </p>
   </div>
 
-  <!-- ══════════ MOD 06: VINYL ══════════ -->
+  <!-- ══════════ MOD 07: VINYL ══════════ -->
   <hr class="divider">
   <div class="section" id="vinyl">
-    <div class="section-num">MODULE 06</div>
+    <div class="section-num">MODULE 07</div>
     <div class="section-title">바이닐 레코드 — VINYL RECORD</div>
     <div class="deco-bar"></div>
     <div class="module-card" data-cap="vinyl">
       <div class="mc-header">
-        <span class="mc-num">MOD-06</span>
+        <span class="mc-num">MOD-07</span>
         <span class="mc-name">VINYL RECORD</span>
         <span class="mc-sub">아날로그 턴테이블 시뮬</span>
       </div>
@@ -1921,15 +2138,15 @@ body::before {
     </div>
 </div>
 
-  <!-- ══════════ MOD 07: ATMOS ══════════ -->
+  <!-- ══════════ MOD 08: ATMOS ══════════ -->
   <hr class="divider">
   <div class="section" id="atmos">
-    <div class="section-num">MODULE 07</div>
+    <div class="section-num">MODULE 08</div>
     <div class="section-title">돌비 애트모스 시뮬레이터 — DOLBY ATMOS</div>
     <div class="deco-bar"></div>
     <div class="module-card" data-cap="atmos">
       <div class="mc-header">
-        <span class="mc-num">MOD-07</span>
+        <span class="mc-num">MOD-08</span>
         <span class="mc-name">DOLBY ATMOS SPATIAL SIMULATOR</span>
         <span class="mc-sub">3D 공간 오디오 시뮬레이터</span>
       </div>
@@ -1998,15 +2215,15 @@ body::before {
     </p>
   </div>
 
-  <!-- ══════════ MOD 08: MASTER ══════════ -->
+  <!-- ══════════ MOD 09: MASTER ══════════ -->
   <hr class="divider">
   <div class="section" id="master">
-    <div class="section-num">MODULE 08</div>
+    <div class="section-num">MODULE 09</div>
     <div class="section-title">마스터링 체인 — MASTERING CHAIN</div>
     <div class="deco-bar"></div>
     <div class="module-card" data-cap="master">
       <div class="mc-header">
-        <span class="mc-num">MOD-08</span>
+        <span class="mc-num">MOD-09</span>
         <span class="mc-name">MASTERING CHAIN</span>
         <span class="mc-sub">멀티밴드 컴프 + 리미터 + 스테레오</span>
       </div>
@@ -2096,15 +2313,15 @@ body::before {
     </p>
   </div>
 
-  <!-- ══════════ MOD 09: HD ══════════ -->
+  <!-- ══════════ MOD 10: HD ══════════ -->
   <hr class="divider">
   <div class="section" id="hd">
-    <div class="section-num">MODULE 09</div>
+    <div class="section-num">MODULE 10</div>
     <div class="section-title">고해상도 복원 — HD RESTORATION</div>
     <div class="deco-bar"></div>
     <div class="module-card" data-cap="hd">
       <div class="mc-header">
-        <span class="mc-num">MOD-09</span>
+        <span class="mc-num">MOD-10</span>
         <span class="mc-name">HIGH-RESOLUTION RESTORATION</span>
         <span class="mc-sub">원음 윗대역 이동 복사 · f0 동기 · 최고 규격 보간 · LIVE 미리듣기 · 비트 깊이 향상</span>
       </div>
@@ -2115,7 +2332,7 @@ body::before {
             <strong>동작 원리:</strong> ① 원본을 목표 레이트로 <strong>보간</strong>합니다(Kaiser 창 sinc, 나이퀴스트의 99.5%까지 평탄, 200 dB). ② 파일 전체의 평균 스펙트럼에서 잘린 지점, 그 직전의 전이 시작점, 윗대역의 기울기를 찾습니다. ③ 전이 시작점 아래 한 옥타브 남짓을 <strong>주파수 이동</strong>으로 위로 옮겨 빈 곳을 덮습니다. 옮긴 조각끼리는 가장자리를 겹쳐 잇습니다. 한 음이 도드라지면 옮기는 양을 그 음의 f0 정수배로 맞춰, 옮긴 배음이 원래 배음 격자 위에 빠짐없이 놓입니다(<strong>f0 동기</strong>). 코덱이 틀마다 차단점 아래를 통째로 비운 구멍이 있으면, 그 틀은 구멍부터 채웁니다(목표보다 30 dB 이상 낮은 빈이 4빈 넘게 이어질 때, 차단점의 75%까지). 원천이 모두 같으면 원천 안의 무늬가 조각 간격(약 6 kHz)마다 되풀이되므로, 일부 조각은 원천 창을 주파수 방향으로 뒤집고(거울), 넷째 조각부터는 원천 창을 조금씩(원천 폭의 ⅙ 안) 아래로 밉니다. ④ 옮긴 소리의 결을 위로 갈수록 고르게 펴고(SMOOTH), 원음 기울기를 이은 곡선에 크기를 맞춥니다(SYNTH). ⑤ 곡선보다 <strong>모자란 만큼만</strong> 원음에 더합니다. 원음은 한 표본도 바뀌지 않습니다. ⑥ 에너지가 1% 넘게 커졌으면 되돌리고, 복원된 소리를 DSP 체인에 넣습니다.<br><br>
             <strong>HD (48 ~ 96kHz):</strong> 잘린 지점 ~ 목표 나이퀴스트. 원본보다 높은 44.1 · 48 · 88.2 · 96kHz로 내보낼 때 적용.<br>
             <strong>ULTRA · eXtreme HD (176.4 ~ 384kHz):</strong> 잘린 지점 ~ 목표 나이퀴스트(88.2 ~ 192kHz). 176.4 · 192 · 352.8 · 384kHz로 내보낼 때 적용.<br>
-            <strong>BIT DEPTH:</strong> 16bit 원본을 24 · 32bit로 쓸 때 계단 사이를 이어 채웁니다. 비트 깊이는 내보내기에서 고릅니다. <span class="badge-new">v3.0</span>
+            <strong>BIT DEPTH:</strong> 16bit 원본을 24 · 32bit로 쓸 때 계단 사이를 이어 채웁니다. 비트 깊이는 내보내기에서 고릅니다. <span class="badge-new v30">v3.0</span>
           </div>
         </div>
         <div class="mc-params">
@@ -2233,7 +2450,7 @@ body::before {
       <p><strong>MP3/AAC 파일에서 효과 극대화:</strong> MP3나 AAC처럼 16kHz~18kHz 이상의 고역이 잘려 있는 파일일수록 HD 복원 효과가 두드러집니다. 무손실 44.1·48kHz 파일은 원래 나이퀴스트 위(약 20kHz 이상)만 채우고, 이미 96·192kHz 대역을 채운 고해상도 파일은 복원을 건너뜁니다.</p>
     </div>
 
-    <h3 class="sub-title">배음 맞춤 — f0 동기 이동 <span class="badge-new">v3.0</span></h3>
+    <h3 class="sub-title">배음 맞춤 — f0 동기 이동 <span class="badge-new v30">v3.0</span></h3>
     <p>
       원음 윗대역을 옮길 때 옮기는 양이 음의 기본 주파수(f0)의 정수배가 아니면, 옮긴 배음이 원래 배음 자리에서 벗어납니다.
       그래서 한 음이 도드라지는 순간에는 옮기는 양을 그 음의 f0 정수배로 맞춥니다. 배음 k·f0는 (k+n)·f0로 가서
@@ -2253,7 +2470,7 @@ body::before {
       과도음이 번져(딸깍만의 번짐 −28.7 dB, 같은 때의 f0 동기 −31.2 dB) 쓰지 않았습니다.
     </p>
 
-    <h3 class="sub-title">비트 깊이 향상 <span class="badge-new">v3.0</span></h3>
+    <h3 class="sub-title">비트 깊이 향상 <span class="badge-new v30">v3.0</span></h3>
     <p>
       16bit 파일은 소리의 크기를 65,536단계 가운데 가장 가까운 칸으로 반올림해 적은 것입니다.
       24 · 32bit로 내보낼 때 이 계단을 그대로 옮기면 반올림으로 생긴 잡음(약 −96 ~ −101 dBFS)도 그대로 따라옵니다.
@@ -2295,7 +2512,7 @@ body::before {
   <!-- ══════════ EXPORT ══════════ -->
   <hr class="divider">
   <div class="section" id="preset">
-    <div class="section-num">SECTION 10</div>
+    <div class="section-num">SECTION 11</div>
     <div class="section-title">프리셋 — 설정 보관 <span class="badge-new v24">v2.4</span></div>
     <div class="deco-bar"></div>
     <p class="section-lead">
@@ -2307,11 +2524,24 @@ body::before {
     <table class="spec-table">
       <tr><th>항목</th><th>내용</th></tr>
       <tr><td>노브 값</td><td>입력 게인을 포함한 슬라이더 전부</td></tr>
-      <tr><td>켜짐 상태</td><td>여덟 모듈의 on/off와 HD·UHD LIVE 스위치</td></tr>
+      <tr><td>켜짐 상태</td><td>아홉 모듈의 on/off와 HD·UHD LIVE 스위치</td></tr>
       <tr><td>모듈 순서</td><td>화면에 배치된 순서 그대로</td></tr>
       <tr><td>프리셋 선택</td><td>SOUNDGOODIZER 모드(A~D)와 DOLBY ATMOS 씬</td></tr>
+      <tr><td>EQ 대역 <span class="badge-new">v3.1</span></td><td>PARAMETRIC EQ의 대역 목록 — 대역마다 종류 · 주파수 · 이득 · Q · 기울기 · 켜짐. EQ의 MACRO · INPUT GAIN · 켜짐은 다른 카드처럼 노브 값 · 켜짐 상태로 담깁니다.</td></tr>
       <tr><td>제외</td><td>음원 파일. 프리셋을 불러와도 올려둔 곡은 바뀌지 않습니다.</td></tr>
     </table>
+
+    <div class="callout ok">
+      <p>
+        <strong>3.0에서 저장한 설정 <span class="badge-new">v3.1</span></strong> —
+        EQ가 없던 판에서 저장한 파일이나 슬롯을 불러오면 EQ를 처음 상태(꺼짐 · 평탄한 네 대역 · MACRO 100% · INPUT GAIN 0 dB)로 되돌려,
+        저장할 때의 소리를 그대로 냅니다. 저장된 카드 순서에 EQ가 없으므로 EQ 카드는 맨 앞에 놓입니다.
+        빈 슬롯(기본값)을 눌러도 EQ는 이 처음 상태로 돌아갑니다.
+      </p>
+      <p>
+        불러올 때는 ATMOS 씬 → SOUNDGOODIZER 모드 → EQ 대역 → 슬라이더 → 스위치 → 카드 순서 → LIVE 차례로 적용합니다.
+      </p>
+    </div>
 
     <h3 class="sub-title">파일로 주고받기 <span class="badge-new v24">v2.4</span></h3>
     <table class="spec-table">
@@ -2349,13 +2579,13 @@ body::before {
       </p>
     </div>
 
-        <h3 class="sub-title">저장하고 불러올 때 <span class="badge-new">v3.0</span></h3>
+        <h3 class="sub-title">저장하고 불러올 때 <span class="badge-new v30">v3.0</span></h3>
     <table class="spec-table">
       <tr><th>순간</th><th>화면</th></tr>
-      <tr><td>저장 <span class="badge-new">v3.0</span></td><td>화면 설정 저장이나 슬롯 길게 누르기로 저장하면, 신호 흐름 지도의 노드와 카드가 <strong>처리 순서대로</strong>(HD 복원 → 체인 → MASTERING) 각자의 색으로 두 번 깜빡입니다. 값과 함께 순서까지 담겼다는 표시입니다.</td></tr>
-      <tr><td>불러오기 <span class="badge-new">v3.0</span></td><td>위쪽 신호 흐름 지도의 노드와 아래 카드들이 저장된 자리로 <strong>미끄러져 갑니다.</strong> 기다림 없이 출발해 눈에 띄는 이동은 0.3초 안에 끝나고, 0.6초 안팎이면 완전히 멈춥니다. 파일 · 슬롯 · 빈 슬롯(기본값) 모두 같습니다.</td></tr>
-      <tr><td>움직이는 중에 다시 불러오기 <span class="badge-new">v3.0</span></td><td>카드와 노드가 멈췄다 다시 출발하지 않고, 지금의 속도를 이어받아 새 자리로 방향을 틉니다.</td></tr>
-      <tr><td>재생 중 불러오기 <span class="badge-new">v3.0</span></td><td>재생 위치를 유지한 채 체인을 한 번만 교체합니다. 교체는 카드가 움직이기 시작한 뒤에 하므로 화면이 멈추지 않고, 순서가 같으면 체인을 다시 짜지 않습니다.</td></tr>
+      <tr><td>저장 <span class="badge-new v30">v3.0</span></td><td>화면 설정 저장이나 슬롯 길게 누르기로 저장하면, 신호 흐름 지도의 노드와 카드가 <strong>처리 순서대로</strong>(HD 복원 → 체인 → MASTERING) 각자의 색으로 두 번 깜빡입니다. 값과 함께 순서까지 담겼다는 표시입니다.</td></tr>
+      <tr><td>불러오기 <span class="badge-new v30">v3.0</span></td><td>위쪽 신호 흐름 지도의 노드와 아래 카드들이 저장된 자리로 <strong>미끄러져 갑니다.</strong> 기다림 없이 출발해 눈에 띄는 이동은 0.3초 안에 끝나고, 0.6초 안팎이면 완전히 멈춥니다. 파일 · 슬롯 · 빈 슬롯(기본값) 모두 같습니다.</td></tr>
+      <tr><td>움직이는 중에 다시 불러오기 <span class="badge-new v30">v3.0</span></td><td>카드와 노드가 멈췄다 다시 출발하지 않고, 지금의 속도를 이어받아 새 자리로 방향을 틉니다.</td></tr>
+      <tr><td>재생 중 불러오기 <span class="badge-new v30">v3.0</span></td><td>재생 위치를 유지한 채 체인을 한 번만 교체합니다. 교체는 카드가 움직이기 시작한 뒤에 하므로 화면이 멈추지 않고, 순서가 같으면 체인을 다시 짜지 않습니다.</td></tr>
     </table>
     <div class="callout">
       <p>
@@ -2375,10 +2605,10 @@ body::before {
   <hr class="divider">
 
   <div class="section" id="export">
-    <div class="section-num">SECTION 11</div>
+    <div class="section-num">SECTION 12</div>
     <div class="section-title">내보내기 — 표본률 · 비트 깊이</div>
     <div class="deco-bar"></div>
-    <p class="section-lead">표본률(44.1 · 48 · 96 · 192 · 384)과 비트 깊이를 눈금 스위치로 따로 고른 뒤 내보내기 단추를 누릅니다. 파일을 올리면 표본률과 비트 깊이가 원본 값에 맞춰지고, 그 눈금 숫자 아래에 (원본)이 붙습니다. 원본이 눈금보다 낮으면 44.1 · 16, 높으면 맨 위 눈금 · 32, 눈금 사이면 바로 위 눈금을 표시 없이 고릅니다. 44.1kHz의 정수배 원본(44.1 · 88.2 · 176.4 · 352.8)이면 위 세 눈금이 88.2 · 176.4 · 352.8로 바뀝니다. 모든 내보내기는 화면에 보이는 모듈 순서와 켜짐 상태를 그대로 반영하여 OfflineAudioContext로 오프라인 렌더링됩니다. <span class="badge-new">v3.0</span></p>
+    <p class="section-lead">표본률(44.1 · 48 · 96 · 192 · 384)과 비트 깊이를 눈금 스위치로 따로 고른 뒤 내보내기 단추를 누릅니다. 파일을 올리면 표본률과 비트 깊이가 원본 값에 맞춰지고, 그 눈금 숫자 아래에 (원본)이 붙습니다. 원본이 눈금보다 낮으면 44.1 · 16, 높으면 맨 위 눈금 · 32, 눈금 사이면 바로 위 눈금을 표시 없이 고릅니다. 44.1kHz의 정수배 원본(44.1 · 88.2 · 176.4 · 352.8)이면 위 세 눈금이 88.2 · 176.4 · 352.8로 바뀝니다. 모든 내보내기는 화면에 보이는 모듈 순서와 켜짐 상태를 그대로 반영하여 OfflineAudioContext로 오프라인 렌더링됩니다. <span class="badge-new v30">v3.0</span></p>
 
     <table class="spec-table">
       <tr><th>원본 대비 표본률</th><th>처리</th><th>설명</th></tr>
@@ -2450,7 +2680,7 @@ body::before {
   <!-- ══════════ TIPS ══════════ -->
   <hr class="divider">
   <div class="section" id="tips">
-    <div class="section-num">SECTION 12</div>
+    <div class="section-num">SECTION 13</div>
     <div class="section-title">활용 팁</div>
     <div class="deco-bar"></div>
 
@@ -2474,6 +2704,21 @@ body::before {
         </div>
       </div>
       <div class="feat-card">
+        <span class="feat-icon">✂️</span>
+        <div class="feat-name">걸러 낼 것은 EQ에서 먼저 <span class="badge-new">v3.1</span></div>
+        <div class="feat-desc">웅웅거림이나 저역 잡음은 맨 앞의 EQ에서 깎아 두세요. 뒤의 압축기와 포화가 그 성분에 먼저 반응하지 않습니다. 압축된 뒤의 음색을 다듬고 싶다면 EQ 카드를 COMP 뒤로 옮깁니다.</div>
+      </div>
+      <div class="feat-card">
+        <span class="feat-icon">🔁</span>
+        <div class="feat-name">EQ는 켜고 끄며 듣기 <span class="badge-new">v3.1</span></div>
+        <div class="feat-desc">큰 편집 창 머리의 스위치는 카드의 스위치와 같아서, 창을 연 채 EQ를 켜고 끄며 비교할 수 있습니다. 대역을 올리면 소리가 커지므로 INPUT GAIN으로 음량을 맞춘 뒤 비교하세요. EQ는 선형이라 INPUT GAIN이 음색을 바꾸지 않습니다.</div>
+      </div>
+      <div class="feat-card">
+        <span class="feat-icon">🎚️</span>
+        <div class="feat-name">EQ의 세기는 MACRO로 <span class="badge-new">v3.1</span></div>
+        <div class="feat-desc">대역의 자리(주파수 · Q)는 그대로 두고 EQ의 세기만 줄여 보고 싶을 때는 MACRO를 내리세요. 모든 벨 · 셸프의 이득이 같은 비율로 줄고(50%면 +6 dB가 +3 dB), 컷 · 노치는 그대로 남습니다. 그래프의 점도 실제로 걸리는 높이로 내려갑니다.</div>
+      </div>
+      <div class="feat-card">
         <span class="feat-icon">🎸</span>
         <div class="feat-name">따뜻한 아날로그 음색</div>
         <div class="feat-desc">Tube (Drive 20~40, Mix 40~60) + SG 모드 A(Warm & Punchy) + Vinyl (Crackle 낮게, Wear 30 정도) 조합. 디지털 음원에 LP 느낌을 입힐 수 있습니다.</div>
@@ -2495,7 +2740,7 @@ body::before {
       </div>
       <div class="feat-card">
         <span class="feat-icon">📏</span>
-        <div class="feat-name">16bit 원본을 크게 끌어올릴 때 <span class="badge-new">v3.0</span></div>
+        <div class="feat-name">16bit 원본을 크게 끌어올릴 때 <span class="badge-new v30">v3.0</span></div>
         <div class="feat-desc">COMP나 MASTERING으로 조용한 부분을 많이 끌어올린다면 BIT DEPTH를 24로 내보내세요. 체인 앞에서 원본의 반올림 잡음을 줄이고 끝에서 디더로 반올림하므로, 조용한 구간의 잡음 바닥이 16bit로 쓸 때보다 낮습니다.</div>
       </div>
       <div class="feat-card">
@@ -2511,7 +2756,7 @@ body::before {
     </div>
 
     <div class="callout blue">
-      <p><strong>초기화 팁:</strong> 설정이 복잡해졌다면 ✕ 초기화 버튼으로 파일과 설정을 모두 리셋할 수 있습니다. 각 모듈은 개별적으로 OFF하면 체인에서 제외되므로, A/B 비교 시 모듈을 껐다 켜는 방법으로 전후 차이를 확인하세요.</p>
+      <p><strong>초기화 팁:</strong> 설정이 복잡해졌다면 <a href="#preset">프리셋</a>의 비어 있는 슬롯을 누르세요. 모든 값이 처음 상태로 돌아가고(EQ는 평탄한 네 대역), 올려 둔 음원은 그대로 남습니다. EQ의 대역만 평탄한 네 대역으로 되돌리려면 큰 편집 창의 ‘처음 상태로’를 누릅니다. ✕ 초기화 버튼은 재생을 멈추고 파일 · 스펙트럼 표시 · HD LIVE 미리듣기를 비우며 INPUT GAIN만 0으로 되돌릴 뿐, 다른 손잡이 · 카드 스위치 · 순서 · EQ 대역은 그대로 둡니다. 각 모듈은 개별적으로 OFF하면 체인에서 제외되므로, A/B 비교 시 모듈을 껐다 켜는 방법으로 전후 차이를 확인하세요.</p>
     </div>
   </div>
 
@@ -2523,7 +2768,7 @@ body::before {
     </div>
     <div style="font-family:var(--c-legend);font-size:0.8125rem;color:var(--muted2);letter-spacing:0.04em;text-align:right">
       ANALOG SOUL DSP ENGINE<br>
-      USER MANUAL v3.0
+      USER MANUAL v3.1
     </div>
   </div>
 

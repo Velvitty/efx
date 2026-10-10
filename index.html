@@ -765,7 +765,7 @@ body::before {
   <div class="cover-rule">
     <span class="cover-rule-label">ANALOG SOUL DSP ENGINE — DOCUMENTATION INDEX</span>
   </div>
-  <div class="cover-eyebrow">통합 색인 · Documentation Index · v3.0</div>
+  <div class="cover-eyebrow">통합 색인 · Documentation Index · v3.1</div>
   <div class="cover-title">ANALOG SOUL<br>DSP ENGINE</div>
   <div class="cover-sub">다섯 문서와 프로그램으로 가는 단일 진입점</div>
   <div class="cover-desc">
@@ -814,7 +814,7 @@ body::before {
 
   <div class="doc-grid">
       <a class="doc-card" style="--dc:var(--red)" href="analog-soul-manual.html">
-        <div class="doc-lv">ENTRY · v3.0</div>
+        <div class="doc-lv">ENTRY · v3.1</div>
         <div class="doc-name">공식 사용 설명서</div>
         <div class="doc-who">제품 전반 · 전 모듈 레퍼런스</div>
         <div class="doc-desc">제품 전체를 한 문서로 훑는 원본 매뉴얼. 모듈별 파라미터 카드, 신호 흐름도, 모니터링 도구, 활용 팁까지 담겨 있다. v2.3에서 LIVE·INPUT GAIN·스펙트로그램 등 신규 기능을 모두 반영했다.</div>
@@ -870,7 +870,7 @@ body::before {
       <div class="path-w">일단 소리가 나게 하고 싶다</div>
       <ol>
         <li><a href="analog-soul-plain.html#start">쉬운 말 · 시작하기</a>로 파일을 올리고 재생</li>
-        <li><a href="analog-soul-plain.html#modules">쉬운 말 · 여덟 개의 기능</a>에서 하나씩 켜보기</li>
+        <li><a href="analog-soul-plain.html#modules">쉬운 말 · 아홉 개의 기능</a>에서 하나씩 켜보기</li>
         <li><a href="analog-soul-plain.html#save">쉬운 말 · 파일로 저장하기</a>로 내보내기</li>
       </ol>
     </div>
@@ -963,9 +963,17 @@ body::before {
         <tr>
           <td>모듈 전반</td>
           <td><a class="c-m" href="analog-soul-manual.html#comp">MODULE 01~</a></td>
-          <td><a class="c-a" href="analog-soul-plain.html#modules">여덟 기능</a></td>
+          <td><a class="c-a" href="analog-soul-plain.html#modules">아홉 기능</a></td>
           <td><a class="c-b" href="analog-soul-guide.html#modules">모듈 하나하나</a></td>
           <td><a class="c-c" href="analog-soul-engineering.html#units">처리 단 사양</a></td>
+          <td><span class="nil">—</span></td>
+        </tr>
+        <tr>
+          <td>대역 다듬기 (EQ)</td>
+          <td><a class="c-m" href="analog-soul-manual.html#peq">PARAMETRIC EQ</a></td>
+          <td><a class="c-a" href="analog-soul-plain.html#modules">PARAMETRIC EQ</a></td>
+          <td><a class="c-b" href="analog-soul-guide.html#m-peq">PARAMETRIC EQ</a></td>
+          <td><a class="c-c" href="analog-soul-engineering.html#u-peq">바이쿼드 구성</a></td>
           <td><span class="nil">—</span></td>
         </tr>
         <tr>
@@ -1189,7 +1197,24 @@ body::before {
   <div class="deco-bar"></div>
   <p class="section-lead">판별 변경 내역입니다. 각 항목의 근거는 사양서 또는 논고의 해당 절에 있습니다. 빌드마다의 세부 변경은 <code>README.md</code>의 변경 이력에 있습니다.</p>
 
-  <h3 class="sub-title">v3.0 — 현재 판</h3>
+  <h3 class="sub-title">v3.1 — 현재 판</h3>
+  <p style="color:var(--c-muted);font-size:15px;margin-bottom:16px">
+    파라메트릭 EQ 카드를 더한 판입니다. 대역을 최대 20개까지 두고 그래프에서 끌어 고치며,
+    재생 중에는 EQ 앞뒤의 스펙트럼을 겹쳐 봅니다. 그래프는 소리를 내는 것과 같은 필터의 응답으로 그려, 그린 대로 들립니다.
+  </p>
+
+  <table class="spec-table">
+    <tr><th>항목</th><th>내용</th></tr>
+
+    <tr><td>파라메트릭 EQ 카드</td><td>대역을 최대 20개까지 두고 대역마다 종류(벨 · 로우 셸프 · 하이 셸프 · 로우 컷 · 하이 컷 · 노치), 주파수(20 Hz ~ 20 kHz), 이득(±24 dB), Q(0.1 ~ 18), 컷의 기울기(12 · 24 · 36 · 48 dB/oct)를 정합니다. 대역 하나가 바이쿼드 하나이고, 가파른 컷은 버터워스 2차 단을 2 ~ 4개 잇습니다. MACRO는 벨 · 셸프 이득에 곱하는 깊이입니다. 처음에는 꺼진 채 평탄한 네 대역이 놓여 있고, 기본 순서의 맨 앞(COMP 앞)에 있습니다.</td></tr>
+    <tr><td>그린 대로 들리는 그래프</td><td>곡선을 소리를 내는 것과 같은 종류 · 같은 값의 필터에서 <code>getFrequencyResponse</code>로 얻어, 렌더링한 소리와 44.1 · 48 kHz에서 20 Hz ~ 20 kHz 전 구간 0.002 dB 안으로 같습니다. 벨의 중심 이득, 셸프 모서리(설정의 절반), 컷의 차단 주파수(−3.01 dB)도 설정값 그대로 나옵니다. 재생 중에는 EQ 앞(선)과 뒤(면)의 스펙트럼을 1/6 옥타브 평균, 옥타브당 +3 dB 기울임으로 겹쳐 그립니다.</td></tr>
+    <tr><td>그래프 조작</td><td>점을 끌어 주파수와 이득(Shift는 1/5로 세밀하게), 점 위 휠로 Q(가파른 컷은 기울기)를 바꾸고, 빈 곳을 두 번 눌러 더하고, 점을 두 번 눌러 켜고 끄고, 오른쪽 단추로 지웁니다. 화살표 · PgUp/PgDn · [ ] · Insert · Delete · 스페이스로 키보드만으로도 모두 할 수 있고, 화면 낭독기가 바뀐 값을 읽습니다.</td></tr>
+    <tr><td>큰 편집 창</td><td>‘크게’로 여는 대화상자에서 큰 그래프와 모든 대역의 표를 고칩니다. 창을 연 채 EQ를 켜고 끄거나 재생하며 비교할 수 있고, ‘처음 상태로’는 한 번 더 눌러야 되돌립니다. Esc나 바깥을 누르면 닫히고, 초점은 창을 열기 전 자리(보통 ‘크게’ 단추)로 돌아옵니다.</td></tr>
+    <tr><td>재생 중 바꾸기</td><td>값은 10 ms 시정수로 옮기고, 대역 수 · 종류 · 기울기 · 켜짐이 바뀌면 새 필터 열을 만들어 20 ms 동안 교차해 넘깁니다. 대역을 더하거나 지우는 동안에도 1 kHz 사인의 표본 간 최대 변화가 평소와 같습니다.</td></tr>
+    <tr><td>프리셋과 3.0 설정</td><td>설정 파일 · 슬롯이 EQ 대역 목록을 함께 담습니다. EQ가 없던 3.0에서 저장한 설정을 불러오면 EQ를 처음 상태(꺼짐 · 평탄한 네 대역)로 되돌려 저장할 때의 소리를 그대로 냅니다.</td></tr>
+  </table>
+
+  <h3 class="sub-title">v3.0</h3>
   <p style="color:var(--c-muted);font-size:15px;margin-bottom:16px">
     화면을 녹음 콘솔 방식으로 새로 꾸민 판입니다. 글자를 키우고 컴퓨터의 다크·라이트 설정에 맞춰 야간·주간 콘솔로 그리며,
     처리 순서를 보고 바꾸는 신호 흐름 지도를 더했습니다. 프리셋을 저장하면 카드가 처리 순서대로 깜빡이고,
@@ -1376,7 +1401,7 @@ body::before {
 <div class="footer">
   <div class="footer-name">ANALOG SOUL DSP ENGINE</div>
   <div class="footer-copy">
-    DOCUMENTATION INDEX v3.0<br>
+    DOCUMENTATION INDEX v3.1<br>
     모든 수치는 구현 코드에서 추출하거나 실측·유도한 값이며, 검증되지 않은 주장은 각 문서에 그렇게 표시했습니다.<br>
     개인적, 비상업적 용도로만 사용하세요.
   </div>
