@@ -1137,7 +1137,7 @@ body::before {
         <li><a href="#overview">개요 및 핵심 특징</a></li>
         <li><a href="#howto">사용 방법 — 5단계</a></li>
         <li><a href="#input">입력 & 파일 지원</a></li>
-        <li><a href="#monitor">모니터링 도구</a></li>
+        <li><a href="#monitor">모니터링 도구 · 모니터 보정</a></li>
         <li><a href="#chain">처리 체인 시스템</a></li>
         <li><a href="#peq">모듈 01 — 파라메트릭 EQ</a> <span class="badge-new">v3.1</span></li>
         <li><a href="#comp">모듈 02 — 컴프레서</a></li>
@@ -1179,7 +1179,9 @@ body::before {
       <tr><td>화면</td><td>EQ 그래프 — 번호 점을 끌어 주파수 · 이득을 고침(Shift는 1/5로 세밀하게) · 점 위 휠로 Q(가파른 컷은 기울기) · 빈 곳을 두 번 눌러 벨 추가 · 점을 두 번 눌러 켜고 끄기 · 오른쪽 단추로 지우기 · 키보드로도 모든 조작 · 곡선은 소리를 내는 것과 같은 필터에서 얻음(40 Hz ~ 20 kHz에서 소리와의 차이 최대 0.002 dB) · 재생 중 EQ 앞(선)과 뒤(면)의 스펙트럼(1 kHz 기준 옥타브당 +3 dB 기울임) · 세로 눈금 ±12 dB, 11.5 dB를 넘으면 ±24 dB · 큰 편집 창 — 큰 그래프와 모든 대역의 표, 창 안의 켜짐 스위치 · 재생 단추 · ＋ 대역 · 처음 상태로(3초 안에 한 번 더), Esc나 바깥을 눌러 닫기</td></tr>
       <tr><td>순서</td><td>기본 처리 순서의 맨 앞에 EQ — EQ → COMP → BBE → TUBE → EXCITER → SG → VINYL → ATMOS → MASTER · 카드 아홉 장, 넓은 화면에서 3 × 3</td></tr>
       <tr><td>프리셋</td><td>설정 파일 · 슬롯에 EQ 대역 목록을 함께 담음 · 3.0에서 저장한 설정을 불러오면 EQ를 처음 상태(꺼짐 · 평탄한 네 대역 · MACRO 100% · INPUT GAIN 0 dB)로 되돌려 저장할 때의 소리를 그대로 내고, EQ 카드는 맨 앞에 놓임</td></tr>
-      <tr><td>문서</td><td>PARAMETRIC EQ 절을 모듈 01로 추가(뒤의 모듈 번호가 하나씩 밀림) · 그래프와 큰 편집 창의 마우스 · 키보드 조작표</td></tr>
+      <tr><td>신규 (3.1.1)</td><td><a href="#moncal">모니터 보정</a> — 재생 줄의 단추로 열고, AutoEQ의 <code>ParametricEQ.txt</code>를 읽어 듣는 헤드폰 · 스피커의 굴곡을 재생할 때만 고름 · 모든 처리가 끝난 뒤 장치 바로 앞(적용본 스펙트럼 뒤)에 걸려 내보낸 파일 · 설정 파일에는 들어가지 않고 이 브라우저에만 저장 · Preamp 0.1 dB 단위, 보정 곡선이 0 dB를 넘으면 경고 · PARAMETRIC EQ 큰 편집 창에도 AutoEQ 가져오기(이쪽은 파일에도 들어감)</td></tr>
+      <tr><td>변경 (3.1.1)</td><td>모든 모듈의 INPUT GAIN을 0.5 dB 단위에서 0.1 dB 단위로(키보드 ←→도 0.1 dB씩)</td></tr>
+      <tr><td>문서</td><td>PARAMETRIC EQ 절을 모듈 01로 추가(뒤의 모듈 번호가 하나씩 밀림) · 그래프와 큰 편집 창의 마우스 · 키보드 조작표 · 모니터링 도구 절에 모니터 보정(3.1.1)</td></tr>
     </table>
 
     <h3 class="sub-title">v3.0</h3>
@@ -1386,7 +1388,7 @@ body::before {
     <div class="section-num">SECTION 04</div>
     <div class="section-title">모니터링 도구</div>
     <div class="deco-bar"></div>
-    <p class="section-lead">처리 중인 오디오의 상태를 실시간으로 파악할 수 있는 3가지 시각화 도구가 내장되어 있습니다.</p>
+    <p class="section-lead">처리 중인 오디오의 상태를 실시간으로 보여 주는 시각화 도구들과, 듣는 기기의 굴곡을 재생할 때만 고르는 모니터 보정이 있습니다.</p>
 
     <div class="callout">
       <p>
@@ -1473,6 +1475,39 @@ body::before {
 
     <div class="callout">
       <p><strong>재생바 스크러빙:</strong> 재생 중 프로그레스 바를 클릭하면 해당 위치로 즉시 이동합니다. 이동 후에도 재생이 끊김 없이 계속됩니다.</p>
+    </div>
+
+    <h3 class="sub-title" id="moncal">모니터 보정 — 듣는 기기 맞추기 <span class="badge-new">v3.1</span></h3>
+    <p>
+      헤드폰과 스피커는 저마다 어떤 높이의 소리를 더 크게, 어떤 높이를 더 작게 냅니다. 재생 줄의 <strong>모니터 보정</strong> 단추로 여는 창에서
+      AutoEQ가 헤드폰 · 이어폰마다 내놓는 보정 파일(<code>ParametricEQ.txt</code>, Equalizer APO 형식)을 읽어, 그 굴곡을 <strong>재생할 때만</strong> 고릅니다.
+      보정은 모든 처리가 끝난 소리가 장치로 나가기 직전, 적용본 스펙트럼을 잰 뒤에 걸립니다. 그래서 화면의 적용본 그래프와 내보낸 파일에는 들어가지 않습니다.
+    </p>
+    <table class="spec-table">
+      <tr><th>항목</th><th>설명</th></tr>
+      <tr><td>AutoEQ&nbsp;가져오기</td><td>파일 고르기 · 끌어다 놓기 · 붙여 넣기로 읽습니다. 읽은 필터 수 · 종류 · Preamp와 바꾼 것을 미리 보여 주고, <strong>적용</strong>을 누르면 보정이 켜지며 파일 이름(‘ParametricEQ’를 뗀 것)이 보정 이름이 됩니다. 파일은 이 컴퓨터 안에서만 읽습니다.</td></tr>
+      <tr><td>켜짐&nbsp;스위치</td><td>창 머리의 스위치입니다. 끄면 소리가 표본 단위로 그대로 나갑니다. 재생 줄 단추에 켜짐과 보정 이름이 보입니다.</td></tr>
+      <tr><td>Preamp</td><td>−24 ~ +24 dB, 0.1 dB 단위입니다. 보정 곡선이 0 dB 위로 올라가면 큰 소리에서 장치 출력이 잘릴 수 있으니 그만큼 더 내리라고 알립니다.</td></tr>
+      <tr><td>곡선 · 표</td><td>Preamp와 필터를 합친 실제 보정 곡선(소리와 같은 계산)과 필터 표입니다.</td></tr>
+      <tr><td>비우기</td><td>지우는 일이라 3초 안에 한 번 더 눌러야 실행됩니다.</td></tr>
+      <tr><td>저장</td><td>이 브라우저에만 남습니다. 설정 파일 · 슬롯에는 담기지 않고, 모니터 보정만 바꾸면 다른 문서로 갈 때 확인도 묻지 않습니다.</td></tr>
+    </table>
+    <table class="spec-table">
+      <tr><th>파일의 필터</th><th>읽는 법</th></tr>
+      <tr><td>PK · PEQ · Modal</td><td>벨</td></tr>
+      <tr><td>LSC · LS · HSC · HS</td><td>로우 · 하이 셸프. AutoEQ의 셸프 Q 0.70은 이 프로그램의 셸프(Q 0.71과 같은 기울기)와 ±6 dB 셸프에서 0.029 dB 다릅니다.</td></tr>
+      <tr><td>NO</td><td>노치</td></tr>
+      <tr><td>HP · HPQ · LP · LPQ</td><td>로우 · 하이 컷 12 dB/oct</td></tr>
+      <tr><td>BW Oct</td><td>대역폭을 Q로 바꿉니다(1옥타브 = Q 1.41).</td></tr>
+      <tr><td>OFF</td><td>꺼진 대역으로 넣습니다.</td></tr>
+      <tr><td>그 밖 · GraphicEQ</td><td>건너뛰고 알립니다. 점 수백 개로 된 GraphicEQ 형식은 읽지 않습니다.</td></tr>
+    </table>
+    <div class="callout">
+      <p>
+        <strong>EQ 카드로 가져오기와의 차이 —</strong> <a href="#peq">PARAMETRIC EQ</a> 큰 편집 창에도 같은 <strong>AutoEQ 가져오기</strong>가 있지만,
+        카드에 넣은 보정은 처리 체인 안에 있어 내보낸 파일에도 들어갑니다(Preamp는 카드의 INPUT GAIN으로).
+        듣는 헤드폰을 맞추는 것이면 모니터 보정을, 그 헤드폰 전용 파일을 일부러 만들 때만 EQ 카드를 쓰세요.
+      </p>
     </div>
   </div>
 
@@ -1587,7 +1622,7 @@ body::before {
     <h3 class="sub-title">모듈별 INPUT GAIN <span class="badge-new v23">v2.3</span></h3>
     <p>
       모든 모듈의 본문 첫 줄에 <strong>INPUT GAIN</strong> 슬라이더가 생겼습니다.
-      범위는 −24 ~ +24 dB이고 기본값은 0입니다. 그 모듈에 <strong>들어가기 직전</strong>의
+      범위는 −24 ~ +24 dB(0.1 dB 단위 <span class="badge-new">v3.1</span>)이고 기본값은 0입니다. 그 모듈에 <strong>들어가기 직전</strong>의
       레벨을 조절합니다. 모듈이 꺼져 있으면 게인도 체인에 끼지 않으므로,
       스위치를 껐는데 음량만 달라지는 일은 없습니다.
     </p>
@@ -1753,6 +1788,7 @@ body::before {
       <tr><td>대역&nbsp;n&nbsp;/&nbsp;20</td><td>지금 대역 수입니다.</td></tr>
       <tr><td>▶&nbsp;재생</td><td>파일을 올리면 나타납니다. 위쪽 재생 줄의 단추를 대신 눌러, 창을 닫지 않고 들으며 고칩니다(재생 중에는 ❚❚ 멈춤).</td></tr>
       <tr><td>＋&nbsp;대역</td><td>카드의 ＋와 같이 빈 곳에 벨을 더합니다.</td></tr>
+      <tr><td>AutoEQ&nbsp;가져오기</td><td>AutoEQ의 <code>ParametricEQ.txt</code>를 읽어 대역 목록을 바꾸고, 파일의 Preamp를 이 카드의 INPUT GAIN으로 넣습니다. 카드에 넣은 보정은 내보낸 파일에도 들어갑니다. 듣는 헤드폰을 맞추려면 <a href="#moncal">모니터 보정</a>을 쓰세요.</td></tr>
       <tr><td>처음&nbsp;상태로</td><td>대역 목록을 평탄한 네 대역으로 되돌립니다. 지우는 일이라 한 번 누르면 ‘한 번 더 누르면 되돌립니다’로 바뀌고, 3초 안에 다시 눌러야 실행됩니다. MACRO · INPUT GAIN · 켜짐은 그대로입니다.</td></tr>
       <tr><td>닫기</td><td>창을 닫습니다. Esc를 누르거나 바깥의 어두운 막을 눌러도 닫힙니다.</td></tr>
     </table>
@@ -2528,7 +2564,7 @@ body::before {
       <tr><td>모듈 순서</td><td>화면에 배치된 순서 그대로</td></tr>
       <tr><td>프리셋 선택</td><td>SOUNDGOODIZER 모드(A~D)와 DOLBY ATMOS 씬</td></tr>
       <tr><td>EQ 대역 <span class="badge-new">v3.1</span></td><td>PARAMETRIC EQ의 대역 목록 — 대역마다 종류 · 주파수 · 이득 · Q · 기울기 · 켜짐. EQ의 MACRO · INPUT GAIN · 켜짐은 다른 카드처럼 노브 값 · 켜짐 상태로 담깁니다.</td></tr>
-      <tr><td>제외</td><td>음원 파일. 프리셋을 불러와도 올려둔 곡은 바뀌지 않습니다.</td></tr>
+      <tr><td>제외</td><td>음원 파일. 프리셋을 불러와도 올려둔 곡은 바뀌지 않습니다. <a href="#moncal">모니터 보정</a>도 담기지 않습니다(이 브라우저에 따로 저장).</td></tr>
     </table>
 
     <div class="callout ok">
@@ -2642,7 +2678,7 @@ body::before {
       <tr><td>① 비트 깊이 향상</td><td>16bit 이하 정수 원본을 더 깊게 쓸 때, 원본 표본률에서 계단 사이를 이어 채움. 원본에서 ½ LSB 이내</td></tr>
       <tr><td>② 리샘플링</td><td>표본률이 원본과 다를 때만. 올림은 최고 규격 보간(99.5%까지 평탄 · 200 dB), 내림은 효율 규격(98% · 180 dB). 날카로운 거름은 FFT 합성곱으로. 거울상 · 에일리어싱 억제는 SoX 최고 설정과 같은 수준. 브라우저 변환기를 쓰지 않음</td></tr>
       <tr><td>③ 고해상도 복원</td><td>원본보다 높은 표본률에서 원음 윗대역의 주파수 이동 복사(한 음이 도드라지면 f0 동기)로 잘린 고역을 채움. LIVE와 같은 순서</td></tr>
-      <tr><td>④ DSP 체인 렌더링</td><td>켜진 모듈을 화면 순서대로 OfflineAudioContext에 빌드 후 렌더링. MASTERING의 천장이 복원까지 포함해 지켜짐</td></tr>
+      <tr><td>④ DSP 체인 렌더링</td><td>켜진 모듈을 화면 순서대로 OfflineAudioContext에 빌드 후 렌더링. MASTERING의 천장이 복원까지 포함해 지켜짐. <a href="#moncal">모니터 보정</a>은 재생에만 걸리므로 들어가지 않음 <span class="badge-new">v3.1</span></td></tr>
       <tr><td>⑤ WAV 인코딩</td><td>16 · 24bit는 음수 ×2<sup>b−1</sup>, 양수 ×(2<sup>b−1</sup>−1) 뒤 TPDF 디더를 더해 반올림(격자 위 표본은 그대로), 32bit는 float 그대로. RIFF WAV 헤더 작성</td></tr>
       <tr><td>⑥ 파일 다운로드</td><td>브라우저 다운로드로 자동 저장. 복원을 거치면 _HD96k24bit · _UHD192k32bit, 아니면 _dsp44.1k16bit처럼 경로 접미사 자동 추가</td></tr>
     </table>

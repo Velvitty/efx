@@ -2241,6 +2241,45 @@ dialog.peq-modal::backdrop { background: rgba(8,11,14,0.72); }
 .peq-table tr.off :is(select, input[type=number]) { color: var(--muted); }
 .peq-table input[type=number] { width: 84px; }
 
+/* ── 모니터 보정 — 재생 줄 단추 · 보정 창 · AutoEQ 가져오기 창 ── */
+.mon-btn { display: inline-flex; align-items: center; gap: 7px; padding: 6px 12px; max-width: 100%; }
+.mon-dot { flex: 0 0 auto; width: 8px; height: 8px; border-radius: 50%; background: var(--border-hi); }
+.mon-btn.on { border-color: var(--amber); }
+.mon-btn.on .mon-dot { background: var(--amber); box-shadow: 0 0 7px var(--amber-glow); }
+.mon-state { min-width: 0; max-width: 18ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 500; color: var(--muted); }
+.mon-btn.on .mon-state { color: var(--amber); }
+.mon-btn:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
+dialog.mon-modal { --cap: var(--amber); width: min(880px, calc(100vw - 24px)); }
+dialog.aeq-modal { width: min(720px, calc(100vw - 24px)); }
+.mon-row { display: flex; align-items: center; gap: 8px 16px; flex-wrap: wrap; margin: 10px 0 8px; }
+.mon-row input {
+  height: 28px; padding: 0 8px; font-family: var(--font-legend); font-size: var(--fs-sm); font-weight: 600; font-variant-numeric: tabular-nums;
+  color: var(--text); background: var(--bg2); border: 1px solid var(--border-hi); border-radius: var(--r-ctl);
+}
+.mon-row input:hover { border-color: var(--cap); }
+.mon-row input:focus-visible { outline: 2px solid var(--amber); outline-offset: 1px; }
+.mon-row input[type=number] { width: 76px; -moz-appearance: textfield; appearance: textfield; }
+.mon-row input[type=number]::-webkit-inner-spin-button, .mon-row input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+.mon-name { flex: 1 1 260px; }
+.mon-name input { flex: 1 1 auto; min-width: 0; font-family: var(--font-body); font-weight: 500; }
+.mon-name input::placeholder, .aeq-text::placeholder { color: var(--dim); opacity: 1; }
+canvas.peq-vis.mon-vis { height: clamp(170px, 30vh, 280px); margin: 0; cursor: default; flex: 0 0 auto; }
+.mon-warn { min-height: 1.4em; margin: 6px 0 0; font-size: var(--fs-xs); line-height: 1.4; color: var(--muted); }
+.mon-warn.bad { color: var(--danger-text); }
+.mon-table td { font-family: var(--font-legend); font-weight: 600; font-variant-numeric: tabular-nums; }
+.mon-table tr.off td { color: var(--muted); }
+.mon-table .peq-empty { font-family: var(--font-body); font-weight: 400; white-space: normal; }
+#monClear.armed { border-color: var(--danger-edge); color: var(--danger-text); }
+.aeq-text {
+  display: block; width: 100%; box-sizing: border-box; min-height: 160px; margin-top: 10px; padding: 8px 10px; resize: vertical;
+  font-family: ui-monospace, 'SFMono-Regular', Menlo, Consolas, 'Noto Sans Mono', monospace; font-size: var(--fs-xs); line-height: 1.5;
+  color: var(--text); background: var(--bg2); border: 1px solid var(--border-hi); border-radius: var(--r-ctl);
+}
+.aeq-text:focus-visible { outline: 2px solid var(--amber); outline-offset: 1px; }
+.aeq-foot { display: flex; justify-content: flex-end; margin-top: 10px; }
+.aeq-foot .btn { padding: 6px 18px; }
+.aeq-foot .btn:disabled { cursor: default; }
+
 /* ── 고해상도 복원 ────────────────────────────────────────── */
 .hd-badge { letter-spacing: 0.04em; border-radius: 999px; padding: 2px 9px; white-space: nowrap; }
 .hd-badge.hd { background: color-mix(in srgb, var(--blue) 12%, transparent); color: color-mix(in srgb, var(--blue) var(--cap-ink), var(--text)); border: 1px solid color-mix(in srgb, var(--blue) 40%, transparent); }
@@ -2665,6 +2704,7 @@ html, body { overflow-x: clip; }
       <button class="btn active" id="playBtn">▶ PLAY</button>
       <button class="btn" id="stopBtn">■ STOP</button>
       <div style="flex:1"></div>
+      <button type="button" class="btn mon-btn" id="monBtn" aria-haspopup="dialog" title="모니터 보정 — 듣는 기기 보정. 재생에만 걸리고 내보내기 · 프리셋에는 들어가지 않습니다"><span class="mon-dot" aria-hidden="true"></span>모니터 보정 <span class="mon-state" id="monState">꺼짐</span></button>
       <span class="info-badge" id="infoSR">—</span>
     </div>
     <div class="progress-outer" id="progOuter">
@@ -2708,7 +2748,7 @@ html, body { overflow-x: clip; }
         </div>
         <div class="slider-row in-gain">
           <span class="slider-label">INPUT GAIN</span>
-          <input type="range" id="peqIn" min="-24" max="24" value="0" step="0.5">
+          <input type="range" id="peqIn" min="-24" max="24" value="0" step="0.1">
           <span class="slider-val" id="peqInV">0.0</span>
         </div>
         <canvas class="peq-vis" id="peqVis" tabindex="0" role="application" aria-roledescription="EQ 그래프" aria-describedby="peqHelp"></canvas>
@@ -2740,7 +2780,7 @@ html, body { overflow-x: clip; }
         </div>
         <div class="slider-row in-gain">
           <span class="slider-label">INPUT GAIN</span>
-          <input type="range" id="compIn" min="-24" max="24" value="0" step="0.5">
+          <input type="range" id="compIn" min="-24" max="24" value="0" step="0.1">
           <span class="slider-val" id="compInV">0.0</span>
         </div>
         <div class="slider-row">
@@ -2795,7 +2835,7 @@ html, body { overflow-x: clip; }
         </div>
         <div class="slider-row in-gain">
           <span class="slider-label">INPUT GAIN</span>
-          <input type="range" id="bbeIn" min="-24" max="24" value="0" step="0.5">
+          <input type="range" id="bbeIn" min="-24" max="24" value="0" step="0.1">
           <span class="slider-val" id="bbeInV">0.0</span>
         </div>
         <div class="slider-row">
@@ -2834,7 +2874,7 @@ html, body { overflow-x: clip; }
         </div>
         <div class="slider-row in-gain">
           <span class="slider-label">INPUT GAIN</span>
-          <input type="range" id="tubeIn" min="-24" max="24" value="0" step="0.5">
+          <input type="range" id="tubeIn" min="-24" max="24" value="0" step="0.1">
           <span class="slider-val" id="tubeInV">0.0</span>
         </div>
         <div class="slider-row">
@@ -2894,7 +2934,7 @@ html, body { overflow-x: clip; }
         </div>
         <div class="slider-row in-gain">
           <span class="slider-label">INPUT GAIN</span>
-          <input type="range" id="excIn" min="-24" max="24" value="0" step="0.5">
+          <input type="range" id="excIn" min="-24" max="24" value="0" step="0.1">
           <span class="slider-val" id="excInV">0.0</span>
         </div>
         <div class="slider-row">
@@ -2933,7 +2973,7 @@ html, body { overflow-x: clip; }
         </div>
         <div class="slider-row in-gain">
           <span class="slider-label">INPUT GAIN</span>
-          <input type="range" id="sgIn" min="-24" max="24" value="0" step="0.5">
+          <input type="range" id="sgIn" min="-24" max="24" value="0" step="0.1">
           <span class="slider-val" id="sgInV">0.0</span>
         </div>
         <!-- Mode A/B/C/D selector -->
@@ -2991,7 +3031,7 @@ html, body { overflow-x: clip; }
         </div>
         <div class="slider-row in-gain">
           <span class="slider-label">INPUT GAIN</span>
-          <input type="range" id="vinylIn" min="-24" max="24" value="0" step="0.5">
+          <input type="range" id="vinylIn" min="-24" max="24" value="0" step="0.1">
           <span class="slider-val" id="vinylInV">0.0</span>
         </div>
         <div class="vinyl-group">RECORD · 레코드</div>
@@ -3102,7 +3142,7 @@ html, body { overflow-x: clip; }
         </div>
         <div class="slider-row in-gain">
           <span class="slider-label">INPUT GAIN</span>
-          <input type="range" id="atmosIn" min="-24" max="24" value="0" step="0.5">
+          <input type="range" id="atmosIn" min="-24" max="24" value="0" step="0.1">
           <span class="slider-val" id="atmosInV">0.0</span>
         </div>
         <!-- Scene preset buttons -->
@@ -3164,7 +3204,7 @@ html, body { overflow-x: clip; }
         </div>
         <div class="slider-row in-gain">
           <span class="slider-label">INPUT GAIN</span>
-          <input type="range" id="masterIn" min="-24" max="24" value="0" step="0.5">
+          <input type="range" id="masterIn" min="-24" max="24" value="0" step="0.1">
           <span class="slider-val" id="masterInV">0.0</span>
         </div>
         <div style="font-size:var(--fs-xs);color:var(--muted);margin-bottom:8px;letter-spacing:0.1em">MULTI-BAND COMP</div>
@@ -3444,6 +3484,7 @@ html, body { overflow-x: clip; }
       <span class="peq-modal-gap"></span>
       <button type="button" class="btn" id="peqPlay" hidden>▶ 재생</button>
       <button type="button" class="btn" id="peqAddBig">＋ 대역</button>
+      <button type="button" class="btn" id="peqImport">AutoEQ 가져오기</button>
       <button type="button" class="btn" id="peqReset">처음 상태로</button>
       <button type="button" class="btn" id="peqClose">닫기</button>
     </div>
@@ -3453,6 +3494,50 @@ html, body { overflow-x: clip; }
       <thead><tr><th scope="col">번호</th><th scope="col">켜짐</th><th scope="col">종류</th><th scope="col">주파수 (Hz)</th><th scope="col">이득 (dB)</th><th scope="col">Q</th><th scope="col">기울기</th><th scope="col"><span class="peq-sr">삭제</span></th></tr></thead>
       <tbody></tbody>
     </table></div>
+  </div>
+</dialog>
+
+<!-- 모니터 보정 창 — 체인 밖, 재생에만 -->
+<dialog class="peq-modal mon-modal" id="monModal" aria-labelledby="monTitle">
+  <div class="peq-modal-box">
+    <div class="peq-modal-head">
+      <h2 class="peq-modal-title" id="monTitle">모니터 보정</h2>
+      <label class="led-toggle" title="모니터 보정 켜기 · 끄기"><input type="checkbox" data-k="mon-power" aria-label="모니터 보정 켜짐"><span class="led-btn"></span></label>
+      <span class="peq-count" id="monSummary"></span>
+      <span class="peq-modal-gap"></span>
+      <button type="button" class="btn" id="monImport">AutoEQ 가져오기</button>
+      <button type="button" class="btn" id="monClear">비우기</button>
+      <button type="button" class="btn" id="monClose">닫기</button>
+    </div>
+    <p class="peq-help">듣는 헤드폰 · 스피커의 응답을 고르는 보정입니다. 재생할 때만, 모든 처리가 끝난 뒤 장치로 나가기 직전에 걸립니다. 내보낸 파일과 프리셋에는 들어가지 않고, 이 브라우저에만 저장됩니다. 화면의 적용본 스펙트럼은 보정 앞의 소리입니다.</p>
+    <div class="mon-row">
+      <label class="peq-num mon-name"><span>이름</span><input type="text" data-k="mon-name" maxlength="80" placeholder="쓰는 헤드폰 이름"></label>
+      <label class="peq-num"><span>Preamp</span><input type="number" data-k="mon-preamp" step="0.1" min="-24" max="24" inputmode="decimal" aria-label="Preamp (dB)"><i>dB</i></label>
+    </div>
+    <canvas class="peq-vis mon-vis" id="monVis" role="img" aria-label="모니터 보정 응답 곡선"></canvas>
+    <p class="mon-warn" id="monWarn" role="status" aria-live="polite"></p>
+    <div class="peq-table-wrap"><table class="peq-table mon-table" id="monTable">
+      <thead><tr><th scope="col">번호</th><th scope="col">켜짐</th><th scope="col">종류</th><th scope="col">주파수 (Hz)</th><th scope="col">이득 (dB)</th><th scope="col">Q</th></tr></thead>
+      <tbody></tbody>
+    </table></div>
+  </div>
+</dialog>
+
+<!-- AutoEQ 가져오기 창 — EQ 카드와 모니터 보정이 함께 쓴다 -->
+<dialog class="peq-modal aeq-modal" id="aeqModal" aria-labelledby="aeqTitle">
+  <div class="peq-modal-box">
+    <div class="peq-modal-head">
+      <h2 class="peq-modal-title" id="aeqTitle">AutoEQ 가져오기</h2>
+      <span class="peq-count" id="aeqTarget"></span>
+      <span class="peq-modal-gap"></span>
+      <button type="button" class="btn" id="aeqPick">파일 고르기</button>
+      <button type="button" class="btn" id="aeqClose">닫기</button>
+    </div>
+    <p class="peq-help" id="aeqHelp">AutoEQ의 ParametricEQ.txt(Equalizer APO 형식)를 고르거나, 내용을 아래에 붙여 넣거나 끌어다 놓습니다. 파일은 이 컴퓨터 안에서만 읽습니다.</p>
+    <input type="file" id="aeqFile" accept=".txt,text/plain" hidden>
+    <textarea class="aeq-text" id="aeqText" rows="8" spellcheck="false" aria-label="AutoEQ 내용" placeholder="Preamp: -6.2 dB&#10;Filter 1: ON LSC Fc 105 Hz Gain 4.6 dB Q 0.70&#10;Filter 2: ON PK Fc 2342 Hz Gain 3.1 dB Q 2.12"></textarea>
+    <p class="mon-warn" id="aeqMsg" role="status" aria-live="polite"></p>
+    <div class="aeq-foot"><button type="button" class="btn active" id="aeqApply" disabled>적용</button></div>
   </div>
 </dialog>
 
@@ -5804,6 +5889,28 @@ function buildPEQBlock(ac, opts) {
   return blk;
 }
 
+// 모니터 보정 — 듣는 기기(헤드폰 · 스피커)의 응답을 고르는 단.
+// 실시간 출력의 맨 끝(분석기 뒤, 장치 앞)에만 걸리고 내보내기 · 프리셋에는 들어가지 않는다.
+// 헤드폰 보정은 만드는 소리가 아니라 듣는 기기의 성질이라, 파일에 박히면 다른 기기에서 틀린 소리가 된다.
+// Preamp(이득) → PARAMETRIC EQ와 같은 빌더로 만든 대역. 꺼져 있으면 이득 1 · 대역 없음이라 표본이 그대로 나간다.
+function buildMonitorBlock(ac) {
+  const pre = ac.createGain(), eq = buildPEQBlock(ac, { live: true });
+  pre.connect(eq.in);
+  const blk = { in: pre, out: eq.out };
+  let first = true;
+  blk.set = function (m) {
+    const on = !!(m && m.on), g = on ? Math.pow(10, (+m.preamp || 0) / 20) : 1, now = ac.currentTime;
+    eq.set({ peq: { depth: 1, bands: on ? (m.bands || []) : [] } });
+    // 처음에는 바로 놓는다(재생 첫머리가 Preamp 없이 크게 나오지 않게)
+    if (first) { first = false; pre.gain.value = g; return; }
+    // 재생 중 바꾸면 10 ms 시정수로 옮긴 뒤 0.1초 뒤에는 정확한 값으로 놓는다(끄면 이득이 정확히 1)
+    if (pre.gain.cancelAndHoldAtTime) pre.gain.cancelAndHoldAtTime(now); else pre.gain.cancelScheduledValues(now);
+    pre.gain.setTargetAtTime(g, now, 0.01);
+    pre.gain.setValueAtTime(g, now + 0.1);
+  };
+  return blk;
+}
+
 // 재생 단계 — MASTER 뒤에 놓을 수 있는 카드. 실제 LP는 마스터 음원으로 래커를 깎아 재생하고,
 // Atmos는 마스터가 끝난 뒤 듣는 기기에 맞춰 공간을 그리므로, 이 둘만 마스터링 뒤의 재생 매체를 흉내 낸다
 const POST_MASTER_OK = { 'mod-vinyl': true, 'mod-atmos': true };
@@ -5823,6 +5930,8 @@ function chainSplit(map) {
 function buildLiveChain() {
   const ac = ctx();
   const nodes = {};
+  if (liveDSP && liveDSP.monitor) { try { liveDSP.monitor.out.disconnect(); } catch (e) {} }
+  nodes.monitor = buildMonitorBlock(ac);
 
   // Input gain
   nodes.inputGain = ac.createGain();
@@ -6025,7 +6134,9 @@ function connectLiveChain(nodes, ac) {
 
   chain.connect(nodes.outputGain);
   nodes.outputGain.connect(nodes.analyser);
-  nodes.analyser.connect(ac.destination);
+  // 모니터 보정은 분석기 뒤 — 적용본 스펙트럼은 파일이 될 소리를 그대로 보여 준다
+  nodes.analyser.connect(nodes.monitor.in);
+  nodes.monitor.out.connect(ac.destination);
 
   // 원음 탭: DSP 체인 진입 직전 신호를 분기 (destination에는 연결하지 않아 소리 중복 없음)
   nodes.inputGain.connect(nodes.dryAnalyser);
@@ -6052,6 +6163,7 @@ function applyLiveDSP() {
   // 곡선·응답 생성이 무거운 모듈은 켜져 있을 때만 갱신한다. 켜는 순간 이 함수가 다시 불린다.
   const P = getParams(null);
   if (nodes.peqBlock  && P.peqEnabled)  nodes.peqBlock.set(P);
+  if (nodes.monitor) nodes.monitor.set(typeof monitorNow === 'function' ? monitorNow() : null);
   if (nodes.bbeBlock  && P.bbeEnabled)  nodes.bbeBlock.set(P);
   if (nodes.tubeBlock && P.tubeEnabled) nodes.tubeBlock.set(P);
 
@@ -9051,8 +9163,8 @@ drawTubeViz();
   var dirty = false;
 
   function markDirty(e) {
-    // EULA 모달 내부 조작은 설정 변경이 아니다
-    if (e && e.target && e.target.closest && e.target.closest('#eulaOverlay')) return;
+    // EULA 모달 내부 조작은 설정 변경이 아니다. 모니터 보정 · AutoEQ 가져오기 창도 — 모니터 보정은 이 브라우저에 따로 저장되고, 카드에 가져오면 카드 쪽에서 변경을 알린다
+    if (e && e.target && e.target.closest && e.target.closest('#eulaOverlay, #monModal, #aeqModal')) return;
     dirty = true;
   }
 
@@ -9892,6 +10004,279 @@ drawTubeViz();
   };
 
   renderChips(); renderEdit(); redraw();
+})();
+</script>
+<script>
+/* ============================================================
+   AutoEQ 가져오기 · 모니터 보정
+   ------------------------------------------------------------
+   AutoEQ의 ParametricEQ.txt(Equalizer APO 형식)를 읽어 대역 목록과 Preamp로 바꾼다.
+   가져갈 곳은 둘이다.
+     PARAMETRIC EQ 카드 — 처리 체인 안. 내보낸 파일에도 들어간다(그 기기용 파일을 일부러 만들 때)
+     모니터 보정 — 체인 밖. 재생에만, 모든 처리가 끝난 뒤 장치 앞에서 걸린다(듣는 기기 보정)
+   모니터 보정은 프리셋에 담지 않고 이 브라우저에만 저장한다. 헤드폰 보정은 듣는 기기의 성질이라
+   설정 파일을 다른 기기로 옮기면 틀린 보정이 되기 때문이다. 파일은 FileReader로 이 컴퓨터 안에서만 읽는다.
+   ============================================================ */
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var monBtn = $('monBtn'), monState = $('monState'), monModal = $('monModal'), aeqModal = $('aeqModal');
+  if (!monBtn || !monModal || !aeqModal) return;
+  var power = monModal.querySelector('input[data-k="mon-power"]'), nameEl = monModal.querySelector('input[data-k="mon-name"]');
+  var preEl = monModal.querySelector('input[data-k="mon-preamp"]'), visEl = $('monVis'), warnEl = $('monWarn');
+  var tbody = monModal.querySelector('tbody'), sumEl = $('monSummary'), clearB = $('monClear');
+  var aeqText = $('aeqText'), aeqMsg = $('aeqMsg'), aeqApply = $('aeqApply'), aeqFile = $('aeqFile'), aeqTarget = $('aeqTarget'), aeqHelp = $('aeqHelp');
+  var TNAME = { bell: '벨', lowshelf: '로우 셸프', highshelf: '하이 셸프', notch: '노치', lowcut: '로우 컷', highcut: '하이 컷' };
+  // 창이 열려 있는 동안 뒤 페이지는 스크롤하지 않는다(EQ 큰 창과 같은 표시). 닫을 때는 열린 창이 더 없을 때만 푼다
+  function lock() { document.documentElement.classList.add('peq-modal-open'); }
+  function unlock() { if (!document.querySelector('dialog.peq-modal[open]')) document.documentElement.classList.remove('peq-modal-open'); }
+  function fmtDb(v) { return (v > 0 ? '+' : v < 0 ? '−' : '') + Math.abs(v).toFixed(1) + ' dB'; }
+  function clampPre(v) { v = Math.round((+v || 0) * 10) / 10; return Math.max(-24, Math.min(24, v)); }
+
+  // ── AutoEQ · Equalizer APO 형식 읽기 ─────────────────────
+  //   Preamp: -6.2 dB
+  //   Filter 1: ON PK Fc 105 Hz Gain -2.7 dB Q 0.70
+  // AutoEQ가 쓰는 PK · LSC · HSC와, 같은 꼴의 APO 종류(노치 · 고역 · 저역 통과)를 받는다. 대역폭(BW Oct)은 Q로 바꾼다.
+  var KIND = { PK: 'bell', PEQ: 'bell', MODAL: 'bell', LSC: 'lowshelf', LS: 'lowshelf', HSC: 'highshelf', HS: 'highshelf',
+               NO: 'notch', NOTCH: 'notch', HP: 'lowcut', HPQ: 'lowcut', LP: 'highcut', LPQ: 'highcut' };
+  function parse(text) {
+    var r = { preamp: null, bands: [], skipped: [], notes: {}, graphic: false, found: 0 };
+    String(text || '').split(/\r?\n/).forEach(function (line) {
+      var l = line.trim(), m;
+      if (!l || l.charAt(0) === '#') return;
+      if ((m = /^preamp\s*:\s*([+-]?\d+(?:[.,]\d+)?)\s*db/i.exec(l))) { r.preamp = parseFloat(m[1].replace(',', '.')); return; }
+      if (/^graphiceq\s*:/i.test(l)) { r.graphic = true; return; }
+      if (!(m = /^filter(?:\s*\d+)?\s*:\s*(on|off)\s+([a-z]+)(.*)$/i.exec(l))) return;
+      r.found++;
+      var on = m[1].toLowerCase() === 'on', code = m[2].toUpperCase(), rest = m[3], t = KIND[code];
+      var num = function (re) { var x = re.exec(rest); return x ? parseFloat(x[1].replace(',', '.')) : null; };
+      var fc = num(/\bfc\s+([\d.,]+)\s*hz/i), gain = num(/\bgain\s+([+-]?[\d.,]+)\s*db/i), q = num(/\bq\s+([\d.,]+)/i), bw = num(/\bbw\s+oct\s+([\d.,]+)/i);
+      if (!t || fc === null || (t === 'bell' && gain === null)) { r.skipped.push(code); return; }
+      if (q === null && bw !== null && bw > 0) { var p2 = Math.pow(2, bw); q = Math.sqrt(p2) / (p2 - 1); }
+      var shelf = t === 'lowshelf' || t === 'highshelf';
+      if (shelf && q !== null && Math.abs(q - Math.SQRT1_2) > 0.02) r.notes.shelfq = true;
+      if (shelf && /\b6\s*db\b/i.test(rest)) r.notes.shelf6 = true;
+      if (fc < PEQ_FMIN || fc > PEQ_FMAX || Math.abs(gain || 0) > PEQ_GMAX || (q !== null && (q < PEQ_QMIN || q > PEQ_QMAX))) r.notes.clamp = true;
+      r.bands.push(peqClean({ type: t, freq: fc, gain: gain || 0, q: q !== null ? q : (t === 'notch' ? 10 : Math.SQRT1_2), slope: 12, on: on }));
+    });
+    if (r.bands.length > PEQ_MAX) { r.notes.max = true; r.bands = r.bands.slice(0, PEQ_MAX); }
+    return r;
+  }
+  function describe(r) {
+    if (!r.bands.length) {
+      if (r.graphic) return 'GraphicEQ 형식(점 수백 개)은 받지 않습니다. AutoEQ의 ParametricEQ.txt를 고르세요.';
+      return r.found ? '읽을 수 있는 필터가 없습니다.' : 'ParametricEQ 형식의 줄(Filter 1: ON PK Fc … Hz Gain … dB Q …)을 찾지 못했습니다.';
+    }
+    var count = {}; r.bands.forEach(function (b) { count[b.type] = (count[b.type] || 0) + 1; });
+    var t = '필터 ' + r.bands.length + '개(' + Object.keys(count).map(function (k) { return TNAME[k] + ' ' + count[k]; }).join(' · ') + ') · '
+          + (r.preamp === null ? 'Preamp 없음(0 dB)' : 'Preamp ' + fmtDb(clampPre(r.preamp))) + '.';
+    var off = r.bands.filter(function (b) { return !b.on; }).length;
+    if (off) t += ' 꺼진 필터 ' + off + '개는 꺼진 채로 넣습니다.';
+    if (r.skipped.length) t += ' 받지 않는 종류 ' + r.skipped.length + '개(' + r.skipped.filter(function (x, i, a) { return a.indexOf(x) === i; }).join(', ') + ')는 건너뜁니다.';
+    if (r.notes.shelfq) t += ' 셸프는 기울기가 정해져 있어(Q 0.71과 같음) 파일의 Q와 조금 다를 수 있습니다.';
+    if (r.notes.shelf6) t += ' 6 dB 셸프는 이 프로그램의 셸프로 근사합니다.';
+    if (r.notes.clamp) t += ' 범위를 벗어난 값은 가장자리로 맞췄습니다.';
+    if (r.notes.max) t += ' 20개를 넘는 필터는 버렸습니다.';
+    return t;
+  }
+  window.asdeAutoEQ = { parse: parse, describe: describe };
+
+  // ── 모니터 보정 상태 — 이 브라우저에만 저장 ─────────────
+  var KEY = 'asde.monitor.v1';
+  var mon = { on: false, name: '', preamp: 0, bands: [] };
+  try {
+    var j = JSON.parse(localStorage.getItem(KEY) || 'null');
+    if (j && typeof j === 'object') {
+      mon.on = !!j.on; mon.name = String(j.name || '').slice(0, 80); mon.preamp = clampPre(j.preamp);
+      mon.bands = (Array.isArray(j.bands) ? j.bands : []).filter(function (b) { return b && typeof b === 'object'; }).slice(0, PEQ_MAX).map(peqClean);
+    }
+  } catch (e) {}
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(mon)); } catch (e) {} }
+  // 실시간 엔진이 읽는다(applyLiveDSP)
+  window.monitorNow = function () { return { on: mon.on, preamp: mon.preamp, bands: mon.bands }; };
+  function pushLive() {
+    if (typeof isPlaying === 'undefined' || !isPlaying) return;
+    if (typeof liveDSP === 'undefined' || !liveDSP || !liveDSP.monitor) return;
+    liveDSP.monitor.set(window.monitorNow());
+  }
+  function changed() { save(); pushLive(); render(); }
+
+  // ── 응답 곡선 — Preamp와 대역을 합친, 실제로 걸리는 보정 ──
+  var probe = null, LIT = '#f0b545';
+  function rateNow() { return (typeof audioCtx !== 'undefined' && audioCtx && audioCtx.sampleRate) || 48000; }
+  function curve(F) {
+    var rate = rateNow();
+    if (!probe || probe.rate !== rate) { var Off = window.OfflineAudioContext || window.webkitOfflineAudioContext; probe = { rate: rate, ac: new Off(1, 128, rate), nodes: [] }; }
+    var N = F.length, out = new Float64Array(N), mag = new Float32Array(N), ph = new Float32Array(N), j;
+    for (j = 0; j < N; j++) out[j] = mon.preamp;
+    peqStages(mon.bands, 1).forEach(function (s, k) {
+      var n = probe.nodes[k] || (probe.nodes[k] = probe.ac.createBiquadFilter());
+      n.type = s.kind; n.frequency.value = s.f; n.Q.value = s.q; n.gain.value = s.g;
+      n.getFrequencyResponse(F, mag, ph);
+      for (j = 0; j < N; j++) if (mag[j] === mag[j]) out[j] += 20 * Math.log10(mag[j] > 1e-6 ? mag[j] : 1e-6);
+    });
+    return out;
+  }
+  function draw() {
+    var W = visEl.clientWidth, H = visEl.clientHeight;
+    if (!W || !H) return null;
+    var dpr = window.devicePixelRatio || 1;
+    visEl.width = Math.round(W * dpr); visEl.height = Math.round(H * dpr);
+    var c = visEl.getContext('2d'); c.setTransform(dpr, 0, 0, dpr, 0, 0); c.clearRect(0, 0, W, H);
+    var x0 = 12, pw = W - 24, y0 = 10, ph = H - 32, N = Math.max(96, Math.min(720, Math.round(pw / 1.5)));
+    var LMIN = Math.log10(20), F = new Float32Array(N), j;
+    for (j = 0; j < N; j++) F[j] = Math.pow(10, LMIN + 3 * j / (N - 1));
+    var d = curve(F), mx = -Infinity, mn = Infinity;
+    for (j = 0; j < N; j++) { if (d[j] > mx) mx = d[j]; if (d[j] < mn) mn = d[j]; }
+    var R = Math.max(Math.abs(mx), Math.abs(mn)) > 11.5 ? 24 : 12;
+    var fx = function (f) { return x0 + (Math.log10(f) - LMIN) / 3 * pw; }, gy = function (g) { return y0 + (1 - (g + R) / (2 * R)) * ph; };
+    var font = (getComputedStyle(document.documentElement).getPropertyValue('--font-legend').trim() || 'sans-serif');
+    c.lineWidth = 1;
+    [20, 30, 40, 50, 60, 70, 80, 90, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000, 20000].forEach(function (f) {
+      var x = Math.round(fx(f)) + 0.5; c.strokeStyle = (f === 100 || f === 1000 || f === 10000) ? 'rgba(200,214,224,0.15)' : 'rgba(200,214,224,0.07)';
+      c.beginPath(); c.moveTo(x, y0); c.lineTo(x, y0 + ph); c.stroke();
+    });
+    for (var g = -R; g <= R; g += R / 4) {
+      var y = Math.round(gy(g)) + 0.5; c.strokeStyle = g === 0 ? 'rgba(200,214,224,0.32)' : 'rgba(200,214,224,0.1)';
+      c.beginPath(); c.moveTo(x0, y); c.lineTo(x0 + pw, y); c.stroke();
+    }
+    c.font = '600 12px ' + font; c.fillStyle = 'rgba(196,208,218,0.66)'; c.textAlign = 'center'; c.textBaseline = 'alphabetic';
+    (pw >= 420 ? [[20, '20'], [50, '50'], [100, '100'], [200, '200'], [500, '500'], [1000, '1k'], [2000, '2k'], [5000, '5k'], [10000, '10k']] : [[50, '50'], [100, '100'], [500, '500'], [1000, '1k'], [5000, '5k'], [10000, '10k']])
+      .forEach(function (p) { c.fillText(p[1], Math.max(x0 + 8, Math.min(x0 + pw - 9, fx(p[0]))), H - 6); });
+    c.textAlign = 'left'; c.textBaseline = 'middle';
+    [R, 0, -R].forEach(function (g, i) { c.fillText((g > 0 ? '+' : g < 0 ? '−' : '') + Math.abs(g) + (i === 0 ? ' dB' : ''), x0 + 3, Math.max(y0 + 6, Math.min(y0 + ph - 6, gy(g)))); });
+    c.beginPath();
+    for (j = 0; j < N; j++) { var yy = Math.max(y0 - 3, Math.min(y0 + ph + 3, gy(d[j]))); j ? c.lineTo(fx(F[j]), yy) : c.moveTo(fx(F[j]), yy); }
+    c.strokeStyle = mon.on ? LIT : 'rgba(240,181,69,0.45)'; c.lineWidth = 2; c.stroke();
+    return mx;
+  }
+
+  // ── 그리기 · 표 ──────────────────────────────────────────
+  function render() {
+    monBtn.classList.toggle('on', mon.on);
+    monState.textContent = mon.on ? (mon.name || '켜짐') : '꺼짐';
+    if (!monModal.open) return;
+    power.checked = mon.on;
+    if (document.activeElement !== nameEl) nameEl.value = mon.name;
+    if (document.activeElement !== preEl) preEl.value = String(mon.preamp);
+    sumEl.textContent = mon.bands.length ? '필터 ' + mon.bands.length + '개 · Preamp ' + fmtDb(mon.preamp) : '필터 없음';
+    tbody.textContent = '';
+    mon.bands.forEach(function (b, i) {
+      var tr = document.createElement('tr'); if (!b.on) tr.className = 'off';
+      [String(i + 1), b.on ? '켜짐' : '꺼짐', TNAME[b.type], String(b.freq < 100 ? Math.round(b.freq * 10) / 10 : Math.round(b.freq)),
+       peqHasGain(b.type) ? (Math.round(b.gain * 10) / 10).toFixed(1) : '—', peqHasQ(b) ? (Math.round(b.q * 100) / 100).toFixed(2) : '—'].forEach(function (v, k) {
+        var cell = document.createElement(k === 0 ? 'th' : 'td'); if (k === 0) cell.scope = 'row'; cell.textContent = v; tr.appendChild(cell);
+      });
+      tbody.appendChild(tr);
+    });
+    if (!mon.bands.length) {
+      var tr0 = document.createElement('tr'), td = document.createElement('td');
+      td.colSpan = 6; td.className = 'peq-empty'; td.textContent = '필터가 없습니다. ‘AutoEQ 가져오기’로 쓰는 헤드폰의 ParametricEQ.txt를 불러옵니다.';
+      tr0.appendChild(td); tbody.appendChild(tr0);
+    }
+    var mx = draw();
+    // 보정 곡선이 0 dB 위로 올라가면 큰 소리에서 장치 출력이 잘린다 — Preamp를 더 내리라고 알린다
+    var w = '';
+    if (mx !== null && isFinite(mx) && (mon.bands.length || mon.preamp)) {
+      w = mx > 0.1 ? '보정 곡선이 ' + fmtDb(Math.round(mx * 10) / 10) + '까지 올라갑니다. 큰 소리에서 잘릴 수 있으니 Preamp를 ' + (Math.ceil(mx * 10) / 10).toFixed(1) + ' dB 더 내리는 것이 안전합니다.'
+                   : '보정 곡선의 가장 높은 곳은 ' + fmtDb(Math.round(mx * 10) / 10) + '입니다.';
+    }
+    warnEl.textContent = w; warnEl.classList.toggle('bad', mx !== null && mx > 0.1);
+  }
+
+  // ── 모니터 보정 창 ──────────────────────────────────────
+  var back = null;
+  monBtn.addEventListener('click', function () {
+    back = document.activeElement;
+    if (monModal.showModal) monModal.showModal(); else monModal.setAttribute('open', '');
+    lock(); render();
+    power.focus();
+  });
+  $('monClose').addEventListener('click', function () { monModal.close(); });
+  // 닫으면 열기 전 초점 자리로 — 그런 자리가 없으면(본문) 재생 줄 단추로
+  monModal.addEventListener('close', function () { disarm(); unlock(); if (back && back !== document.body && back.focus && document.contains(back)) back.focus(); else monBtn.focus(); });
+  var veil = false;
+  monModal.addEventListener('pointerdown', function (e) { veil = e.target === monModal; });
+  monModal.addEventListener('click', function (e) { if (veil && e.target === monModal) monModal.close(); veil = false; });
+  power.addEventListener('change', function () { mon.on = power.checked; changed(); });
+  nameEl.addEventListener('input', function () { mon.name = nameEl.value.slice(0, 80); save(); render(); });
+  preEl.addEventListener('input', function () {
+    var v = parseFloat(preEl.value); if (!isFinite(v) || v < -24 || v > 24) return;
+    mon.preamp = clampPre(v); changed();
+  });
+  preEl.addEventListener('change', function () { var v = parseFloat(preEl.value); if (isFinite(v)) mon.preamp = clampPre(v); preEl.value = String(mon.preamp); changed(); });
+  // 비우기 — 3초 안에 한 번 더 눌러야 한다
+  var armT = 0;
+  function disarm() { clearTimeout(armT); clearB.classList.remove('armed'); clearB.textContent = '비우기'; }
+  clearB.addEventListener('click', function () {
+    if (!clearB.classList.contains('armed')) { clearB.classList.add('armed'); clearB.textContent = '한 번 더 누르면 비웁니다'; clearTimeout(armT); armT = setTimeout(disarm, 3000); return; }
+    disarm(); mon = { on: false, name: '', preamp: 0, bands: [] }; changed();
+  });
+  $('monImport').addEventListener('click', function () { openImport('mon'); });
+  if (window.ResizeObserver) new ResizeObserver(function () { if (monModal.open) draw(); }).observe(visEl);
+
+  // ── AutoEQ 가져오기 창 ──────────────────────────────────
+  var imp = { target: 'mon', fileName: '', parsed: null, back: null };
+  var HELP = aeqHelp.textContent;
+  function openImport(target) {
+    imp.target = target; imp.fileName = ''; imp.parsed = null; imp.back = document.activeElement;
+    aeqTarget.textContent = target === 'peq' ? '→ PARAMETRIC EQ 카드' : '→ 모니터 보정';
+    aeqHelp.textContent = HELP + (target === 'peq' ? ' 카드에 넣으면 내보낸 파일에도 들어갑니다. 듣는 기기 보정이라면 재생 줄의 ‘모니터 보정’에 가져오세요.'
+                                                  : ' 모니터 보정은 재생에만 걸리고 내보낸 파일에는 들어가지 않습니다.');
+    aeqText.value = ''; preview();
+    if (aeqModal.showModal) aeqModal.showModal(); else aeqModal.setAttribute('open', '');
+    lock(); aeqText.focus();
+  }
+  function preview() {
+    var t = aeqText.value;
+    if (!t.trim()) { aeqMsg.textContent = ''; aeqMsg.classList.remove('bad'); aeqApply.disabled = true; imp.parsed = null; return; }
+    var r = parse(t); imp.parsed = r;
+    aeqMsg.textContent = describe(r); aeqMsg.classList.toggle('bad', !r.bands.length); aeqApply.disabled = !r.bands.length;
+  }
+  function readFile(f) {
+    if (!f) return;
+    var rd = new FileReader();
+    rd.onload = function () { aeqText.value = String(rd.result || ''); imp.fileName = f.name || ''; preview(); };
+    rd.onerror = function () { aeqMsg.textContent = '파일을 읽지 못했습니다.'; aeqMsg.classList.add('bad'); };
+    rd.readAsText(f);
+  }
+  function nameFrom(fn) { return String(fn).replace(/\.txt$/i, '').replace(/[\s_-]*(parametric\s*eq|fixed\s*band\s*eq)$/i, '').trim().slice(0, 80); }
+  aeqText.addEventListener('input', function () { imp.fileName = ''; preview(); });
+  $('aeqPick').addEventListener('click', function () { aeqFile.click(); });
+  aeqFile.addEventListener('change', function () { readFile(aeqFile.files && aeqFile.files[0]); aeqFile.value = ''; });
+  aeqText.addEventListener('dragover', function (e) { if (e.dataTransfer && Array.prototype.indexOf.call(e.dataTransfer.types || [], 'Files') >= 0) e.preventDefault(); });
+  aeqText.addEventListener('drop', function (e) { var f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]; if (f) { e.preventDefault(); readFile(f); } });
+  $('aeqClose').addEventListener('click', function () { aeqModal.close(); });
+  aeqModal.addEventListener('close', function () {
+    unlock();
+    var b = imp.back, opener = $(imp.target === 'peq' ? 'peqImport' : 'monImport');
+    if (b && b !== document.body && b.focus && document.contains(b)) b.focus(); else if (opener) opener.focus();
+  });
+  var veil2 = false;
+  aeqModal.addEventListener('pointerdown', function (e) { veil2 = e.target === aeqModal; });
+  aeqModal.addEventListener('click', function (e) { if (veil2 && e.target === aeqModal) aeqModal.close(); veil2 = false; });
+  aeqApply.addEventListener('click', function () {
+    var r = imp.parsed; if (!r || !r.bands.length) return;
+    var pre = r.preamp === null ? 0 : clampPre(r.preamp), msg;
+    if (imp.target === 'peq') {
+      // 카드의 대역을 바꾸고, Preamp는 카드의 INPUT GAIN으로(카드가 켜졌을 때만 카드 앞에 걸린다)
+      window.asdePEQ.load({ bands: r.bands });
+      var inEl = $('peqIn'); inEl.value = String(pre); inEl.dispatchEvent(new Event('input', { bubbles: true }));
+      msg = 'AutoEQ 필터 ' + r.bands.length + '개를 EQ 카드에 넣었습니다(Preamp ' + fmtDb(pre) + ' → INPUT GAIN). 내보낸 파일에도 들어갑니다.'
+          + ($('peqOn').checked ? '' : ' EQ 카드가 꺼져 있어 켜야 들립니다.');
+    } else {
+      // 이름은 파일 이름에서 — 붙여 넣은 글이면 이전 기기의 이름이 남지 않게 비운다(창에서 적을 수 있다)
+      mon.bands = r.bands; mon.preamp = pre; mon.on = true;
+      mon.name = imp.fileName ? nameFrom(imp.fileName) : '';
+      changed();
+      msg = '모니터 보정에 필터 ' + r.bands.length + '개를 넣고 켰습니다(Preamp ' + fmtDb(pre) + '). 재생에만 걸리고 내보낸 파일에는 들어가지 않습니다.';
+    }
+    if (typeof setStatus === 'function') setStatus(msg, 'ok');
+    aeqModal.close();
+  });
+  var peqImport = $('peqImport');
+  if (peqImport) peqImport.addEventListener('click', function () { openImport('peq'); });
+
+  render();
 })();
 </script>
 <script>

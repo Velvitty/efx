@@ -484,6 +484,7 @@ footer {
       <ol>
         <li><a href="#chain-order">배치 순서의 근거</a></li>
         <li><a href="#chain-gain">게인 스테이징</a></li>
+        <li><a href="#chain-monitor">모니터 보정</a></li>
       </ol>
     </li>
     <li><a href="#units">처리 단 사양</a>
@@ -652,7 +653,7 @@ footer {
   <h3 id="chain-gain">게인 스테이징</h3>
   <div class="rd">
     <p>
-      각 단 진입 직전에 ±24 dB 범위의 입력 게인이 있다. 해당 단이 비활성이면
+      각 단 진입 직전에 ±24 dB 범위(0.1 dB 단위)의 입력 게인이 있다. 해당 단이 비활성이면
       게인도 개입하지 않으므로 토글 상태가 레벨에 영향을 주지 않는다.
     </p>
     <div class="eq">선형 배율 = <b>10^(dB/20)</b>
@@ -668,6 +669,58 @@ footer {
         <tr><td class="n">EQ</td><td>선형 처리뿐이라 레벨만 변한다. 대역의 응답은 입력 레벨과 무관하다.</td></tr>
         <tr><td class="n">BBE · VINYL · ATMOS</td><td>선형 처리가 지배적이므로 레벨만 변한다.</td></tr>
         <tr><td class="n">MASTER</td><td>대역 압축기 4개의 스레숄드가 고정값이므로, 입력 게인이 전체 리덕션 깊이를 결정한다.</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+
+  <h3 id="chain-monitor">모니터 보정</h3>
+  <div class="rd">
+    <p>
+      실시간 엔진에만 있는 단이다. 출력 게인과 적용본 분석기 뒤, 장치 앞에서 재생계(헤드폰 · 스피커)의 주파수 응답을 보정한다.
+      렌더링 엔진에는 없으므로 내보낸 파일에 들어가지 않고, 적용본 분석기는 보정 전 신호를 잰다.
+    </p>
+    <div class="blk">… ─▶ 출력 게인 ─▶ 적용본 분석기 ─▶ <b>Preamp</b> ─▶ <b>바이쿼드 1 … n</b> ─▶ 장치
+                                   └─── 모니터 보정 ───┘</div>
+    <div class="tw"><table>
+      <thead><tr><th>항목</th><th>값</th></tr></thead>
+      <tbody>
+        <tr><td>필터</td><td class="m">PARAMETRIC EQ와 같은 빌더 · 최대 20대역 · 깊이 1</td></tr>
+        <tr><td>Preamp</td><td class="m">−24 ~ +24 dB, 0.1 dB 단위</td></tr>
+        <tr><td>비활성</td><td class="m">이득 1 · 대역 없음</td></tr>
+        <tr><td>값 변경</td><td class="m">Preamp 시정수 10 ms, 0.1 s 뒤 확정 · 구조 변경 시 20 ms 교차 · 재생 시작 시 즉시 확정</td></tr>
+        <tr><td>저장</td><td class="m">localStorage <code>asde.monitor.v1</code> — 설정 파일 · 슬롯 제외</td></tr>
+      </tbody>
+    </table></div>
+    <p>
+      입력 형식은 AutoEQ가 내놓는 ParametricEQ.txt(Equalizer APO 설정)다. PARAMETRIC EQ의 AutoEQ 가져오기도 같은 규칙으로 읽고,
+      Preamp는 그 카드의 INPUT GAIN에 넣는다.
+    </p>
+    <div class="tw"><table>
+      <thead><tr><th>APO 종류</th><th>대응</th></tr></thead>
+      <tbody>
+        <tr><td class="n">PK · PEQ · Modal</td><td><code>peaking(Fc, Q, Gain)</code></td></tr>
+        <tr><td class="n">LSC · LS / HSC · HS</td><td><code>lowshelf</code> · <code>highshelf(Fc, —, Gain)</code> — 명세상 S = 1 고정</td></tr>
+        <tr><td class="n">NO</td><td><code>notch(Fc, Q)</code>, Q 생략 시 10</td></tr>
+        <tr><td class="n">HP · HPQ / LP · LPQ</td><td><code>highpass</code> · <code>lowpass(Fc, Q)</code>, Q 생략 시 1/√2</td></tr>
+        <tr><td class="n">BW Oct b</td><td>Q = √(2<sup>b</sup>) / (2<sup>b</sup> − 1)</td></tr>
+        <tr><td class="n">OFF</td><td>비활성 대역</td></tr>
+        <tr><td class="n">그 밖 · GraphicEQ</td><td>건너뜀 · 미지원</td></tr>
+      </tbody>
+    </table></div>
+    <p>
+      셸프 Q 차이(AutoEQ 0.70 대 1/√2)에 따른 응답 차이는 ±3 dB 셸프 0.015 dB, ±6 dB 0.029 dB, ±10 dB 0.045 dB다.
+      범위 밖 값은 PARAMETRIC EQ의 범위로 자르고 21번째 이후 필터는 버린다.
+      보정 곡선의 최댓값이 0.1 dB를 넘으면 그만큼 Preamp를 내리도록 경고한다. CEILING 보장은 MASTER 출력까지라, 보정이 올린 만큼 장치에서 잘릴 수 있기 때문이다.
+    </p>
+    <div class="tw"><table>
+      <thead><tr><th>시험 (48 kHz)</th><th>결과</th></tr></thead>
+      <tbody>
+        <tr><td>비활성, Preamp · 대역이 있어도</td><td class="m">입력과 최대 차이 0</td></tr>
+        <tr><td>활성, 곡선 대 렌더 (50 Hz ~ 16 kHz 12곳)</td><td class="m">최대 0.0006 dB</td></tr>
+        <tr><td>재생 중 켜기 · 끄기 · Preamp 변경, 1 kHz 사인 진폭 0.5</td><td class="m">표본 간 최대 변화 0.065 (평소와 같음)</td></tr>
+        <tr><td>끈 뒤 0.1 s 이후 대 한 번도 켜지 않은 렌더</td><td class="m">최대 차이 0</td></tr>
+        <tr><td>보정 켬 · 끔으로 내보낸 파일 (EQ만 켠 체인)</td><td class="m">바이트 동일</td></tr>
+        <tr><td>모든 카드를 켠 내보내기 중 모니터 보정 함수 호출</td><td class="m">0회</td></tr>
       </tbody>
     </table></div>
   </div>
@@ -712,7 +765,7 @@ in ─▶ <b>이득 1</b> ─▶ out                                   <i>켜진
           <tr><td>Q</td><td class="m">0.1 ~ 18</td><td>벨 · 노치 · 12 dB/oct 컷</td></tr>
           <tr><td>기울기</td><td class="m">12 · 24 · 36 · 48 dB/oct</td><td>컷</td></tr>
           <tr><td>MACRO</td><td class="m">0 ~ 100 %</td><td>벨 · 셸프의 이득에 곱함</td></tr>
-          <tr><td>INPUT GAIN</td><td class="m">−24 ~ +24 dB</td><td>카드 앞, 켜졌을 때만</td></tr>
+          <tr><td>INPUT GAIN</td><td class="m">−24 ~ +24 dB, 0.1 dB 단위</td><td>카드 앞, 켜졌을 때만</td></tr>
         </tbody>
       </table></div>
       <p>
@@ -881,6 +934,13 @@ S = 1                  α<sub>S</sub> = (sin ω<sub>0</sub> / 2) √((A + 1/A)(1
           MACRO · INPUT GAIN · 켜짐은 다른 손잡이처럼 슬라이더 · 토글로 담긴다. EQ가 없는 3.0의 설정을 불러오면
           EQ를 처음 상태(꺼짐 · 평탄한 네 대역 · MACRO 100 % · INPUT GAIN 0 dB)로 되돌리고, 저장된 카드 순서에 EQ가 없으므로
           EQ 카드는 맨 앞에 놓인다. 저장할 때의 소리가 그대로 난다.
+        </p>
+      </div>
+      <div class="nb">
+        <span class="t">AutoEQ 가져오기</span>
+        <p>
+          큰 편집 창에서 AutoEQ의 ParametricEQ.txt를 읽어 대역 목록을 바꾸고 Preamp를 INPUT GAIN에 넣는다(해석 규칙은 <a href="#chain-monitor">모니터 보정</a>과 같다).
+          처리 체인 안이므로 내보내기에 들어간다. 재생계 보정만 원하면 모니터 보정에 넣는다.
         </p>
       </div>
     </div>
@@ -2211,6 +2271,12 @@ MP3 320k, 40대 청자 → [20 kHz, 15 kHz] = 없음</div>
         20 ~ 30 Hz에서 96 kHz 최대 0.013 dB, 192 kHz 최대 0.055 dB로 벌어진다. 40 Hz 위는 192 kHz에서도 0.004 dB 안이다.
         임펄스 응답의 DFT로 재면 같은 구간이 더 크게(48 kHz 약 0.05 dB, 192 kHz 약 0.8 dB) 나오지만 정상 상태에는 없는 차이라,
         긴 저역 꼬리에 쌓인 연산 잡음으로 본다(<a href="#u-peq">PARAMETRIC EQ</a>).
+      </li>
+      <li>
+        <strong>AutoEQ의 셸프는 근사하고, GraphicEQ는 읽지 않는다.</strong>
+        명세의 셸프는 Q를 쓰지 않아(S = 1) AutoEQ의 셸프 Q 0.70과 ±10 dB에서 최대 0.045 dB 다르다. 다른 기울기는 계수를 직접 넣는
+        IIRFilter로만 만들 수 있는데, 그 노드는 재생 중 계수를 옮길 수 없어 채택하지 않았다. 점 수백 개로 된 GraphicEQ는 20대역 바이쿼드 열로 옮길 수 없다
+        (<a href="#chain-monitor">모니터 보정</a>).
       </li>
     </ul>
 

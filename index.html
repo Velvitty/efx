@@ -961,6 +961,14 @@ body::before {
           <td><span class="nil">—</span></td>
         </tr>
         <tr>
+          <td>모니터 보정 · AutoEQ</td>
+          <td><a class="c-m" href="analog-soul-manual.html#moncal">모니터 보정</a></td>
+          <td><a class="c-a" href="analog-soul-plain.html#monitor">헤드폰에 맞춰 듣기</a></td>
+          <td><a class="c-b" href="analog-soul-guide.html#flow-monitor">모니터 보정</a></td>
+          <td><a class="c-c" href="analog-soul-engineering.html#chain-monitor">모니터 보정</a></td>
+          <td><span class="nil">—</span></td>
+        </tr>
+        <tr>
           <td>모듈 전반</td>
           <td><a class="c-m" href="analog-soul-manual.html#comp">MODULE 01~</a></td>
           <td><a class="c-a" href="analog-soul-plain.html#modules">아홉 기능</a></td>
@@ -1201,6 +1209,7 @@ body::before {
   <p style="color:var(--c-muted);font-size:15px;margin-bottom:16px">
     파라메트릭 EQ 카드를 더한 판입니다. 대역을 최대 20개까지 두고 그래프에서 끌어 고치며,
     재생 중에는 EQ 앞뒤의 스펙트럼을 겹쳐 봅니다. 그래프는 소리를 내는 것과 같은 필터의 응답으로 그려, 그린 대로 들립니다.
+    AutoEQ 보정 파일을 읽어, 듣는 헤드폰을 재생에서만 고르는 모니터 보정도 더했습니다.
   </p>
 
   <table class="spec-table">
@@ -1212,6 +1221,9 @@ body::before {
     <tr><td>큰 편집 창</td><td>‘크게’로 여는 대화상자에서 큰 그래프와 모든 대역의 표를 고칩니다. 창을 연 채 EQ를 켜고 끄거나 재생하며 비교할 수 있고, ‘처음 상태로’는 한 번 더 눌러야 되돌립니다. Esc나 바깥을 누르면 닫히고, 초점은 창을 열기 전 자리(보통 ‘크게’ 단추)로 돌아옵니다.</td></tr>
     <tr><td>재생 중 바꾸기</td><td>값은 10 ms 시정수로 옮기고, 대역 수 · 종류 · 기울기 · 켜짐이 바뀌면 새 필터 열을 만들어 20 ms 동안 교차해 넘깁니다. 대역을 더하거나 지우는 동안에도 1 kHz 사인의 표본 간 최대 변화가 평소와 같습니다.</td></tr>
     <tr><td>프리셋과 3.0 설정</td><td>설정 파일 · 슬롯이 EQ 대역 목록을 함께 담습니다. EQ가 없던 3.0에서 저장한 설정을 불러오면 EQ를 처음 상태(꺼짐 · 평탄한 네 대역)로 되돌려 저장할 때의 소리를 그대로 냅니다.</td></tr>
+    <tr><td>모니터 보정 (3.1.1)</td><td>재생 줄의 단추로 여는 창에서 AutoEQ의 ParametricEQ.txt를 읽어, 듣는 헤드폰 · 스피커의 굴곡을 재생할 때만 고릅니다. 적용본 분석기 뒤 · 장치 앞에 걸려 화면의 그래프와 내보낸 파일에는 들어가지 않고, 설정 파일 대신 이 브라우저에 저장됩니다. 꺼 두면 표본이 그대로이고, 켜면 소리와 곡선의 차이가 0.0006 dB 안입니다. 보정 곡선이 0 dB를 넘으면 Preamp를 내리라고 알립니다(<a href="analog-soul-engineering.html#chain-monitor">사양서</a>).</td></tr>
+    <tr><td>AutoEQ 가져오기 (3.1.1)</td><td>PK · LSC · HSC를 비롯한 Equalizer APO 필터를 PARAMETRIC EQ와 같은 바이쿼드로 옮깁니다. AutoEQ의 셸프 Q 0.70은 명세의 셸프(S = 1)와 ±10 dB에서 최대 0.045 dB 다릅니다. EQ 카드의 큰 편집 창에서도 가져올 수 있고, 이때는 처리 체인 안이라 내보낸 파일에도 들어갑니다.</td></tr>
+    <tr><td>INPUT GAIN 0.1 dB (3.1.1)</td><td>모든 카드의 INPUT GAIN을 0.5 dB에서 0.1 dB 단위로 바꿨습니다. 켠 쪽과 끈 쪽의 음량을 0.1 dB까지 맞출 수 있습니다.</td></tr>
   </table>
 
   <h3 class="sub-title">v3.0</h3>
