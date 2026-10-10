@@ -4127,6 +4127,15 @@ function iirMag(c, f, fs) {
   c.fb.forEach(function (a, k) { dr += a * Math.cos(-w * k); di += a * Math.sin(-w * k); });
   return Math.hypot(nr, ni) / Math.hypot(dr, di);
 }
+// 복소 응답 H(e^{jω}) — [실수부, 허수부]
+function iirResp(c, f, fs) {
+  const w = 2 * Math.PI * f / fs;
+  let nr = 0, ni = 0, dr = 0, di = 0;
+  c.ff.forEach(function (b, k) { nr += b * Math.cos(-w * k); ni += b * Math.sin(-w * k); });
+  c.fb.forEach(function (a, k) { dr += a * Math.cos(-w * k); di += a * Math.sin(-w * k); });
+  const d = dr * dr + di * di;
+  return [(nr * dr + ni * di) / d, (ni * dr - nr * di) / d];
+}
 function iirNormalize(c, f, fs) {
   const g = iirMag(c, f, fs);
   return { ff: c.ff.map(function (x) { return x / g; }), fb: c.fb.slice() };
@@ -4300,11 +4309,25 @@ function cartridgeFilter(fs, loadPf) {
   return out;
 }
 // 채널 분리도(1 kHz)와 방위각 오차 → 누설 계수
-// 카트리지 분리도는 고역에서 나빠진다. 누설 = L1k·(0.579 + 2.149·HP₁(f, 5 kHz))로 두면
-// 1 kHz에서 정확히 L1k, 10 kHz에서 약 +8 dB 나빠진다. 방위각 오차 θ는 tan θ만큼 평탄하게 더해진다.
-function vinylLeak(sepDb, aziDeg) {
-  const l1 = Math.pow(10, -sepDb / 20), t = Math.tan(Math.abs(aziDeg) * Math.PI / 180);
-  return { flat: 0.579 * l1 + t, hf: 2.149 * l1 };
+// 카트리지 분리도는 고역에서 나빠진다. 누설 = L1k·(a + b·HP₁(f, 5 kHz))로 두고, 1 kHz에서 정확히 L1k,
+// 10 kHz에서 2.5배(약 +8 dB)가 되게 a, b를 정한다. 방위각 오차 θ는 tan θ만큼 평탄하게 더해진다.
+// 평탄 성분과 고역 통과 성분은 따로 반대 채널에 더해지므로 위상째 합쳐진다. 그래서 a, b는 이 표본률에서
+// 실제로 쓰는 고역 통과의 복소 응답으로 푼다(48 kHz에서 a ≈ 0.874, b ≈ 1.832). 크기만 더해 맞춘 예전 계수
+// 0.579 · 2.149는 1 kHz 누설이 L1k보다 약 2.2 dB 작았다.
+const _leakFit = {};
+function vinylLeakFit(fs) {
+  if (_leakFit[fs]) return _leakFit[fs];
+  const hp = firstOrderHP(fs, 5000), h1 = iirResp(hp, 1000, fs), h10 = iirResp(hp, 10000, fs), g2 = 2.5 * 2.5;
+  const m1 = h1[0] * h1[0] + h1[1] * h1[1], m10 = h10[0] * h10[0] + h10[1] * h10[1];
+  // |1 + r·H(10k)|² = 2.5²·|1 + r·H(1k)|²를 r = b/a에 대해 푼다 — 이차식의 양의 근
+  const A = m10 - g2 * m1, B = 2 * (h10[0] - g2 * h1[0]), C = 1 - g2;
+  const r = (-B + Math.sqrt(B * B - 4 * A * C)) / (2 * A);
+  const a = 1 / Math.sqrt(1 + 2 * r * h1[0] + r * r * m1);   // |a + b·H(1k)| = 1
+  return (_leakFit[fs] = { a: a, b: r * a });
+}
+function vinylLeak(sepDb, aziDeg, fs) {
+  const l1 = Math.pow(10, -sepDb / 20), t = Math.tan(Math.abs(aziDeg) * Math.PI / 180), k = vinylLeakFit(fs);
+  return { flat: k.a * l1 + t, hf: k.b * l1 };
 }
 
 // ---- 재생 기하 ---------------------------------------------------------
@@ -4820,7 +4843,7 @@ function buildVinylChain(ac, rpm45) {
     V.setCart(Math.round(p.loadPf));
 
     // 누화 — 분리도와 방위각 오차
-    const lk = vinylLeak(p.sepDb, p.aziDeg), n = 1 / (1 + lk.flat);
+    const lk = vinylLeak(p.sepDb, p.aziDeg, fs), n = 1 / (1 + lk.flat);
     put(V.xDirL.gain, n); put(V.xDirR.gain, n);
     put(V.xLRf.gain, lk.flat * n); put(V.xRLf.gain, lk.flat * n);
     put(V.xLRh.gain, lk.hf * n);   put(V.xRLh.gain, lk.hf * n);
