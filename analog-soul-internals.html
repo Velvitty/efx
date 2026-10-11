@@ -2041,6 +2041,57 @@ pausedAt = Math.<span class="f">min</span>(resumeAt, Math.<span class="f">max</s
       더욱 안정적이다.
     </p>
 
+    <h4>합류점의 덧셈 순서</h4>
+    <p>
+      한 노드 입력에 연결이 여럿 모이면 그 출력들을 더한 것이 입력이 된다. 명세는 더하는 순서를 정하지 않고,
+      Chromium에서는 그 순서가 렌더할 때마다 바뀐다. float 덧셈은 결합 법칙이 성립하지 않아
+      <span class="m">(a+b)+c</span>와 <span class="m">(a+c)+b</span>가 마지막 자리에서 달라지므로, 연결이 셋 이상인 합류점은
+      같은 그래프 · 같은 입력에서도 결과가 실행마다 조금씩 다르다. 연결이 둘이면 <span class="m">a+b = b+a</span>라 순서가 없다.
+      AudioParam은 자기 값에 연결들을 더하므로, 값이 0이 아니면 연결 둘부터 같은 문제가 생긴다.
+    </p>
+    <div class="tw"><table>
+      <thead><tr><th>그래프 (잡음 입력, 1 s)</th><th>렌더 36번(페이지 3 × 12)의 서로 다른 결과</th></tr></thead>
+      <tbody>
+        <tr><td>한 입력에 연결 2개</td><td class="m">1가지</td></tr>
+        <tr><td>한 입력에 연결 3개</td><td class="m">3가지</td></tr>
+        <tr><td>한 입력에 연결 4개</td><td class="m">12가지</td></tr>
+        <tr><td>연결 3개를 둘씩 묶음 — (a + b) + c</td><td class="m">1가지</td></tr>
+        <tr><td>값 0.37인 AudioParam에 연결 2개</td><td class="m">2가지</td></tr>
+        <tr><td>같은 둘을 먼저 더해 연결 1개로</td><td class="m">1가지</td></tr>
+      </tbody>
+    </table></div>
+    <p>
+      그래서 셋 이상은 이득 1 합류점으로 둘씩 묶어 정해진 순서로 더하고, 값이 0이 아닌 AudioParam에는 연결을 하나로 묶어 넣는다.
+      SOUNDGOODIZER는 (저 + 중) + 고, VINYL의 홈 신호는 (원음 + 후행 에코) + (트레이싱 왜곡 + 홈 잡음),
+      홈 잡음은 ((표면 잡음 + 크래클) + (팝 + 스크래치)) + 톤암 공진, 누화는 채널마다 직접 + (평탄 누화 + 고역 누화),
+      와우 지연 시간은 중심값 + (편심 + 와우·플러터), ATMOS는 직접음 + (초기 반사 + 후기 잔향),
+      MASTERING은 (대역 1 + 2) + (대역 3 + 4)다. 팝은 겹치는 개수가 곡마다 달라 줄을 나눠 담는다(§16).
+    </p>
+    <figure class="src">
+      <figcaption>sumPair — 둘씩 더하는 합류점</figcaption>
+<pre><span class="k">function</span> <span class="f">sumPair</span>(ac, a, b) {
+  <span class="k">const</span> g = ac.<span class="f">createGain</span>();
+  a.<span class="f">connect</span>(g); b.<span class="f">connect</span>(g);
+  <span class="k">return</span> g;
+}</pre>
+    </figure>
+    <p>
+      이득 1은 곱해도 값이 그대로이고, 합류점 노드는 지연을 더하지 않는다. 내보내기 결과는 다음과 같다(같은 설정을 9번,
+      페이지 3개 × 3번, 32bit float). 3.1.3에서 카드 하나씩은 차이가 작았지만, MASTER를 끈 기본 카드 조합의
+      6.65 × 10⁻⁶(3.1.1에서 잰 값)이 MASTER를 켜면 4.76 × 10⁻⁴가 됐다. 앞에서 생긴 작은 차이가 MASTERING의 압축기들을 지나며 커진다.
+    </p>
+    <div class="tw"><table>
+      <thead><tr><th>켠 카드</th><th>3.1.3 — 서로 다른 결과 · 최대 차이</th><th>3.1.4</th></tr></thead>
+      <tbody>
+        <tr><td>기본(COMP · BBE · EXCITER · SG · MASTER)</td><td class="m">9가지 · 4.76 × 10⁻⁴</td><td class="m">1가지</td></tr>
+        <tr><td>모든 카드</td><td class="m">9가지 · 5.81 × 10⁻⁴</td><td class="m">1가지</td></tr>
+        <tr><td>VINYL</td><td class="m">9가지 · 3.82 × 10⁻⁵</td><td class="m">1가지</td></tr>
+        <tr><td>SOUNDGOODIZER</td><td class="m">3가지 · 3.19 × 10⁻⁶</td><td class="m">1가지</td></tr>
+        <tr><td>MASTERING</td><td class="m">6가지 · 2.38 × 10⁻⁷</td><td class="m">1가지</td></tr>
+        <tr><td>ATMOS</td><td class="m">3가지 · 5.96 × 10⁻⁸</td><td class="m">1가지</td></tr>
+      </tbody>
+    </table></div>
+
     <h4>저주파 바이쿼드의 계수 민감도</h4>
     <p>
       192 kHz 컨텍스트에서 MASTER 밴드 1의 120 Hz LR4는
@@ -2654,6 +2705,9 @@ chain = v.out;</pre>
       같은 소리가 되풀이되는 게 들리므로, 곡 전체 길이의 사건 목록을 만들어 각각
       <code>AudioBufferSourceNode</code>로 예약한다. 재생 중 밀도가 바뀌면 크래클은 새 버퍼의 소스를 같은 곡 시간 위치에서
       시작하고, 팝은 남은 사건을 다시 예약한다.
+      팝 셋 이상이 겹쳐 울리면 한 입력에서 더하는 순서가 실행마다 바뀌므로(§10), 팝을 시각 순으로 K개 줄에 돌려 담고
+      줄들을 둘씩 더한다. 팝 i가 끝난 뒤에 팝 i + 2K가 시작하면 한 줄에서 셋이 함께 울릴 수 없으므로,
+      K는 곡의 사건 목록에서 이것을 만족하는 가장 작은 2의 거듭제곱으로 정한다. 거의 늘 1이라 줄 없이 곧바로 잇는다.
     </p>
 
     <h3 id="vinyl-cart">카트리지의 전기적 공진</h3>
@@ -3055,13 +3109,14 @@ lim.<span class="f">set</span>(p.limCeil, <span class="v">0</span>, <span class=
     </figure>
     <figure class="src">
       <figcaption>encodeWAV — 원본 격자 판정과 TPDF</figcaption>
-<pre>      <span class="k">const</span> kq = widen ? s * (s &gt; <span class="v">0</span> ? grid.pos : grid.neg) : <span class="v">0</span>, k = Math.<span class="f">round</span>(kq);
+<pre>      <span class="k">const</span> tri = dither ? <span class="f">rnd</span>() - <span class="f">rnd</span>() : <span class="v">0</span>;              <span class="c">// 이 표본 자리의 디더(±1 LSB 삼각 분포)</span>
+      <span class="k">const</span> kq = widen ? s * (s &gt; <span class="v">0</span> ? grid.pos : grid.neg) : <span class="v">0</span>, k = Math.<span class="f">round</span>(kq);
       <span class="k">if</span> (widen &amp;&amp; Math.<span class="f">abs</span>(kq - k) &lt;= <span class="v">0.005</span>) {
         iv = k * widen;                                    <span class="c">// 원본 격자 위 — 정수를 그대로 밀어 쓴다</span>
       } <span class="k">else</span> {
         <span class="k">const</span> v = s * (s &gt; <span class="v">0</span> ? sPos : sNeg);
         iv = Math.<span class="f">round</span>(v);
-        <span class="k">if</span> (dither &amp;&amp; Math.<span class="f">abs</span>(v - iv) &gt; <span class="v">0.005</span>) iv = Math.<span class="f">round</span>(v + <span class="f">rnd</span>() - <span class="f">rnd</span>());   <span class="c">// 출력 격자 위(0.005 LSB 안)면 그대로</span>
+        <span class="k">if</span> (dither &amp;&amp; Math.<span class="f">abs</span>(v - iv) &gt; <span class="v">0.005</span>) iv = Math.<span class="f">round</span>(v + tri);   <span class="c">// 출력 격자 위(0.005 LSB 안)면 그대로</span>
       }
       <span class="k">if</span> (iv &gt; full - <span class="v">1</span>) iv = full - <span class="v">1</span>; <span class="k">else</span> <span class="k">if</span> (iv &lt; -full) iv = -full;</pre>
     </figure>
@@ -3070,7 +3125,10 @@ lim.<span class="f">set</span>(p.limCeil, <span class="v">0</span>, <span class=
       24bit 배율을 곱하면 0.4 LSB까지 커져 출력 단위의 0.005 LSB 판정을 통과하지 못한다. 출력 단위로 판정하던 동안은
       REFINE 0의 16 → 24bit에서 원본 정수 × 256과 같은 표본이 90.0%에 그쳤고, 원본 단위로 바꾼 뒤 100%가 됐다.
       TPDF 디더 u₁ − u₂는 전체 오차의 1·2차 모멘트를 신호와 독립으로 만들고 분산은 Δ²/4다(Lipshitz·Wannamaker·Vanderkooy, 1992).
-      난수는 시작값을 고정한 xorshift32라 같은 입력이면 같은 파일이 나온다.
+      난수는 시작값을 고정한 xorshift32라 같은 입력이면 같은 파일이 나온다. 디더를 쓰지 않는 격자 위 표본에서도 난수를
+      두 개씩 뽑아, 표본마다 쓰는 난수가 그 자리로 정해진다. 3.1.3까지는 격자 위 표본에서 건너뛰어, 앞의 아주 작은 차이 하나가
+      그 뒤 모든 표본의 디더를 밀었다(48 kHz 1초 스테레오에서 표본 하나를 바꾸면 16bit 파일 192,000바이트 중 42,212바이트가 달라졌고,
+      지금은 그 표본의 1바이트만 달라진다).
     </p>
 
     <h3 id="bits-verify">검증</h3>

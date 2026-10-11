@@ -4351,6 +4351,21 @@ function setCeilingClip(cc, ceilDb) {
 }
 
 // ============================================================
+// 정해진 순서로 더하기
+// ------------------------------------------------------------
+// 한 노드 입력에 연결이 여럿 모이면 브라우저가 그 연결들을 더하는 순서는 명세에 없고,
+// 크로미움은 실행마다 순서가 바뀐다. float 덧셈은 결합 법칙이 성립하지 않아 (a+b)+c와 (a+c)+b가
+// 마지막 자리에서 달라지므로, 같은 설정으로 내보내도 표본이 조금씩 달랐다(기본 카드에서 최대 4.76 × 10⁻⁴).
+// 연결이 둘이면 a+b = b+a라 순서가 없다. 그래서 셋 이상은 이득 1 합류점으로 둘씩 묶어 더한다.
+// AudioParam은 자기 값에 연결들을 더하므로(v+a+b) 값이 0이 아니면 연결을 하나로 묶어 넣는다.
+// ============================================================
+function sumPair(ac, a, b) {
+  const g = ac.createGain();
+  a.connect(g); b.connect(g);
+  return g;
+}
+
+// ============================================================
 // 공용 스테레오 처리 블록
 // ============================================================
 
@@ -4893,6 +4908,18 @@ function vinylPopEvents(duration, rpm45, perMin) {
   ev.sort(function (x, y) { return x.t - y.t; });
   return ev;
 }
+// 팝 줄 수 — 한 줄에서 셋이 함께 울리지 않는 가장 작은 2의 거듭제곱 K.
+// 팝을 시각 순으로 i % K번 줄에 담으면, 팝 i가 끝난 뒤에 팝 i + 2K가 시작하는 한
+// 한 줄의 팝 셋(i, i + K, i + 2K, …)이 동시에 울릴 수 없다. 둘까지는 a+b = b+a라 순서가 없다.
+// 끝 시각은 팝 버퍼 길이(펄스 + 2표본)에 보간 여유 2표본을 더해 넉넉히 잡는다.
+function popLaneCount(evs, fs) {
+  const end = evs.map(function (e) { return e.t + (Math.max(2, Math.round(e.w * fs)) + 4) / fs; });
+  for (let K = 1; ; K *= 2) {
+    let ok = true;
+    for (let i = 0; i + 2 * K < evs.length; i++) if (evs[i + 2 * K].t - 1 / fs < end[i]) { ok = false; break; }
+    if (ok) return K;
+  }
+}
 
 // ---- 보정 — 재생 곡선을 지난 뒤의 목표 레벨에 맞춘 이득 ------------------
 function vinylCalibrate(fs, bufs) {
@@ -5002,14 +5029,14 @@ function buildVinylChain(ac, rpm45) {
   mAP.connect(emg, 0, 1); sNeg.connect(emg, 0, 1);
 
   // ── 홈 신호 합류점 ──────────────────────────────────────────────
+  // (원음 + 후행 에코) + (트레이싱 왜곡 + 홈 잡음)으로 둘씩 묶어 더한다(sumPair) — 아래 '홈 안에서 생기는 소리들' 끝에서 잇는다
   const groove = G(1);
-  emg.connect(groove);
 
   // ── 후행 에코: 바로 다음 홈이 누른 자국이 한 바퀴 뒤에 희미하게 들린다 ──
   const echoDly = ac.createDelay(2.0);
   echoDly.delayTime.value = 60 / (rpm45 ? 45 : 100 / 3);
   V.echoGain = G(0);
-  emg.connect(echoDly); echoDly.connect(V.echoGain); V.echoGain.connect(groove);
+  emg.connect(echoDly); echoDly.connect(V.echoGain);
 
   // ── 트레이싱 왜곡 ──────────────────────────────────────────────
   // 둥근 바늘 끝은 홈의 굴곡을 정확히 따라가지 못한다. 2차 배음의 크기는
@@ -5036,20 +5063,19 @@ function buildVinylChain(ac, rpm45) {
   const pb0 = riaaPlayback(fs, false);
   const deEmphD = ac.createIIRFilter(pb0.ff, pb0.fb);
   const dHP = ac.createBiquadFilter(); dHP.type = 'highpass'; dHP.frequency.value = 1000; dHP.Q.value = Q_BUTTER;
-  mgP.connect(V.traceK); V.traceK.connect(soft); soft.connect(deEmphD); deEmphD.connect(dHP); dHP.connect(groove);
+  mgP.connect(V.traceK); V.traceK.connect(soft); soft.connect(deEmphD); deEmphD.connect(dHP);
 
   // ── 홈 안에서 생기는 소리들 ─────────────────────────────────────
   const pb1 = riaaPlayback(fs, true);
   const deEmphN = ac.createIIRFilter(pb1.ff, pb1.fb);
-  deEmphN.connect(groove);
-  V.hissGain = G(0);    V.hissGain.connect(deEmphN);
-  V.crackleGain = G(0); V.crackleGain.connect(deEmphN);
-  V.popGain = G(0);     V.popGain.connect(deEmphN);
-  V.scratchGain = G(0); V.scratchGain.connect(deEmphN);
+  V.hissGain = G(0); V.crackleGain = G(0); V.popGain = G(0); V.scratchGain = G(0);
   // 톤암·카트리지의 저역 기계 공진 — 럼블과 휨을 키운다
   V.arm = ac.createBiquadFilter();
   V.arm.type = 'peaking'; V.arm.frequency.value = 10; V.arm.Q.value = 2; V.arm.gain.value = 8;
+  // 홈 잡음 = ((표면 잡음 + 크래클) + (팝 + 스크래치)) + 톤암 공진 — 둘씩 묶어 더한다(sumPair)
+  sumPair(ac, sumPair(ac, V.hissGain, V.crackleGain), sumPair(ac, V.popGain, V.scratchGain)).connect(deEmphN);
   V.arm.connect(deEmphN);
+  sumPair(ac, emg, V.echoGain).connect(groove); sumPair(ac, dHP, deEmphN).connect(groove);
   V.rumbleGain = G(0); V.rumbleGain.connect(V.arm);
   // 휨 — 회전 정현파를 수직(L−R) 성분으로 보낸다
   V.warpGain = G(0);
@@ -5072,8 +5098,10 @@ function buildVinylChain(ac, rpm45) {
   attach('rumble', bufs.rumble, V.rumbleGain);
   attach('warp', bufs.rot, V.warpGain);
 
-  // 팝 — 곡 전체의 사건 목록을 곡 시간에 맞춰 하나씩 예약한다
-  V.popNodes = []; V._popKey = ''; V._popEv = null;
+  // 팝 — 곡 전체의 사건 목록을 곡 시간에 맞춰 하나씩 예약한다.
+  // 팝마다 소스가 하나라 셋 이상이 함께 울리면 popGain 입력에서 더하는 순서가 실행마다 바뀐다.
+  // 그래서 팝을 차례로 K개 줄에 돌려 담고 줄들을 둘씩 더한다(popLaneCount — 거의 늘 K = 1, 줄 없이 곧바로).
+  V.popNodes = []; V.popLanes = []; V._popKey = ''; V._popEv = null;
   function popBuffer(ev) {
     const b = ac.createBuffer(2, Math.max(2, Math.round(ev.w * fs)) + 2, fs);
     const ch = [b.getChannelData(0), b.getChannelData(1)];
@@ -5083,16 +5111,30 @@ function buildVinylChain(ac, rpm45) {
   }
   function clearPops() {
     V.popNodes.forEach(function (s) { try { s.stop(); } catch (e) {} try { s.disconnect(); } catch (e) {} });
-    V.popNodes = [];
+    V.popLanes.forEach(function (g) { try { g.disconnect(); } catch (e) {} });
+    V.popNodes = []; V.popLanes = [];
   }
   function schedulePops(songTime, at) {
     clearPops();
     if (!V._popEv) return;
-    for (let i = 0; i < V._popEv.length; i++) {
-      const ev = V._popEv[i];
-      if (ev.t < songTime) continue;
-      const s = ac.createBufferSource(); s.buffer = popBuffer(ev); s.connect(V.popGain);
-      try { s.start(at + (ev.t - songTime)); } catch (e) {}
+    const evs = V._popEv.filter(function (ev) { return ev.t >= songTime; });
+    const K = popLaneCount(evs, fs);
+    let lanes = [V.popGain];
+    if (K > 1) {
+      // 줄 K개(2의 거듭제곱)를 둘씩 더해 올라가 마지막 둘을 popGain에 잇는다
+      lanes = [];
+      for (let k = 0; k < K; k++) { const g = ac.createGain(); lanes.push(g); V.popLanes.push(g); }
+      let level = lanes;
+      while (level.length > 2) {
+        const next = [];
+        for (let k = 0; k < level.length; k += 2) { const g = sumPair(ac, level[k], level[k + 1]); V.popLanes.push(g); next.push(g); }
+        level = next;
+      }
+      level.forEach(function (g) { g.connect(V.popGain); });
+    }
+    for (let i = 0; i < evs.length; i++) {
+      const s = ac.createBufferSource(); s.buffer = popBuffer(evs[i]); s.connect(lanes[i % K]);
+      try { s.start(at + (evs[i].t - songTime)); } catch (e) {}
       V.popNodes.push(s);
     }
   }
@@ -5111,8 +5153,9 @@ function buildVinylChain(ac, rpm45) {
   const wow = ac.createDelay(0.05);
   wow.delayTime.value = VINYL_CENTER;
   V.eccGain = G(0); V.modGain = G(0);
-  attach('ecc', bufs.rot, V.eccGain);  V.eccGain.connect(wow.delayTime);
-  attach('mod', bufs.mod, V.modGain);  V.modGain.connect(wow.delayTime);
+  attach('ecc', bufs.rot, V.eccGain); attach('mod', bufs.mod, V.modGain);
+  // 지연 시간은 중심값에 연결을 더한다 — 편심 + 와우·플러터를 먼저 묶어 연결 하나로 넣는다(sumPair)
+  sumPair(ac, V.eccGain, V.modGain).connect(wow.delayTime);
   V.wow = wow;
   V.setCart = function (loadPf) {
     if (V._cartPf === loadPf) return;
@@ -5132,12 +5175,13 @@ function buildVinylChain(ac, rpm45) {
   const hp = firstOrderHP(fs, 5000);
   const hpL = ac.createIIRFilter(hp.ff, hp.fb), hpR = ac.createIIRFilter(hp.ff, hp.fb);
   wow.connect(xsp);
-  xsp.connect(V.xDirL, 0); V.xDirL.connect(xmg, 0, 0);
-  xsp.connect(V.xDirR, 1); V.xDirR.connect(xmg, 0, 1);
-  xsp.connect(V.xLRf, 0);  V.xLRf.connect(xmg, 0, 1);
-  xsp.connect(V.xRLf, 1);  V.xRLf.connect(xmg, 0, 0);
-  xsp.connect(hpL, 0); hpL.connect(V.xLRh); V.xLRh.connect(xmg, 0, 1);
-  xsp.connect(hpR, 1); hpR.connect(V.xRLh); V.xRLh.connect(xmg, 0, 0);
+  xsp.connect(V.xDirL, 0); xsp.connect(V.xDirR, 1);
+  xsp.connect(V.xLRf, 0);  xsp.connect(V.xRLf, 1);
+  xsp.connect(hpL, 0); hpL.connect(V.xLRh);
+  xsp.connect(hpR, 1); hpR.connect(V.xRLh);
+  // 한 채널 = 직접 + (평탄 누화 + 고역 누화) — 머저 입력마다 연결을 둘로 둔다(sumPair)
+  V.xDirL.connect(xmg, 0, 0); sumPair(ac, V.xRLf, V.xRLh).connect(xmg, 0, 0);
+  V.xDirR.connect(xmg, 0, 1); sumPair(ac, V.xLRf, V.xLRh).connect(xmg, 0, 1);
   V.out = xmg;
 
   // 지금 곡의 어느 지점인가 — set·start 이후의 경과 시간으로 추적한다
@@ -5574,11 +5618,13 @@ function buildSGBlock(ac) {
   // 원음 경로 — 대역 합과 같은 전역통과 AP(f1)·AP(f2)와 같은 오버샘플링 지연을 거친다
   const dAP1 = ap(), dAP2 = ap(), dry = ac.createGain(), mix = ac.createGain();
   const twin = makeLatencyTwin(ac, '4x');
-  input.connect(loLP.in); loAP.connect(shL); shL.connect(gL); gL.connect(wetBus);
-  input.connect(hp1.in); midLP.out.connect(shM); shM.connect(gM); gM.connect(wetBus);
+  input.connect(loLP.in); loAP.connect(shL); shL.connect(gL);
+  input.connect(hp1.in); midLP.out.connect(shM); shM.connect(gM);
   // 고역 대역만 포화 전 대역 제한이 필요하다 (저·중역은 크로스오버가 이미 묶는다)
   const hiAA = ac.createBiquadFilter(); hiAA.type = 'lowpass'; hiAA.Q.value = Q_BUTTER;
-  hiHP.out.connect(hiAA); hiAA.connect(shH); shH.connect(gH); gH.connect(wetBus);
+  hiHP.out.connect(hiAA); hiAA.connect(shH); shH.connect(gH);
+  // 세 대역은 (저 + 중) + 고 순서로 더한다 — 한 입력에 셋을 모으면 순서가 실행마다 바뀐다(sumPair)
+  sumPair(ac, gL, gM).connect(wetBus); gH.connect(wetBus);
   wetBus.connect(dcBus); dcBus.connect(mix);
   input.connect(dAP1); dAP1.connect(dAP2); dAP2.connect(twin.in); twin.out.connect(dry); dry.connect(mix);
   const pres = ac.createBiquadFilter(); pres.type = 'peaking'; pres.frequency.value = 2500; pres.Q.value = 0.7;
@@ -5837,8 +5883,9 @@ function buildAtmosBlock(ac, opts) {
   const gEarly = ac.createGain(), gLate = ac.createGain(), out = ac.createGain();
   input.connect(out);                                   // 직접음 — 원음 그대로
   input.connect(up); up.connect(early); up.connect(late);
-  early.connect(gEarly); gEarly.connect(out);
-  late.connect(gLate); gLate.connect(out);
+  early.connect(gEarly); late.connect(gLate);
+  // 반사(초기 + 후기)를 먼저 더해 직접음에 — 한 입력에 셋을 모으면 순서가 실행마다 바뀐다(sumPair)
+  sumPair(ac, gEarly, gLate).connect(out);
   let eKey = '', lKey = '';
   return {
     in: input, out: out,
@@ -5888,7 +5935,9 @@ function buildMasterBlock(ac) {
   const b2 = chainOf([lr('highpass', 120), lr('lowpass', 500), ap(5000), c[1]]);
   const b3 = chainOf([lr('highpass', 120), lr('highpass', 500), lr('lowpass', 5000), c[2]]);
   const b4 = chainOf([lr('highpass', 120), lr('highpass', 500), lr('highpass', 5000), c[3]]);
-  [b1, b2, b3, b4].forEach(function (b) { input.connect(b[0].in); c[[b1, b2, b3, b4].indexOf(b)].out.connect(sum); });
+  [b1, b2, b3, b4].forEach(function (b) { input.connect(b[0].in); });
+  // 네 대역은 (1 + 2) + (3 + 4) 순서로 더한다 — 한 입력에 넷을 모으면 순서가 실행마다 바뀐다(sumPair)
+  sumPair(ac, c[0].out, c[1].out).connect(sum); sumPair(ac, c[2].out, c[3].out).connect(sum);
   const lim = makeNeutralComp(ac);
   const width = buildStereoWidth(ac);
   const og = ac.createGain();
@@ -8729,7 +8778,9 @@ async function exportAudio() {
 // 반올림 오차가 신호를 따라다니는 왜곡 대신 신호와 상관없는 고른 잡음이 된다.
 // 이미 격자 위에 있는 표본(디지털 무음, 손대지 않은 정수 원본)은 디더 없이 그대로 쓴다 — 원본 격자 위인지는
 // 원본의 단위로 판정한다(k/32767의 float32 반올림 오차는 24bit 단위로 0.4 LSB까지 커지기 때문).
-// 난수는 시작값을 고정해 같은 입력이면 같은 파일이 나온다.
+// 난수는 시작값을 고정해 같은 입력이면 같은 파일이 나온다. 격자 위라 디더를 쓰지 않는 표본에서도
+// 난수는 똑같이 두 개씩 뽑는다 — 건너뛰면 앞의 아주 작은 차이 하나가 그 뒤 모든 표본의 디더를 밀어
+// 파일 전체가 달라진다(3.1.3까지는 표본 하나가 격자를 벗어나면 그 뒤 바이트의 약 22 %가 바뀌었다).
 function encodeWAV(buffer, bitDepth, dither, grid) {
   const ch = buffer.numberOfChannels;
   const sr = buffer.sampleRate;
@@ -8773,13 +8824,14 @@ function encodeWAV(buffer, bitDepth, dither, grid) {
         continue;
       }
       let iv;
+      const tri = dither ? rnd() - rnd() : 0;              // 이 표본 자리의 디더(±1 LSB 삼각 분포)
       const kq = widen ? s * (s > 0 ? grid.pos : grid.neg) : 0, k = Math.round(kq);
       if (widen && Math.abs(kq - k) <= 0.005) {
         iv = k * widen;                                    // 원본 격자 위 — 정수를 그대로 밀어 쓴다
       } else {
         const v = s * (s > 0 ? sPos : sNeg);
         iv = Math.round(v);
-        if (dither && Math.abs(v - iv) > 0.005) iv = Math.round(v + rnd() - rnd());   // 출력 격자 위(0.005 LSB 안)면 그대로
+        if (dither && Math.abs(v - iv) > 0.005) iv = Math.round(v + tri);   // 출력 격자 위(0.005 LSB 안)면 그대로
       }
       if (iv > full - 1) iv = full - 1; else if (iv < -full) iv = -full;
       if (bitDepth === 24) {
