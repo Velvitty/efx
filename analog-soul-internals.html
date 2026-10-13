@@ -1943,17 +1943,17 @@ mid.<span class="f">connect</span>(mg, <span class="v">0</span>, <span class="v"
       정확한 통합 라우드니스를 얻을 수 있다.
     </p>
 
-    <h3 id="level-compare">원음 비교의 같은 크기 (3.1.8)</h3>
+    <h3 id="level-compare">비교의 같은 크기 (3.1.8 · 3.1.9)</h3>
     <p>
-      재생 줄의 원음 비교는 위 요건대로 BS.1770-4 게이트 라우드니스로 원음을 처리본에 맞춘다.
+      재생 줄의 비교는 위 요건대로 BS.1770-4 게이트 라우드니스로 견줄 소리(원음, 또는 카드 하나를 뺀 처리본)를 처리본에 맞춘다.
       K 가중은 셸프와 고역 통과 두 단이고, 48 kHz 밖의 표본률에서는 명세 표의 계수를 낳은 아날로그 원형을 그 표본률로 쌍선형 변환한다.
       400 ms 블록을 100 ms마다 잡아 채널별 평균 제곱 <span class="m">z<sub>c,j</sub></span>를 구한다.
     </p>
-    <div class="eq tex"><div class="eq-c eq-lab">블록</div><div class="eq-c"><span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle scriptlevel="0" displaystyle="true"><msub><mi>l</mi><mi>j</mi></msub><mo>=</mo><mo>−</mo><mn>0.691</mn><mo>+</mo><mn>10</mn><msub><mrow><mi>log</mi><mo>⁡</mo></mrow><mn>10</mn></msub><munder><mo>∑</mo><mi>c</mi></munder><msub><mi>G</mi><mi>c</mi></msub><mtext> </mtext><msub><mi>z</mi><mrow><mi>c</mi><mo separator="true">,</mo><mi>j</mi></mrow></msub></mstyle></mrow><annotation encoding="application/x-tex">\displaystyle l_j = -0.691 + 10\log_{10}\sum_{c} G_c\, z_{c,j}</annotation></semantics></math></span></div><div class="eq-c eq-lab">통합</div><div class="eq-c"><span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle scriptlevel="0" displaystyle="true"><mi>L</mi><mo>=</mo><mo>−</mo><mn>0.691</mn><mo>+</mo><mn>10</mn><msub><mrow><mi>log</mi><mo>⁡</mo></mrow><mn>10</mn></msub><mo fence="true" stretchy="true" minsize="1.8em" maxsize="1.8em">(</mo><mfrac><mn>1</mn><mrow><mi mathvariant="normal">∣</mi><mi>J</mi><mi mathvariant="normal">∣</mi></mrow></mfrac><munder><mo>∑</mo><mrow><mi>j</mi><mo>∈</mo><mi>J</mi></mrow></munder><munder><mo>∑</mo><mi>c</mi></munder><msub><mi>G</mi><mi>c</mi></msub><mtext> </mtext><msub><mi>z</mi><mrow><mi>c</mi><mo separator="true">,</mo><mi>j</mi></mrow></msub><mo fence="true" stretchy="true" minsize="1.8em" maxsize="1.8em">)</mo></mstyle></mrow><annotation encoding="application/x-tex">\displaystyle L = -0.691 + 10\log_{10}\Bigl(\frac{1}{|J|}\sum_{j\in J}\sum_{c} G_c\, z_{c,j}\Bigr)</annotation></semantics></math></span></div><div class="eq-c eq-lab">게이트</div><div class="eq-c"><span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle scriptlevel="0" displaystyle="true"><mi>J</mi><mo>=</mo><mo stretchy="false">{</mo><mtext> </mtext><mi>j</mi><mo>:</mo><msub><mi>l</mi><mi>j</mi></msub><mo>&gt;</mo><mo>−</mo><mn>70</mn><mo separator="true">,</mo><mtext> </mtext><msub><mi>l</mi><mi>j</mi></msub><mo>&gt;</mo><msub><mi>L</mi><mrow><mo>−</mo><mn>70</mn></mrow></msub><mo>−</mo><mn>10</mn><mtext> </mtext><mo stretchy="false">}</mo></mstyle></mrow><annotation encoding="application/x-tex">\displaystyle J = \{\, j : l_j &gt; -70,\ l_j &gt; L_{-70} - 10 \,\}</annotation></semantics></math></span></div><div class="eq-c eq-lab">원음 이득</div><div class="eq-c"><span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle scriptlevel="0" displaystyle="true"><msub><mi>g</mi><mi>A</mi></msub><mo>=</mo><msup><mn>10</mn><mrow><mo stretchy="false">(</mo><msub><mi>L</mi><mi>B</mi></msub><mo>−</mo><msub><mi>L</mi><mi>A</mi></msub><mo stretchy="false">)</mo><mi mathvariant="normal">/</mi><mn>20</mn></mrow></msup><mo separator="true">,</mo><mspace width="2em"/><msub><mi>L</mi><mi>B</mi></msub><mo>&gt;</mo><msub><mi>L</mi><mi>A</mi></msub><mo>⇒</mo><msub><mi>g</mi><mi>A</mi></msub><mo>≤</mo><msup><mn>10</mn><mrow><mo stretchy="false">(</mo><mo>−</mo><mn>0.1</mn><mo>−</mo><msub><mi>P</mi><mi>A</mi></msub><mo stretchy="false">)</mo><mi mathvariant="normal">/</mi><mn>20</mn></mrow></msup></mstyle></mrow><annotation encoding="application/x-tex">\displaystyle g_A = 10^{(L_B - L_A)/20},\qquad L_B &gt; L_A \Rightarrow g_A \le 10^{(-0.1 - P_A)/20}</annotation></semantics></math></span></div></div>
+    <div class="eq tex"><div class="eq-c eq-lab">블록</div><div class="eq-c"><span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle scriptlevel="0" displaystyle="true"><msub><mi>l</mi><mi>j</mi></msub><mo>=</mo><mo>−</mo><mn>0.691</mn><mo>+</mo><mn>10</mn><msub><mrow><mi>log</mi><mo>⁡</mo></mrow><mn>10</mn></msub><munder><mo>∑</mo><mi>c</mi></munder><msub><mi>G</mi><mi>c</mi></msub><mtext> </mtext><msub><mi>z</mi><mrow><mi>c</mi><mo separator="true">,</mo><mi>j</mi></mrow></msub></mstyle></mrow><annotation encoding="application/x-tex">\displaystyle l_j = -0.691 + 10\log_{10}\sum_{c} G_c\, z_{c,j}</annotation></semantics></math></span></div><div class="eq-c eq-lab">통합</div><div class="eq-c"><span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle scriptlevel="0" displaystyle="true"><mi>L</mi><mo>=</mo><mo>−</mo><mn>0.691</mn><mo>+</mo><mn>10</mn><msub><mrow><mi>log</mi><mo>⁡</mo></mrow><mn>10</mn></msub><mo fence="true" stretchy="true" minsize="1.8em" maxsize="1.8em">(</mo><mfrac><mn>1</mn><mrow><mi mathvariant="normal">∣</mi><mi>J</mi><mi mathvariant="normal">∣</mi></mrow></mfrac><munder><mo>∑</mo><mrow><mi>j</mi><mo>∈</mo><mi>J</mi></mrow></munder><munder><mo>∑</mo><mi>c</mi></munder><msub><mi>G</mi><mi>c</mi></msub><mtext> </mtext><msub><mi>z</mi><mrow><mi>c</mi><mo separator="true">,</mo><mi>j</mi></mrow></msub><mo fence="true" stretchy="true" minsize="1.8em" maxsize="1.8em">)</mo></mstyle></mrow><annotation encoding="application/x-tex">\displaystyle L = -0.691 + 10\log_{10}\Bigl(\frac{1}{|J|}\sum_{j\in J}\sum_{c} G_c\, z_{c,j}\Bigr)</annotation></semantics></math></span></div><div class="eq-c eq-lab">게이트</div><div class="eq-c"><span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle scriptlevel="0" displaystyle="true"><mi>J</mi><mo>=</mo><mo stretchy="false">{</mo><mtext> </mtext><mi>j</mi><mo>:</mo><msub><mi>l</mi><mi>j</mi></msub><mo>&gt;</mo><mo>−</mo><mn>70</mn><mo separator="true">,</mo><mtext> </mtext><msub><mi>l</mi><mi>j</mi></msub><mo>&gt;</mo><msub><mi>L</mi><mrow><mo>−</mo><mn>70</mn></mrow></msub><mo>−</mo><mn>10</mn><mtext> </mtext><mo stretchy="false">}</mo></mstyle></mrow><annotation encoding="application/x-tex">\displaystyle J = \{\, j : l_j &gt; -70,\ l_j &gt; L_{-70} - 10 \,\}</annotation></semantics></math></span></div><div class="eq-c eq-lab">견줄 소리 이득</div><div class="eq-c"><span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle scriptlevel="0" displaystyle="true"><msub><mi>g</mi><mi>A</mi></msub><mo>=</mo><msup><mn>10</mn><mrow><mo stretchy="false">(</mo><msub><mi>L</mi><mi>B</mi></msub><mo>−</mo><msub><mi>L</mi><mi>A</mi></msub><mo stretchy="false">)</mo><mi mathvariant="normal">/</mi><mn>20</mn></mrow></msup><mo separator="true">,</mo><mspace width="2em"/><msub><mi>L</mi><mi>B</mi></msub><mo>&gt;</mo><msub><mi>L</mi><mi>A</mi></msub><mo>⇒</mo><msub><mi>g</mi><mi>A</mi></msub><mo>≤</mo><msup><mn>10</mn><mrow><mo stretchy="false">(</mo><mo>−</mo><mn>0.1</mn><mo>−</mo><msub><mi>P</mi><mi>A</mi></msub><mo stretchy="false">)</mo><mi mathvariant="normal">/</mi><mn>20</mn></mrow></msup></mstyle></mrow><annotation encoding="application/x-tex">\displaystyle g_A = 10^{(L_B - L_A)/20},\qquad L_B &gt; L_A \Rightarrow g_A \le 10^{(-0.1 - P_A)/20}</annotation></semantics></math></span></div></div>
     <p>
       <span class="m">L<sub>−70</sub></span>은 절대 게이트만 지난 블록의 라우드니스, <span class="m">G<sub>c</sub></span>는 채널 가중(좌우 1, 모노는 두 귀에 같은 소리라 2),
-      <span class="m">P<sub>A</sub></span>는 곡 전체의 표본 봉우리(dBFS)다. 처리본 이득은 1로 둔다. 듣는 처리본이 내보낼 파일과 같아야 비교가 내보낼 소리를 가리킨다.
-      짧은 구간의 크기를 따라 이득을 계속 바꾸면 원음에 압축을 거는 셈이 되므로, 재생 위치 앞 2초 ~ 뒤 8초의 통합 라우드니스 한 값으로 맞춘다.
+      <span class="m">P<sub>A</sub></span>는 견줄 소리의 표본 봉우리(dBFS — 원음은 곡 전체, 카드를 뺀 소리는 잴 구간)다. 처리본 이득은 1로 둔다. 듣는 처리본이 내보낼 파일과 같아야 비교가 내보낼 소리를 가리킨다.
+      짧은 구간의 크기를 따라 이득을 계속 바꾸면 견줄 소리에 압축을 거는 셈이 되므로, 재생 위치 앞 2초 ~ 뒤 8초의 통합 라우드니스 한 값으로 맞춘다.
     </p>
     <figure class="src">
       <figcaption>cmpLUFS — 절대 · 상대 게이트</figcaption>
@@ -1966,9 +1966,9 @@ mid.<span class="f">connect</span>(mg, <span class="v">0</span>, <span class="v"
   <span class="k">return</span> m ? <span class="f">L</span>(s / m) : -Infinity;</pre>
     </figure>
     <figure class="src">
-      <figcaption>cmpRun — 원음 이득과 키울 한도</figcaption>
+      <figcaption>cmpRun — 견줄 소리 이득과 키울 한도</figcaption>
 <pre>    gainDb = LB - LA;
-<span class="hl">    <span class="k">const</span> room = Math.<span class="f">max</span>(<span class="v">0</span>, -<span class="v">0.1</span> - <span class="f">cmpPeakDb</span>(pb));</span>
+<span class="hl">    <span class="k">const</span> room = Math.<span class="f">max</span>(<span class="v">0</span>, -<span class="v">0.1</span> - peakDb);</span>
     <span class="k">if</span> (gainDb &gt; room) { gainDb = room; capped = <span class="k">true</span>; }</pre>
     </figure>
     <div class="tw"><table>
@@ -1983,6 +1983,66 @@ mid.<span class="f">connect</span>(mg, <span class="v">0</span>, <span class="v"
     <p>
       48 kHz의 사인 값이 명세와 같고, 다른 표본률의 차이는 쌍선형 변환한 K 필터의 997 Hz 응답(+0.6938 · +0.6737 dB, 48 kHz는 +0.6910 dB)에서 그대로 나온다.
       원음과 처리본을 같은 표본률에서 재므로 맞춤에는 이 차이가 들어가지 않는다. 앞부분의 HD 복원 RMS 정합은 그대로다.
+    </p>
+
+    <h3 id="card-bypass">카드 하나를 뺀 소리 (3.1.9)</h3>
+    <p>
+      견줄 소리로 카드 X를 고르면 체인을 하나 더 돌리지 않고, 같은 체인 안에서 X 둘레에 우회로를 둔다.
+      X 앞의 소리 <span class="m">u</span>를 X(INPUT GAIN 포함, <span class="m">T<sub>X</sub></span>)와 <span class="m">τ<sub>X</sub></span>표본 늦춘 우회로로 나눠 보내고 합류에서 더한다.
+      뒤 카드들의 처리를 <span class="m">V</span>, 그 카드만 끈 내보내기를 <span class="m">ỹ = Vu</span>라 하면,
+    </p>
+    <div class="eq tex"><div class="eq-c eq-lab">우회로</div><div class="eq-c"><span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle scriptlevel="0" displaystyle="true"><mi>y</mi><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>=</mo><msub><mi>g</mi><mi>T</mi></msub><mtext> </mtext><mo stretchy="false">(</mo><msub><mi>T</mi><mi>X</mi></msub><mi>u</mi><mo stretchy="false">)</mo><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>+</mo><msub><mi>g</mi><mi>P</mi></msub><mtext> </mtext><mi>u</mi><mo stretchy="false">[</mo><mi>n</mi><mo>−</mo><msub><mi>τ</mi><mi>X</mi></msub><mo stretchy="false">]</mo></mstyle></mrow><annotation encoding="application/x-tex">\displaystyle y[n] = g_T\,(T_X u)[n] + g_P\,u[n-\tau_X]</annotation></semantics></math></span></div><div class="eq-c eq-lab">바꾸기</div><div class="eq-c"><span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle scriptlevel="0" displaystyle="true"><mo stretchy="false">(</mo><msub><mi>g</mi><mi>T</mi></msub><mo separator="true">,</mo><mtext> </mtext><msub><mi>g</mi><mi>P</mi></msub><mo stretchy="false">)</mo><mo>∈</mo><mo stretchy="false">{</mo><mo stretchy="false">(</mo><mn>1</mn><mo separator="true">,</mo><mtext> </mtext><mn>0</mn><mo stretchy="false">)</mo><mo separator="true">,</mo><mtext> </mtext><mo stretchy="false">(</mo><mn>0</mn><mo separator="true">,</mo><mtext> </mtext><mn>1</mn><mo stretchy="false">)</mo><mo stretchy="false">}</mo></mstyle></mrow><annotation encoding="application/x-tex">\displaystyle (g_T,\,g_P) \in \{(1,\,0),\ (0,\,1)\}</annotation></semantics></math></span></div><div class="eq-c eq-lab">늦춤</div><div class="eq-c"><span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle scriptlevel="0" displaystyle="true"><mi>V</mi><mo stretchy="false">{</mo><mi>u</mi><mo stretchy="false">[</mo><mi>n</mi><mo>−</mo><msub><mi>τ</mi><mi>X</mi></msub><mo stretchy="false">]</mo><mo stretchy="false">}</mo><mo>=</mo><mo stretchy="false">(</mo><mi>V</mi><mi>u</mi><mo stretchy="false">)</mo><mo stretchy="false">[</mo><mi>n</mi><mo>−</mo><msub><mi>τ</mi><mi>X</mi></msub><mo stretchy="false">]</mo></mstyle></mrow><annotation encoding="application/x-tex">\displaystyle V\{u[n-\tau_X]\} = (Vu)[n-\tau_X]</annotation></semantics></math></span></div><div class="eq-c eq-lab">카드를 뺀 소리</div><div class="eq-c"><span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle scriptlevel="0" displaystyle="true"><msub><mi>y</mi><mi>A</mi></msub><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mo>=</mo><msub><mi>g</mi><mi>A</mi></msub><mtext> </mtext><mover accent="true"><mi>y</mi><mo>~</mo></mover><mo stretchy="false">[</mo><mi>n</mi><mo>−</mo><msub><mi>τ</mi><mi>X</mi></msub><mo stretchy="false">]</mo></mstyle></mrow><annotation encoding="application/x-tex">\displaystyle y_A[n] = g_A\,\tilde y[n-\tau_X]</annotation></semantics></math></span></div><div class="eq-c eq-lab">카드 지연</div><div class="eq-c"><span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle scriptlevel="0" displaystyle="true"><msub><mi>τ</mi><mi>X</mi></msub><mo>=</mo><mi>arg</mi><mo>⁡</mo><munder><mrow><mi>max</mi><mo>⁡</mo></mrow><mrow><mn>0</mn><mo>≤</mo><mi>τ</mi><mo>≤</mo><msub><mi>τ</mi><mi>max</mi><mo>⁡</mo></msub></mrow></munder><munder><mo>∑</mo><mi>n</mi></munder><mover accent="true"><mi>m</mi><mo>~</mo></mover><mo stretchy="false">[</mo><mi>n</mi><mo stretchy="false">]</mo><mtext> </mtext><msub><mi>m</mi><mi>B</mi></msub><mo stretchy="false">[</mo><mi>n</mi><mo>+</mo><mi>τ</mi><mo stretchy="false">]</mo></mstyle></mrow><annotation encoding="application/x-tex">\displaystyle \tau_X = \arg\max_{0 \le \tau \le \tau_{\max}} \sum_{n} \tilde m[n]\, m_B[n+\tau]</annotation></semantics></math></span></div></div>
+    <p>
+      처리본 쪽 <span class="m">(g<sub>T</sub>, g<sub>P</sub>) = (1, 0)</span>은 IEEE 754에서 <span class="m">1 · x + 0 · y = x</span>(y가 유한하면)라 카드 출력과 표본까지 같다.
+      카드를 뺀 쪽은 <span class="m">V</span>가 시간 이동에 대해 변하지 않으면(늦춘 입력에 늦춘 출력) 그 카드만 끈 내보내기를 <span class="m">τ<sub>X</sub></span> 늦춘 것이 되고,
+      <span class="m">τ<sub>X</sub></span>를 X의 지연으로 잡으면 두 소리의 박자가 맞는다. <span class="m">m̃</span> · <span class="m">m<sub>B</sub></span>는 카드를 뺀 소리와 처리본 렌더의 채널 합이다.
+      원음에 견준 두 지연(원음 → 처리본, 원음 → 카드를 뺀 소리)의 차로도 셈할 수 있지만, 위상을 바꾸는 카드에서는 상관 봉우리가 넓어 ±8표본 흔들린다(4초 시험 곡의 SOUNDGOODIZER 552 대 544). 두 렌더를 바로 견주면 같은 조각에서 0표본이다.
+    </p>
+    <figure class="src">
+      <figcaption>connectLiveChain · cmpWrap — 고른 카드 둘레의 우회로</figcaption>
+<pre>  <span class="k">function</span> <span class="f">cmpWrap</span>(key, fn) {
+    <span class="k">return</span> <span class="k">function</span> () {
+      <span class="k">const</span> pre = chain;
+      <span class="f">fn</span>();
+      <span class="k">if</span> (chain === pre || <span class="f">cmpTargetNow</span>() !== key) <span class="k">return</span>;   <span class="c">// 꺼져 체인에 없거나 고른 카드가 아니다</span>
+<span class="hl">      pre.<span class="f">connect</span>(nodes.cmpByDelay); nodes.cmpByDelay.<span class="f">connect</span>(nodes.cmpByPass); nodes.cmpByPass.<span class="f">connect</span>(nodes.cmpBySum);</span>
+<span class="hl">      chain.<span class="f">connect</span>(nodes.cmpByThru); nodes.cmpByThru.<span class="f">connect</span>(nodes.cmpBySum);</span>
+      chain = nodes.cmpBySum;
+    };
+  }</pre>
+    </figure>
+    <figure class="src">
+      <figcaption>cmpApply — 카드를 뺀 소리로 바꿀 때의 이득 · cmpRun — 카드 지연</figcaption>
+<pre>  <span class="k">if</span> (onA &amp;&amp; t === <span class="v">'orig'</span>) { wet = <span class="v">0</span>; dry = g; }
+  <span class="k">else if</span> (onA) {
+<span class="hl">    <span class="k">const</span> og = t === <span class="v">'master'</span> ? Math.<span class="f">pow</span>(<span class="v">10</span>, <span class="f">parseFloat</span>(document.<span class="f">getElementById</span>(<span class="v">'masterGain'</span>).value) / <span class="v">20</span>) : <span class="v">1</span>;</span>
+    wet = g * og; thru = <span class="v">0</span>; pass = <span class="v">1</span>;
+  }
+…
+    lag = <span class="f">cmpLag</span>(<span class="f">cmpMix</span>(C, n).<span class="f">subarray</span>(from, from + seg + maxLag), w.mb, <span class="v">0</span>, seg, maxLag);</pre>
+    </figure>
+    <p>
+      MASTER를 빼면 OUTPUT GAIN이 문제다. 내보내기는 MASTER가 켜져 있으면 OUTPUT GAIN을 MASTER 블록 안(클리퍼 앞)에서, 꺼져 있으면 재생 단계(VINYL · ATMOS) 뒤 체인 끝에서 건다.
+      VINYL은 잡음을 더하고 포화가 있어 이득과 순서를 바꿀 수 없으므로, 우회로가 아니라 체인 끝의 처리본 이득 <span class="m">g<sub>B</sub></span>에서 곱한다.
+      아래는 실시간 그래프를 OfflineAudioContext로 돌려(재생 엔진의 AudioContext를 바꿔 끼워) 내보내기 체인과 표본으로 견준 값이다(48 kHz 큰 마스터 20초, 처음 상태).
+    </p>
+    <div class="tw"><table>
+      <thead><tr><th>검증 — 실시간 그래프를 오프라인 렌더로</th><th>결과</th></tr></thead>
+      <tbody>
+        <tr><td>처리본 경로(우회로가 이어진 채) 대 내보내기 체인</td><td>처음 상태의 다섯 카드를 하나씩 빼고 모두 최대 차이 0</td></tr>
+        <tr><td>카드를 뺀 경로 대 그 카드만 끈 내보내기 × g를 τ<sub>X</sub> 늦춘 것</td><td>잔차 COMPRESSOR −46.8 · BBE −42.9 · EXCITER −53.4 · SOUNDGOODIZER −42.8 · MASTERING CHAIN −150.3 dB</td></tr>
+        <tr><td>카드를 뺀 소리와 처리본의 상호상관 지연 · 라우드니스 차</td><td>0 ~ 4표본 · 0.005 LU 안</td></tr>
+      </tbody>
+    </table></div>
+    <p>
+      잔차가 0이 아닌 것은 <span class="m">V</span>가 시간 이동에 대해 정확히 변하지 않는 것은 아니기 때문이다.
+      Chromium DynamicsCompressor는 이득을 32표본 묶음마다 셈해, 입력을 32의 배수가 아닌 L표본 늦추면 출력이 늦춘 출력과 표본까지 같지 않다
+      (홀로 잰 잔차 L = 1 · 8 · 264에서 −49 · −41 · −41 dB, 32의 배수면 시작 뒤로 0). 체인에서도 같아서, 뒤에 압축기가 남는 카드를 빼면 시작 0.5초 뒤로
+      카드 지연이 32의 배수인 COMPRESSOR(288) · EXCITER(192)는 −97.0 · −94.2 dB, 아닌 BBE(108) · SOUNDGOODIZER(569)는 −43.1 · −45.3 dB가 남고,
+      MASTER를 빼면 뒤가 비어 float 반올림만 남는다. 들리는 차이가 아니며, 크기 · 박자는 위 표대로 맞는다.
+      VINYL은 시간 이동에 대해 변한다. 홈 잡음(표면 잡음 · 크래클 · 팝 · 스크래치)과 휨은 곡의 시간에 맞춰 더해지므로, VINYL 앞의 카드를 빼면 음악만 그 카드의 지연만큼 늦어
+      이 소리들과 그만큼 어긋난다(아홉 카드를 모두 켠 상태에서 잔차 −15 ~ −29 dB, 잡음 · 휨의 크기와 성질은 같다).
+      ATMOS를 MASTER 뒤에 두고 OUTPUT GAIN −3 dB에서 MASTER를 빼면 잔차 −135.1 dB다. OUTPUT GAIN을 우회로에서 곱하지 않고 내보내기와 같은 자리에 건 결과다.
     </p>
   </div>
 </section>

@@ -2371,14 +2371,20 @@ dialog.peq-modal::backdrop { background: rgba(8,11,14,0.72); }
 .mon-state { min-width: 0; max-width: 18ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 500; color: var(--muted); }
 .mon-btn.on .mon-state { color: var(--amber); }
 .mon-btn:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
-/* 원음 비교 · 같은 크기 — 모니터 보정 단추와 같은 모양(켜지면 호박색) */
+/* 비교 · 같은 크기 — 모니터 보정 단추와 같은 모양(켜지면 호박색) */
 .cmp-btn, .cmp-match { display: inline-flex; align-items: center; gap: 7px; padding: 6px 12px; max-width: 100%; }
 .cmp-dot { flex: 0 0 auto; width: 8px; height: 8px; border-radius: 50%; background: var(--border-hi); }
-.cmp-btn.on { border-color: var(--amber); }            /* 원음을 듣는 중 — 모르고 지나치지 않게 테두리까지 */
+.cmp-btn.on { border-color: var(--amber); }            /* 견줄 소리를 듣는 중 — 모르고 지나치지 않게 테두리까지 */
 .cmp-btn.on .cmp-dot, .cmp-match.on .cmp-dot { background: var(--amber); box-shadow: 0 0 7px var(--amber-glow); }
 .cmp-state, .cmp-gain { white-space: nowrap; font-weight: 500; color: var(--muted); font-variant-numeric: tabular-nums; }
 .cmp-btn.on .cmp-state { color: var(--amber); }
-.cmp-btn:focus-visible, .cmp-match:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
+.cmp-btn:focus-visible, .cmp-match:focus-visible, .cmp-target:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
+/* 견줄 소리 — 원음 · 카드 하나 빼고(3.1.9). 고르는 창은 고역 복원 프리셋과 같은 rp-pop */
+.cmp-target { display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px; max-width: 100%; }
+.cmp-target-lbl { color: var(--muted); }
+.cmp-target-sum { white-space: nowrap; font-weight: 500; }
+.cmp-target[aria-expanded="true"] { border-color: var(--border-hi); }
+.cmp-pop { width: min(300px, calc(100vw - 16px)); }
 dialog.mon-modal { --cap: var(--amber); width: min(880px, calc(100vw - 24px)); }
 dialog.aeq-modal { width: min(720px, calc(100vw - 24px)); }
 .mon-row { display: flex; align-items: center; gap: 8px 16px; flex-wrap: wrap; margin: 10px 0 8px; }
@@ -2841,8 +2847,9 @@ html, body { overflow-x: clip; }
       <button class="btn active" id="playBtn">▶ PLAY</button>
       <button class="btn" id="stopBtn">■ STOP</button>
       <div style="flex:1"></div>
-      <button type="button" class="btn cmp-btn" id="cmpBtn" aria-pressed="false" title="원음 비교 — 처리 체인을 거치지 않은 원음으로 바꿔 듣습니다. 재생에만 걸리고 내보내기 · 프리셋에는 들어가지 않습니다"><span class="cmp-dot" aria-hidden="true"></span>원음 비교 <span class="cmp-state" id="cmpState">처리본</span></button>
-      <button type="button" class="btn cmp-match" id="cmpMatchBtn" aria-pressed="true" title="같은 크기 — 원음 비교에서 원음을 처리본의 라우드니스(ITU-R BS.1770)에 맞춥니다. 처리본은 그대로라 내보낼 소리와 같습니다"><span class="cmp-dot" aria-hidden="true"></span>같은 크기 <span class="cmp-gain" id="cmpGain">켬</span></button>
+      <button type="button" class="btn cmp-btn" id="cmpBtn" aria-pressed="false" title="비교 — 처리본과 견줄 소리(원음, 또는 카드 하나를 뺀 처리본)를 맞바꿔 듣습니다. 재생에만 걸리고 내보내기 · 프리셋에는 들어가지 않습니다"><span class="cmp-dot" aria-hidden="true"></span>비교 <span class="cmp-state" id="cmpState">처리본</span></button>
+      <button type="button" class="btn cmp-target" id="cmpTargetBtn" aria-haspopup="dialog" aria-expanded="false" title="견줄 소리 — 원음, 또는 켜진 카드 하나만 뺀 처리본"><span class="cmp-target-lbl">견줄 소리</span> <span class="cmp-target-sum" id="cmpTargetSum">원음</span><span class="rp-caret" aria-hidden="true">▾</span></button>
+      <button type="button" class="btn cmp-match" id="cmpMatchBtn" aria-pressed="true" title="같은 크기 — 견줄 소리를 처리본의 라우드니스(ITU-R BS.1770)에 맞춥니다. 처리본은 그대로라 내보낼 소리와 같습니다"><span class="cmp-dot" aria-hidden="true"></span>같은 크기 <span class="cmp-gain" id="cmpGain">켬</span></button>
       <button type="button" class="btn mon-btn" id="monBtn" aria-haspopup="dialog" title="모니터 보정 — 듣는 기기 보정. 재생에만 걸리고 내보내기 · 프리셋에는 들어가지 않습니다"><span class="mon-dot" aria-hidden="true"></span>모니터 보정 <span class="mon-state" id="monState">꺼짐</span></button>
       <span class="info-badge" id="infoSR">—</span>
     </div>
@@ -6181,11 +6188,16 @@ function buildLiveChain() {
   nodes.dryAnalyser.minDecibels = SG_MIN_DB;
   nodes.dryAnalyser.maxDecibels = SG_MAX_DB;
 
-  // 원음 비교 — 체인 입력을 체인 지연만큼 늦춘 원음 경로와, 처리본 · 원음 이득(재생에만)
+  // 비교(원음) — 체인 입력을 체인 지연만큼 늦춘 원음 경로와, 처리본 · 원음 이득(재생에만)
   nodes.cmpDelay = ac.createDelay(1.0);
   nodes.cmpDry = ac.createGain();
   nodes.cmpWet = ac.createGain();
   nodes.cmpSum = ac.createGain();
+  // 비교(카드 빼고) — 고른 카드 둘레의 우회로(카드 앞 → 지연 → 우회 이득)와 통과 이득, 둘을 더하는 합류
+  nodes.cmpByDelay = ac.createDelay(1.0);
+  nodes.cmpByPass = ac.createGain();
+  nodes.cmpByThru = ac.createGain();
+  nodes.cmpBySum = ac.createGain();
 
   liveDSP = nodes;
   return nodes;
@@ -6304,6 +6316,23 @@ function connectLiveChain(nodes, ac) {
     chain = nodes.masterBlock.out;
   }
 
+  // 비교의 '카드 빼고' — 고른 카드만 둘레에 우회로를 두어, 같은 체인 안에서 그 카드를 뺀 소리와 교차한다(재생에만).
+  // 우회로는 카드의 INPUT GAIN 앞에서 갈라 카드 지연만큼 늦추고, 카드 출력(통과 이득)과 합류에서 더한다.
+  // 통과 이득 1 · 우회 이득 0이면 합류의 출력이 카드 출력과 표본까지 같다(내보내기와 같은 소리)
+  function cmpWrap(key, fn) {
+    return function () {
+      const pre = chain;
+      fn();
+      if (chain === pre || cmpTargetNow() !== key) return;   // 꺼져 체인에 없거나 고른 카드가 아니다
+      pre.connect(nodes.cmpByDelay); nodes.cmpByDelay.connect(nodes.cmpByPass); nodes.cmpByPass.connect(nodes.cmpBySum);
+      chain.connect(nodes.cmpByThru); nodes.cmpByThru.connect(nodes.cmpBySum);
+      chain = nodes.cmpBySum;
+    };
+  }
+  applyPEQ = cmpWrap('peq', applyPEQ); applyBBE = cmpWrap('bbe', applyBBE); applyTube = cmpWrap('tube', applyTube);
+  applyVinyl = cmpWrap('vinyl', applyVinyl); applyExciter = cmpWrap('exciter', applyExciter); applySG = cmpWrap('sg', applySG);
+  applyAtmos = cmpWrap('atmos', applyAtmos); applyComp = cmpWrap('comp', applyComp); applyMaster = cmpWrap('master', applyMaster);
+
   // ── DOM 순서대로 처리 ───────────────────────────────────────────────
   // 오프라인 체인(buildOfflineChain)과 동일한 규칙을 쓴다.
   // 예전에는 여기가 고정 순서였던 탓에, 드래그로 순서를 바꾸면
@@ -6336,7 +6365,8 @@ function connectLiveChain(nodes, ac) {
   chain.connect(nodes.outputGain);
   nodes.outputGain.connect(nodes.analyser);
   // 모니터 보정은 분석기 뒤 — 적용본 스펙트럼은 파일이 될 소리를 그대로 보여 준다
-  // 원음 비교 — 분석기 뒤에서 처리본과, 지연을 맞춘 원음 가운데 하나를 고른다(분석기는 언제나 처리본을 본다)
+  // 비교 — 분석기 뒤에서 처리본과, 지연을 맞춘 원음 가운데 하나를 고른다(분석기는 처리본을 본다).
+  // 카드를 뺀 소리는 체인 안의 우회로(cmpWrap)에서 바뀌므로 분석기도 그 소리를 본다(같은 크기 맞춤 전)
   nodes.analyser.connect(nodes.cmpWet); nodes.cmpWet.connect(nodes.cmpSum);
   nodes.inputGain.connect(nodes.cmpDelay); nodes.cmpDelay.connect(nodes.cmpDry); nodes.cmpDry.connect(nodes.cmpSum);
   nodes.cmpSum.connect(nodes.monitor.in);
@@ -6433,24 +6463,57 @@ function hotswapDSP() {
 }
 
 // ============================================================
-// 원음 비교 · 같은 크기 — 재생에만 걸리고 내보내기 · 프리셋과는 상관없다
+// 비교 · 견줄 소리 · 같은 크기 — 재생에만 걸리고 내보내기 · 프리셋과는 상관없다
 // ------------------------------------------------------------
 // 처리 체인을 켜면 크게 마스터링된 곡은 작아진다(SOUNDGOODIZER의 버스 압축 · MASTERING의 대역 압축과 리미터가
 // 누른 만큼 MAKEUP을 더하지 않는다). 켜고 끄며 들으면 큰 쪽이 좋게 들리는 착각이 비교를 한쪽으로 기울인다.
-// 원음 비교는 체인 입력(inputGain)을 체인 지연만큼 늦춘 원음 경로로 30 ms 동안 교차해 바꾼다.
-// 같은 크기를 켜면 원음의 이득을 처리본의 통합 라우드니스(ITU-R BS.1770-4)에 맞춘다. 처리본은 그대로라
-// 듣는 처리본은 언제나 내보낼 소리와 같다. 원음을 키워야 할 때는 곡 전체의 봉우리가 −0.1 dBFS를 넘지 않는 데까지만 키운다.
+// 비교 단추는 처리본과 '견줄 소리'를 30 ms 동안 교차해 맞바꾼다. 견줄 소리는 둘 가운데 하나다.
+//  · 원음 — 체인 입력(inputGain)을 체인 지연만큼 늦춘 경로(cmpDelay → cmpDry). 분석기는 처리본을 그대로 본다
+//  · 카드 하나를 뺀 처리본 — 같은 체인에서 그 카드 둘레에 둔 우회로(cmpWrap)로 바꾼다. 우회로는 카드 지연만큼 늦춰
+//    뒤 카드들이 받는 소리의 박자를 맞춘다. 체인을 하나 더 돌리지 않는다. 분석기는 지금 나오는 그 소리를 본다
+// 같은 크기를 켜면 견줄 소리의 이득을 처리본의 통합 라우드니스(ITU-R BS.1770-4)에 맞춘다. 처리본은 그대로라
+// 듣는 처리본은 언제나 내보낼 소리와 같다. 견줄 소리를 키워야 할 때는 봉우리가 −0.1 dBFS를 넘지 않는 데까지만 키운다
+// (원음은 곡 전체의 봉우리, 카드를 뺀 소리는 잰 구간의 봉우리).
 // 크기와 지연은 재생 위치 둘레 10초를 내보내기와 같은 함수(buildOfflineChain)로 렌더해 잰다.
-// 그 앞 2초를 함께 렌더하고 버려, 압축기 · 잔향이 자리 잡은 뒤를 잰다.
-// 처음 비교할 때 한 번 재고(재는 동안은 처리본이 그대로 나온다), 그 뒤로는 설정이 바뀌고 1.2초 동안 조용하거나
-// 재생 위치가 잰 구간 가운데서 15초 넘게 멀어지면 다시 잰다. 한 번도 비교하지 않으면 재지 않는다.
+// 그 앞 2초를 함께 렌더하고 버려, 압축기 · 잔향이 자리 잡은 뒤를 잰다. 카드를 뺀 소리는 그 카드만 끈 값으로
+// 한 번 더 렌더하고, 카드 지연은 카드를 뺀 소리에 견준 처리본의 지연이다(두 렌더의 상호상관).
+// 설정 · 순서가 그대로이고 구간이 아직 재생 위치 둘레면 처리본 렌더는 다시 쓴다 — 견줄 소리만 바꿀 때는 렌더가 하나(원음은 없음)다.
+// 처음 비교할 때 · 견줄 소리를 고를 때 잰 뒤에 바꾸고(재는 동안은 처리본이 그대로 나온다), 그 뒤로는 설정이 바뀌고
+// 1.2초 동안 조용하거나 재생 위치가 잰 구간 가운데서 15초 넘게 멀어지면 다시 잰다. 한 번도 비교하지 않으면 재지 않는다.
 // ============================================================
-let cmpListen = 'B';                 // 'B' 처리본 · 'A' 원음
+let cmpListen = 'B';                 // 'B' 처리본 · 'A' 견줄 소리
+let cmpTarget = 'orig';              // 견줄 소리 — 'orig' 원음 또는 카드(CMP_CARDS의 키)
 let cmpMatchOn = true;               // 같은 크기
 let cmpArmed = false;                // 한 번이라도 비교했으면 설정이 바뀔 때 다시 잰다
-let cmpMeas = null;                  // { gainDb, lagSec, LA, LB, capped, center, buf }
-let cmpBusy = false, cmpAgain = false, cmpPending = false, cmpGen = 0, cmpTimer = null;
+let cmpMeas = null;                  // { target, gainDb, lagSec, LA, LB, capped, center, buf }
+let cmpBusy = false, cmpAgain = false, cmpPending = false, cmpGen = 0, cmpTimer = null, cmpPopOpen = false;
+let cmpBCache = null;                // 처리본의 잴 구간 · 라우드니스 · 지연 — 견줄 소리만 바꿀 때 다시 쓴다
 const CMP_FADE = 0.03;               // 바꿀 때 교차 시간(초)
+// 빼고 들을 수 있는 카드 — 렌더 값의 켜짐 키 · 카드 · 켜짐 스위치 · 이름 · 짧은 이름
+const CMP_CARDS = {
+  peq:     { en: 'peqEnabled',    mod: 'mod-peq',     on: 'peqOn',     name: 'PARAMETRIC EQ',       short: 'EQ' },
+  comp:    { en: 'compEnabled',   mod: 'mod-comp',    on: 'compOn',    name: 'COMPRESSOR',          short: 'COMP' },
+  bbe:     { en: 'bbeEnabled',    mod: 'mod-bbe',     on: 'bbeOn',     name: 'BBE SONIC MAXIMIZER', short: 'BBE' },
+  tube:    { en: 'tubeEnabled',   mod: 'mod-tube',    on: 'tubeOn',    name: 'VACUUM TUBE',         short: 'TUBE' },
+  exciter: { en: 'excEnabled',    mod: 'mod-exciter', on: 'exciterOn', name: 'EXCITER',             short: 'EXC' },
+  sg:      { en: 'sgEnabled',     mod: 'mod-sg',      on: 'sgOn',      name: 'SOUNDGOODIZER',       short: 'SG' },
+  vinyl:   { en: 'vinylEnabled',  mod: 'mod-vinyl',   on: 'vinylOn',   name: 'VINYL RECORD',        short: 'VINYL' },
+  atmos:   { en: 'atmosEnabled',  mod: 'mod-atmos',   on: 'atmosOn',   name: 'DOLBY ATMOS',         short: 'ATMOS' },
+  master:  { en: 'masterEnabled', mod: 'mod-master',  on: 'masterOn',  name: 'MASTERING CHAIN',     short: 'MASTER' },
+};
+const CMP_BY_MOD = {};
+Object.keys(CMP_CARDS).forEach(function (k) { CMP_BY_MOD[CMP_CARDS[k].mod] = k; });
+// 지금 견줄 소리 — 고른 카드가 꺼져 있으면 원음
+function cmpTargetNow() {
+  const c = CMP_CARDS[cmpTarget];
+  return c && document.getElementById(c.on).checked ? cmpTarget : 'orig';
+}
+// 고른 카드가 꺼졌으면(스위치 · 프리셋) 견줄 소리를 원음으로 돌리고 처리본을 듣는다 — 꺼진 카드를 뺀 소리는 처리본과 같다
+function cmpSync() {
+  if (cmpTarget === 'orig' || cmpTargetNow() !== 'orig') return;
+  cmpTarget = 'orig'; cmpListen = 'B'; cmpMeas = null; cmpPending = false;
+}
+function cmpAName(t) { return t === 'orig' ? '원음' : CMP_CARDS[t].short + ' 빼고'; }
 
 // ITU-R BS.1770-4 K 가중 계수 — 명세 표는 48 kHz 값이라, 아날로그 원형을 쌍선형 변환해 어느 표본률에서나 같은 응답을 얻는다
 // (셸프 f0 1681.97 Hz · +4.00 dB · Q 0.7072, 고역 통과 f0 38.135 Hz · Q 0.5003. 48 kHz에서 명세 표와 같은 계수가 나온다)
@@ -6524,34 +6587,73 @@ function cmpPeakDb(buf) {
   _cmpPeak.set(buf, d);
   return d;
 }
-// 재생 위치 둘레를 렌더해 원음 · 처리본의 라우드니스와 체인 지연을 잰다
-async function cmpRun(pb) {
-  const fs = pb.sampleRate, dur = pb.duration, t = liveSongTime();
-  // 잴 구간 10초(재생 위치 앞 2초 ~ 뒤 8초, 곡 끝에 닿으면 앞으로 민다)와 그 앞 2초의 미리 돌림
-  const W = Math.min(10, dur), w0 = Math.max(0, Math.min(t - 2, dur - W)), w1 = Math.min(dur, w0 + W), r0 = Math.max(0, w0 - 2);
-  const i0 = Math.round(r0 * fs), n = Math.min(pb.length - i0, Math.round(w1 * fs) - i0), m0 = Math.round(w0 * fs) - i0;
-  if (n < Math.round(0.5 * fs)) return null;
-  const ex = new AudioBuffer({ numberOfChannels: pb.numberOfChannels, length: n, sampleRate: fs });
-  for (let c = 0; c < pb.numberOfChannels; c++) ex.copyToChannel(pb.getChannelData(c).subarray(i0, i0 + n), c);
+// 렌더 하나 — 내보내기와 같은 함수 · 같은 값
+async function cmpRender(P, n, fs) {
   const oc = new OfflineAudioContext(2, n, fs);
-  await buildOfflineChain(oc, getParams(ex));
-  const out = await oc.startRendering();
-  const A = [], B = [out.getChannelData(0), out.getChannelData(1)];
+  await buildOfflineChain(oc, P);
+  return oc.startRendering();
+}
+// 두 채널의 합(모노는 같은 채널을 두 번) — 지연을 찾는 데 쓴다
+function cmpMix(chans, n) {
+  const m = new Float32Array(n), a = chans[0], b = chans[1] || chans[0];
+  for (let i = 0; i < n; i++) m[i] = a[i] + b[i];
+  return m;
+}
+// 처리본이 달라지는 것 — 렌더 값(입력 버퍼 빼고)과 카드 순서
+function cmpKey() {
+  const sp = chainSplit(CMP_BY_MOD);
+  return JSON.stringify(getParams(null), function (k, v) { return k === 'inputBuffer' ? undefined : v; }) + '|' + sp.pre.join(',') + '|' + sp.post.join(',');
+}
+// 재생 위치 둘레를 렌더해 견줄 소리 · 처리본의 라우드니스와 지연을 잰다
+async function cmpRun(pb, target) {
+  const fs = pb.sampleRate, dur = pb.duration, t = liveSongTime(), key = cmpKey();
+  // 앞서 잰 처리본이 같은 곡 · 같은 설정 · 같은 순서이고 그 구간이 아직 재생 위치 둘레(가운데서 15초 안)면,
+  // 그 구간에서 견줄 소리만 렌더한다(원음은 렌더하지 않는다)
+  let w = cmpBCache;
+  if (!(w && w.buf === pb && w.key === key && Math.abs(t - w.center) <= 15)) {
+    // 잴 구간 10초(재생 위치 앞 2초 ~ 뒤 8초, 곡 끝에 닿으면 앞으로 민다)와 그 앞 2초의 미리 돌림
+    const W = Math.min(10, dur), w0 = Math.max(0, Math.min(t - 2, dur - W)), w1 = Math.min(dur, w0 + W), r0 = Math.max(0, w0 - 2);
+    const i0 = Math.round(r0 * fs), n = Math.min(pb.length - i0, Math.round(w1 * fs) - i0);
+    if (n < Math.round(0.5 * fs)) return null;
+    w = { buf: pb, key: key, i0: i0, n: n, m0: Math.round(w0 * fs) - i0, center: (w0 + w1) / 2, LB: null, lagB: 0, mb: null };
+  }
+  const n = w.n, m0 = w.m0;
+  const ex = new AudioBuffer({ numberOfChannels: pb.numberOfChannels, length: n, sampleRate: fs });
+  for (let c = 0; c < pb.numberOfChannels; c++) ex.copyToChannel(pb.getChannelData(c).subarray(w.i0, w.i0 + n), c);
+  const P = getParams(ex), A = [];
   for (let c = 0; c < ex.numberOfChannels; c++) A.push(ex.getChannelData(c));
-  const LA = cmpLUFS(A, fs, m0, n), LB = cmpLUFS(B, fs, m0, n);
   // 지연 — 잴 구간 가운데 2초(최대 0.25초까지 찾는다)
-  const ma = new Float32Array(n), mb = new Float32Array(n), A1 = A[1] || A[0];
-  for (let i = 0; i < n; i++) { ma[i] = A[0][i] + A1[i]; mb[i] = B[0][i] + B[1][i]; }
+  const ma = cmpMix(A, n);
   const seg = Math.min(Math.round(2 * fs), Math.floor((n - m0) / 2)), from = m0 + Math.floor((n - m0 - seg) / 2);
-  const lag = cmpLag(ma, mb, from, seg, Math.min(Math.round(0.25 * fs), n - from - seg));
+  const maxLag = Math.min(Math.round(0.25 * fs), n - from - seg);
+  if (w.LB === null) {
+    const out = await cmpRender(P, n, fs), B = [out.getChannelData(0), out.getChannelData(1)], mb = cmpMix(B, n);
+    w.LB = cmpLUFS(B, fs, m0, n); w.lagB = cmpLag(ma, mb, from, seg, maxLag);
+    w.mb = mb.slice(from, from + seg + maxLag);          // 카드 지연을 잴 처리본 조각만 남긴다
+    cmpBCache = w;
+  }
+  const LB = w.LB;
+  let LA, lag, peakDb;
+  if (target === 'orig') {
+    LA = cmpLUFS(A, fs, m0, n); lag = w.lagB; peakDb = cmpPeakDb(pb);
+  } else {
+    // 그 카드만 끈 값으로 렌더 — 카드 지연은 카드를 뺀 소리에 견준 처리본의 지연
+    const P2 = Object.assign({}, P); P2[CMP_CARDS[target].en] = false;
+    const out2 = await cmpRender(P2, n, fs), C = [out2.getChannelData(0), out2.getChannelData(1)];
+    LA = cmpLUFS(C, fs, m0, n);
+    lag = cmpLag(cmpMix(C, n).subarray(from, from + seg + maxLag), w.mb, 0, seg, maxLag);
+    let pk = 0;
+    for (const x of C) for (let i = m0; i < n; i++) { const v = Math.abs(x[i]); if (v > pk) pk = v; }
+    peakDb = pk > 0 ? 20 * Math.log10(pk) : -Infinity;
+  }
   let gainDb = 0, capped = false;
   if (isFinite(LA) && isFinite(LB)) {
     gainDb = LB - LA;
-    // 원음을 키워야 하면 곡 전체 봉우리가 −0.1 dBFS를 넘지 않는 데까지만 — 넘으면 그만큼 덜 맞는다
-    const room = Math.max(0, -0.1 - cmpPeakDb(pb));
+    // 견줄 소리를 키워야 하면 봉우리가 −0.1 dBFS를 넘지 않는 데까지만 — 넘으면 그만큼 덜 맞는다
+    const room = Math.max(0, -0.1 - peakDb);
     if (gainDb > room) { gainDb = room; capped = true; }
   }
-  return { gainDb: gainDb, lagSec: lag / fs, LA: LA, LB: LB, capped: capped, center: (w0 + w1) / 2, buf: pb };
+  return { target: target, gainDb: gainDb, lagSec: lag / fs, LA: LA, LB: LB, capped: capped, center: w.center, buf: pb };
 }
 async function cmpMeasure() {
   cmpTimer = null;
@@ -6559,15 +6661,15 @@ async function cmpMeasure() {
   const pb = playBuf();
   if (!pb) return;
   cmpBusy = true; cmpAgain = false;
-  const gen = cmpGen;
+  const gen = cmpGen, target = cmpTargetNow();
   cmpShow();
   let r = null;
-  try { r = await cmpRun(pb); } catch (e) { r = null; }
+  try { r = await cmpRun(pb, target); } catch (e) { r = null; }
   cmpBusy = false;
-  // 재는 동안 설정이나 곡이 바뀌었으면 그 값은 버리고 다시 잰다
-  if (gen !== cmpGen || pb !== playBuf()) cmpAgain = true;
+  // 재는 동안 설정 · 곡 · 견줄 소리가 바뀌었으면 그 값은 버리고 다시 잰다
+  if (gen !== cmpGen || pb !== playBuf() || target !== cmpTargetNow()) cmpAgain = true;
   else if (r) cmpMeas = r;
-  if (cmpPending && !cmpAgain) { cmpPending = false; cmpListen = 'A'; }   // 처음 비교 — 잰 뒤에 바꾼다(재지 못했으면 맞추지 않은 채)
+  if (cmpPending && !cmpAgain) { cmpPending = false; cmpListen = 'A'; }   // 처음 비교 · 고른 뒤 — 잰 뒤에 바꾼다(재지 못했으면 맞추지 않은 채)
   cmpApply(false);
   cmpShow();
   if (cmpAgain) cmpSchedule(0);
@@ -6582,14 +6684,25 @@ function cmpDirty() {
   cmpGen++;
   cmpSchedule(1200);
 }
-// 두 이득을 고른 쪽으로 옮긴다(immediate는 체인을 새로 이을 때)
+// 이득들을 고른 쪽으로 옮긴다(immediate는 체인을 새로 이을 때)
+//  원음: 처리본(cmpWet) 0 · 원음(cmpDry) g
+//  카드를 뺀 소리: 통과(cmpByThru) 0 · 우회(cmpByPass) 1 · 처리본(cmpWet) g
+//  MASTER를 빼면 내보내기처럼 OUTPUT GAIN이 체인 끝(재생 단계 뒤)에 걸려야 하므로 cmpWet에서 함께 곱한다
 function cmpApply(immediate) {
+  cmpSync();
   const nodes = liveDSP;
   if (!nodes || !nodes.cmpDry || !audioCtx) return;
-  const now = audioCtx.currentTime, onA = cmpListen === 'A';
-  const gA = cmpMatchOn && cmpMeas ? Math.pow(10, cmpMeas.gainDb / 20) : 1;
-  if (cmpMeas) nodes.cmpDelay.delayTime.value = Math.min(0.9, cmpMeas.lagSec);
-  [[nodes.cmpWet.gain, onA ? 0 : 1], [nodes.cmpDry.gain, onA ? gA : 0]].forEach(function (q) {
+  const now = audioCtx.currentTime, onA = cmpListen === 'A', t = cmpTarget;
+  const m = cmpMeas && cmpMeas.target === t ? cmpMeas : null;
+  const g = cmpMatchOn && m ? Math.pow(10, m.gainDb / 20) : 1;
+  let wet = 1, dry = 0, thru = 1, pass = 0;
+  if (onA && t === 'orig') { wet = 0; dry = g; }
+  else if (onA) {
+    const og = t === 'master' ? Math.pow(10, parseFloat(document.getElementById('masterGain').value) / 20) : 1;
+    wet = g * og; thru = 0; pass = 1;
+  }
+  if (m) (t === 'orig' ? nodes.cmpDelay : nodes.cmpByDelay).delayTime.value = Math.min(0.9, m.lagSec);
+  [[nodes.cmpWet.gain, wet], [nodes.cmpDry.gain, dry], [nodes.cmpByThru.gain, thru], [nodes.cmpByPass.gain, pass]].forEach(function (q) {
     const p = q[0], v = q[1];
     if (immediate) { p.cancelScheduledValues(0); p.value = v; return; }
     if (p.cancelAndHoldAtTime) p.cancelAndHoldAtTime(now); else { p.cancelScheduledValues(now); p.setValueAtTime(p.value, now); }
@@ -6597,34 +6710,53 @@ function cmpApply(immediate) {
   });
 }
 function cmpShow() {
-  const b = document.getElementById('cmpBtn'), st = document.getElementById('cmpState');
+  const b = document.getElementById('cmpBtn'), st = document.getElementById('cmpState'), ts = document.getElementById('cmpTargetSum');
   const mb = document.getElementById('cmpMatchBtn'), g = document.getElementById('cmpGain');
   if (!b || !mb) return;
-  const onA = cmpListen === 'A';
+  cmpSync();
+  const onA = cmpListen === 'A', t = cmpTarget;
   b.classList.toggle('on', onA);
   b.setAttribute('aria-pressed', onA ? 'true' : 'false');
-  st.textContent = cmpPending ? '재는 중' : (onA ? '원음' : '처리본');
+  st.textContent = cmpPending ? '재는 중' : (onA ? cmpAName(t) : '처리본');
+  ts.textContent = cmpAName(t);
   mb.classList.toggle('on', cmpMatchOn);
   mb.setAttribute('aria-pressed', cmpMatchOn ? 'true' : 'false');
-  const d = cmpMeas ? cmpMeas.gainDb : 0;
+  const m = cmpMeas && cmpMeas.target === t ? cmpMeas : null, d = m ? m.gainDb : 0;
   g.textContent = !cmpMatchOn ? '끔'
-    : (cmpBusy && !cmpMeas) ? '재는 중'
-    : cmpMeas ? '원음 ' + (d >= 0.05 ? '+' : d <= -0.05 ? '−' : '') + Math.abs(d).toFixed(1) + ' dB' + (cmpMeas.capped ? ' · 한도' : '')
+    : (cmpBusy && !m) ? '재는 중'
+    : m ? cmpAName(t) + ' ' + (d >= 0.05 ? '+' : d <= -0.05 ? '−' : '') + Math.abs(d).toFixed(1) + ' dB' + (m.capped ? ' · 한도' : '')
     : '켬';
 }
-// 새 곡 — 처리본으로 돌아가고 잰 값을 버린다
+// 새 곡 — 처리본 · 원음으로 돌아가고 잰 값을 버린다
 function cmpReset() {
   clearTimeout(cmpTimer); cmpTimer = null;
-  cmpListen = 'B'; cmpMeas = null; cmpPending = false; cmpArmed = false; cmpGen++;
+  cmpListen = 'B'; cmpTarget = 'orig'; cmpMeas = null; cmpBCache = null; cmpPending = false; cmpArmed = false; cmpGen++;
+  cmpPopClose();
   cmpApply(true);
+  cmpShow();
+}
+// 견줄 소리를 고른다 — 체인을 새로 이어(우회로를 그 카드 둘레로) 잰 뒤 그 소리를 듣는다
+function cmpPick(t) {
+  cmpPopClose(true);
+  if (t !== 'orig' && !(CMP_CARDS[t] && document.getElementById(CMP_CARDS[t].on).checked)) t = 'orig';
+  if (t !== cmpTarget) {
+    cmpTarget = t; cmpMeas = null; cmpListen = 'B'; cmpPending = false; cmpGen++;
+    if (isPlaying) hotswapDSP(); else cmpApply(true);
+  }
+  if (playBuf() && cmpListen === 'B') {
+    cmpArmed = true;
+    if (cmpMeas && cmpMeas.target === t) { cmpListen = 'A'; cmpApply(false); }
+    else { cmpPending = true; cmpSchedule(0); }
+  }
   cmpShow();
 }
 document.getElementById('cmpBtn').addEventListener('click', function () {
   // 처음 잴 동안 다시 누르면 바꾸지 않고 그만둔다
   if (cmpPending) { cmpPending = false; cmpShow(); return; }
   if (!playBuf()) return;
+  cmpSync();
   cmpArmed = true;
-  if (cmpListen === 'B' && !cmpMeas) { cmpPending = true; cmpShow(); cmpSchedule(0); return; }
+  if (cmpListen === 'B' && !(cmpMeas && cmpMeas.target === cmpTarget)) { cmpPending = true; cmpShow(); cmpSchedule(0); return; }
   cmpListen = cmpListen === 'A' ? 'B' : 'A';
   cmpApply(false);
   cmpShow();
@@ -6634,6 +6766,61 @@ document.getElementById('cmpMatchBtn').addEventListener('click', function () {
   cmpApply(false);
   cmpShow();
 });
+// 카드를 켜고 끄면 고르는 창을 새로 그리고, 고른 카드가 꺼졌으면 원음으로 돌아간다(체인은 스위치가 새로 잇는다)
+Object.keys(CMP_CARDS).forEach(function (k) {
+  document.getElementById(CMP_CARDS[k].on).addEventListener('change', function () {
+    cmpApply(false);
+    cmpShow();
+    if (cmpPopOpen) cmpPopRender();
+  });
+});
+// 견줄 소리 고르는 창 — 고역 복원 프리셋과 같은 모양(rp-pop)의 라디오 목록. 원음과, 켜진 카드를 처리 순서대로
+function cmpPopRender() {
+  const pop = document.getElementById('cmpPop'), cur = cmpTargetNow(), sp = chainSplit(CMP_BY_MOD);
+  const list = [{ t: 'orig', name: '원음', desc: '처리 체인을 거치지 않은 소리' }];
+  sp.pre.concat('master', sp.post).forEach(function (k) {
+    if (document.getElementById(CMP_CARDS[k].on).checked) list.push({ t: k, name: CMP_CARDS[k].name + ' 빼고', desc: '' });
+  });
+  pop.innerHTML = '<div class="rp-list" role="radiogroup" aria-label="견줄 소리">' + list.map(function (o) {
+    return '<button type="button" class="rp-opt" role="radio" aria-checked="' + (o.t === cur) + '" data-t="' + o.t + '"><span class="rp-name">' + o.name + '</span>'
+      + (o.desc ? '<span class="rp-desc">' + o.desc + '</span>' : '') + '</button>';
+  }).join('') + '</div><div class="rp-foot">카드 하나를 빼면 그 카드가 한 일만 견줄 수 있습니다. 고르면 크기와 지연을 잰 뒤 그 소리로 바뀌고, 비교 단추로 처리본과 맞바꿉니다.</div>';
+  const opts = Array.prototype.slice.call(pop.querySelectorAll('.rp-opt'));
+  opts.forEach(function (bt) { bt.addEventListener('click', function () { cmpPick(bt.dataset.t); }); });
+  pop.querySelector('.rp-list').addEventListener('keydown', function (e) {
+    if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return;
+    const i = opts.indexOf(document.activeElement), nx = opts[(i + (e.key === 'ArrowDown' ? 1 : opts.length - 1)) % opts.length];
+    if (nx) nx.focus();
+    e.preventDefault();
+  });
+}
+function cmpPopPlace() {
+  const btn = document.getElementById('cmpTargetBtn'), pop = document.getElementById('cmpPop'), r = btn.getBoundingClientRect(), w = pop.offsetWidth, h = pop.offsetHeight;
+  let x = Math.min(r.left, window.innerWidth - w - 8), y = r.bottom + 4;
+  if (y + h > window.innerHeight - 8 && r.top - h - 4 > 8) y = r.top - h - 4;
+  pop.style.left = Math.max(8, x) + 'px'; pop.style.top = y + 'px';
+}
+function cmpPopClose(refocus) {
+  const pop = document.getElementById('cmpPop'), btn = document.getElementById('cmpTargetBtn');
+  if (!pop || !cmpPopOpen) return;
+  cmpPopOpen = false; pop.classList.remove('open'); btn.setAttribute('aria-expanded', 'false');
+  if (refocus) btn.focus();
+}
+(function cmpPopInit() {
+  const pop = document.createElement('div'); pop.id = 'cmpPop'; pop.className = 'rp-pop cmp-pop'; pop.setAttribute('role', 'dialog'); pop.setAttribute('aria-label', '견줄 소리');
+  document.body.appendChild(pop);
+  const btn = document.getElementById('cmpTargetBtn');
+  btn.addEventListener('click', function (e) {
+    e.stopPropagation();
+    if (cmpPopOpen) { cmpPopClose(); return; }
+    cmpPopRender(); cmpPopOpen = true; pop.classList.add('open'); btn.setAttribute('aria-expanded', 'true'); cmpPopPlace();
+    const sel = pop.querySelector('.rp-opt[aria-checked="true"]') || pop.querySelector('.rp-opt'); if (sel) sel.focus();
+  });
+  document.addEventListener('mousedown', function (e) { if (cmpPopOpen && !pop.contains(e.target) && !e.target.closest('#cmpTargetBtn')) cmpPopClose(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && cmpPopOpen) cmpPopClose(true); });
+  window.addEventListener('resize', function () { if (cmpPopOpen) cmpPopPlace(); });
+  window.addEventListener('scroll', function () { if (cmpPopOpen) cmpPopPlace(); }, true);
+})();
 
 // 지금 곡의 몇 초 지점을 재생하고 있는지.
 // 레코드 모형은 먼지·스크래치·홈 반경이 곡의 시간 위치에 묶여 있어 이 값이 필요하다.
@@ -6716,7 +6903,7 @@ function updateProgress() {
   const pct = Math.min(100, (elapsed / pb.duration) * 100);
   document.getElementById('progInner').style.width = pct + '%';
   document.getElementById('timeCur').textContent = fmt(elapsed);
-  // 원음 비교 — 재생 위치가 잰 구간 가운데서 15초 넘게 멀어지면 다시 잰다
+  // 비교 — 재생 위치가 잰 구간 가운데서 15초 넘게 멀어지면 다시 잰다
   if (cmpArmed && cmpMeas && !cmpBusy && !cmpTimer && Math.abs(elapsed - cmpMeas.center) > 15) cmpSchedule(0);
   progAnimID = requestAnimationFrame(updateProgress);
 }
@@ -7564,7 +7751,7 @@ function getParams(inputBuffer) {
   };
 }
 
-// ---- HD Upsample: FFT 기반 스펙트럼 연장 복원 ----
+// ---- HD 업스케일링: 업샘플(보간) → FFT 기반 스펙트럼 연장 복원 ----
 // ============================================================
 // 고해상도 복원 — HD RESTORE (88.2 · 96 kHz) · ULTRA · eXtreme HD RESTORE (176.4 · 192 kHz는 ULTRA HD, 352.8 · 384 kHz는 eXtreme HD)
 // ------------------------------------------------------------
@@ -8626,7 +8813,7 @@ document.getElementById('uxhdLiveOn').addEventListener('change', function() {
 // ============================================================
 // 내보낼 형식 — 표본률(원본 · 48 · 96 · 192)과 비트 깊이(16 · 24 · 32)
 // ------------------------------------------------------------
-// 목표가 원본보다 높으면 최고 음질 보간 뒤 목표 나이퀴스트까지 고역을 채우고(96kHz 이하는 HD,
+// 목표가 원본보다 높으면 최고 규격 보간 뒤 목표 나이퀴스트까지 고역을 채우고(96kHz 이하는 HD,
 // 176.4 · 192kHz는 ULTRA HD, 352.8 · 384kHz는 eXtreme HD — 같은 uxhd 설정), 낮으면 효율 변환으로 내리기만 하며, 같으면 변환하지 않는다.
 // 16bit 이하 정수 원본을 그보다 깊게(24 · 32bit) 쓰면 비트 깊이 향상을 먼저 거친다.
 // ============================================================
@@ -8697,9 +8884,9 @@ function updateExportUI() {
   let rn;
   if (!srcSR) rn = '파일을 올리면 원본 표본률에 맞춰집니다';
   else if (c.dir === 'same') rn = '원본과 같음 — 변환 없음';
-  else if (c.dir === 'up') rn = fmtKHz(srcSR) + ' → ' + fmtKHz(c.targetSR) + ' · 업스케일링 — 최고 음질 보간'
+  else if (c.dir === 'up') rn = fmtKHz(srcSR) + ' → ' + fmtKHz(c.targetSR) + ' · 업스케일링 — 최고 규격 보간'
          + (c.restoring ? (c.restore === 'hd' ? ' + HD 복원' : (c.targetSR >= 352800 ? ' + eXtreme HD 복원' : ' + ULTRA HD 복원')) : '만(SYNTH 0)');
-  else rn = fmtKHz(srcSR) + ' → ' + fmtKHz(c.targetSR) + ' · 다운샘플링(98%까지 평탄)';
+  else rn = fmtKHz(srcSR) + ' → ' + fmtKHz(c.targetSR) + ' · 다운샘플링 — 효율 규격 변환(98%까지 평탄)';
   let bn = c.bits === 32 ? '32bit float' : c.bits + 'bit 정수' + (c.dither ? ' · TPDF 디더' : '');
   if (c.enhance) bn += ' · 비트 깊이 향상';
   else if (sourceBuf && c.bits > 16) {
