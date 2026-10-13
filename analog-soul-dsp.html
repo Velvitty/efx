@@ -5652,7 +5652,11 @@ function buildSGBlock(ac) {
       dry.gain.value = 1;
       mix.gain.value = 1 / (1 + p.sgAmount * 0.3);
       pres.gain.value = p.sgAmount * 3;
-      nc.set(-10 - p.sgAmount * 8, 6, 2, 0.003, 0.20);
+      // 버스 압축은 AMOUNT와 함께 들어온다. AMOUNT 0이면 비율 1 · 문턱 0 dB라 아무것도 누르지 않고(COMPRESSOR의 MACRO 0 %와 같은 자리),
+      // AMOUNT 25(MACRO 50 %)에서 설계값(비율 2 · 문턱 −10 − 8·AMOUNT dB)에 닿는다. 그 위는 전과 같다.
+      // 전에는 AMOUNT 0에서도 −10 dBFS 위를 2 : 1로 눌러, 크게 마스터링된 곡이 카드만 켜도 2.7 ~ 3.3 dB 작아졌다.
+      const cIn = Math.min(1, p.sgAmount / 0.25);
+      nc.set(cIn * (-10 - p.sgAmount * 8), 6, 1 + cIn, 0.003, 0.20);
       setStereoWidth(width, p.sgStereo * 2);
     }
   };

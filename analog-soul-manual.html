@@ -1293,6 +1293,7 @@ body::before {
       <tr><td>변경 (3.1.3)</td><td>글꼴을 파일 안에 넣음 — 프로그램과 문서가 열 때 바깥(Google Fonts)으로 아무것도 요청하지 않음 · 인터넷이 없어도 화면이 같음 · 쓰인 글자만 남겨 프로그램이 약 0.4 MB, 문서 한 쪽이 약 0.5 MB 커짐</td></tr>
       <tr><td>수정 (3.1.4)</td><td>같은 설정으로 내보내도 실행마다 표본이 조금씩 달라지던 문제(이제 같은 원본 · 같은 설정이면 몇 번을 내보내도 파일이 바이트까지 같음) · 16 · 24bit 디더의 난수가 격자 위 표본에서 어긋나, 표본 하나의 차이가 파일 전체로 번지던 문제</td></tr>
       <tr><td>수정 (3.1.5)</td><td>3열이 막 시작되어 카드 폭이 360 ~ 371 px일 때(화면 스크롤바가 15 px인 창에서 1,175 ~ 1,209 px) VINYL · ATMOS · MASTERING의 값 칸이 오른쪽에서 잘리던 문제(이제 좁은 카드에서는 슬라이더 막대만 짧아짐) · HD 복원 카드가 화면에서만 맨 앞이고 문서에서는 맨 끝이라 Tab 순서와 화면 읽기 순서가 보이는 순서와 달랐던 문제 · HD 복원 카드의 머리줄을 끌면 끌기가 시작됐다가 놓으면 제자리로 돌아가던 것(이제 MASTER처럼 끌리지 않음) · 개발자 논고 표의 위 첨자 ⁵ · ⁸이 넣은 글꼴에 없어 다른 글꼴로 그려지던 것</td></tr>
+      <tr><td>수정 (3.1.7)</td><td>SOUNDGOODIZER의 출력 컴프레서가 AMOUNT 0에서도 −10 dBFS 위를 2 : 1로 눌러, 크게 마스터링된 곡이 MACRO 0%로 켜기만 해도 2.7 ~ 3.3 dB 작아지던 문제(이제 AMOUNT 0 → 25에서 함께 들어오게 함 · 처음 상태의 소리는 그대로) · 문서의 MACRO 0% 레벨 수치를 다시 잼(전의 값은 위상이 돌면 작게 잡히는 맞춤 이득)</td></tr>
       <tr><td>수정 (3.1.6)</td><td>신호 처리 사양서 · 개발자 논고의 고정폭 글꼴 칸(표의 값 칸 · 수식 줄 · 코드 주석)과 논고 수식 안의 한글이, 파일에 넣은 글꼴이 아니라 컴퓨터마다 다른 글꼴로 그려지던 문제</td></tr>
       <tr><td>문서</td><td>PARAMETRIC EQ 절을 모듈 01로 추가(뒤의 모듈 번호가 하나씩 밀림) · 그래프와 큰 편집 창의 마우스 · 키보드 조작표 · 모니터링 도구 절에 모니터 보정(3.1.1)</td></tr>
     </table>
@@ -2162,7 +2163,7 @@ body::before {
         </div>
         <div class="mc-params">
           <div class="param-row"><span class="param-name">MODE A/B/C/D</span><span class="param-range">4가지</span><span class="param-desc">밴드 특성 및 크로스오버 주파수 프리셋</span></div>
-          <div class="param-row"><span class="param-name">AMOUNT</span><span class="param-range">0~100</span><span class="param-desc">전체 인핸스먼트 강도</span></div>
+          <div class="param-row"><span class="param-name">AMOUNT</span><span class="param-range">0~100</span><span class="param-desc">전체 인핸스먼트 강도(0이면 포화 · 출력 컴프레서도 일하지 않음)</span></div>
           <div class="param-row"><span class="param-name">LOW SAT</span><span class="param-range">0~100</span><span class="param-desc">저역 밴드 포화 강도</span></div>
           <div class="param-row"><span class="param-name">MID SAT</span><span class="param-range">0~100</span><span class="param-desc">중역 밴드 포화 강도</span></div>
           <div class="param-row"><span class="param-name">HI SAT</span><span class="param-range">0~100</span><span class="param-desc">고역 밴드 포화 강도</span></div>

@@ -1741,7 +1741,7 @@ input.<span class="f">connect</span>(dAP1); dAP1.<span class="f">connect</span>(
       <tbody>
         <tr><td>COMPRESSOR</td><td class="m">−18 · 10 · 4</td><td class="m">+6.03 dB</td></tr>
         <tr><td>MASTERING 대역 1 / 2 / 3 / 4</td><td class="m">−24·10·2 / −22·8·2 / −20·6·3 / −22·5·2</td><td class="m">+5.68 / +5.43 / +6.93 / +5.90 dB</td></tr>
-        <tr><td>SOUNDGOODIZER 버스 (양 50 / 100)</td><td class="m">−14·6·2 / −18·6·2</td><td class="m">+3.35 / +4.55 dB</td></tr>
+        <tr><td>SOUNDGOODIZER 버스 (양 0 / 50 / 100)</td><td class="m">0·6·1 / −14·6·2 / −18·6·2</td><td class="m">0.00 / +3.35 / +4.55 dB</td></tr>
         <tr><td>MASTERING 리미터 (천장 −0.3)</td><td class="m">−0.3 · 0 · 20</td><td class="m">+0.17 dB</td></tr>
       </tbody>
     </table></div>
@@ -2269,6 +2269,11 @@ hd.gain.value = p.bbeHi * <span class="v">6</span>;      <span class="c">// HI D
         <tr><td>기본값 (40·60·50) — 수정 후</td><td class="m">+3.9</td><td class="m">+2.9</td><td class="m">+1.2</td><td class="m">0.0</td><td class="m">0.0</td><td class="m">+0.1</td><td class="m">+4.4</td><td class="m">+6.3</td></tr>
       </tbody>
     </table></div>
+    <p>
+      세 노브가 0이면(MACRO 0 %) 레벨은 그대로다(에너지 변화 0.00 dB). 봉우리 모양만 바뀐다. 천장까지 누르거나 자른 큰 마스터는
+      여러 성분이 봉우리에서 천장에 맞춰 눌려 있어, 주파수마다 시간을 달리 밀면 그 맞춤이 풀려 표본 봉우리가 +3.0 · +4.8 dB 커진다(조용한 분홍 잡음은 +0.1 dB).
+      뒤에 MASTERING이 있으면 그 리미터가 이를 누른다.
+    </p>
     <div class="nb">
       <span class="t">바로잡은 점</span>
       <p>
@@ -2475,8 +2480,15 @@ wetBus.gain.value = p.sgAmount * <span class="v">0.6</span>;
 dry.gain.value = <span class="v">1</span>;
 mix.gain.value = <span class="v">1</span> / (<span class="v">1</span> + p.sgAmount * <span class="v">0.3</span>);
 pres.gain.value = p.sgAmount * <span class="v">3</span>;
-nc.<span class="f">set</span>(-<span class="v">10</span> - p.sgAmount * <span class="v">8</span>, <span class="v">6</span>, <span class="v">2</span>, <span class="v">0.003</span>, <span class="v">0.20</span>);</pre>
+<span class="k">const</span> cIn = Math.<span class="f">min</span>(<span class="v">1</span>, p.sgAmount / <span class="v">0.25</span>);   <span class="c">// AMOUNT 0 → 25: 레시오 1 → 2, 문턱 0 dB → 설계값</span>
+nc.<span class="f">set</span>(cIn * (-<span class="v">10</span> - p.sgAmount * <span class="v">8</span>), <span class="v">6</span>, <span class="v">1</span> + cIn, <span class="v">0.003</span>, <span class="v">0.20</span>);</pre>
     </figure>
+    <p>
+      버스 압축은 AMOUNT와 함께 들어온다. c = min(1, AMT/0.25)일 때 레시오 1 + c, 문턱 c·(−10 − 8·AMT) dB라,
+      AMOUNT 0에서는 레시오 1 · 문턱 0 dB로 0 dBFS 아래가 그대로 지나고(§6의 정적 곡선은 문턱까지 선형),
+      AMOUNT 25부터는 3.1.6까지와 같다. 3.1.6까지는 AMOUNT 0에서도 −10 dBFS 위를 2 : 1로 눌러,
+      포화 · 존재감이 모두 0인데도 크게 마스터링된 시험 신호가 2.7 ~ 3.3 dB 작아졌다.
+    </p>
     <p>
       대역 분할과 원음 경로의 위상 정렬은 §5, 곡선과 직류는 §4에 있다.
     </p>
@@ -2947,6 +2959,12 @@ lim.<span class="f">set</span>(p.limCeil, <span class="v">0</span>, <span class=
       <p>
         이전 판의 MASTERING은 조용한 부분까지 약 6 dB 끌어올렸다. 설계가 아니라 네 압축기의 자동 메이크업에서 온 이득이었고, 대역마다 양이 달라 중역이 1.7 dB 도드라졌다. 지금은 압축이 없는 신호를 그대로 통과시키므로, 기본값에서 큰 입력은 압축된 만큼 작아진다. 크게 하려면 MASTERING의 INPUT GAIN으로 리미터를 민다. 전 모듈을 기본값으로 켠 체인의 RMS 증가는 +8.8 dB에서 +3.0 dB가 됐으며, 남은 증가는 조작한 값(COMPRESSOR MAKEUP 4 dB, BBE 강조)만큼이다.
       </p>
+    <p>
+      MACRO 0 %(대역 레시오 1)에서 대역 압축기는 아무것도 누르지 않는다. 큰 마스터(천장까지 누른 것 · 자른 것)로 단계를 나눠 재면
+      분할만 0.00 dB, 대역 압축기까지 −0.02 dB, 리미터까지 −0.17 · −0.89 dB, 클리퍼까지 −0.18 · −0.91 dB다.
+      분할의 합은 크기가 1이어도 위상이 돌아 봉우리가 +3.4 · +4.5 dB 커지고, 리미터가 천장에서 이를 누른다.
+      같은 리미터 · 클리퍼만 분할 없이 걸면 −0.06 · −0.01 dB다.
+    </p>
     </div>
   </div>
 </section>
