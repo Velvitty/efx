@@ -647,6 +647,7 @@ footer {
         <li><a href="#flow-order">순서 바꾸기</a></li>
         <li><a href="#flow-ingain">입력 게인</a></li>
         <li><a href="#flow-monitor">모니터 보정</a></li>
+        <li><a href="#flow-compare">원음 비교</a></li>
       </ol>
     </li>
     <li><a href="#modules">모듈 하나하나</a>
@@ -951,6 +952,18 @@ footer {
           특정 헤드폰 전용 파일을 일부러 만들 때만 쓰세요.
         </p>
       </div>
+
+      <h3 id="flow-compare">원음 비교 · 같은 크기<span class="level">중급</span></h3>
+      <p>
+        재생 바의 <strong>원음 비교</strong>는 체인에 들어가기 전의 원음과 체인을 지난 처리본을 30 ms 동안 교차해 맞바꿉니다.
+        <strong>같은 크기</strong>를 켜 두면 원음을 처리본의 통합 라우드니스(ITU-R BS.1770)에 맞춥니다.
+      </p>
+      <ul>
+        <li><strong>자리.</strong> 적용본 분석기 뒤, 모니터 보정 앞에서 둘 중 하나를 고릅니다. 원음은 체인이 늦추는 시간(처음 상태 약 45 ms)만큼 늦춰 둡니다.</li>
+        <li><strong>크기 맞춤.</strong> 원음 쪽 이득만 바꿉니다. 처리본은 그대로라 내보낼 파일과 같습니다. 원음을 키워야 하면 곡 봉우리가 −0.1 dBFS를 넘지 않는 데까지만 키웁니다.</li>
+        <li><strong>재는 구간.</strong> 재생 위치 앞 2초 ~ 뒤 8초를 내보내기와 같은 함수로 처리해 잽니다. 압축은 큰 곳과 조용한 곳에서 다르게 걸리므로, 지금 듣는 곳의 차이로 맞춥니다.</li>
+        <li><strong>쓰는 법.</strong> 카드 하나의 효과는 그 카드만 켜고 견줍니다. 카드 전원을 켜고 끄는 비교는 크기를 맞추지 않습니다.</li>
+      </ul>
     </div>
   </section>
 

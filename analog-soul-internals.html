@@ -1942,6 +1942,48 @@ mid.<span class="f">connect</span>(mg, <span class="v">0</span>, <span class="v"
       400 ms 게이트 블록과 −10 LU 상대 게이트를 구현하면
       정확한 통합 라우드니스를 얻을 수 있다.
     </p>
+
+    <h3 id="level-compare">원음 비교의 같은 크기 (3.1.8)</h3>
+    <p>
+      재생 줄의 원음 비교는 위 요건대로 BS.1770-4 게이트 라우드니스로 원음을 처리본에 맞춘다.
+      K 가중은 셸프와 고역 통과 두 단이고, 48 kHz 밖의 표본률에서는 명세 표의 계수를 낳은 아날로그 원형을 그 표본률로 쌍선형 변환한다.
+      400 ms 블록을 100 ms마다 잡아 채널별 평균 제곱 <span class="m">z<sub>c,j</sub></span>를 구한다.
+    </p>
+    <div class="eq tex"><div class="eq-c eq-lab">블록</div><div class="eq-c"><span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle scriptlevel="0" displaystyle="true"><msub><mi>l</mi><mi>j</mi></msub><mo>=</mo><mo>−</mo><mn>0.691</mn><mo>+</mo><mn>10</mn><msub><mrow><mi>log</mi><mo>⁡</mo></mrow><mn>10</mn></msub><munder><mo>∑</mo><mi>c</mi></munder><msub><mi>G</mi><mi>c</mi></msub><mtext> </mtext><msub><mi>z</mi><mrow><mi>c</mi><mo separator="true">,</mo><mi>j</mi></mrow></msub></mstyle></mrow><annotation encoding="application/x-tex">\displaystyle l_j = -0.691 + 10\log_{10}\sum_{c} G_c\, z_{c,j}</annotation></semantics></math></span></div><div class="eq-c eq-lab">통합</div><div class="eq-c"><span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle scriptlevel="0" displaystyle="true"><mi>L</mi><mo>=</mo><mo>−</mo><mn>0.691</mn><mo>+</mo><mn>10</mn><msub><mrow><mi>log</mi><mo>⁡</mo></mrow><mn>10</mn></msub><mo fence="true" stretchy="true" minsize="1.8em" maxsize="1.8em">(</mo><mfrac><mn>1</mn><mrow><mi mathvariant="normal">∣</mi><mi>J</mi><mi mathvariant="normal">∣</mi></mrow></mfrac><munder><mo>∑</mo><mrow><mi>j</mi><mo>∈</mo><mi>J</mi></mrow></munder><munder><mo>∑</mo><mi>c</mi></munder><msub><mi>G</mi><mi>c</mi></msub><mtext> </mtext><msub><mi>z</mi><mrow><mi>c</mi><mo separator="true">,</mo><mi>j</mi></mrow></msub><mo fence="true" stretchy="true" minsize="1.8em" maxsize="1.8em">)</mo></mstyle></mrow><annotation encoding="application/x-tex">\displaystyle L = -0.691 + 10\log_{10}\Bigl(\frac{1}{|J|}\sum_{j\in J}\sum_{c} G_c\, z_{c,j}\Bigr)</annotation></semantics></math></span></div><div class="eq-c eq-lab">게이트</div><div class="eq-c"><span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle scriptlevel="0" displaystyle="true"><mi>J</mi><mo>=</mo><mo stretchy="false">{</mo><mtext> </mtext><mi>j</mi><mo>:</mo><msub><mi>l</mi><mi>j</mi></msub><mo>&gt;</mo><mo>−</mo><mn>70</mn><mo separator="true">,</mo><mtext> </mtext><msub><mi>l</mi><mi>j</mi></msub><mo>&gt;</mo><msub><mi>L</mi><mrow><mo>−</mo><mn>70</mn></mrow></msub><mo>−</mo><mn>10</mn><mtext> </mtext><mo stretchy="false">}</mo></mstyle></mrow><annotation encoding="application/x-tex">\displaystyle J = \{\, j : l_j &gt; -70,\ l_j &gt; L_{-70} - 10 \,\}</annotation></semantics></math></span></div><div class="eq-c eq-lab">원음 이득</div><div class="eq-c"><span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle scriptlevel="0" displaystyle="true"><msub><mi>g</mi><mi>A</mi></msub><mo>=</mo><msup><mn>10</mn><mrow><mo stretchy="false">(</mo><msub><mi>L</mi><mi>B</mi></msub><mo>−</mo><msub><mi>L</mi><mi>A</mi></msub><mo stretchy="false">)</mo><mi mathvariant="normal">/</mi><mn>20</mn></mrow></msup><mo separator="true">,</mo><mspace width="2em"/><msub><mi>L</mi><mi>B</mi></msub><mo>&gt;</mo><msub><mi>L</mi><mi>A</mi></msub><mo>⇒</mo><msub><mi>g</mi><mi>A</mi></msub><mo>≤</mo><msup><mn>10</mn><mrow><mo stretchy="false">(</mo><mo>−</mo><mn>0.1</mn><mo>−</mo><msub><mi>P</mi><mi>A</mi></msub><mo stretchy="false">)</mo><mi mathvariant="normal">/</mi><mn>20</mn></mrow></msup></mstyle></mrow><annotation encoding="application/x-tex">\displaystyle g_A = 10^{(L_B - L_A)/20},\qquad L_B &gt; L_A \Rightarrow g_A \le 10^{(-0.1 - P_A)/20}</annotation></semantics></math></span></div></div>
+    <p>
+      <span class="m">L<sub>−70</sub></span>은 절대 게이트만 지난 블록의 라우드니스, <span class="m">G<sub>c</sub></span>는 채널 가중(좌우 1, 모노는 두 귀에 같은 소리라 2),
+      <span class="m">P<sub>A</sub></span>는 곡 전체의 표본 봉우리(dBFS)다. 처리본 이득은 1로 둔다. 듣는 처리본이 내보낼 파일과 같아야 비교가 내보낼 소리를 가리킨다.
+      짧은 구간의 크기를 따라 이득을 계속 바꾸면 원음에 압축을 거는 셈이 되므로, 재생 위치 앞 2초 ~ 뒤 8초의 통합 라우드니스 한 값으로 맞춘다.
+    </p>
+    <figure class="src">
+      <figcaption>cmpLUFS — 절대 · 상대 게이트</figcaption>
+<pre>  <span class="k">let</span> s = <span class="v">0</span>, m = <span class="v">0</span>;
+  <span class="k">for</span> (<span class="k">let</span> j = <span class="v">0</span>; j &lt; nb; j++) <span class="k">if</span> (<span class="f">L</span>(z[j]) &gt; -<span class="v">70</span>) { s += z[j]; m++; }
+  <span class="k">if</span> (!m) <span class="k">return</span> -Infinity;
+<span class="hl">  <span class="k">const</span> gate = <span class="f">L</span>(s / m) - <span class="v">10</span>;</span>
+  s = <span class="v">0</span>; m = <span class="v">0</span>;
+  <span class="k">for</span> (<span class="k">let</span> j = <span class="v">0</span>; j &lt; nb; j++) { <span class="k">const</span> l = <span class="f">L</span>(z[j]); <span class="k">if</span> (l &gt; -<span class="v">70</span> &amp;&amp; l &gt; gate) { s += z[j]; m++; } }
+  <span class="k">return</span> m ? <span class="f">L</span>(s / m) : -Infinity;</pre>
+    </figure>
+    <figure class="src">
+      <figcaption>cmpRun — 원음 이득과 키울 한도</figcaption>
+<pre>    gainDb = LB - LA;
+<span class="hl">    <span class="k">const</span> room = Math.<span class="f">max</span>(<span class="v">0</span>, -<span class="v">0.1</span> - <span class="f">cmpPeakDb</span>(pb));</span>
+    <span class="k">if</span> (gainDb &gt; room) { gainDb = room; capped = <span class="k">true</span>; }</pre>
+    </figure>
+    <div class="tw"><table>
+      <thead><tr><th>검증</th><th>결과</th></tr></thead>
+      <tbody>
+        <tr><td>997 Hz −20 dBFS 사인(두 채널) 44.1 · 48 · 96 kHz</td><td class="m">−19.997 · −20.000 · −20.017 LUFS</td></tr>
+        <tr><td>−23 dBFS 20 s + −80 dBFS 20 s (절대 게이트)</td><td class="m">−23.033 LUFS (경계 블록 셋까지 셈한 값 −23.0327)</td></tr>
+        <tr><td>−23 dBFS 10 s + −40 dBFS 10 s (상대 게이트)</td><td class="m">−23.064 LUFS (셈한 값 −23.0643)</td></tr>
+        <tr><td>시험 신호 셋의 원음, 참값 계산과 비교</td><td class="m">−16.746 · −8.496 · −6.235 LUFS, 차이 0.000</td></tr>
+      </tbody>
+    </table></div>
+    <p>
+      48 kHz의 사인 값이 명세와 같고, 다른 표본률의 차이는 쌍선형 변환한 K 필터의 997 Hz 응답(+0.6938 · +0.6737 dB, 48 kHz는 +0.6910 dB)에서 그대로 나온다.
+      원음과 처리본을 같은 표본률에서 재므로 맞춤에는 이 차이가 들어가지 않는다. 앞부분의 HD 복원 RMS 정합은 그대로다.
+    </p>
   </div>
 </section>
 
