@@ -461,7 +461,7 @@ body::before {
   padding-bottom: 8px;
 }
 .param-name {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: 'JetBrains Mono', 'Noto Sans KR', monospace;
   font-size: 0.62rem;
   color: var(--amber);
   letter-spacing: 0.05em;
@@ -781,7 +781,7 @@ body::before {
 }
 
 .inline-tag {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: 'JetBrains Mono', 'Noto Sans KR', monospace;
   font-size: 0.65em;
   padding: 1px 6px;
   border-radius: 2px;
@@ -908,7 +908,7 @@ body::before {
   /* 글꼴 — Barlow · Barlow Condensed · Noto Sans KR · JetBrains Mono는 파일 안에 넣었다(바깥 요청 없음). 넣은 글꼴에 없는 글자만 다음 글꼴(Windows Bahnschrift, macOS Avenir Next Condensed)로 */
   --c-legend: 'Barlow Condensed', 'Bahnschrift SemiCondensed', 'Bahnschrift', 'Avenir Next Condensed', 'Roboto Condensed', 'DejaVu Sans Condensed', 'Arial Narrow', 'Noto Sans KR', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
   --c-body: 'Barlow', 'Segoe UI', 'Helvetica Neue', 'Noto Sans KR', 'Apple SD Gothic Neo', 'Malgun Gothic', system-ui, sans-serif;
-  --c-mono: 'JetBrains Mono', 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --c-mono: 'JetBrains Mono', 'IBM Plex Mono', 'Noto Sans KR', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;   /* 영문 고정폭 글꼴에는 한글이 없다 — 한글은 넣은 Noto Sans KR로(--c-body와 같은 자리) */
   --cap: var(--c-amber-fill);
 }
 @media (prefers-color-scheme: light) {
@@ -1293,6 +1293,7 @@ body::before {
       <tr><td>변경 (3.1.3)</td><td>글꼴을 파일 안에 넣음 — 프로그램과 문서가 열 때 바깥(Google Fonts)으로 아무것도 요청하지 않음 · 인터넷이 없어도 화면이 같음 · 쓰인 글자만 남겨 프로그램이 약 0.4 MB, 문서 한 쪽이 약 0.5 MB 커짐</td></tr>
       <tr><td>수정 (3.1.4)</td><td>같은 설정으로 내보내도 실행마다 표본이 조금씩 달라지던 문제(이제 같은 원본 · 같은 설정이면 몇 번을 내보내도 파일이 바이트까지 같음) · 16 · 24bit 디더의 난수가 격자 위 표본에서 어긋나, 표본 하나의 차이가 파일 전체로 번지던 문제</td></tr>
       <tr><td>수정 (3.1.5)</td><td>3열이 막 시작되어 카드 폭이 360 ~ 371 px일 때(화면 스크롤바가 15 px인 창에서 1,175 ~ 1,209 px) VINYL · ATMOS · MASTERING의 값 칸이 오른쪽에서 잘리던 문제(이제 좁은 카드에서는 슬라이더 막대만 짧아짐) · HD 복원 카드가 화면에서만 맨 앞이고 문서에서는 맨 끝이라 Tab 순서와 화면 읽기 순서가 보이는 순서와 달랐던 문제 · HD 복원 카드의 머리줄을 끌면 끌기가 시작됐다가 놓으면 제자리로 돌아가던 것(이제 MASTER처럼 끌리지 않음) · 개발자 논고 표의 위 첨자 ⁵ · ⁸이 넣은 글꼴에 없어 다른 글꼴로 그려지던 것</td></tr>
+      <tr><td>수정 (3.1.6)</td><td>신호 처리 사양서 · 개발자 논고의 고정폭 글꼴 칸(표의 값 칸 · 수식 줄 · 코드 주석)과 논고 수식 안의 한글이, 파일에 넣은 글꼴이 아니라 컴퓨터마다 다른 글꼴로 그려지던 문제</td></tr>
       <tr><td>문서</td><td>PARAMETRIC EQ 절을 모듈 01로 추가(뒤의 모듈 번호가 하나씩 밀림) · 그래프와 큰 편집 창의 마우스 · 키보드 조작표 · 모니터링 도구 절에 모니터 보정(3.1.1)</td></tr>
     </table>
 

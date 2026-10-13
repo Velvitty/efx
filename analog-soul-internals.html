@@ -282,7 +282,7 @@ pre .hl { background: rgba(127,179,224,.10); display: inline-block; width: 100%;
 .eq.tex .eq-lab { white-space: nowrap; }
 .eq.tex .eq-note { color: var(--mute); }
 :root:not(#_) .eq.tex .eq-note { color: var(--c-screen-dim); }
-:root:not(#_) .eq.tex math { font-size: 1.14em; font-family: math, "Cambria Math", "STIX Two Math", "Latin Modern Math", "Noto Sans Math", serif; }   /* 컴퓨터의 수학 글꼴 — 칸의 고정폭 글꼴을 물려받지 않게 */
+:root:not(#_) .eq.tex math { font-size: 1.14em; font-family: math, "Cambria Math", "STIX Two Math", "Latin Modern Math", "Noto Sans Math", "Noto Sans KR", serif; }   /* 컴퓨터의 수학 글꼴 — 칸의 고정폭 글꼴을 물려받지 않게. 수학 글꼴에 없는 한글(\text{…})은 넣은 Noto Sans KR로 */
 .eq.tex .nw { white-space: nowrap; }                    /* 수식과 붙은 괄호 · 조사는 함께 줄을 바꾼다 */
 
 /* 정리 블록 */
@@ -424,7 +424,7 @@ footer {
   /* 글꼴 — Barlow · Barlow Condensed · Noto Sans KR · JetBrains Mono는 파일 안에 넣었다(바깥 요청 없음). 넣은 글꼴에 없는 글자만 다음 글꼴(Windows Bahnschrift, macOS Avenir Next Condensed)로 */
   --c-legend: 'Barlow Condensed', 'Bahnschrift SemiCondensed', 'Bahnschrift', 'Avenir Next Condensed', 'Roboto Condensed', 'DejaVu Sans Condensed', 'Arial Narrow', 'Noto Sans KR', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
   --c-body: 'Barlow', 'Segoe UI', 'Helvetica Neue', 'Noto Sans KR', 'Apple SD Gothic Neo', 'Malgun Gothic', system-ui, sans-serif;
-  --c-mono: 'JetBrains Mono', 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --c-mono: 'JetBrains Mono', 'IBM Plex Mono', 'Noto Sans KR', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;   /* 영문 고정폭 글꼴에는 한글이 없다 — 한글은 넣은 Noto Sans KR로(--c-body와 같은 자리) */
   --cap: var(--c-amber-fill);
 }
 @media (prefers-color-scheme: light) {

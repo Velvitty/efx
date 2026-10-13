@@ -420,7 +420,7 @@ body::before {
   to   { opacity:1; }
 }
 .inline-tag {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: 'JetBrains Mono', 'Noto Sans KR', monospace;
   font-size: 0.65em;
   padding: 1px 6px;
   border-radius: 2px;
@@ -599,7 +599,7 @@ body::before {
   /* 글꼴 — Barlow · Barlow Condensed · Noto Sans KR · JetBrains Mono는 파일 안에 넣었다(바깥 요청 없음). 넣은 글꼴에 없는 글자만 다음 글꼴(Windows Bahnschrift, macOS Avenir Next Condensed)로 */
   --c-legend: 'Barlow Condensed', 'Bahnschrift SemiCondensed', 'Bahnschrift', 'Avenir Next Condensed', 'Roboto Condensed', 'DejaVu Sans Condensed', 'Arial Narrow', 'Noto Sans KR', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
   --c-body: 'Barlow', 'Segoe UI', 'Helvetica Neue', 'Noto Sans KR', 'Apple SD Gothic Neo', 'Malgun Gothic', system-ui, sans-serif;
-  --c-mono: 'JetBrains Mono', 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --c-mono: 'JetBrains Mono', 'IBM Plex Mono', 'Noto Sans KR', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;   /* 영문 고정폭 글꼴에는 한글이 없다 — 한글은 넣은 Noto Sans KR로(--c-body와 같은 자리) */
   --cap: var(--c-amber-fill);
 }
 @media (prefers-color-scheme: light) {
@@ -1331,6 +1331,7 @@ body::before {
     <tr><td>모니터 보정 (3.1.1)</td><td>재생 줄의 단추로 여는 창에서 AutoEQ의 ParametricEQ.txt를 읽어, 듣는 헤드폰 · 스피커의 굴곡을 재생할 때만 고릅니다. 적용본 분석기 뒤 · 장치 앞에 걸려 화면의 그래프와 내보낸 파일에는 들어가지 않고, 설정 파일 대신 이 브라우저에 저장됩니다. 꺼 두면 표본이 그대로이고, 켜면 소리와 곡선의 차이가 0.0006 dB 안입니다. 보정 곡선이 0 dB를 넘으면 Preamp를 내리라고 알립니다(<a href="analog-soul-engineering.html#chain-monitor">사양서</a>).</td></tr>
     <tr><td>AutoEQ 가져오기 (3.1.1)</td><td>PK · LSC · HSC를 비롯한 Equalizer APO 필터를 PARAMETRIC EQ와 같은 바이쿼드로 옮깁니다. AutoEQ의 셸프 Q 0.70은 명세의 셸프(S = 1)와 ±10 dB에서 최대 0.045 dB 다릅니다. EQ 카드의 큰 편집 창에서도 가져올 수 있고, 이때는 처리 체인 안이라 내보낸 파일에도 들어갑니다.</td></tr>
     <tr><td>INPUT GAIN 0.1 dB (3.1.1)</td><td>모든 카드의 INPUT GAIN을 0.5 dB에서 0.1 dB 단위로 바꿨습니다. 켠 쪽과 끈 쪽의 음량을 0.1 dB까지 맞출 수 있습니다.</td></tr>
+    <tr><td>고정폭 칸의 한글 (3.1.6)</td><td>고정폭 글꼴 목록(JetBrains Mono · IBM Plex Mono · 시스템 고정폭)과 개발자 논고의 수식 글꼴 목록(컴퓨터의 수학 글꼴)에 한글이 든 글꼴이 없어, 신호 처리 사양서 · 개발자 논고의 표 값 칸 · 수식 줄 · 코드 주석과 수식 안의 한글이 파일에 넣은 Noto Sans KR이 아니라 컴퓨터마다 다른 글꼴로 그려졌습니다. 두 목록의 영문 글꼴 뒤에 Noto Sans KR을 넣어 본문과 같은 글꼴로 그립니다. 넣은 네 글꼴 어디에도 없는 기호(위 첨자 마이너스 등)와 수식의 수학 기호는 전처럼 컴퓨터의 글꼴로 그려집니다.</td></tr>
     <tr><td>HD 카드의 문서 순서 (3.1.5)</td><td>HD 복원 카드는 CSS로만 맨 앞에 보이고 문서에서는 맨 끝이라, Tab으로 옮겨 가면 PARAMETRIC EQ부터 지나 HD 카드에 맨 마지막에 닿고 화면 읽기 프로그램도 맨 끝에 읽었습니다. 이제 문서에서도 맨 앞이라 보이는 순서 · Tab 순서 · 읽는 순서가 HD → EQ → … → MASTER로 같습니다. 화면의 배치와 처리 순서, 내보낸 소리는 그대로입니다. 설정 파일의 카드 순서도 HD가 첫 칸이 되고, HD가 끝에 있는 예전 파일은 불러올 때 맨 앞으로 옮깁니다. HD 카드는 MASTER처럼 끌리지 않습니다.</td></tr>
     <tr><td>좁은 타일의 값 칸 (3.1.5)</td><td>3열이 막 시작되어 카드 폭이 360 ~ 371 px일 때(화면 스크롤바가 15 px인 창에서 1,175 ~ 1,209 px), 스크롤바 자리 22 px를 비운 VINYL · ATMOS · MASTERING의 손잡이 줄이 카드 안쪽을 넘어 값 칸이 오른쪽에서 최대 12 px 잘렸습니다. 슬라이더 막대가 범위 입력의 기본 폭 129 px 아래로 줄지 않았기 때문이라, 타일에서는 막대가 그보다 짧아질 수 있게 해 이름과 값 칸은 그대로 두고 막대만 줄입니다.</td></tr>
     <tr><td>같은 설정이면 같은 파일 (3.1.4)</td><td>같은 설정으로 내보내도 실행마다 표본이 조금씩 달랐습니다(같은 설정 9번에 9가지, 기본 카드 최대 4.76 × 10⁻⁴). 한 입력에 연결이 셋 이상 모이면 Chromium이 더하는 순서를 실행마다 바꾸고 float 덧셈은 순서에 따라 마지막 자리가 달라지기 때문이라, 그런 합류점(SOUNDGOODIZER · VINYL · ATMOS · MASTERING)을 둘씩 묶어 정해진 순서로 더합니다. 디더 난수도 표본마다 두 개씩 뽑아, 작은 차이 하나가 16 · 24bit 파일 전체로 번지지 않습니다. 이제 같은 원본 · 같은 설정이면 파일이 바이트까지 같습니다. README 4.16 · 4.19, 개발자 논고 §10 · §19.</td></tr>
