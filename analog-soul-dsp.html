@@ -3738,6 +3738,8 @@ let liveHDMode = 'off';   // 'off' | 'hd' | 'uxhd'
 let hdLiveBuf  = null;    // 복원 완료 버퍼 캐시
 let hdLiveKey  = '';      // 캐시 유효성 키 (모드+파라미터+파일)
 let _hdLiveBusy = false;
+let _hdLiveTarget = 'off';  // 지금 만드는 중인 모드
+let _hdLiveAgain = null;    // 만드는 동안 들어온 마지막 요청 — 끝난 뒤 이어서 처리한다(예전에는 버려 마지막 값이 반영되지 않았다)
 let _defaultSR = 0;       // 장치 기본 샘플레이트
 let eulaAccepted = false; // set to true on file upload or EULA accept
 
@@ -4216,7 +4218,7 @@ function rpRender(mode) {
   const dot = t => (t.id === 'base' ? '' : (st[t.id] !== 'none' && !(t.id === 'ultra' && st[t.id] === 'real') ? '<span class="rp-dot" aria-hidden="true"></span>' : ''));
   pop.innerHTML = `<div class="rp-tabs" role="tablist" aria-label="프리셋 분류">${tabs.map(t => `<button type="button" class="rp-tab" role="tab" id="rpTab-${t.id}" aria-selected="${t.id === cur.id}" tabindex="${t.id === cur.id ? 0 : -1}" data-tab="${t.id}">${t.name}${dot(t)}</button>`).join('')}</div>
     <div class="rp-list" role="radiogroup" aria-labelledby="rpTab-${cur.id}">${cur.opts.map(o => `<button type="button" class="rp-opt" role="radio" aria-checked="${st[cur.id] === o.id}" data-opt="${o.id}"><span class="rp-name">${o.name}</span><span class="rp-desc">${o.desc}</span></button>`).join('')}</div>
-    <div class="rp-foot">${cur.id === 'base' ? '기준은 무손실 원본으로 검증한 값입니다.' : '탭마다 하나씩 골라 섞을 수 있습니다. 기준 외에는 취향 프리셋입니다.'}</div>`;
+    <div class="rp-foot">${cur.id === 'base' ? '기준은 무손실 원본으로 검증한 값입니다.' : '탭마다 하나씩 골라 섞을 수 있습니다. 기준 외에는 취향 프리셋입니다.'}${liveHDMode === mode ? ' 창을 닫으면 LIVE 미리듣기를 다시 만듭니다.' : ''}</div>`;
   pop.querySelectorAll('.rp-tab').forEach(b => b.addEventListener('click', () => { rpTab[mode] = b.dataset.tab; rpRender(mode); pop.querySelector('.rp-tab[aria-selected="true"]').focus(); }));
   pop.querySelectorAll('.rp-opt').forEach(b => b.addEventListener('click', () => { rpState[mode][cur.id] = b.dataset.opt; rpApply(mode); rpRender(mode); }));
   const tl = pop.querySelector('.rp-tabs');
@@ -4226,10 +4228,13 @@ function rpRender(mode) {
 function rpPlace(btn) { const pop = document.getElementById('rpPop'), r = btn.getBoundingClientRect(), w = pop.offsetWidth, h = pop.offsetHeight;
   let x = Math.min(r.left, window.innerWidth - w - 8), y = r.bottom + 4; if (y + h > window.innerHeight - 8 && r.top - h - 4 > 8) y = r.top - h - 4;
   pop.style.left = Math.max(8, x) + 'px'; pop.style.top = y + 'px'; }
+// 프리셋은 창을 닫을 때(다른 모드 창으로 넘어갈 때도) 그 모드의 LIVE 미리듣기에 한 번 반영한다 —
+// 탭마다 하나씩 골라 섞는 동안 곡 전체를 매번 다시 복원하지 않게. 예전에는 손잡이 값만 바꾸고 다시 복원하지 않았다
 function rpToggle(mode, force) {
-  const btn = document.getElementById(mode + 'PresetBtn'), pop = document.getElementById('rpPop'), open = force !== undefined ? force : rpOpen !== mode;
+  const btn = document.getElementById(mode + 'PresetBtn'), pop = document.getElementById('rpPop'), open = force !== undefined ? force : rpOpen !== mode, was = rpOpen;
   ['hd', 'uxhd'].forEach(m => document.getElementById(m + 'PresetBtn').setAttribute('aria-expanded', 'false'));
-  if (!open) { pop.classList.remove('open'); rpOpen = null; return; }
+  if (!open) { pop.classList.remove('open'); rpOpen = null; if (was) hdLiveRefresh(was, false); return; }
+  if (was && was !== mode) hdLiveRefresh(was, false);
   rpOpen = mode; rpRender(mode); pop.classList.add('open'); btn.setAttribute('aria-expanded', 'true'); rpPlace(btn);
 }
 (function rpInit() {
@@ -7994,16 +7999,21 @@ function detectSourceGrid(buf) {
 // 조용히 이어지는 음 7 dB 안팎. 디더 없이 반올림한 음악은 0.3~0.7 dB로 작다.
 // ============================================================
 const BIT_CFG = { N: 2048, hop: 512, gMin: 0.1, alpha: 0.98, silence: 64,
-  // 셰이핑 디더 원본: 7빈 평활 주기도의 10% 백분위를 배율 CAL로 나눠 잡음 세기로 보고,
-  // 15~19.5 kHz 바닥이 평탄 반올림 수준의 LEVEL배 이상이면서 3~5 kHz 바닥의 RISE배 이상일 때만 셰이핑으로 판별한다.
+  // 셰이핑 디더 원본: 7빈 평활 주기도의 10% 백분위를 배율 CAL로 나눠 잡음 세기로 보고, 15~19.5 kHz 바닥이
+  //  ① 평탄 반올림 수준의 LEVEL배 이상 LEVELMAX배 이하이고, ② 3~5 kHz 바닥과 8~11 kHz 바닥의 RISE배 이상이며,
+  //  ③ 고를 때(그 띠 에너지가 2% 백분위인 틀이 10% 백분위인 틀의 STEADY배 이상)만 셰이핑으로 판별한다.
+  //  ①의 위 끝은 알려진 가장 센 곡선(SoX high-shibata, +31 dB)보다 5 dB 위다. ②의 8~11 kHz는 맨 위 옥타브에서
+  //  가파르게 오르는 셰이핑 잡음을 위가 평평한 심벌 · 하이햇과 가르고, ③은 잦아드는 소리의 꼬리를 늘 깔린 잡음과 가른다.
   // SPLIT 아래는 평탄 수준을 넘지 않게 묶고(셰이핑은 저역 잡음을 낮추기만 한다), 결과는 원본에서 ±K LSB 안에 둔다 —
   // K는 추정한 셰이핑 잡음의 표준편차 σ의 SIGMA배(올림, 최소 1), 어떤 경우에도 KMAX LSB를 넘지 않는다
-  shapePct: 0.1, shapeCal: 0.4915, shapeLevel: 10, shapeRise: 3, shapeSplit: 8000, shapeSigma: 3, shapeKMax: 16 };
+  shapePct: 0.1, shapeCal: 0.4915, shapeLevel: 10, shapeLevelMax: 4000, shapeRise: 3, shapeSteady: 0.794,
+  shapeSplit: 8000, shapeSigma: 3, shapeKMax: 16 };
 // ============================================================
 // 반올림 잡음의 모양 추정 — 셰이핑 디더로 만든 16bit는 잡음이 고역으로 몰려 크게 올라와 있다
 // ------------------------------------------------------------
 // 모든 채널의 틀별 스펙트럼(7빈 평활)을 모아 빈마다 10% 백분위를 구한다. 음악은 오가도 반올림 잡음은
-// 늘 깔려 있어, 조용한 순간들의 바닥이 잡음의 모양이 된다. 셰이핑이 아니면 null — 평탄 잡음 그대로 쓴다.
+// 늘 깔려 있어, 조용한 순간들의 바닥이 잡음의 모양이 된다. 다만 고역이 늘 깔린 음악(심벌 · 하이햇)은 바닥이
+// 음악이라, 그 바닥이 셰이핑 잡음답게 높이 · 모양 · 고름을 갖췄는지 따져 본다. 셰이핑이 아니면 null — 평탄 잡음 그대로 쓴다.
 // 틀별 스펙트럼은 여기서만 쓰고 놓으므로 향상 중의 순간 최대 메모리는 늘지 않는다.
 // ============================================================
 async function estimateQuantNoise(chans, sr, grid, onProgress) {
@@ -8038,19 +8048,27 @@ async function estimateQuantNoise(chans, sr, grid, onProgress) {
   if (f < 50) return null;
   // 빈마다 백분위 — 한 빈의 모든 틀 값을 모아 선택 알고리즘으로
   const Nest = new Float64Array(NB), col = new Float64Array(f), rank = Math.floor(BIT_CFG.shapePct * (f - 1));
-  for (let k = 0; k < NB; k++) {
-    for (let i = 0; i < f; i++) col[i] = spec[i * NB + k];
-    let lo = 0, hi = f - 1;                                   // 퀵셀렉트
+  const pick = r => {                                         // 퀵셀렉트 — col에서 r번째로 작은 값
+    let lo = 0, hi = f - 1;
     while (lo < hi) {
       const pv = col[(lo + hi) >> 1]; let i = lo, j = hi;
       while (i <= j) { while (col[i] < pv) i++; while (col[j] > pv) j--; if (i <= j) { const t = col[i]; col[i] = col[j]; col[j] = t; i++; j--; } }
-      if (rank <= j) hi = j; else if (rank >= i) lo = i; else break;
+      if (r <= j) hi = j; else if (r >= i) lo = i; else break;
     }
-    Nest[k] = col[rank] / BIT_CFG.shapeCal;
+    return col[r];
+  };
+  for (let k = 0; k < NB; k++) {
+    for (let i = 0; i < f; i++) col[i] = spec[i * NB + k];
+    Nest[k] = pick(rank) / BIT_CFG.shapeCal;
   }
   const med = (f1, f2) => { const a = []; for (let k = Math.ceil(f1 * N / sr); k <= Math.floor(f2 * N / sr); k++) a.push(Nest[k]); a.sort((p, q) => p - q); return a[a.length >> 1]; };
-  const hiF = med(15000, 19500), midF = med(3000, 5000);
-  if (!(hiF >= BIT_CFG.shapeLevel * PnFlat && hiF >= BIT_CFG.shapeRise * midF)) return null;
+  const hiF = med(15000, 19500), midF = med(3000, 5000), upF = med(8000, 11000);
+  // 고역 바닥의 고름: 15~19.5 kHz 띠 에너지를 틀마다 더해 2% · 10% 백분위를 견준다 — 늘 깔린 잡음이면 둘이 붙어 있다
+  const kA = Math.ceil(15000 * N / sr), kB = Math.floor(19500 * N / sr);
+  for (let i = 0; i < f; i++) { let s = 0; for (let k = kA; k <= kB; k++) s += spec[i * NB + k]; col[i] = s; }
+  const e10 = pick(rank), e2 = pick(Math.floor(0.02 * (f - 1)));
+  if (!(hiF >= BIT_CFG.shapeLevel * PnFlat && hiF <= BIT_CFG.shapeLevelMax * PnFlat
+    && hiF >= BIT_CFG.shapeRise * midF && hiF >= BIT_CFG.shapeRise * upF && e2 >= BIT_CFG.shapeSteady * e10)) return null;
   // 주파수별 잡음 세기: SPLIT 위는 추정치를 한 번 더 평활, 아래는 평탄 수준을 넘지 않게
   const Pn = new Float64Array(NB), kS = Math.round(BIT_CFG.shapeSplit * N / sr);
   for (let k = 0; k < NB; k++) {
@@ -8064,7 +8082,8 @@ async function estimateQuantNoise(chans, sr, grid, onProgress) {
   const sigma = Math.sqrt(2 * s2 / (N * N)) / D;
   const K = Math.min(BIT_CFG.shapeKMax, Math.max(1, Math.ceil(BIT_CFG.shapeSigma * sigma)));
   if (onProgress) onProgress(0.5);
-  return { Pn, K, sigma, hiDb: 10 * Math.log10(hiF / PnFlat), midDb: 10 * Math.log10(midF / PnFlat) };
+  return { Pn, K, sigma, hiDb: 10 * Math.log10(hiF / PnFlat), midDb: 10 * Math.log10(midF / PnFlat),
+    upDb: 10 * Math.log10(upF / PnFlat), steadyDb: 10 * Math.log10(e2 / e10) };
 }
 
 async function dequantizeChannel(q, grid, strength, onProgress, noise) {
@@ -8651,8 +8670,10 @@ const HD_PROGRESS_MSGS = [
 // 복원 버퍼 생성 — export와 같은 순서(업샘플 → 복원)와 같은 알고리즘
 async function renderHDLive(mode) {
   const targetSR = liveTargetSR(mode);
+  // 손잡이는 첫 await 전에 모두 읽는다 — 리샘플링하는 동안 바뀐 값이 섞이지 않게(캐시 키도 같은 순간에 셈한다)
   const hfStr  = parseFloat(document.getElementById(mode === 'hd' ? 'hdHF'     : 'uxhdHF' ).value) / 100;
   const smooth = parseFloat(document.getElementById(mode === 'hd' ? 'hdSmooth' : 'uxhdAir').value) / 100;
+  const opts   = restoreOpts(mode);
 
   // 목표 표본률로 직접 올린다 — 브라우저 변환기는 품질이 정해져 있지 않다(선형 보간이면 고역이 깎이고 거울상이 남는다)
   let buf;
@@ -8678,21 +8699,29 @@ async function renderHDLive(mode) {
     setOverlayProg(pct,
       '고해상도 복원 합성 중... ' + Math.min(100, Math.round(prog * 100)) + '%',
       msgs[Math.min(mi, msgs.length - 1)]);
-  }, restoreOpts(mode));
+  }, opts);
 
   return buf;
 }
 
 // 실시간 복원 모드 전환 — 'off' | 'hd' | 'uxhd'
+// 미리듣기 복원의 캐시 키 — 그 모드의 손잡이(SYNTH · SMOOTH/AIR · 나머지 복원 손잡이)와 파일이 같으면 다시 쓴다
+function hdLiveKeyOf(mode) {
+  const pA = document.getElementById(mode === 'hd' ? 'hdHF'     : 'uxhdHF' ).value;
+  const pB = document.getElementById(mode === 'hd' ? 'hdSmooth' : 'uxhdAir').value;
+  const fid = originalFile ? (originalFile.name + ':' + originalFile.size) : '';
+  return mode + '|' + pA + '|' + pB + '|' + JSON.stringify(restoreOpts(mode)) + '|' + fid;
+}
+
 async function setLiveHDMode(mode) {
-  if (_hdLiveBusy) return;
+  if (_hdLiveBusy) { _hdLiveAgain = mode; return; }
   if (!sourceBuf && mode !== 'off') { updateHDLiveUI(); return; }
 
   const wasPlaying = isPlaying;
   // 재생 위치 보존
   const resumeAt = (isPlaying && audioCtx) ? (audioCtx.currentTime - startedAt) : pausedAt;
 
-  _hdLiveBusy = true;
+  _hdLiveBusy = true; _hdLiveTarget = mode;
   try {
     stopPlay();
 
@@ -8702,10 +8731,7 @@ async function setLiveHDMode(mode) {
       await ensureCtxRate(null);
     } else {
       // 캐시 키 — 해당 모드의 파라미터와 파일이 같으면 재사용
-      const pA = document.getElementById(mode === 'hd' ? 'hdHF'     : 'uxhdHF' ).value;
-      const pB = document.getElementById(mode === 'hd' ? 'hdSmooth' : 'uxhdAir').value;
-      const fid = originalFile ? (originalFile.name + ':' + originalFile.size) : '';
-      const key = mode + '|' + pA + '|' + pB + '|' + JSON.stringify(restoreOpts(mode)) + '|' + fid;
+      const key = hdLiveKeyOf(mode);
 
       if (key !== hdLiveKey || !hdLiveBuf) {
         showOverlay(
@@ -8714,8 +8740,9 @@ async function setLiveHDMode(mode) {
           5
         );
         await new Promise(r => setTimeout(r, 30));
+        const rkey = hdLiveKeyOf(mode);           // 실제로 복원할 손잡이 — 기다리는 사이에 바뀌었을 수 있다
         hdLiveBuf = await renderHDLive(mode);
-        hdLiveKey = key;
+        hdLiveKey = rkey;
         setOverlayProg(100, '완료', '▸ 실시간 재생 준비 완료');
         await new Promise(r => setTimeout(r, 200));
         hideOverlay();
@@ -8751,7 +8778,10 @@ async function setLiveHDMode(mode) {
     updateHDLiveUI();
     setStatus('실시간 복원 실패: ' + e.message, 'err');
   } finally {
-    _hdLiveBusy = false;
+    _hdLiveBusy = false; _hdLiveTarget = 'off';
+    // 만드는 동안 들어온 요청 — 모드나 손잡이가 달라졌으면 이어서 처리한다(같으면 재생을 끊지 않는다)
+    const again = _hdLiveAgain; _hdLiveAgain = null;
+    if (again !== null && (again !== liveHDMode || (again !== 'off' && hdLiveKeyOf(again) !== hdLiveKey))) setLiveHDMode(again);
   }
 }
 
@@ -8794,6 +8824,16 @@ document.getElementById('uxhdLiveOn').addEventListener('change', function() {
   setLiveHDMode(this.checked ? 'uxhd' : 'off');
 });
 
+// 복원 손잡이가 바뀌었다 — 그 모드의 LIVE가 켜져 있으면(또는 그 모드로 켜는 중이면) 다시 복원한다.
+// force는 손잡이를 놓을 때(전처럼 늘 다시 만든다), 아니면 캐시 키가 달라졌을 때만 — 같으면 재생을 끊지 않는다
+function hdLiveRefresh(m, force) {
+  const cur = _hdLiveBusy ? (_hdLiveAgain !== null ? _hdLiveAgain : _hdLiveTarget) : liveHDMode;
+  if (cur === 'off' || cur !== m) return;
+  if (force) hdLiveKey = '';
+  else if (!_hdLiveBusy && hdLiveKeyOf(m) === hdLiveKey) return;
+  setLiveHDMode(m);
+}
+
 // 파라미터를 바꾸면 해당 모드가 켜져 있을 때만 다시 복원
 {
   const HD_SLIDER_MODE = { hdAuto: 'hd', hdHF: 'hd', hdSmooth: 'hd', hdKnee: 'hd', hdAtk: 'hd', hdSus: 'hd', hdWidth: 'hd', uxhdAuto: 'uxhd', uxhdHF: 'uxhd', uxhdAir: 'uxhd', uxhdKnee: 'uxhd', uxhdKnee2: 'uxhd', uxhdAtk: 'uxhd', uxhdSus: 'uxhd', uxhdWidth: 'uxhd' };
@@ -8801,12 +8841,7 @@ document.getElementById('uxhdLiveOn').addEventListener('change', function() {
     const el = document.getElementById(id);
     if (!el) return;
     // 'change'는 슬라이더를 놓았을 때만 발생 — 드래그 중 재렌더 방지
-    el.addEventListener('change', function() {
-      if (liveHDMode !== 'off' && liveHDMode === HD_SLIDER_MODE[id]) {
-        hdLiveKey = '';
-        setLiveHDMode(liveHDMode);
-      }
-    });
+    el.addEventListener('change', function() { hdLiveRefresh(HD_SLIDER_MODE[id], true); });
   });
 }
 

@@ -2126,6 +2126,44 @@ pausedAt = Math.<span class="f">min</span>(resumeAt, Math.<span class="f">max</s
   }, <span class="v">200</span>);
 } <span class="k">else</span> late.buffer = <span class="f">atmosCached</span>(<span class="v">'late'</span>, lk, <span class="k">function</span> () { <span class="k">return</span> <span class="f">makeAtmosLate</span>(ac, p); });</pre>
     </figure>
+    <h4>LIVE 복원을 다시 만드는 때 (3.1.10)</h4>
+    <p>
+      LIVE의 복원 버퍼는 모드 · 복원 손잡이 · 파일을 이은 키로 보관하고, 키가 같으면 다시 쓴다. 다시 만들라는 신호는 손잡이를 놓을 때의
+      <code>change</code>뿐이었는데, 복원 PRESET은 슬라이더 값만 옮기고 이 신호를 내지 않아 손잡이는 새 값(밝게: SYNTH 65)인데
+      들리는 소리는 이전 값(50)으로 만든 것이었다. 탭마다 골라 섞는 동안 고를 때마다 곡 전체를 복원하지 않도록, 판을 닫을 때
+      (바깥 · Esc · 다른 모드의 판으로 넘어감) 키를 견주어 달라졌을 때만 한 번 다시 만든다.
+    </p>
+    <figure class="src">
+      <figcaption>hdLiveRefresh — 판을 닫을 때와 손잡이를 놓을 때</figcaption>
+<pre><span class="k">function</span> <span class="f">hdLiveRefresh</span>(m, force) {
+  <span class="k">const</span> cur = _hdLiveBusy ? (_hdLiveAgain !== <span class="k">null</span> ? _hdLiveAgain : _hdLiveTarget) : liveHDMode;
+  <span class="k">if</span> (cur === <span class="v">'off'</span> || cur !== m) <span class="k">return</span>;
+  <span class="k">if</span> (force) hdLiveKey = <span class="v">''</span>;
+  <span class="k">else</span> <span class="k">if</span> (!_hdLiveBusy &amp;&amp; <span class="f">hdLiveKeyOf</span>(m) === hdLiveKey) <span class="k">return</span>;
+  <span class="f">setLiveHDMode</span>(m);
+}
+…
+  <span class="k">if</span> (!open) { pop.classList.<span class="f">remove</span>(<span class="v">'open'</span>); rpOpen = <span class="k">null</span>; <span class="k">if</span> (was) <span class="f">hdLiveRefresh</span>(was, <span class="k">false</span>); <span class="k">return</span>; }
+  <span class="k">if</span> (was &amp;&amp; was !== mode) <span class="f">hdLiveRefresh</span>(was, <span class="k">false</span>);</pre>
+    </figure>
+    <p>
+      복원하는 동안 온 요청은 버리지 않고 마지막 하나를 두었다가, 끝난 뒤 모드나 키가 달라졌으면 이어서 처리한다(같으면 재생을 끊지 않는다).
+      이전에는 복원 중의 요청을 버려, 키보드로 손잡이를 잇달아 옮기면 마지막 값이 반영되지 않았다. 또 키를 30 ms 기다림 앞에서 셈하고
+      복원 손잡이는 리샘플링을 기다린 뒤에 읽어, 그 사이 바뀐 값으로 만든 버퍼가 이전 키로 보관될 수 있었다. 지금은 복원에 쓸 손잡이를
+      첫 기다림 전에 한꺼번에 읽고, 키도 렌더 바로 앞에서 셈한다.
+    </p>
+    <figure class="src">
+      <figcaption>setLiveHDMode — 만드는 동안 온 요청</figcaption>
+<pre><span class="k">async</span> <span class="k">function</span> <span class="f">setLiveHDMode</span>(mode) {
+  <span class="k">if</span> (_hdLiveBusy) { _hdLiveAgain = mode; <span class="k">return</span>; }
+  …
+        <span class="k">const</span> rkey = <span class="f">hdLiveKeyOf</span>(mode);           <span class="c">// 실제로 복원할 손잡이 — 기다리는 사이에 바뀌었을 수 있다</span>
+        hdLiveBuf = <span class="k">await</span> <span class="f">renderHDLive</span>(mode);
+        hdLiveKey = rkey;
+  …
+    <span class="k">const</span> again = _hdLiveAgain; _hdLiveAgain = <span class="k">null</span>;
+    <span class="k">if</span> (again !== <span class="k">null</span> &amp;&amp; (again !== liveHDMode || (again !== <span class="v">'off'</span> &amp;&amp; <span class="f">hdLiveKeyOf</span>(again) !== hdLiveKey))) <span class="f">setLiveHDMode</span>(again);</pre>
+    </figure>
   </div>
 </section>
 
@@ -3194,13 +3232,19 @@ lim.<span class="f">set</span>(p.limCeil, <span class="v">0</span>, <span class=
       위의 칸은 디더 없이 반올림한 원본에서만 정확하다. TPDF 원본은 원래 값이 ±1.5 LSB까지 벗어날 수 있고, 노이즈 셰이핑 원본은
       오차 되먹임이 반올림 잡음을 |1 − F|² 모양으로 고역에 몰아(Wannamaker, 1992) 여러 LSB 벗어난다. 평탄 잡음을 가정한 향상은
       셰이핑 원본에서 0.04 dB였다. 그래서 모든 채널의 틀별 스펙트럼(7빈 평활)을 보관해 빈마다 10% 백분위로 잡음 모양을 추정하고
-      (최소 통계법 계열, Martin, 2001), 고역 바닥이 평탄 수준의 10배 이상이면서 중역 바닥의 3배 이상일 때만 셰이핑으로 판별한다.
+      (최소 통계법 계열, Martin, 2001), 고역(15 ~ 19.5 kHz) 바닥이 셰이핑 잡음다울 때만 셰이핑으로 판별한다. 높이는 평탄 수준의 10배 이상
+      4000배 이하, 모양은 중역(3 ~ 5 kHz)과 8 ~ 11 kHz 바닥의 3배 이상, 고름은 이 띠 에너지의 2% 백분위 틀이 10% 백분위 틀의 0.794배 이상이다.
       셰이핑이면 빈마다 추정한 잡음 세기로 위너 이득을 걸고, 칸을 추정한 셰이핑 잡음 σ의 3배로 넓히되 16 LSB를 넘지 않게 한다.
     </p>
     <figure class="src">
       <figcaption>estimateQuantNoise — 판별과 칸의 폭</figcaption>
-<pre>  <span class="k">const</span> hiF = <span class="f">med</span>(<span class="v">15000</span>, <span class="v">19500</span>), midF = <span class="f">med</span>(<span class="v">3000</span>, <span class="v">5000</span>);
-  <span class="k">if</span> (!(hiF &gt;= BIT_CFG.shapeLevel * PnFlat &amp;&amp; hiF &gt;= BIT_CFG.shapeRise * midF)) <span class="k">return</span> <span class="k">null</span>;
+<pre>  <span class="k">const</span> hiF = <span class="f">med</span>(<span class="v">15000</span>, <span class="v">19500</span>), midF = <span class="f">med</span>(<span class="v">3000</span>, <span class="v">5000</span>), upF = <span class="f">med</span>(<span class="v">8000</span>, <span class="v">11000</span>);
+  <span class="c">// 고역 바닥의 고름: 15~19.5 kHz 띠 에너지를 틀마다 더해 2% · 10% 백분위를 견준다 — 늘 깔린 잡음이면 둘이 붙어 있다</span>
+  <span class="k">const</span> kA = Math.<span class="f">ceil</span>(<span class="v">15000</span> * N / sr), kB = Math.<span class="f">floor</span>(<span class="v">19500</span> * N / sr);
+  <span class="k">for</span> (<span class="k">let</span> i = <span class="v">0</span>; i &lt; f; i++) { <span class="k">let</span> s = <span class="v">0</span>; <span class="k">for</span> (<span class="k">let</span> k = kA; k &lt;= kB; k++) s += spec[i * NB + k]; col[i] = s; }
+  <span class="k">const</span> e10 = <span class="f">pick</span>(rank), e2 = <span class="f">pick</span>(Math.<span class="f">floor</span>(<span class="v">0.02</span> * (f - <span class="v">1</span>)));
+  <span class="k">if</span> (!(hiF &gt;= BIT_CFG.shapeLevel * PnFlat &amp;&amp; hiF &lt;= BIT_CFG.shapeLevelMax * PnFlat
+    &amp;&amp; hiF &gt;= BIT_CFG.shapeRise * midF &amp;&amp; hiF &gt;= BIT_CFG.shapeRise * upF &amp;&amp; e2 &gt;= BIT_CFG.shapeSteady * e10)) <span class="k">return</span> <span class="k">null</span>;
   …
   <span class="k">let</span> s2 = Pn[<span class="v">0</span>] + Pn[half]; <span class="k">for</span> (<span class="k">let</span> k = <span class="v">1</span>; k &lt; half; k++) s2 += <span class="v">2</span> * Pn[k];
   <span class="k">const</span> sigma = Math.<span class="f">sqrt</span>(<span class="v">2</span> * s2 / (N * N)) / D;
@@ -3210,6 +3254,18 @@ lim.<span class="f">set</span>(p.limCeil, <span class="v">0</span>, <span class=
       σ가 이론값과 맞는다(Lipshitz 5차 2.0, F-가중 9차 4.2, 개선 E-가중 9차 7.1 LSB). 칸을 무제한으로 둘 때 벗어난 최대량은 14 · 20 · 34 LSB였고,
       3σ로 묶어도 이득은 거의 같다(성긴 음악 18.7 · 19.2 · 18.3 dB, 무제한 18.6 · 19.1 · 19.2 dB). 평탄 원본 여덟 조건은 모두 판별에 걸리지 않아
       이전과 비트 단위로 같게 처리됐다. 틀별 스펙트럼(4분 스테레오 약 160 MB)은 추정에만 쓰고 향상 전에 놓는다.
+    </p>
+    <p>
+      판별의 세 조건(위 끝 · 8 ~ 11 kHz 대비 상승 · 고름)은 3.1.10에서 더했다. 바닥이 늘 잡음이라는 가정은 하이햇 · 라이드 · 심벌이 쉬지 않는 음악에서 깨진다.
+      참값을 아는 합성 신호 15가지를 16비트로 만드는 방식 16가지(SoX 14.4.2 dither.c의 셰이핑 여덟 가지 · 1 ~ 3차 고역 통과 · 청각 문턱에서 만든
+      최소 위상 곡선 둘 · 디더 없음 · TPDF · 기운 TPDF)로 만들어 44.1 · 48 kHz에서 450가지를 재면, 이전 판은 고역이 늘 깔린 음악 210가지를 모두
+      셰이핑(K = 16)으로 보고 참값과의 오차를 최대 34.8 dB 키웠다(원본에서 16 LSB까지 옮김). 셰이핑 잡음은 맨 위 옥타브로 가파르게 오르고
+      (8 ~ 11 kHz 대비 +5.3 ~ +39.0 dB) 늘 같은 세기라 2%와 10% 백분위 틀이 붙지만(−0.27 ~ −0.57 dB), 음악의 바닥은 위가 평평하고(+0.3 ~ +2.1 dB)
+      잦아드는 꼬리 때문에 그 사이가 벌어진다(−0.53 ~ −2.03 dB). 바닥의 높이도 셰이핑 원본 +13.3 ~ +32.0 dB, 음악 +34.4 ~ +73.9 dB로 갈린다.
+      세 조건을 더하자 그 210가지가 모두 평탄으로 돌아왔고(−0.06 ~ +0.40 dB, ½ LSB 안), 셰이핑 원본 119가지는 판별 · K · 오차 감소가 그대로였다.
+      대가로 가장 약한 1차 고역 통과 셰이핑(K = 3, 상승 +3.3 ~ +3.7 dB)과 녹음 잡음 −90 dBFS 아래의 약한 곡선(수정 E-가중 · 2차, 상승 +3.5 ~ +4.4 dB)은
+      평탄으로 처리한다(오차 감소 +2.8 ~ +18.0 → +1.1 ~ +2.8 dB, +3.6 ~ +3.7 → +0.3 ~ +0.4 dB). 10 kHz 위에만 늘 고르게 깔린 잡음은 셰이핑 잡음과
+      높이 · 모양 · 고름이 같아 가를 수 없다(−78 dBFS 고역 잡음, 평탄 원본에서 K = 13, 오차 17.4 ~ 22.2 dB 커짐).
     </p>
 
     <h3 id="bits-enc">인코더</h3>
@@ -3262,6 +3318,8 @@ lim.<span class="f">set</span>(p.limCeil, <span class="v">0</span>, <span class=
         <tr><td>이전 판 인코더(두 부호 ×32767)로 같은 16bit 원본을 되쓰기</td><td>Chromium 디코딩 값</td><td class="m">표본 0.23% 오차(모두 −6 dBFS를 넘는 음수, 1 LSB)</td></tr>
         <tr><td>4분 스테레오 16bit의 향상</td><td>실제 Chromium</td><td class="m">6.4 s</td></tr>
         <tr><td>F-가중 셰이핑 16bit WAV, 원본 · 24bit</td><td>실제 Chromium 종단</td><td class="m">19.2 dB 감소(−77.9 → −97.1 dBFS), 최대 13 LSB</td></tr>
+        <tr><td>고역이 늘 깔린 합성 음악 7가지 × 16비트를 만든 방식(44.1 · 48 kHz, 210가지)</td><td>실제 Chromium, 참값 대비 (3.1.10)</td><td class="m">3.1.9 셰이핑 −34.8 ~ +2.7 dB · 지금 평탄 −0.06 ~ +0.40 dB, ½ LSB 안</td></tr>
+        <tr><td>셰이핑 원본 119가지(SoX 셰이핑 여덟 가지 · 고역 통과 · 청각 문턱 곡선)</td><td>같음 (3.1.10)</td><td class="m">판별 · K · 오차 감소가 3.1.9와 같음</td></tr>
       </tbody>
     </table></div>
   </div>
