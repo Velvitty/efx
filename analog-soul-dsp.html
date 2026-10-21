@@ -9740,7 +9740,7 @@ drawTubeViz();
   var grid = document.getElementById('dspGrid');
   if(!grid) return;
   var dragging = null;
-  var indicator = null;
+  var indicator = null, swapped = null;   // swapped: 방금 자리를 바꾼 카드
   var lastRef = undefined; // 마지막 insertBefore 참조 캐시
 
   // 재생 단계 — MASTER 뒤에는 VINYL · ATMOS만 놓을 수 있다(POST_MASTER_OK).
@@ -9794,7 +9794,7 @@ drawTubeViz();
   grid.addEventListener('dragstart', function(e){
     var mod = e.target.closest('.module');
     if(!mod || mod.id === 'mod-master' || mod.id === 'mod-hd'){ e.preventDefault(); return; }
-    dragging = mod;
+    dragging = mod; swapped = null;
     setTimeout(function(){ mod.classList.add('dragging'); }, 0);
     e.dataTransfer.effectAllowed = 'move';
   });
@@ -9821,20 +9821,27 @@ drawTubeViz();
       deny(false); placeIndicator(skip(z.nextSibling) || null); return;
     }
     var target = e.target.closest('.module');
-    if(!target || target === dragging || target.id === 'mod-hd') return;
+    if (target !== swapped) swapped = null;                    // 자리를 바꾼 카드를 벗어나면(빈틈 · 다른 카드) 다시 반응
+    if(!target || target === dragging || target.id === 'mod-hd' || target === swapped) return;
 
     var rect = target.getBoundingClientRect();
-    var after = e.clientX >= rect.left + rect.width / 2;
+    var half = e.clientX >= rect.left + rect.width / 2;
+    // 놓을 자리 — 지금 자리(자리 표시, 없으면 끄는 카드)보다 뒤에 있는 카드 위로 들어가면 그 카드 뒤, 앞에 있는 카드면 그 카드 앞.
+    // 카드 어디에 올려도 이웃과 자리가 바뀐다. 예전에는 카드의 왼쪽 · 오른쪽 절반으로 갈라, 이웃 카드의 가까운 절반에 놓으면
+    // 원래 자리로 돌아가 타일 하나(400 px 남짓)의 반을 넘게 끌어야 옮겨졌다
+    var here = (indicator && indicator.parentNode) ? indicator : dragging;
+    var after = !!(here.compareDocumentPosition(target) & Node.DOCUMENT_POSITION_FOLLOWING);
 
     // MASTER — 왼쪽 절반은 바로 앞, 오른쪽 절반은 재생 단계 맨 앞
     if (target.id === 'mod-master') {
-      if (!after) { deny(false); placeIndicator(master); return; }
+      if (!half) { deny(false); placeIndicator(master); return; }
       if (!ok) { deny(true); return; }
       deny(false); placeIndicator(skip((zone() || master).nextSibling) || null); return;
     }
     if (afterMaster(target) && !ok) { deny(true); return; }   // 재생 단계 안 — VINYL · ATMOS만
     deny(false);
 
+    swapped = target;                                          // 바꾼 카드는 스프링으로 미끄러지는 동안 커서 밑에 남아 있어, 벗어날 때까지 다시 보지 않는다(되돌아가며 깜빡임)
     if(!after){
       placeIndicator(target);
     } else {
