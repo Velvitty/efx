@@ -1256,7 +1256,7 @@ body::before {
         <li><a href="#vinyl">모듈 07 — 바이닐 레코드</a></li>
         <li><a href="#atmos">모듈 08 — 돌비 애트모스</a></li>
         <li><a href="#master">모듈 09 — 마스터링 체인</a></li>
-        <li><a href="#hd">모듈 10 — HD 업스케일링</a></li>
+        <li><a href="#hd">모듈 10 — 고해상도 복원</a></li>
         <li><a href="#preset">프리셋 — 설정 보관</a> <span class="badge-new v24">v2.4</span></li>
         <li><a href="#export">내보내기 — 표본률 · 비트 깊이</a> <span class="badge-new v30">v3.0</span></li>
         <li><a href="#tips">활용 팁</a></li>
@@ -1287,7 +1287,7 @@ body::before {
       <tr><td>화면</td><td>EQ 그래프 — 번호 점을 끌어 주파수 · 이득을 고침(Shift는 1/5로 세밀하게) · 점 위 휠로 Q(가파른 컷은 기울기) · 빈 곳을 두 번 눌러 벨 추가 · 점을 두 번 눌러 켜고 끄기 · 오른쪽 단추로 지우기 · 키보드로도 모든 조작 · 곡선은 소리를 내는 것과 같은 필터에서 얻음(40 Hz ~ 20 kHz에서 소리와의 차이 최대 0.002 dB) · 재생 중 EQ 앞(선)과 뒤(면)의 스펙트럼(1 kHz 기준 옥타브당 +3 dB 기울임) · 세로 눈금 ±12 dB, 11.5 dB를 넘으면 ±24 dB · 큰 편집 창 — 큰 그래프와 모든 대역의 표, 창 안의 켜짐 스위치 · 재생 단추 · ＋ 대역 · 처음 상태로(3초 안에 한 번 더), Esc나 바깥을 눌러 닫기</td></tr>
       <tr><td>순서</td><td>기본 처리 순서의 맨 앞에 EQ — EQ → COMP → BBE → TUBE → EXCITER → SG → VINYL → ATMOS → MASTER · 카드 아홉 장, 넓은 화면에서 3 × 3</td></tr>
       <tr><td>프리셋</td><td>설정 파일 · 슬롯에 EQ 대역 목록을 함께 담음 · 3.0에서 저장한 설정을 불러오면 EQ를 처음 상태(꺼짐 · 평탄한 네 대역 · MACRO 100% · INPUT GAIN 0 dB)로 되돌려 저장할 때의 소리를 그대로 내고, EQ 카드는 맨 앞에 놓임</td></tr>
-      <tr><td>신규 (3.1.1)</td><td><a href="#moncal">모니터 보정</a> — 재생 줄의 단추로 열고, AutoEQ의 <code>ParametricEQ.txt</code>를 읽어 듣는 헤드폰 · 스피커의 굴곡을 재생할 때만 고름 · 모든 처리가 끝난 뒤 장치 바로 앞(적용본 스펙트럼 뒤)에 걸려 내보낸 파일 · 설정 파일에는 들어가지 않고 이 브라우저에만 저장 · Preamp 0.1 dB 단위, 보정 곡선이 0 dB를 넘으면 경고 · PARAMETRIC EQ 큰 편집 창에도 AutoEQ 가져오기(이쪽은 파일에도 들어감)</td></tr>
+      <tr><td>신규 (3.1.1)</td><td><a href="#moncal">모니터 보정</a> — 재생 줄의 단추로 열고, AutoEQ의 <code>ParametricEQ.txt</code>를 읽어 듣는 헤드폰 · 스피커의 굴곡을 재생할 때만 고름 · 모든 처리가 끝난 뒤 장치 바로 앞(적용본 스펙트럼 뒤)에 걸려 내보낸 파일 · 설정 파일에는 들어가지 않고 이 브라우저에만 저장 · Preamp 0.1 dB 단위, 보정 곡선이 0.1 dB를 넘으면 경고 · PARAMETRIC EQ 큰 편집 창에도 AutoEQ 가져오기(이쪽은 파일에도 들어감)</td></tr>
       <tr><td>변경 (3.1.1)</td><td>모든 모듈의 INPUT GAIN을 0.5 dB 단위에서 0.1 dB 단위로(키보드 ←→도 0.1 dB씩)</td></tr>
       <tr><td>수정 (3.1.2)</td><td>VINYL · ATMOS · MASTERING처럼 내용이 넘치는 카드를 끝까지 굴린 뒤 더 굴리면 화면이 따라 올라가, 카드 아래쪽이 위에 붙은 재생 줄 밑으로 들어가 아래쪽 손잡이가 눌리지 않던 문제(이제 카드 안에서 끝까지 굴려도 화면은 그대로) · 화면을 굴린 직후 0.4초 동안 카드가 휠과 누름을 받지 않던 문제(마우스를 움직이면 곧바로 풀림)</td></tr>
       <tr><td>신규 (3.1.2)</td><td>카드 늘이기 — 내용이 넘치는 카드의 머리줄 단추로 그 카드만 내용 높이만큼 늘여 손잡이를 한 번에 다 봄(이 브라우저에 기억)</td></tr>
@@ -1301,8 +1301,12 @@ body::before {
       <tr><td>신규 (3.1.9)</td><td><a href="#compare">견줄 소리</a> — 비교할 소리로 원음 대신 켜진 카드 하나만 뺀 처리본을 고름 · 그 카드의 지연을 맞추고 크기도 맞춤 · 원음 비교 단추의 이름을 ‘비교’로</td></tr>
       <tr><td>표기 (3.1.9)</td><td>내보내기 단추 아래 처리 경로 안내를 문서와 같은 말로(업스케일링 — 최고 규격 보간 · 다운샘플링 — 효율 규격 변환)</td></tr>
       <tr><td>수정 (3.1.10)</td><td><a href="#hd">HD 복원 PRESET</a>으로 손잡이를 바꿔도 LIVE 미리듣기가 이전 값 그대로이던 문제(이제 판을 닫을 때 한 번 다시 만들고, 다시 만드는 동안 바뀐 손잡이도 끝난 뒤 반영) · 비트 깊이 향상이 하이햇 · 라이드 · 심벌처럼 고역이 늘 깔린 음악을 셰이핑 디더 원본으로 잘못 보던 문제(합성 하이햇 곡에서 참값과의 오차가 최대 34.8 dB 커짐 · 이제 평탄 원본처럼 ½ LSB 안)</td></tr>
-      <tr><td>신규 (3.1.11)</td><td><a href="#chain">켜짐 효과 · 네온</a> — 모듈 스위치와 신호 흐름 지도의 불빛이 누르는 동안 깜빡이고 떼는 순간 빛이 퍼지며 켜짐(소리는 떼는 순간 바뀜) · 켜진 모듈과 노드의 테두리가 네온처럼 빛남 · 설정 불러오기와 동작 줄이기 설정에서는 효과 없이 · <a href="#chain">값 막대</a>를 누르면 손잡이가 그리로 미끄러짐(MACRO · PRESET이 움직이는 막대도 함께) · 단추를 누르면 물결이 퍼짐</td></tr>
-      <tr><td>수정 (3.1.11)</td><td>고역 복원의 차단점 부근 계단을 줄임 — 차단점 위 출발 기울기를 이어받고(차단점 16 kHz 위), HF SYNTH 50 위의 평탄한 선을 1옥타브에 걸쳐 둥글게 풂. 최대 · 밝게의 28 kHz 위가 4 ~ 6 dB 낮아짐(20 kHz 아래는 그대로)</td></tr>
+      <tr><td>신규 (3.1.11)</td><td><a href="#chain">켜짐 효과 · 네온</a> — 모듈 스위치와 신호 흐름 지도의 불빛이 누르는 동안 깜빡이고 떼는 순간 빛이 퍼지며 켜짐(소리는 떼는 순간 바뀜) · 켜진 모듈과 노드의 테두리가 네온처럼 빛남 · 설정 불러오기와 동작 줄이기 설정에서는 효과 없이 · <a href="#chain">값 막대</a>를 누르면 손잡이가 그리로 미끄러짐(MACRO · PRESET이 움직이는 막대도 함께) · 단추를 누르면 물결이 퍼짐 · 탭 아이콘 — 프로그램과 문서 여섯 개가 같은 계기 바늘 아이콘을 씀(밝은 화면은 검정, 어두운 화면은 흰색 · 파일 안에 들어 있어 바깥 요청 없음)</td></tr>
+      <tr><td>수정 (3.1.11)</td><td>고역 복원의 차단점 부근 계단을 줄임 — 차단점 위 출발 기울기를 이어받고(차단점 16 kHz 위), HF SYNTH 50 위의 평탄한 선을 1옥타브에 걸쳐 둥글게 풂. 최대는 28 kHz 위가 4 ~ 6 dB, 밝게는 약 4 dB 낮아짐(20 kHz 아래는 그대로)</td></tr>
+      <tr><td>수정 (3.1.12)</td><td><a href="#chain">카드 끌어 옮기기</a> — 카드를 이웃 카드 위에 놓아도 원래 자리로 돌아가기 쉽던 문제(놓을 자리를 그 카드의 왼쪽 · 오른쪽 절반으로 갈라, 이웃 카드의 반을 넘게 끌어야 옮겨졌음) · 이제 지금 자리보다 뒤에 있는 카드 위면 그 카드 뒤, 앞에 있는 카드 위면 그 카드 앞으로 가서 이웃 카드의 어디에 놓아도 자리가 바뀜 · MASTER 카드는 왼쪽 절반이 바로 앞, 오른쪽 절반이 재생 단계 맨 앞 그대로 · 놓을 자리 표시가 앞뒤로 깜빡이던 것도 없앰</td></tr>
+      <tr><td>문서 (3.1.13)</td><td>README를 여섯 언어로 — 한국어 · 영어 · 일본어 · 중국어(간체) · 프랑스어 · 스페인어. 맨 위 언어 선택 줄로 서로 오가고, 번역판과 한국어 원문이 다르면 한국어 원문을 따름</td></tr>
+      <tr><td>표기 (3.1.14)</td><td>‘ULTRA HD’를 ‘Ultra HD’로 — 앱 화면(복원 모듈 · LIVE 스위치 설명 · 상태 줄 · 내보내기 경로 안내)과 문서 · README가 모두 같은 표기, 줄여 쓴 ‘Ultra · eXtreme HD’도 · 동작과 소리는 그대로</td></tr>
+      <tr><td>문서 (3.1.15)</td><td>문서 여섯 개를 3.1.14 앱과 한 줄씩 대조해 고침 — 이 설명서에서는 원본 샘플레이트 판독 범위(8 ~ 768 kHz) · Ultra · eXtreme HD의 SMOOTH 기본값 40 · MASTERING LOW · HIGH COMP의 실제 상한(4:1 · 3:1) · HD 복원 카드의 자리(카드 맨 앞) · 카드 놓을 자리 규칙 · 내보낸 파일 이름 꼬리 · 프리셋 파일 크기 · 비교와 견줄 소리 안내 · 개정 내역의 3.1.12 ~ 3.1.14</td></tr>
       <tr><td>문서</td><td>PARAMETRIC EQ 절을 모듈 01로 추가(뒤의 모듈 번호가 하나씩 밀림) · 그래프와 큰 편집 창의 마우스 · 키보드 조작표 · 모니터링 도구 절에 모니터 보정(3.1.1)</td></tr>
     </table>
 
@@ -1426,7 +1430,7 @@ body::before {
       <div class="wf-step">
         <div class="wf-num">STEP 01</div>
         <div class="wf-title">오디오 파일 불러오기</div>
-        <div class="wf-desc">파일을 화면 상단 드롭존에 드래그 앤 드롭하거나, 드롭존을 클릭해 탐색기에서 선택하세요. WAV, MP3, FLAC, OGG, AAC 모두 지원합니다. 파일이 로드되면 파일명, 샘플레이트, 채널 수, 재생 시간이 표시됩니다.</div>
+        <div class="wf-desc">파일을 화면 상단 드롭존에 드래그 앤 드롭하거나, 드롭존을 클릭해 탐색기에서 선택하세요. WAV, MP3, FLAC, OGG, AAC 모두 지원합니다. 파일이 로드되면 파일명과 재생 시간 · 샘플레이트 · 비트 깊이(정수 원본일 때, 예: 16bit) · 채널 수 · 파일 크기가 표시됩니다.</div>
       </div>
       <div class="wf-step">
         <div class="wf-num">STEP 02</div>
@@ -1436,12 +1440,12 @@ body::before {
       <div class="wf-step">
         <div class="wf-num">STEP 03</div>
         <div class="wf-title">처리 순서 배치</div>
-        <div class="wf-desc">모듈 헤더 왼쪽의 점선 핸들을 드래그하거나, 처리 체인 위 신호 흐름 지도에서 노드를 끌어 놓으면 모듈 순서를 바꿀 수 있습니다. 흐름 지도에서 노드를 끄는 동안에는 다른 노드가 옆으로 비켜 가 놓일 자리가 비고, 놓으면 그 노드와 아래 카드들이 새 자리로 미끄러져 갑니다. 카드를 직접 끌면 그 자리에 점선 빈칸이 생겨 커서를 따라가고, 놓은 카드는 놓은 자리에서 빈칸으로 미끄러져 들어갑니다. 넓은 화면에서는 카드가 같은 크기로 처리 순서대로 놓이고, 켜진 카드는 내용이 넘치면 카드 안에서 스크롤하며, 꺼진 카드는 손잡이가 눌리지 않는 배경으로 물러납니다. 켜진 카드 밖에서 화면을 굴리기 시작하면 휠이 멈출 때까지 화면이 계속 굴러갑니다. VINYL · ATMOS는 제목줄 아래 ‘처리 위치’에서 MASTER 뒤(재생 단계)로 옮길 수 있습니다. 마스터링이 끝난 소리를 LP로 재생하거나 듣는 기기에 맞춰 공간을 그리는 단계를 흉내 내며, CEILING 보장은 MASTER까지입니다. <span class="badge-new v30">v3.0</span> 예를 들어 컴프레서를 앞에 두면 레벨을 안정시킨 후 색채 이펙트가 적용됩니다. 마스터링 체인은 제작의 마지막 단에 고정됩니다. 그 뒤의 재생 단계에는 VINYL · ATMOS만 둘 수 있습니다. 처음 순서는 PARAMETRIC EQ가 맨 앞이고(EQ → COMP → BBE → TUBE → EXCITER → SG → VINYL → ATMOS → MASTER), 넓은 화면에서는 이 아홉 장이 3 × 3으로 놓입니다. <span class="badge-new">v3.1</span></div>
+        <div class="wf-desc">모듈 헤더 왼쪽의 점선 핸들을 드래그하거나, 처리 체인 위 신호 흐름 지도에서 노드를 끌어 놓으면 모듈 순서를 바꿀 수 있습니다. 흐름 지도에서 노드를 끄는 동안에는 다른 노드가 옆으로 비켜 가 놓일 자리가 비고, 놓으면 그 노드와 아래 카드들이 새 자리로 미끄러져 갑니다. 카드를 직접 끌면 그 자리에 점선 빈칸이 생겨 커서를 따라가고, 놓은 카드는 놓은 자리에서 빈칸으로 미끄러져 들어갑니다. <span class="badge-new v30">v3.0</span> 이웃 카드 위라면 어디에 놓아도 두 카드의 자리가 바뀝니다. <span class="badge-new">v3.1</span> 넓은 화면에서는 카드가 같은 크기로 처리 순서대로 놓이고, 켜진 카드는 내용이 넘치면 카드 안에서 스크롤하며, 꺼진 카드는 손잡이가 눌리지 않는 배경으로 물러납니다. 켜진 카드 밖에서 화면을 굴리기 시작하면 휠이 멈출 때까지 화면이 계속 굴러갑니다. VINYL · ATMOS는 제목줄 아래 ‘처리 위치’에서 MASTER 뒤(재생 단계)로 옮길 수 있습니다. 마스터링이 끝난 소리를 LP로 재생하거나 듣는 기기에 맞춰 공간을 그리는 단계를 흉내 내며, CEILING 보장은 MASTER까지입니다. <span class="badge-new v30">v3.0</span> 예를 들어 컴프레서를 앞에 두면 레벨을 안정시킨 후 색채 이펙트가 적용됩니다. 마스터링 체인은 제작의 마지막 단에 고정됩니다. 그 뒤의 재생 단계에는 VINYL · ATMOS만 둘 수 있습니다. 처음 순서는 PARAMETRIC EQ가 맨 앞이고(EQ → COMP → BBE → TUBE → EXCITER → SG → VINYL → ATMOS → MASTER), 넓은 화면에서는 이 아홉 장이 3 × 3으로 놓입니다. <span class="badge-new">v3.1</span></div>
       </div>
       <div class="wf-step">
         <div class="wf-num">STEP 04</div>
         <div class="wf-title">HD 업스케일 설정 (선택)</div>
-        <div class="wf-desc">화면 하단 HD RESTORATION 모듈에서 HF SYNTH 강도와 SMOOTH 값을 설정합니다. 이 설정은 원본보다 높은 표본률로 내보낼 때만 적용되며(나가는 표본률이 96kHz 이하면 HD, 176.4 · 192kHz면 Ultra HD, 352.8 · 384kHz면 eXtreme HD 설정), 같거나 낮을 때는 영향을 주지 않습니다. 같은 모듈의 BIT DEPTH 열에서 비트 깊이 향상의 세기(REFINE)와 디더를 정합니다. <span class="badge-new v30">v3.0</span></div>
+        <div class="wf-desc">처리 체인 카드들의 맨 앞(PARAMETRIC EQ 앞)에 있는 HIGH-RESOLUTION RESTORATION(고해상도 복원) 카드에서 HF SYNTH 강도와 SMOOTH 값을 설정합니다. 이 설정은 원본보다 높은 표본률로 내보낼 때만 적용되며(나가는 표본률이 96kHz 이하면 HD, 176.4 · 192kHz면 Ultra HD, 352.8 · 384kHz면 eXtreme HD 설정), 같거나 낮을 때는 영향을 주지 않습니다. 같은 모듈의 BIT DEPTH 열에서 비트 깊이 향상의 세기(REFINE)와 디더를 정합니다. <span class="badge-new v30">v3.0</span></div>
       </div>
       <div class="wf-step">
         <div class="wf-num">STEP 05</div>
@@ -1476,7 +1480,7 @@ body::before {
       <tr><td>입력 방식</td><td>드래그 앤 드롭 / 클릭하여 파일 선택</td></tr>
       <tr><td>채널</td><td>모노 / 스테레오 모두 지원</td></tr>
       <tr><td>샘플레이트</td><td>제한 없음 (브라우저 Web Audio API가 지원하는 모든 샘플레이트)</td></tr>
-      <tr><td>파일 로드 후 표시 정보</td><td>파일명, 샘플레이트(SR), 채널 수, 총 재생시간</td></tr>
+      <tr><td>파일 로드 후 표시 정보</td><td>파일명, 총 재생시간, 샘플레이트(SR), 비트 깊이(정수 격자를 판별한 원본만, 예: 16bit), 채널 수, 파일 크기(MB)</td></tr>
       <tr><td>파일 초기화</td><td>✕ 초기화 버튼은 재생을 멈추고 불러온 파일 · 스펙트럼 표시 · HD LIVE 미리듣기를 비우며, 모든 카드의 INPUT GAIN을 0으로 되돌립니다. 다른 손잡이 · 카드 스위치 · 순서 · EQ 대역은 그대로 둡니다. 모든 값을 처음 상태로 되돌리려면 <a href="#preset">프리셋</a>의 비어 있는 슬롯을 누릅니다.</td></tr>
     </table>
     <div class="callout blue">
@@ -1486,7 +1490,7 @@ body::before {
     <div class="callout ok">
       <p>
         <span class="badge-new v24">v2.4</span> <a href="#preset">프리셋</a>에는 <strong>음원이 담기지 않습니다.</strong>
-        설정만 오가므로 파일 크기는 1KB 남짓이고, 같은 설정을 여러 곡에 돌려쓰기 좋습니다.
+        설정만 오가므로 파일 크기는 3KB 남짓(EQ 대역을 20개 모두 쓰면 약 5.5KB)이고, 같은 설정을 여러 곡에 돌려쓰기 좋습니다.
         반대로 프리셋을 불러와도 올려둔 곡은 바뀌지 않으니,
         곡을 바꾸려면 파일을 다시 올려야 합니다.
       </p>
@@ -1499,7 +1503,7 @@ body::before {
         이제 컨테이너 헤더를 직접 읽어 그 레이트로 디코딩합니다.
         WAV의 fmt 청크, FLAC의 STREAMINFO, OGG Vorbis 식별 헤더,
         MP3 프레임 헤더, MP4/M4A의 stsd 상자를 각각 해석합니다.
-        판독에 실패하거나 8~192kHz 범위를 벗어나면 장치 기본값으로 되돌아갑니다.
+        판독에 실패하거나 8~768kHz 범위를 벗어나면 장치 기본값으로 되돌아갑니다. 원본 레이트로 디코딩하다 실패해도 장치 기본값으로 다시 시도합니다.
       </p>
     </div>
 </div>
@@ -1508,7 +1512,7 @@ body::before {
   <hr class="divider">
   <div class="section" id="monitor">
     <div class="section-num">SECTION 04</div>
-    <div class="section-title">모니터링 도구</div>
+    <div class="section-title">모니터링 도구 · 모니터 보정 · 비교</div>
     <div class="deco-bar"></div>
     <p class="section-lead">처리 중인 오디오의 상태를 실시간으로 보여 주는 시각화 도구들과, 듣는 기기의 굴곡을 재생할 때만 고르는 모니터 보정, 원음이나 카드 하나를 뺀 소리를 처리본과 같은 크기로 들어 보는 비교가 있습니다.</p>
 
@@ -1734,7 +1738,7 @@ body::before {
     <table class="spec-table">
       <tr><th>기능</th><th>설명</th></tr>
       <tr><td>기본 순서 <span class="badge-new">v3.1</span></td><td>처음 순서는 EQ → COMP → BBE → TUBE → EXCITER → SG → VINYL → ATMOS → MASTER입니다. 카드는 아홉 장이고(그 앞에 고해상도 복원), 넓은 화면에서는 3 × 3으로 놓입니다. PARAMETRIC EQ도 다른 카드처럼 끌어 옮길 수 있지만, MASTER 뒤 재생 단계에는 VINYL · ATMOS만 들어가므로 MASTER 앞에서만 움직입니다.</td></tr>
-      <tr><td>모듈 순서 변경</td><td>헤더의 점선 핸들을 드래그 앤 드롭. 드래그 중 삽입 위치 표시선(주황 바)이 나타납니다.</td></tr>
+      <tr><td>모듈 순서 변경 <span class="badge-new">v3.1</span></td><td>헤더의 점선 핸들을 드래그 앤 드롭. 드래그 중 놓일 자리가 넓은 화면(타일)에서는 카드 크기의 앰버 점선 빈칸으로, 그 밖의 화면에서는 앰버 표시선으로 나타납니다. 지금 자리보다 뒤에 있는 카드 위면 그 카드 뒤, 앞에 있는 카드 위면 그 카드 앞으로 가므로 이웃 카드의 어디에 놓아도 자리가 바뀝니다. MASTER 카드 위에서는 왼쪽 절반이 MASTER 바로 앞, 오른쪽 절반이 재생 단계 맨 앞(VINYL · ATMOS만)입니다.</td></tr>
       <tr><td>모듈 켜기/끄기 <span class="badge-new">v3.1</span></td><td>각 모듈 우측 상단 LED 토글. 꺼진 모듈은 체인에서 완전히 제외됩니다. 스위치는 전구처럼 켜집니다. 누르고 있는 동안 가운데 불빛이 깜빡이고, 떼는 순간 불빛이 부풀며 빛과 불티가 퍼지고 네온 테두리가 스위치 자리에서 카드를 둘러 번집니다(0.57초). 소리는 떼는 순간 켜지고 꺼지며, 누른 채 스위치 밖으로 나가서 떼면 아무것도 바뀌지 않습니다. 끌 때는 불빛이 잠깐 남았다가 꺼지고 네온도 함께 사그라듭니다. 켜진 모듈은 테두리가 네온처럼 빛나(주간 화면은 처리기 색 테두리와 옅은 빛무리) 어느 모듈이 켜졌는지 한눈에 보입니다. 키보드로는 스페이스를 누르는 동안 깜빡이고 떼면 켜집니다. 설정을 불러올 때와 컴퓨터의 동작 줄이기 설정에서는 효과 없이 바로 바뀝니다.</td></tr>
       <tr><td>값 막대 · 단추 <span class="badge-new">v3.1</span></td><td>막대의 원하는 자리를 누르기만 하면 손잡이가 그리로 미끄러집니다 — 서서히 출발해 빨라졌다가 브레이크를 걸듯 멈추며, 거리에 따라 0.24 ~ 0.6초입니다. 움직이는 동안 소리도 따라가고(끄는 것과 같음), MACRO · AUTO가 움직이는 손잡이도 같은 곡선으로 함께 옮겨 갑니다. 누른 채 끌면 그대로 따라오고, 키보드 화살표는 바로 한 칸씩 바뀝니다. HD 복원 PRESET · SG 모드 · ATMOS 장면 단추, 슬롯 · 파일 불러오기, 초기화로 바뀐 막대도 같은 움직임으로 옮겨 갑니다(값과 소리는 누른 순간 바뀌고 손잡이 모습만 미끄러짐). 미끄러지는 동안 다른 곳을 누르면 곧바로 끝 자리에 섭니다. 저장 · 불러오기 · 슬롯 · 복사 · 내보내기 같은 단추를 누르면 누른 자리에 물방울이 떨어진 듯 원형 물결이 퍼지다가 단추 안에서 잦아듭니다(키보드로 누르면 가운데에서). 컴퓨터의 동작 줄이기 설정이면 막대는 바로 옮겨 가고 물결은 옅게 한 번 빛납니다.</td></tr>
       <tr><td>신호 흐름 지도 <span class="badge-new v30">v3.0</span></td><td>처리 체인 위에 원음부터 출력까지 현재 순서를 한 줄로 보여 줍니다. 노드를 끌면 순서가 바뀌고, 불빛을 누르면 켜고 끄며, 이름을 누르면 그 카드로 이동합니다. 키보드로는 노드 이름에 초점을 두고 Alt+←/→로 한 칸씩 옮깁니다. 끄는 동안에는 다른 노드가 옆으로 비켜 가 놓일 자리가 비고(여러 줄일 때는 앰버 표시선으로 자리를 보여 줌), 끄는 중에 Esc를 누르면 모두 제자리로 돌아갑니다. 순서를 바꾸면 흐름 지도 노드와 아래 카드들이 같은 스프링으로 새 자리로 미끄러져 갑니다(컴퓨터의 동작 줄이기 설정이면 곧바로 자리를 바꿈). 창이 좁으면 촘촘한 한 줄이나 여러 줄로 바뀝니다. HD 복원과 MASTER는 자리가 고정되어 끌 수 없으며, 양 끝의 원음·출력처럼 점선 테두리로 그려집니다. MASTER 바로 뒤의 청록 ‘재생’ 경계부터가 재생 단계이며, VINYL · ATMOS만 들어갈 수 있습니다. HD 복원 노드는 LIVE가 켜져 있을 때 밝아집니다. 불빛도 모듈 스위치처럼 누르는 동안 깜빡이고, 떼면 노드와 카드가 함께 켜지며 노드의 바탕과 네온 테두리가 불빛 자리에서 번집니다(0.35초). 켜진 노드는 네온 테두리로 빛나고, 재생 단계 노드는 청록으로 빛납니다. 엔터로 켜면 불빛이 한 번 깜빡인 뒤 함께 켜집니다.</td></tr>
@@ -1788,7 +1792,7 @@ body::before {
       <p>
         <strong>A/B 비교의 기준점 —</strong> 모듈을 켜면 대개 소리가 커지고,
         사람의 귀는 커진 소리를 무조건 더 좋다고 느낍니다.
-        켠 상태와 끈 상태의 음량을 INPUT GAIN이나 MASTER의 OUTPUT GAIN으로 맞춘 뒤 비교하세요.
+        켠 상태와 끈 상태의 음량을 INPUT GAIN이나 MASTER의 OUTPUT GAIN으로 맞춘 뒤 비교하세요. 재생 줄의 <a href="#compare">비교</a>는 원음이나 카드 하나를 뺀 소리를 처리본과 같은 크기로 맞춰 바로 맞바꿔 들려줍니다. <span class="badge-new">v3.1</span>
         이 습관 하나가 다른 어떤 조언보다 중요합니다.
       </p>
     </div>
@@ -2241,7 +2245,7 @@ body::before {
       <div class="mc-header">
         <span class="mc-num">MOD-07</span>
         <span class="mc-name">VINYL RECORD</span>
-        <span class="mc-sub">아날로그 턴테이블 시뮬</span>
+        <span class="mc-sub">레코드 재생 물리 모형</span>
       </div>
       <div class="mc-body">
         <div>
@@ -2329,7 +2333,7 @@ body::before {
       <div class="mc-header">
         <span class="mc-num">MOD-08</span>
         <span class="mc-name">DOLBY ATMOS SPATIAL SIMULATOR</span>
-        <span class="mc-sub">3D 공간 오디오 시뮬레이터</span>
+        <span class="mc-sub">공간 오디오 시뮬레이터</span>
       </div>
       <div class="mc-body">
         <div>
@@ -2406,7 +2410,7 @@ body::before {
       <div class="mc-header">
         <span class="mc-num">MOD-09</span>
         <span class="mc-name">MASTERING CHAIN</span>
-        <span class="mc-sub">멀티밴드 컴프 + 리미터 + 스테레오</span>
+        <span class="mc-sub">멀티밴드 + 리미터 + 스테레오</span>
       </div>
       <div class="mc-body">
         <div>
@@ -2417,9 +2421,9 @@ body::before {
           </div>
         </div>
         <div class="mc-params">
-          <div class="param-row"><span class="param-name">LOW COMP</span><span class="param-range">1:1~10:1</span><span class="param-desc">120Hz 이하 서브/킥 대역 압축 비율</span></div>
+          <div class="param-row"><span class="param-name">LOW COMP</span><span class="param-range">1:1~10:1</span><span class="param-desc">500Hz 아래 두 대역(~120Hz · 120~500Hz) 압축 비율. ~120Hz 대역은 4:1까지만 걸림</span></div>
           <div class="param-row"><span class="param-name">MID COMP</span><span class="param-range">1:1~10:1</span><span class="param-desc">500Hz~5kHz 보컬/악기 대역 압축 비율</span></div>
-          <div class="param-row"><span class="param-name">HIGH COMP</span><span class="param-range">1:1~10:1</span><span class="param-desc">5kHz 이상 에어/심벌즈 대역 압축 비율</span></div>
+          <div class="param-row"><span class="param-name">HIGH COMP</span><span class="param-range">1:1~10:1</span><span class="param-desc">5kHz 이상 에어/심벌즈 대역 압축 비율. 3:1까지만 걸림</span></div>
           <div class="param-row"><span class="param-name">STEREO WIDTH</span><span class="param-range">0~200</span><span class="param-desc">M/S 방식 폭 조절. 100=원본, 0=모노, 200=사이드 2배. 리미터 뒤에서 동작</span></div>
           <div class="param-row"><span class="param-name">CEILING dB</span><span class="param-range">-6~0 dB</span><span class="param-desc">천장. 소프트 클리퍼와 천장 묶음이 출력 표본이 이 값을 넘지 않도록 보장</span></div>
           <div class="param-row"><span class="param-name">OUTPUT GAIN</span><span class="param-range">-12~+12 dB</span><span class="param-desc">최종 출력 레벨. 세이프티 클리퍼 앞에서 걸리므로 올려도 천장을 넘지 않음 <span class="badge-new v24">v2.4</span></span></div>
@@ -2509,7 +2513,7 @@ body::before {
       <div class="mc-body">
         <div>
           <div class="mc-what">
-            잘린 고역을 채워 원본보다 높은 표본률(48 ~ 384kHz, 44.1 계열 원본이면 88.2 · 176.4 · 352.8kHz)의 파일로 만드는 모듈입니다. 원음의 윗대역을 주파수만 옮겨 빈 곳에 이어 붙이고, 그 크기를 원음 스펙트럼의 기울기를 그대로 이어 그린 곡선 하나에 맞추므로 층 없이 이어집니다. 내보내기와 LIVE 미리듣기에 적용됩니다.<br><br>
+            잘린 고역을 채워 원본보다 높은 표본률(48 ~ 384kHz, 44.1 계열 원본이면 88.2 · 176.4 · 352.8kHz)의 파일로 만드는 모듈입니다. 원음의 윗대역을 주파수만 옮겨 빈 곳에 이어 붙이고, 그 크기를 원음 스펙트럼의 기울기를 그대로 이어 그린 곡선 하나에 맞추므로 층 없이 이어집니다. 내보내기와 LIVE 미리듣기에 적용됩니다. 복원이 이펙트 체인보다 먼저 일어나므로 카드는 처리 체인 카드들의 맨 앞(PARAMETRIC EQ 앞)에 놓이고, MASTER처럼 끌어 옮길 수 없습니다. 카드 가운데 Tab 순서와 화면 읽기 순서도 이 카드가 처음입니다.<br><br>
             <strong>동작 원리:</strong> ① 원본을 목표 레이트로 <strong>보간</strong>합니다(Kaiser 창 sinc, 나이퀴스트의 99.5%까지 평탄, 200 dB). ② 파일 전체의 평균 스펙트럼에서 잘린 지점, 그 직전의 전이 시작점, 윗대역의 기울기를 찾습니다. ③ 전이 시작점 아래 한 옥타브 남짓을 <strong>주파수 이동</strong>으로 위로 옮겨 빈 곳을 덮습니다. 옮긴 조각끼리는 가장자리를 겹쳐 잇습니다. 한 음이 도드라지면 옮기는 양을 그 음의 f0 정수배로 맞춰, 옮긴 배음이 원래 배음 격자 위에 빠짐없이 놓입니다(<strong>f0 동기</strong>). 코덱이 틀마다 차단점 아래를 통째로 비운 구멍이 있으면, 그 틀은 구멍부터 채웁니다(목표보다 30 dB 이상 낮은 빈이 4빈 넘게 이어질 때, 차단점의 75%까지). 원천이 모두 같으면 원천 안의 무늬가 조각 간격(약 6 kHz)마다 되풀이되므로, 일부 조각은 원천 창을 주파수 방향으로 뒤집고(거울), 넷째 조각부터는 원천 창을 조금씩(원천 폭의 ⅙ 안) 아래로 밉니다. ④ 옮긴 소리의 결을 위로 갈수록 고르게 펴고(SMOOTH), 원음 기울기를 이은 곡선에 크기를 맞춥니다(SYNTH). ⑤ 곡선보다 <strong>모자란 만큼만</strong> 원음에 더합니다. 원음은 한 표본도 바뀌지 않습니다. ⑥ 에너지가 1% 넘게 커졌으면 되돌리고, 복원된 소리를 DSP 체인에 넣습니다.<br><br>
             <strong>HD (48 ~ 96kHz):</strong> 잘린 지점 ~ 목표 나이퀴스트. 원본보다 높은 44.1 · 48 · 88.2 · 96kHz로 내보낼 때 적용.<br>
             <strong>Ultra · eXtreme HD (176.4 ~ 384kHz):</strong> 잘린 지점 ~ 목표 나이퀴스트(88.2 ~ 192kHz). 176.4 · 192 · 352.8 · 384kHz로 내보낼 때 적용.<br>
@@ -2525,14 +2529,14 @@ body::before {
           <div class="param-row"><span class="param-name">KNEE 2</span><span class="param-range">AUTO · 24~64k</span><span class="param-desc">Ultra · eXtreme HD: 음악이 끝나는 곳. AUTO는 목표선이 차단점보다 42 dB 낮아지는 곳(24~48 kHz)</span></div>
           <div class="param-row"><span class="param-name">ATTACK · SUSTAIN</span><span class="param-range">−6~+6 dB</span><span class="param-desc">복원 고역의 치는 순간 · 잦아드는 울림만 조절. 바탕은 그대로</span></div>
           <div class="param-row"><span class="param-name">WIDTH</span><span class="param-range">0~150%</span><span class="param-desc">복원 고역의 좌우 폭. 100%가 AUTO(원음의 폭을 따르고 코덱이 좁힌 몫을 보정)</span></div>
-          <div class="param-row"><span class="param-name">UHF SYNTH</span><span class="param-range">0~100</span><span class="param-desc">UHD · XHD: 같은 의미. 기본 50은 같은 곡선</span></div>
-          <div class="param-row"><span class="param-name">SMOOTH (UHD · XHD)</span><span class="param-range">0~100</span><span class="param-desc">UHD · XHD 쪽 결 평탄화. 이전 이름은 AIR MIX</span></div>
+          <div class="param-row"><span class="param-name">UHF SYNTH</span><span class="param-range">0~100</span><span class="param-desc">Ultra · eXtreme HD: 같은 의미. 기본 50은 같은 곡선</span></div>
+          <div class="param-row"><span class="param-name">SMOOTH (UHD · XHD)</span><span class="param-range">0~100</span><span class="param-desc">Ultra · eXtreme HD 쪽 결 평탄화. 이전 이름은 AIR MIX</span></div>
           <div class="param-row"><span class="param-name">REFINE</span><span class="param-range">0~100</span><span class="param-desc">비트 깊이 향상 세기. 기본 100. 0이면 향상 없이 원본 정수 그대로</span></div>
           <div class="param-row"><span class="param-name">DITHER</span><span class="param-range">켬 / 끔</span><span class="param-desc">16 · 24bit 정수로 쓸 때 TPDF 디더를 더해 반올림. 기본 켬</span></div>
         </div>
         <div class="mc-badge-row">
           <span class="mc-badge blue">48 ~ 96kHz HD</span>
-          <span class="mc-badge purple">176.4 ~ 384kHz UHD · XHD</span>
+          <span class="mc-badge purple">176.4 ~ 384kHz Ultra · eXtreme HD</span>
           <span class="mc-badge amber">주파수 이동 복사 (SSB)</span>
           <span class="mc-badge">Kaiser sinc 보간 99.5% · 200 dB</span>
           <span class="mc-badge amber">f0 동기 이동</span>
@@ -2605,12 +2609,12 @@ body::before {
       잘린 지점에서는 원음의 결 그대로 이어지고, 위로 올라갈수록 음의 봉우리가 눕혀져 고른 잡음에 가까워집니다.
       크기는 바꾸지 않으므로 SMOOTH를 움직여도 채워지는 양은 같습니다.
       v2.3에서 처음 동작하게 된 이 슬라이더는 v2.4에서 가우시안 평활 대신 이 방식으로 바뀌었고,
-      UHD · XHD 쪽 슬라이더의 이전 이름은 AIR MIX입니다.
+      Ultra · eXtreme HD 쪽 SMOOTH 슬라이더의 이전 이름은 AIR MIX입니다.
     </p>
     <table class="spec-table">
       <tr><th>SMOOTH</th><th>한 옥타브 위의 결</th><th>성격</th></tr>
       <tr><td>0</td><td>원천 그대로</td><td>음의 봉우리가 높은 곳까지 남음</td></tr>
-      <tr><td>35 · 40</td><td>봉우리 대비 약 절반(dB 기준)</td><td>기본값(UHD · XHD · HD). 대부분의 소스에 적정</td></tr>
+      <tr><td>40</td><td>봉우리 대비 약 절반(dB 기준)</td><td>기본값(HD · Ultra · eXtreme HD 모두 AUTO 75%에서). 대부분의 소스에 적정</td></tr>
       <tr><td>70</td><td>약 3분의 1</td><td>음질이 낮은 파일의 쇳소리 억제</td></tr>
       <tr><td>100</td><td>약 4분의 1</td><td>위쪽이 거의 고른 잡음</td></tr>
     </table>
@@ -2707,7 +2711,7 @@ body::before {
     <table class="spec-table">
       <tr><th>항목</th><th>내용</th></tr>
       <tr><td>노브 값</td><td>입력 게인을 포함한 슬라이더 전부</td></tr>
-      <tr><td>켜짐 상태</td><td>아홉 모듈의 on/off와 HD·UHD LIVE 스위치</td></tr>
+      <tr><td>켜짐 상태</td><td>아홉 모듈의 on/off, HD · Ultra HD LIVE 스위치, 비트 깊이 DITHER, VINYL의 SPEED(33⅓ / 45)</td></tr>
       <tr><td>모듈 순서</td><td>화면에 배치된 순서 그대로</td></tr>
       <tr><td>프리셋 선택</td><td>SOUNDGOODIZER 모드(A~D)와 DOLBY ATMOS 씬</td></tr>
       <tr><td>EQ 대역 <span class="badge-new">v3.1</span></td><td>PARAMETRIC EQ의 대역 목록 — 대역마다 종류 · 주파수 · 이득 · Q · 기울기 · 켜짐. EQ의 MACRO · INPUT GAIN · 켜짐은 다른 카드처럼 노브 값 · 켜짐 상태로 담깁니다.</td></tr>
@@ -2827,7 +2831,7 @@ body::before {
       <tr><td>③ 고해상도 복원</td><td>원본보다 높은 표본률에서 원음 윗대역의 주파수 이동 복사(한 음이 도드라지면 f0 동기)로 잘린 고역을 채움. LIVE와 같은 순서</td></tr>
       <tr><td>④ DSP 체인 렌더링</td><td>켜진 모듈을 화면 순서대로 OfflineAudioContext에 빌드 후 렌더링. MASTERING의 천장이 복원까지 포함해 지켜짐. <a href="#moncal">모니터 보정</a>은 재생에만 걸리므로 들어가지 않음 <span class="badge-new">v3.1</span></td></tr>
       <tr><td>⑤ WAV 인코딩</td><td>16 · 24bit는 음수 ×2<sup>b−1</sup>, 양수 ×(2<sup>b−1</sup>−1) 뒤 TPDF 디더를 더해 반올림(격자 위 표본은 그대로), 32bit는 float 그대로. RIFF WAV 헤더 작성</td></tr>
-      <tr><td>⑥ 파일 다운로드</td><td>브라우저 다운로드로 자동 저장. 복원을 거치면 _HD96k24bit · _UHD192k32bit, 아니면 _dsp44.1k16bit처럼 경로 접미사 자동 추가</td></tr>
+      <tr><td>⑥ 파일 다운로드</td><td>브라우저 다운로드로 자동 저장. 복원을 거치면 _HD96k24bit · _UHD192k32bit · _XHD384k32bit(352.8 · 384kHz), 아니면 _dsp44.1k16bit처럼 경로 접미사 자동 추가</td></tr>
     </table>
   
     <div class="callout ok">
@@ -2904,7 +2908,7 @@ body::before {
       <div class="feat-card">
         <span class="feat-icon">🎸</span>
         <div class="feat-name">따뜻한 아날로그 음색</div>
-        <div class="feat-desc">Tube (Drive 20~40, Mix 40~60) + SG 모드 A(Warm & Punchy) + Vinyl (Crackle 낮게, Wear 30 정도) 조합. 디지털 음원에 LP 느낌을 입힐 수 있습니다.</div>
+        <div class="feat-desc">Tube (Drive 20~40, Mix 40~60) + SG 모드 A(Warm & Punchy) + Vinyl (Crackle 낮게, Plays 조금 높게) 조합. 디지털 음원에 LP 느낌을 입힐 수 있습니다.</div>
       </div>
       <div class="feat-card">
         <span class="feat-icon">🎤</span>
@@ -2939,7 +2943,7 @@ body::before {
     </div>
 
     <div class="callout blue">
-      <p><strong>초기화 팁:</strong> 설정이 복잡해졌다면 <a href="#preset">프리셋</a>의 비어 있는 슬롯을 누르세요. 모든 값이 처음 상태로 돌아가고(EQ는 평탄한 네 대역), 올려 둔 음원은 그대로 남습니다. EQ의 대역만 평탄한 네 대역으로 되돌리려면 큰 편집 창의 ‘처음 상태로’를 누릅니다. ✕ 초기화 버튼은 재생을 멈추고 파일 · 스펙트럼 표시 · HD LIVE 미리듣기를 비우며 INPUT GAIN만 0으로 되돌릴 뿐, 다른 손잡이 · 카드 스위치 · 순서 · EQ 대역은 그대로 둡니다. 각 모듈은 개별적으로 OFF하면 체인에서 제외되므로, A/B 비교 시 모듈을 껐다 켜는 방법으로 전후 차이를 확인하세요.</p>
+      <p><strong>초기화 팁:</strong> 설정이 복잡해졌다면 <a href="#preset">프리셋</a>의 비어 있는 슬롯을 누르세요. 모든 값이 처음 상태로 돌아가고(EQ는 평탄한 네 대역), 올려 둔 음원은 그대로 남습니다. EQ의 대역만 평탄한 네 대역으로 되돌리려면 큰 편집 창의 ‘처음 상태로’를 누릅니다. ✕ 초기화 버튼은 재생을 멈추고 파일 · 스펙트럼 표시 · HD LIVE 미리듣기를 비우며 INPUT GAIN만 0으로 되돌릴 뿐, 다른 손잡이 · 카드 스위치 · 순서 · EQ 대역은 그대로 둡니다. 각 모듈은 개별적으로 OFF하면 체인에서 제외됩니다. 한 카드의 전후 차이는 재생 줄의 <a href="#compare">비교</a>에서 견줄 소리를 그 카드를 뺀 소리(예: ‘SOUNDGOODIZER 빼고’)로 고르면 크기까지 맞춰 견줄 수 있습니다(카드를 껐다 켜는 비교는 크기를 맞추지 않습니다). <span class="badge-new">v3.1</span></p>
     </div>
   </div>
 

@@ -613,10 +613,10 @@ footer {
         <li><a href="#sbr-why">손실 압축의 흔적</a></li>
         <li><a href="#sbr-up">표본률 변환</a></li>
         <li><a href="#sbr-detect">컷오프 판정</a></li>
+        <li><a href="#sbr-shift">주파수 이동 복사</a></li>
         <li><a href="#sbr-seam">이음매</a></li>
         <li><a href="#sbr-mirror">조각의 반복 무늬</a></li>
         <li><a href="#sbr-truth">정답 시험</a></li>
-        <li><a href="#sbr-shift">주파수 이동 복사</a></li>
         <li><a href="#sbr-env">포락선 외삽</a></li>
         <li><a href="#sbr-sm">결 평탄화</a></li>
         <li><a href="#sbr-lvl">레벨 정합</a></li>
@@ -1115,7 +1115,7 @@ S = 1                  α<sub>S</sub> = (sin ω<sub>0</sub> / 2) √((A + 1/A)(1
           설정 파일 · 슬롯에 담긴다. 불러올 때는 ATMOS 씬 → SG 모드 → EQ 대역 → 슬라이더 → 토글 → 카드 순서 → LIVE 순으로 넣는다.
           MACRO · INPUT GAIN · 켜짐은 다른 손잡이처럼 슬라이더 · 토글로 담긴다. EQ가 없는 3.0의 설정을 불러오면
           EQ를 처음 상태(꺼짐 · 평탄한 네 대역 · MACRO 100 % · INPUT GAIN 0 dB)로 되돌리고, 저장된 카드 순서에 EQ가 없으므로
-          EQ 카드는 맨 앞에 놓인다. 저장할 때의 소리가 그대로 난다.
+          EQ 카드는 처리 카드의 맨 앞(늘 첫 칸인 HD 복원 카드 바로 뒤)에 놓인다. 저장할 때의 소리가 그대로 난다.
         </p>
       </div>
       <div class="nb">
@@ -1134,18 +1134,18 @@ S = 1                  α<sub>S</sub> = (sin ω<sub>0</sub> / 2) √((A + 1/A)(1
       <div class="blk">in ─▶ <b>압축기</b> ─▶ <b>상쇄</b> ─▶ <b>메이크업</b> ─▶ out
                  <i>1 / 자동 메이크업</i>   <i>10^(MAKE/20)</i></div>
       <div class="tw"><table>
-        <thead><tr><th>파라미터</th><th>범위</th><th>기본</th></tr></thead>
+        <thead><tr><th>파라미터</th><th>범위</th><th>처음 상태 (MACRO 50 %)</th><th>기준 설계값 (MACRO 100 %)</th></tr></thead>
         <tbody>
-          <tr><td>스레숄드</td><td class="m">−60 ~ 0 dB</td><td class="m">−18 dB</td></tr>
-          <tr><td>레시오</td><td class="m">1:1 ~ 20:1</td><td class="m">4:1</td></tr>
-          <tr><td>어택</td><td class="m">0.1 ~ 200 ms</td><td class="m">10 ms</td></tr>
-          <tr><td>릴리즈</td><td class="m">10 ~ 3000 ms</td><td class="m">250 ms</td></tr>
-          <tr><td>니</td><td class="m">0 ~ 40 dB</td><td class="m">10 dB</td></tr>
-          <tr><td>메이크업</td><td class="m">0 ~ +24 dB</td><td class="m">+4 dB</td></tr>
+          <tr><td>스레숄드</td><td class="m">−60 ~ 0 dB</td><td class="m">−9 dB</td><td class="m">−18 dB</td></tr>
+          <tr><td>레시오</td><td class="m">1:1 ~ 20:1</td><td class="m">2.5:1</td><td class="m">4:1</td></tr>
+          <tr><td>어택</td><td class="m">0.1 ~ 200 ms</td><td class="m">10 ms</td><td class="m">10 ms</td></tr>
+          <tr><td>릴리즈</td><td class="m">10 ~ 3000 ms</td><td class="m">250 ms</td><td class="m">250 ms</td></tr>
+          <tr><td>니</td><td class="m">0 ~ 40 dB</td><td class="m">10 dB</td><td class="m">10 dB</td></tr>
+          <tr><td>메이크업</td><td class="m">0 ~ +24 dB</td><td class="m">+2 dB</td><td class="m">+4 dB</td></tr>
         </tbody>
       </table></div>
       <p>
-        니는 스레숄드에서 <b>위쪽으로만</b> 펼쳐진다. 니 10 dB이면 −18 ~ −8 dB 구간에서
+        니는 스레숄드에서 <b>위쪽으로만</b> 펼쳐진다. 니 10 dB이면 기준 설계값(스레숄드 −18 dB)에서 −18 ~ −8 dB 구간에서
         기울기가 1에서 1/레시오로 지수 곡선을 따라 바뀐다. 니를 스레숄드 양쪽으로 나누는
         하드웨어 관례와 달라, 같은 숫자라도 압축이 시작되는 지점이 니의 절반만큼 높다.
         저역이 많은 소스에서 니를 좁히면 킥 타격마다 리덕션이 계단식으로 걸려
@@ -1155,8 +1155,8 @@ S = 1                  α<sub>S</sub> = (sin ω<sub>0</sub> / 2) √((A + 1/A)(1
         <span class="t">자동 메이크업의 상쇄</span>
         <p>
           압축 소자는 규격상 문턱 아래의 신호까지 (1 / 곡선(1.0))<sup>0.6</sup>만큼 키운다.
-          기본값에서 +6.03 dB다. 같은 식으로 계산한 역수를 곧바로 곱해 문턱 아래 이득을 정확히 1로 만들고,
-          메이크업은 MAKEUP으로만 준다. 기본값에서 조용한 신호의 이득은 +4.0 dB이며,
+          기준 설계값에서 +6.03 dB, 처음 상태에서 +1.49 dB다. 같은 식으로 계산한 역수를 곧바로 곱해 문턱 아래 이득을 정확히 1로 만들고,
+          메이크업은 MAKEUP으로만 준다. 기준 설계값에서 조용한 신호의 이득은 +4.0 dB(처음 상태 +2.0 dB)이며,
           입력 −42 / −24 / −12 / 0 dBFS의 출력은 −38.0 / −20.0 / −9.5 / −6.0 dBFS다.
         </p>
       </div>
@@ -1380,7 +1380,7 @@ f(x) = clamp(soft·(1 − SAT×0.3) + cubic·(SAT×0.3), −1, +1)
         <tbody>
           <tr><td>다이내믹 EQ</td><td class="m">피킹 2.5 kHz, Q 0.7, +AMOUNT×3 dB</td></tr>
           <tr><td>출력 압축</td><td class="m">스레숄드 c × (−10 − AMOUNT×8) dB, 레시오 1 + c</td></tr>
-          <tr><td></td><td class="m">c = min(1, AMOUNT / 0.25) — AMOUNT 0에서 레시오 1 · 스레숄드 0 dB, 25부터 2:1 · −10 − AMOUNT×8 dB</td></tr>
+          <tr><td></td><td class="m">c = min(1, AMOUNT / 0.25) — AMOUNT 0에서 레시오 1 · 스레숄드 0 dB, 0.25(화면 25)부터 2:1 · −10 − AMOUNT×8 dB</td></tr>
           <tr><td></td><td class="m">어택 3 ms, 릴리즈 200 ms, 니 6 dB</td></tr>
           <tr><td>자동 메이크업 상쇄</td><td class="m">AMOUNT 50에서 −3.35 dB, 100에서 −4.55 dB</td></tr>
         </tbody>
@@ -1616,9 +1616,9 @@ K(t) = 0.006 × (r_s / 7.6 µm) × (0.51 / v(t))² × (1 + 2·w)</div>
           <tr><td>SPACE</td><td>방의 모든 치수 0.6 ~ 1.4배. 잔향 시간과 반사 지연이 함께 변한다.</td></tr>
           <tr><td>DEPTH</td><td>음원과 청취자 거리 r = 1 + DEPTH·(0.7·길이 − 1) m. 멀수록 직접음에 비해 잔향이 커진다.</td></tr>
           <tr><td>HEIGHT</td><td>천장·바닥 반사 0 ~ 2배, 머리 위 반사의 8 kHz 강조 0 ~ +8 dB.</td></tr>
-          <tr><td>OBJECT</td><td>옆벽 반사 0 ~ 2배. 음원의 폭(양이 상관도)을 조절한다.</td></tr>
+          <tr><td>OBJECT MIX</td><td>옆벽 반사 0 ~ 2배. 음원의 폭(양이 상관도)을 조절한다.</td></tr>
           <tr><td>REVERB</td><td>확산 잔향 0 ~ 2배.</td></tr>
-          <tr><td>MIX</td><td>반사와 잔향 전체의 양. 직접음은 항상 원음 그대로다.</td></tr>
+          <tr><td>DRY/WET</td><td>반사와 잔향 전체의 양. 직접음은 항상 원음 그대로다.</td></tr>
         </tbody>
       </table></div>
       <p>HEIGHT·OBJECT·REVERB의 50 %는 방의 물리적 값이다. 위 표는 처음 열었을 때의 SPACE 60 기준이다. 씬 버튼을 누르면 SPACE·HEIGHT·DEPTH·REVERB·OBJECT도 씬마다 정해진 값으로 바뀌어, 1 kHz 잔향 시간이 STUDIO(SPACE 25) 0.21 s · CLUB(SPACE 55) 0.76 s · CINEMA(SPACE 75) 0.90 s · CONCERT(SPACE 85) 2.37 s · STADIUM(SPACE 95) 4.73 s가 된다.</p>
@@ -1794,17 +1794,17 @@ w = STEREO WIDTH / 100     <i>(0 = 모노, 1 = 원본, 2 = 사이드 2배)</i></
     <div class="blk">원본 ─▶ <b>업샘플</b> ─▶ <b>컷오프·기울기</b> ─▶ <b>이동 복사</b> ─▶ <b>포락선·결</b> ─▶ <b>보충</b> ─▶ <b>DSP 체인</b> ─▶ 출력
         <i>Kaiser sinc</i>                     <i>SSB</i>           <i>외삽 · γ</i>        <i>원음 + 합성분</i></div>
     <div class="tw"><table>
-      <thead><tr><th>항목</th><th>96 kHz</th><th>192 kHz</th></tr></thead>
+      <thead><tr><th>항목</th><th>96 kHz (HD)</th><th>192 kHz (Ultra HD)</th><th>384 kHz (eXtreme HD)</th></tr></thead>
       <tbody>
-        <tr><td>프레임 길이</td><td class="m">2048 (21.3 ms)</td><td class="m">4096 (21.3 ms)</td></tr>
-        <tr><td>홉</td><td class="m">512 (5.3 ms)</td><td class="m">1024 (5.3 ms)</td></tr>
-        <tr><td>주파수 분해능</td><td class="m">46.9 Hz</td><td class="m">46.9 Hz</td></tr>
-        <tr><td>컷오프 판정 분해능</td><td class="m">23.4 Hz</td><td class="m">23.4 Hz</td></tr>
-        <tr><td>표현 가능 상한</td><td class="m">48 kHz</td><td class="m">96 kHz</td></tr>
+        <tr><td>프레임 길이</td><td class="m">2048 (21.3 ms)</td><td class="m">4096 (21.3 ms)</td><td class="m">8192 (21.3 ms)</td></tr>
+        <tr><td>홉</td><td class="m">512 (5.3 ms)</td><td class="m">1024 (5.3 ms)</td><td class="m">2048 (5.3 ms)</td></tr>
+        <tr><td>주파수 분해능</td><td class="m">46.9 Hz</td><td class="m">46.9 Hz</td><td class="m">46.9 Hz</td></tr>
+        <tr><td>컷오프 판정 분해능</td><td class="m">23.4 Hz</td><td class="m">23.4 Hz</td><td class="m">23.4 Hz</td></tr>
+        <tr><td>표현 가능 상한</td><td class="m">48 kHz</td><td class="m">96 kHz</td><td class="m">192 kHz</td></tr>
       </tbody>
     </table></div>
     <p>
-      프레임 길이를 시간으로 고정해 두 레이트의 시간·주파수 분해능을 같게 했다.
+      프레임 길이를 시간으로 고정해 세 레이트의 시간·주파수 분해능을 같게 했다.
       창은 Hann, 중첩은 75%다. 복원은 DSP 체인 앞에서 하므로 LIVE와 내보내기의 순서가 같고,
       체인 끝 MASTERING의 천장이 복원 뒤까지 지켜진다.
     </p>
@@ -2065,7 +2065,7 @@ P<sub>m</sub>[k] = Σ<sub>p</sub> w<sub>p</sub>(k) · X<sub>m</sub>[k − s<sub>
       지킬 조건: 한 음 f0 동기 100%, 두 음 ±10 / ±20 Hz 51.6 / 60.0%, 딸깍만의 번짐 −34.1 dB, 반복 무늬 0.08 ~ 0.13.
       더 넓힌 코덱의 LSD(3.0.23 → 3.0.24): MP3 VBR −V 6 15.8 → 11.9 dB, Vorbis −q 2 16.7 → 12.2 dB, Opus 32k 15.0 → 13.7 dB.
       Opus는 차단점이 20 kHz라 S자가 차단점에서 시작해 20 ~ 22 kHz가 +7 dB 남짓 높다(자연 감쇠는 절대 주파수에 매여 있다).
-      LIVE의 복원 버퍼는 내보내기와 같은 변환 · 복원을 거쳐 표본 단위로 같다(HD 88.2 · UHD 176.4 kHz, 최대 차이 0).
+      LIVE의 복원 버퍼는 내보내기와 같은 변환 · 복원을 거쳐 표본 단위로 같다(HD 88.2 · Ultra HD 176.4 kHz, 최대 차이 0).
       버퍼는 모드 · 복원 손잡이 · 파일을 이은 키로 보관한다. PRESET으로 바뀐 손잡이는 판을 닫을 때(다른 모드의 판으로 넘어갈 때도) 키를 견주어
       달라졌으면 한 번 다시 복원하고, 복원하는 동안 온 요청은 마지막 하나를 두었다가 끝난 뒤 처리한다. 복원에 쓸 손잡이는 첫 기다림 전에 한꺼번에 읽는다(3.1.10).
     </p>
@@ -2186,7 +2186,8 @@ r(k) = 전이 시작에서 0, 차단점에서 1로 오르는 올림 코사인, �
   <h2><span class="n">04</span>계측과 판독</h2>
   <div class="rd">
     <p>
-      처리 전후를 동시에 표시한다. 원음 신호는 모든 처리 단 진입 이전에서 분기한다.
+      처리 전후를 동시에 표시한다. 원음 신호는 모든 처리 단 진입 이전에서 분기한다. 적용본은 출력 게인 뒤 · 모니터 보정 앞에서 재므로 내보낼 소리이고,
+      견줄 소리로 카드 하나를 뺀 소리를 듣는 동안은 그 소리를 잰다(같은 크기 맞춤 전). LIVE를 켜면 재생 버퍼가 복원본이라 원음 표시에도 복원한 고역이 나타난다.
     </p>
     <div class="tw"><table>
       <thead><tr><th>항목</th><th>값</th></tr></thead>
@@ -2252,7 +2253,7 @@ r(k) = 전이 시작에서 0, 차단점에서 1로 오르는 올림 코사인, �
       </tbody>
     </table></div>
     <p>
-      96 kHz 확장이 채우는 20 ~ 48 kHz, 192 kHz 확장이 추가로 채우는 48 ~ 96 kHz는
+      96 kHz 확장이 채우는 20 ~ 48 kHz, 192 kHz 확장이 추가로 채우는 48 ~ 96 kHz, 384 kHz 확장이 더 채우는 96 ~ 192 kHz는
       어느 연령에서도 직접 지각되지 않는다.
       실효 이득은 <strong>차단점과 가청 상한 사이의 중첩 구간</strong>에서만 발생한다.
     </p>
@@ -2466,6 +2467,7 @@ MP3 320k, 40대 청자 → [20 kHz, 15 kHz] = 없음</div>
         <strong>대역 확장의 외삽 — 옮겨 오는 것은 원천 대역의 소리다.</strong>
         원천 대역과 실제 고역의 악기 구성이 다르면 그 비율까지는 되살리지 못한다.
         차단점 위의 S자 감쇠(30 dB · 1옥타브)는 무손실 원본 한 곡으로 정한 잠정값이라, 고역이 더 뻗는 녹음에서는 실제보다 낮게, 더 일찍 꺾이는 녹음에서는 높게 그려질 수 있다.
+        SYNTH 50 위의 평탄한 선은 차단점에서 원음 기울기로 출발해 1옥타브에 걸쳐 풀리므로 풀린 만큼 초고역이 낮다(3.1.10 대비 최대 20 ~ 25 kHz −1.8 ~ −1.9 dB, 28 kHz 위 Ultra HD −4.3 ~ −4.7 dB · HD −5.6 dB). 20 kHz 아래 들리는 대역은 그대로다. 원음 꼭대기가 매우 가파른 순간에는 최대에서도 차단점 바로 위 두세 막대가 평평하게 남는다. 원음을 추세선까지 끌어올리면 원래 있던 소리를 바꾸므로 고치지 않았다.
         차단점은 파일 전체에서 하나로 정하므로, 대역폭이 구간마다 크게 바뀌는 VBR 파일에서
         전이 시작보다 더 낮게 끊긴 구간은 그 사이가 빈 채로 남는다.
       </li>
@@ -2592,7 +2594,7 @@ fc = sr/2 (대역 제한 없음) → 7차        fc = sr/3 (대역 제한) → 1
       실패했을 때만 보조 수단으로 쓴다.
     </p>
     <p>
-      판독에 실패하거나 8 ~ 192 kHz 범위를 벗어나면 장치 기본값으로 되돌아간다.
+      판독에 실패하거나 8 ~ 768 kHz 범위를 벗어나면 장치 기본값으로 디코딩한다(Chromium은 768 kHz까지 받는다). 원본 레이트로 디코딩하다 실패해도 장치 기본값으로 다시 시도한다.
     </p>
 
   </div>

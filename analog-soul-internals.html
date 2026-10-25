@@ -676,7 +676,12 @@ footer {
         </ol>
       </li>
       <li><a href="#stereo">M/S와 양이 상관도</a></li>
-      <li><a href="#level">레벨 정합의 오류</a></li>
+      <li><a href="#level">레벨 정합의 오류</a>
+        <ol>
+          <li><a href="#level-compare">비교의 같은 크기 (3.1.8 · 3.1.9)</a></li>
+          <li><a href="#card-bypass">카드 하나를 뺀 소리 (3.1.9)</a></li>
+        </ol>
+      </li>
       <li><a href="#graph">그래프 수명주기</a></li>
       <li><a href="#num">수치적 고려</a></li>
       <li><a href="#comp">COMPRESSOR — 앞먹임 압축기</a>
@@ -746,7 +751,7 @@ footer {
           <li><a href="#master-verify">검증</a></li>
         </ol>
       </li>
-      <li><a href="#bits">비트 깊이 — 격자와 인코더</a>
+      <li><a href="#bits">비트 깊이 — 격자, 일관 재구성, 인코더</a>
         <ol>
           <li><a href="#bits-grid">격자와 디코더의 관례</a></li>
           <li><a href="#bits-deq">칸 안의 위너 추정</a></li>
@@ -1082,7 +1087,7 @@ footer {
       역필터링(tonality control)의 네 단계를 거치고, 포락선과 잡음 바닥은 인코더가 비트스트림에 실어 보낸다.
       이 구현은 그 정보 없이(블라인드) STFT 영역에서 패칭과 포락선 조정을 하고,
       역필터링의 역할은 결 평탄화가 맡는다. 잡음 바닥의 별도 부가는 없다.
-      전이 시작 아래의 원음은 바꾸지 않고 모자란 에너지만 더한다(<span class="m">y = x + h</span>). 전이 구간에서는 <span class="m">h</span>에 원음을 절반까지 내리는 몫이 들어 있다(§ 명제 3.5).
+      전이 시작 아래의 원음은 바꾸지 않고 모자란 에너지만 더한다(<span class="m">y = x + h</span>). 전이 구간에서는 <span class="m">h</span>에 원음을 절반까지 내리는 몫이 들어 있다(명제 3.5).
     </p>
 
     <h3 id="sbr-est">컷오프 추정량</h3>
@@ -1486,7 +1491,7 @@ footer {
       이전 구현은 조화성을 강하게 충족했지만 포락선에서 무너졌다. 옥타브마다 같은 원천을 <span class="m">1/k</span>로
       되풀이해 경계마다 레벨이 튀고 성김이 바뀌었으므로, 각 옥타브가 따로 떨어진 층으로 분리될 단서가 되었다.
       현재 구현은 조화성을 조건부로 내주는 대신 나머지 세 단서를 모두 지킨다. 차단점 위 어긋남 가운데
-      +0.8 dB는 HD의 기본 SYNTH 60이 의도적으로 더한 몫이다.
+      +0.8 dB는 이 값을 잰 SYNTH 60(3.0.24 전 HD의 기본값)이 의도적으로 더한 몫이다. 지금의 기본값 SYNTH 50(HF SYNTH · UHF SYNTH 모두)은 목표선 그대로다.
     </p>
     <div class="nb warn">
       <span class="t">SBR과의 남은 차이</span>
@@ -1717,6 +1722,33 @@ input.<span class="f">connect</span>(dAP1); dAP1.<span class="f">connect</span>(
     <p>
       이전 판의 렌더링 엔진은 SOUNDGOODIZER 필터쌍을 <code>a.type=type</code>처럼 종류를 변수로 받아 만들었고, Q 단위를 바로잡을 때 종류를 문자열로 적은 줄만 찾는 바람에 이 네 개가 선형 0.707로 남았다. 재생은 고쳐졌지만 내보낸 파일에만 분할점마다 +7.4 dB 봉우리가 있었다. 두 엔진을 한 빌더로 합친 뒤로는 이런 어긋남이 생길 수 없다.
     </p>
+    <h4>파라메트릭 EQ의 바이쿼드 (3.1.0)</h4>
+    <p>
+      PARAMETRIC EQ는 대역을 나누지 않고 직렬로 거는 필터 열이지만 같은 Q 단위 문제를 안는다. 대역 하나가 <code>BiquadFilterNode</code> 하나이고(벨 <code>peaking</code> · 셸프 · <code>notch</code>),
+      로우 컷 · 하이 컷은 기울기 12 · 24 · 36 · 48 dB/oct를 버터워스 2 · 4 · 6 · 8차로 보고 2차 단 1 ~ 4개로 나눈다.
+      <span class="m">n</span>차 버터워스의 극은 왼쪽 반평면의 단위원 위에 고르게 놓이므로 켤레 극 쌍마다
+      <span class="m">Q<sub>k</sub> = 1/(2 sin((2k − 1)π/2n))</span>, <span class="m">k = 1 … n/2</span>다(24 dB/oct 0.541 · 1.307, 48 dB/oct 0.510 · 0.601 · 0.900 · 2.563).
+      <code>highpass</code> · <code>lowpass</code>의 Q는 명세상 dB이므로 단마다 <span class="m">20·log<sub>10</sub>Q<sub>k</sub></span>를 넣고, <code>peaking</code> · <code>notch</code>는 선형 Q를 그대로 쓴다.
+      컷 가운데서는 12 dB/oct만 사용자 Q를 받는다(컷으로 바꾸면 1/√2). MACRO 깊이 <span class="m">d</span>는 벨 · 셸프의 이득에만 <span class="m">G → dG</span>로 들어가고 컷 · 노치는 그대로 남는다.
+    </p>
+    <figure class="src">
+      <figcaption>butterQs · peqStages — 대역 목록에서 바이쿼드 단 목록으로</figcaption>
+<pre><span class="k">function</span> <span class="f">butterQs</span>(n) { <span class="k">const</span> q = []; <span class="k">for</span> (<span class="k">let</span> k = <span class="v">1</span>; k &lt;= n / <span class="v">2</span>; k++) q.<span class="f">push</span>(<span class="v">1</span> / (<span class="v">2</span> * Math.<span class="f">sin</span>((<span class="v">2</span> * k - <span class="v">1</span>) * Math.PI / (<span class="v">2</span> * n)))); <span class="k">return</span> q; }
+…
+    <span class="k">if</span> (<span class="f">peqIsCut</span>(b.type)) {
+      <span class="c">// lowpass · highpass의 Q는 명세상 dB이므로 선형 Q를 dB로 바꿔 넣는다(Q_BUTTER와 같은 이유)</span>
+      <span class="k">const</span> qs = b.slope === <span class="v">12</span> ? [b.q] : <span class="f">butterQs</span>(b.slope / <span class="v">6</span>);
+      qs.<span class="f">forEach</span>(<span class="k">function</span> (q) { out.<span class="f">push</span>({ band: i, kind: kind, f: b.freq, q: <span class="v">20</span> * Math.<span class="f">log10</span>(q), g: <span class="v">0</span> }); });
+    } <span class="k">else</span> {
+      out.<span class="f">push</span>({ band: i, kind: kind, f: b.freq, q: b.q, g: <span class="f">peqHasGain</span>(b.type) ? b.gain * d : <span class="v">0</span> });
+    }</pre>
+    </figure>
+    <p>
+      버터워스 묶음은 차단 주파수의 크기가 차수와 관계없이 1/√2(−3.01 dB)라 기울기만 바꿔도 컷의 자리가 옮겨 가지 않는다.
+      48 kHz 임펄스 응답에서 200 Hz 로우 컷은 네 기울기 모두 차단 주파수 −3.01 dB, 한 옥타브 아래 −12.3 / −24.1 / −36.1 / −48.2 dB이고, 벨 +6 dB · 1 kHz · Q 1.41의 중심은 6.000 dB다.
+      화면의 응답 곡선도 같은 단 목록을 같은 종류의 노드에 넣어 <code>getFrequencyResponse</code>를 곱해 그리므로, 렌더링한 소리와 그래프의 차이가 44.1 · 48 kHz의 20 Hz ~ 20 kHz에서 0.002 dB 안이다.
+      실시간 엔진에서는 값이 10 ms 시정수로 옮겨 가고, 대역 수 · 종류 · 기울기 · 켜짐이 바뀌면 새 필터 열을 만들어 20 ms 동안 교차해 넘긴다.
+    </p>
   </div>
 </section>
 
@@ -1745,9 +1777,10 @@ input.<span class="f">connect</span>(dAP1); dAP1.<span class="f">connect</span>(
       </p>
     </div>
     <div class="tw"><table>
-      <thead><tr><th>압축기 (기본값)</th><th>문턱 · 무릎 · 비율</th><th>자동 메이크업</th></tr></thead>
+      <thead><tr><th>압축기</th><th>문턱 · 무릎 · 비율</th><th>자동 메이크업</th></tr></thead>
       <tbody>
-        <tr><td>COMPRESSOR</td><td class="m">−18 · 10 · 4</td><td class="m">+6.03 dB</td></tr>
+        <tr><td>COMPRESSOR 기준 설계값 (MACRO 100 %)</td><td class="m">−18 · 10 · 4</td><td class="m">+6.03 dB</td></tr>
+        <tr><td>COMPRESSOR 처음 값 (MACRO 50 %)</td><td class="m">−9 · 10 · 2.5</td><td class="m">+1.49 dB</td></tr>
         <tr><td>MASTERING 대역 1 / 2 / 3 / 4</td><td class="m">−24·10·2 / −22·8·2 / −20·6·3 / −22·5·2</td><td class="m">+5.68 / +5.43 / +6.93 / +5.90 dB</td></tr>
         <tr><td>SOUNDGOODIZER 버스 (양 0 / 50 / 100)</td><td class="m">0·6·1 / −14·6·2 / −18·6·2</td><td class="m">0.00 / +3.35 / +4.55 dB</td></tr>
         <tr><td>MASTERING 리미터 (천장 −0.3)</td><td class="m">−0.3 · 0 · 20</td><td class="m">+0.17 dB</td></tr>
@@ -1851,7 +1884,7 @@ pre.<span class="f">connect</span>(ws); ws.<span class="f">connect</span>(clamp)
     <div class="nb">
       <span class="t">배치 제약</span>
       <p>
-        클리퍼는 M/S 폭 조절과 출력 게인 <em>뒤</em>, 곧 체인의 가장 끝에 둔다. 폭을 1보다 크게 하면 사이드 성분이, 출력 게인을 0 dB보다 올리면 신호 전체가 커지므로 둘 중 하나라도 클리퍼 뒤에 있으면 천장 보장이 깨진다. 구현은 <code>limiter → width → output gain → ceiling</code> 순서다(§18).
+        클리퍼는 M/S 폭 조절과 출력 게인 <em>뒤</em>, 곧 MASTERING 블록의 가장 끝에 둔다(그 뒤에는 재생 단계에 둔 VINYL · ATMOS만 온다). 폭을 1보다 크게 하면 사이드 성분이, 출력 게인을 0 dB보다 올리면 신호 전체가 커지므로 둘 중 하나라도 클리퍼 뒤에 있으면 천장 보장이 깨진다. 구현은 <code>limiter → width → output gain → ceiling</code> 순서다(§18).
       </p>
     </div>
   </div>
@@ -2064,6 +2097,21 @@ mid.<span class="f">connect</span>(mg, <span class="v">0</span>, <span class="v"
       모든 이펙터는 <code>{ in, out, set(p) }</code>를 돌려주는 공용 빌더로 만들어진다. 실시간 엔진은 블록을 한 번 만들고 체인을 바꿀 때 <code>out</code>만 끊어 다시 잇고, 값은 <code>getParams()</code>로 읽어 <code>set()</code>에 넘긴다. 렌더링 엔진은 같은 빌더로 블록을 만들어 <code>set()</code>을 한 번 부른다. 들은 소리와 저장된 파일이 한 함수에서 나온다.
     </p>
     <p>
+      예외는 하나다. 3.1.1의 모니터 보정은 만드는 소리가 아니라 듣는 기기(헤드폰 · 스피커)의 응답을 고르는 단이라, 실시간 엔진의 맨 끝 — 적용본 분석기와 비교 합류 뒤, 장치 앞 — 에만 걸고 렌더링 엔진에는 두지 않는다.
+      대역은 PARAMETRIC EQ와 같은 <code>buildPEQBlock</code>으로 만들고 앞에 Preamp 이득 하나를 둔다. 꺼져 있으면 이득 1 · 대역 없음이라 표본이 그대로 나가고(최대 차이 0),
+      켜 두면 듣는 소리와 내보낸 파일이 일부러 다르다. 모든 카드를 켜고 내보내는 동안 이 단은 한 번도 불리지 않는다.
+    </p>
+    <figure class="src">
+      <figcaption>buildMonitorBlock · buildLiveChain — 장치 앞의 마지막 단</figcaption>
+<pre><span class="k">function</span> <span class="f">buildMonitorBlock</span>(ac) {
+  <span class="k">const</span> pre = ac.<span class="f">createGain</span>(), eq = <span class="f">buildPEQBlock</span>(ac, { live: <span class="k">true</span> });
+  pre.<span class="f">connect</span>(eq.in);
+…
+  nodes.cmpSum.<span class="f">connect</span>(nodes.monitor.in);
+  <span class="f">cmpApply</span>(<span class="k">true</span>);
+  nodes.monitor.out.<span class="f">connect</span>(ac.destination);</pre>
+    </figure>
+    <p>
       실시간 경로는 노드를 재사용하고 연결만 재구성한다.
       복합 블록을 도입하면서 해제 규칙이 미묘해졌다.
     </p>
@@ -2182,11 +2230,9 @@ pausedAt = Math.<span class="f">min</span>(resumeAt, Math.<span class="f">max</s
   <div class="rd">
     <h4>OLA 누적의 오차</h4>
     <p>
-      <code>out</code>과 <code>norm</code>은 <code>Float32Array</code>다.
-      각 표본에 최대 4개 프레임이 가산되므로 누적 항 수는 작고,
-      가수 24비트에서 상대 오차는 <span class="m">10⁻⁷</span> 규모로 무시할 만하다.
-      다만 <code>norm</code>은 항상 양수 항의 합이므로 상쇄 소거가 없어
-      더욱 안정적이다.
+      합성분은 길이 <span class="m">N + R</span>의 <code>Float64Array</code> 고리 버퍼 <code>hb</code>에 쌓고, 한 홉이 확정될 때마다 원음 채널에 더한다(명제 2.3).
+      각 표본에 네 프레임만 더해지고 창 제곱의 합은 상수 <code>olaScale</code>(2/3)로 되돌리므로(보조정리 2.2) 따로 누적하는 정규화 배열이 없다.
+      배정밀도 누적의 상대 오차는 <span class="m">10<sup>−16</sup></span> 규모이고, 합성분이 겪는 단정밀도 반올림은 <code>Float32Array</code>인 원음 채널에 더할 때 한 번뿐이다.
     </p>
 
     <h4>합류점의 덧셈 순서</h4>
@@ -2322,7 +2368,7 @@ nodes.analyser.maxDecibels = SG_MAX_DB;   <span class="c">// −30</span></pre>
 
     <h3 id="comp-verify">검증</h3>
     <p>
-      1 kHz 사인을 기본값(문턱 −18 dB, 무릎 10 dB, 4:1, MAKEUP 4 dB)으로 렌더링해 봉우리 레벨을 쟀다. 예상값은 명세 곡선에 MAKEUP을 더한 것이다. 렌더러의 압축기가 명세의 정적 곡선을 그대로 쓰므로 이 표가 확인하는 것은 곡선 자체가 아니라 상쇄 이득과 메이크업의 배선이다.
+      1 kHz 사인을 기준 설계값(MACRO 100 % — 문턱 −18 dB, 무릎 10 dB, 4:1, MAKEUP 4 dB)으로 렌더링해 봉우리 레벨을 쟀다. 예상값은 명세 곡선에 MAKEUP을 더한 것이다. 렌더러의 압축기가 명세의 정적 곡선을 그대로 쓰므로 이 표가 확인하는 것은 곡선 자체가 아니라 상쇄 이득과 메이크업의 배선이다.
     </p>
     <div class="tw"><table>
       <thead><tr><th>입력 (dBFS)</th><th>−42</th><th>−30</th><th>−24</th><th>−18</th><th>−12</th><th>−6</th><th>0</th></tr></thead>
@@ -2338,7 +2384,7 @@ nodes.analyser.maxDecibels = SG_MAX_DB;   <span class="c">// −30</span></pre>
     <div class="nb">
       <span class="t">바로잡은 점</span>
       <p>
-        자동 메이크업을 상쇄해 MAKEUP 노브가 표시한 그대로의 이득이 됐다. 기본값에서 조용한 신호의 이득이 +10.0 dB에서 +4.0 dB로 줄었다.
+        자동 메이크업을 상쇄해 MAKEUP 노브가 표시한 그대로의 이득이 됐다. 기준 설계값에서 조용한 신호의 이득이 +10.0 dB에서 +4.0 dB로 줄었다. 처음 값(MACRO 50 % — 문턱 −9 dB, 2.5:1, MAKEUP 2 dB)에서는 숨은 1.49 dB를 상쇄해 MAKEUP 그대로 +2.0 dB다.
       </p>
       <p>
         두 엔진이 같은 <code>buildCompBlock</code>을 쓴다. 이전 판의 실시간 엔진은 MAKEUP을 최종 출력 노드에 걸었다가 마스터 블록이 덮어써, 한때 재생에서만 MAKEUP이 먹지 않은 적이 있다.
@@ -2414,7 +2460,7 @@ hd.gain.value = p.bbeHi * <span class="v">6</span>;      <span class="c">// HI D
       <tbody>
         <tr><td>LO 100, 나머지 0 — 수정 전</td><td class="m">−0.5</td><td class="m">−2.3</td><td class="m">−9.3</td><td class="m">−1.8</td><td class="m">−9.2</td><td class="m">−0.7</td><td class="m">0.0</td><td class="m">0.0</td></tr>
         <tr><td>LO 100, 나머지 0 — 수정 후</td><td class="m">+9.7</td><td class="m">+7.0</td><td class="m">+3.1</td><td class="m">+0.1</td><td class="m">+0.1</td><td class="m">0.0</td><td class="m">0.0</td><td class="m">0.0</td></tr>
-        <tr><td>기본값 (40·60·50) — 수정 후</td><td class="m">+3.9</td><td class="m">+2.9</td><td class="m">+1.2</td><td class="m">0.0</td><td class="m">0.0</td><td class="m">+0.1</td><td class="m">+4.4</td><td class="m">+6.3</td></tr>
+        <tr><td>기준 설계값 (40·60·50, MACRO 100 %) — 수정 후</td><td class="m">+3.9</td><td class="m">+2.9</td><td class="m">+1.2</td><td class="m">0.0</td><td class="m">0.0</td><td class="m">+0.1</td><td class="m">+4.4</td><td class="m">+6.3</td></tr>
       </tbody>
     </table></div>
     <p>
@@ -3056,7 +3102,7 @@ re[N - k] = lr + ri; im[N - k] = -li + rr;
   <h2><span class="n">§18</span>MASTERING — 트리 분할과 천장</h2>
   <div class="rd">
     <p>
-      MASTERING은 제작 체인의 마지막에서(그 뒤는 재생 단계에 둔 VINYL · ATMOS뿐) 네 대역을 따로 압축하고, 리미터로 봉우리를 누르고, 스테레오 폭과 출력 이득을 거쳐 천장 클리퍼로 끝낸다. 체인 순서와 무관하게 항상 마지막이다.
+      MASTERING은 제작 체인의 마지막에서(그 뒤는 재생 단계에 둔 VINYL · ATMOS뿐) 네 대역을 따로 압축하고, 리미터로 봉우리를 누르고, 스테레오 폭과 출력 이득을 거쳐 천장 클리퍼로 끝낸다. 체인 순서와 무관하게 제작 단계의 마지막이다.
     </p>
 
     <h3 id="master-phys">물리 세계</h3>
@@ -3099,13 +3145,13 @@ lim.<span class="f">set</span>(p.limCeil, <span class="v">0</span>, <span class=
         <tr><td>낮은 레벨 응답 (−40 dBFS, 31.5 Hz~20 kHz)</td><td class="m">+5.4 ~ +7.1 dB, 기울기 1.7 dB</td><td class="m">0.0 dB</td></tr>
         <tr><td>100 Hz 사각파, OUTPUT +12 dB (천장 −0.3)</td><td class="m">+0.32 dBFS</td><td class="m">−0.30 dBFS</td></tr>
         <tr><td>임펄스열 +12 dBFS, OUTPUT +12 dB</td><td class="m">+2.97 dBFS</td><td class="m">−0.30 dBFS</td></tr>
-        <tr><td>전 모듈 기본값, 분홍 잡음 −20.2 dBFS RMS</td><td class="m">−11.4 dBFS RMS, 봉우리 −0.43</td><td class="m">−17.2 dBFS RMS, 봉우리 −3.98</td></tr>
+        <tr><td>전 모듈 기준 설계값(MACRO 100 %), 분홍 잡음 −20.2 dBFS RMS</td><td class="m">−11.4 dBFS RMS, 봉우리 −0.43</td><td class="m">−17.2 dBFS RMS, 봉우리 −3.98</td></tr>
       </tbody>
     </table></div>
     <div class="nb">
       <span class="t">소리 크기의 변화</span>
       <p>
-        이전 판의 MASTERING은 조용한 부분까지 약 6 dB 끌어올렸다. 설계가 아니라 네 압축기의 자동 메이크업에서 온 이득이었고, 대역마다 양이 달라 중역이 1.7 dB 도드라졌다. 지금은 압축이 없는 신호를 그대로 통과시키므로, 기본값에서 큰 입력은 압축된 만큼 작아진다. 크게 하려면 MASTERING의 INPUT GAIN으로 리미터를 민다. 전 모듈을 기본값으로 켠 체인의 RMS 증가는 +8.8 dB에서 +3.0 dB가 됐으며, 남은 증가는 조작한 값(COMPRESSOR MAKEUP 4 dB, BBE 강조)만큼이다.
+        이전 판의 MASTERING은 조용한 부분까지 약 6 dB 끌어올렸다. 설계가 아니라 네 압축기의 자동 메이크업에서 온 이득이었고, 대역마다 양이 달라 중역이 1.7 dB 도드라졌다. 지금은 압축이 없는 신호를 그대로 통과시키므로, 기본값에서 큰 입력은 압축된 만큼 작아진다. 크게 하려면 MASTERING의 INPUT GAIN으로 리미터를 민다. 전 모듈을 기준 설계값(MACRO 100 %)으로 켠 체인의 RMS 증가는 +8.8 dB에서 +3.0 dB가 됐으며, 남은 증가는 조작한 값(COMPRESSOR MAKEUP 4 dB, BBE 강조)만큼이다.
       </p>
     <p>
       MACRO 0 %(대역 레시오 1)에서 대역 압축기는 아무것도 누르지 않는다. 큰 마스터(천장까지 누른 것 · 자른 것)로 단계를 나눠 재면

@@ -882,7 +882,7 @@ body::before {
   </div>
   <div class="cover-badges">
     <span class="badge">5 DOCUMENTS</span>
-    <span class="badge">25 TOPICS CROSS-LINKED</span>
+    <span class="badge">33 TOPICS CROSS-LINKED</span>
     <span class="badge">LEVEL 1 → 4</span>
   </div>
 </div>
@@ -898,7 +898,7 @@ body::before {
       브라우저에서 바로 구동됩니다. 내보내기도 동작하며, 저장 시 파일은 무압축 <code>.zip</code>으로
       전달됩니다. wav가 저장 허용 확장자가 아니기 때문이며 압축은 하지 않으므로 풀면 원본 그대로입니다.
       <code>analog-soul-dsp.html</code>을 내려받아 로컬에서 열면 <code>.wav</code>로 바로 저장됩니다.
-      최신 데스크톱 Chrome을 기준으로 만들고 시험했습니다. 다른 브라우저에서는 일부 표시나 동작이 다를 수 있고, 192kHz 경로가 막히는 경우도 있습니다.
+      최신 데스크톱 Chrome을 기준으로 만들고 시험했습니다. 다른 브라우저에서는 일부 표시나 동작이 다를 수 있고, 192 · 384kHz 경로가 막히는 경우도 있습니다.
     </div>
   </a>
 
@@ -925,8 +925,8 @@ body::before {
         <div class="doc-lv">ENTRY · v3.1</div>
         <div class="doc-name">공식 사용 설명서</div>
         <div class="doc-who">제품 전반 · 전 모듈 레퍼런스</div>
-        <div class="doc-desc">제품 전체를 한 문서로 훑는 원본 매뉴얼. 모듈별 파라미터 카드, 신호 흐름도, 모니터링 도구, 활용 팁까지 담겨 있다. v2.3에서 LIVE·INPUT GAIN·스펙트로그램 등 신규 기능을 모두 반영했다.</div>
-        <div class="doc-meta">SECTION 01~11 · MODULE 01~09<br>개정 내역 · 활용 팁</div>
+        <div class="doc-desc">제품 전체를 한 문서로 훑는 원본 매뉴얼. 모듈별 파라미터 카드, 신호 흐름도, 모니터링 도구, 활용 팁까지 담겨 있다. v3.1의 PARAMETRIC EQ · 모니터 보정 · 비교 · 켜짐 효과까지 지금 기능을 모두 반영했다.</div>
+        <div class="doc-meta">SECTION 01~13 · MODULE 01~10<br>개정 내역 · 활용 팁</div>
         <div class="doc-go">OPEN →</div>
       </a>
       <a class="doc-card" style="--dc:var(--green)" href="analog-soul-plain.html">
@@ -934,7 +934,7 @@ body::before {
         <div class="doc-name">쉬운 말 설명서</div>
         <div class="doc-who">오디오를 처음 다루는 사람</div>
         <div class="doc-desc">전문용어를 쓰지 않고 모든 기능을 설명한다. 수치 대신 무엇이 달라지는지와 어디서부터 만지면 되는지를 적었다. 모듈 이름은 화면 표기 그대로 두고 뜻을 옆에 붙였다.</div>
-        <div class="doc-meta">11장 · 비유 중심<br>복원 원리 그림 · 용어 풀이</div>
+        <div class="doc-meta">12장 · 비유 중심<br>복원 원리 그림 · 용어 풀이</div>
         <div class="doc-go">OPEN →</div>
       </a>
       <a class="doc-card" style="--dc:var(--blue)" href="analog-soul-guide.html">
@@ -950,7 +950,7 @@ body::before {
         <div class="doc-name">신호 처리 사양서</div>
         <div class="doc-who">설계 의도를 확인하려는 사람</div>
         <div class="doc-desc">필터 종류·차단점·Q·시정수를 블록도와 함께 명시하고, 그 값이 왜 그래야 하는지를 음향학으로 정당화한다. 구현 코드와 플랫폼 이야기는 의도적으로 제외했다.</div>
-        <div class="doc-meta">7장 · 블록도와 계수표<br>배음 · 잔향 · 천장 · 앨리어싱 실측</div>
+        <div class="doc-meta">8장 · 블록도와 계수표<br>배음 · 잔향 · 천장 · 앨리어싱 실측</div>
         <div class="doc-go">OPEN →</div>
       </a>
       <a class="doc-card" style="--dc:var(--purple)" href="analog-soul-internals.html">
@@ -958,7 +958,7 @@ body::before {
         <div class="doc-name">개발자 논고</div>
         <div class="doc-who">구현을 고치거나 이식하려는 사람</div>
         <div class="doc-desc">구현 코드가 축이고 그 위에 유도가 얹힌다. STFT 합성 이론, 체비쇼프 전개, Bregman의 융합 단서, BS.1770 라우드니스까지 동원해 코드 한 줄의 근거를 따진다. 이펙터마다 물리 모형과 수식을 세우고 렌더링 실측으로 검증한다.</div>
-        <div class="doc-meta">19장 · 코드 43블록 · 명제 18개<br>인용 231줄 대조 완료 · 참고문헌 39편</div>
+        <div class="doc-meta">19장 · 코드 65블록 · 명제 18개<br>인용 402조각 대조 완료 · 참고문헌 48편</div>
         <div class="doc-go">OPEN →</div>
       </a>
   </div>
@@ -1086,7 +1086,7 @@ body::before {
         </tr>
         <tr>
           <td>모듈 전반</td>
-          <td><a class="c-m" href="analog-soul-manual.html#comp">MODULE 01~</a></td>
+          <td><a class="c-m" href="analog-soul-manual.html#peq">MODULE 01~</a></td>
           <td><a class="c-a" href="analog-soul-plain.html#modules">아홉 기능</a></td>
           <td><a class="c-b" href="analog-soul-guide.html#modules">모듈 하나하나</a></td>
           <td><a class="c-c" href="analog-soul-engineering.html#units">처리 단 사양</a></td>
@@ -1247,7 +1247,7 @@ body::before {
         <tr>
           <td><strong>프리셋</strong></td>
           <td><a class="c-m" href="analog-soul-manual.html#preset">설정 보관</a></td>
-          <td><span class="nil">—</span></td>
+          <td><a class="c-a" href="analog-soul-plain.html#save">설정 저장하기</a></td>
           <td><span class="nil">—</span></td>
           <td><span class="nil">—</span></td>
           <td><span class="nil">—</span></td>
@@ -1258,7 +1258,7 @@ body::before {
           <td><a class="c-a" href="analog-soul-plain.html#save">파일로 저장</a></td>
           <td><a class="c-b" href="analog-soul-guide.html#export">내보내기</a></td>
           <td><a class="c-c" href="analog-soul-engineering.html#bitdepth">비트 깊이와 출력</a></td>
-          <td><span class="nil">—</span></td>
+          <td><a class="c-d" href="analog-soul-internals.html#bits">격자와 인코더</a></td>
         </tr>
         <tr>
           <td>앨리어싱</td>
@@ -1338,13 +1338,18 @@ body::before {
     <tr><td>큰 편집 창</td><td>‘크게’로 여는 대화상자에서 큰 그래프와 모든 대역의 표를 고칩니다. 창을 연 채 EQ를 켜고 끄거나 재생하며 비교할 수 있고, ‘처음 상태로’는 한 번 더 눌러야 되돌립니다. Esc나 바깥을 누르면 닫히고, 초점은 창을 열기 전 자리(보통 ‘크게’ 단추)로 돌아옵니다.</td></tr>
     <tr><td>재생 중 바꾸기</td><td>값은 10 ms 시정수로 옮기고, 대역 수 · 종류 · 기울기 · 켜짐이 바뀌면 새 필터 열을 만들어 20 ms 동안 교차해 넘깁니다. 대역을 더하거나 지우는 동안에도 1 kHz 사인의 표본 간 최대 변화가 평소와 같습니다.</td></tr>
     <tr><td>프리셋과 3.0 설정</td><td>설정 파일 · 슬롯이 EQ 대역 목록을 함께 담습니다. EQ가 없던 3.0에서 저장한 설정을 불러오면 EQ를 처음 상태(꺼짐 · 평탄한 네 대역)로 되돌려 저장할 때의 소리를 그대로 냅니다.</td></tr>
-    <tr><td>모니터 보정 (3.1.1)</td><td>재생 줄의 단추로 여는 창에서 AutoEQ의 ParametricEQ.txt를 읽어, 듣는 헤드폰 · 스피커의 굴곡을 재생할 때만 고릅니다. 적용본 분석기 뒤 · 장치 앞에 걸려 화면의 그래프와 내보낸 파일에는 들어가지 않고, 설정 파일 대신 이 브라우저에 저장됩니다. 꺼 두면 표본이 그대로이고, 켜면 소리와 곡선의 차이가 0.0006 dB 안입니다. 보정 곡선이 0 dB를 넘으면 Preamp를 내리라고 알립니다(<a href="analog-soul-engineering.html#chain-monitor">사양서</a>).</td></tr>
+    <tr><td>모니터 보정 (3.1.1)</td><td>재생 줄의 단추로 여는 창에서 AutoEQ의 ParametricEQ.txt를 읽어, 듣는 헤드폰 · 스피커의 굴곡을 재생할 때만 고릅니다. 적용본 분석기 뒤 · 장치 앞에 걸려 화면의 그래프와 내보낸 파일에는 들어가지 않고, 설정 파일 대신 이 브라우저에 저장됩니다. 꺼 두면 표본이 그대로이고, 켜면 소리와 곡선의 차이가 0.0006 dB 안입니다. 보정 곡선이 0.1 dB를 넘으면 Preamp를 내리라고 알립니다(<a href="analog-soul-engineering.html#chain-monitor">사양서</a>).</td></tr>
     <tr><td>AutoEQ 가져오기 (3.1.1)</td><td>PK · LSC · HSC를 비롯한 Equalizer APO 필터를 PARAMETRIC EQ와 같은 바이쿼드로 옮깁니다. AutoEQ의 셸프 Q 0.70은 명세의 셸프(S = 1)와 ±10 dB에서 최대 0.045 dB 다릅니다. EQ 카드의 큰 편집 창에서도 가져올 수 있고, 이때는 처리 체인 안이라 내보낸 파일에도 들어갑니다.</td></tr>
     <tr><td>INPUT GAIN 0.1 dB (3.1.1)</td><td>모든 카드의 INPUT GAIN을 0.5 dB에서 0.1 dB 단위로 바꿨습니다. 켠 쪽과 끈 쪽의 음량을 0.1 dB까지 맞출 수 있습니다.</td></tr>
+    <tr><td>문서 대조 (3.1.15)</td><td>문서 여섯 개를 3.1.14 앱 코드와 한 줄씩 대조해 고쳤습니다. 지적 123개를 다른 검토로 한 번 더 반박해 본 뒤 122개를 반영했습니다. 틀린 값(원본 샘플레이트 판독 범위 8 ~ 768 kHz, SMOOTH 기본값 40, MASTERING 대역 압축 상한, HD 쪽 PRESET 탭 다섯 개, 모니터 보정 경고 0.1 dB, 논고의 HD 기본 SYNTH 50과 OLA 누적), ‘기본’으로 적혀 있던 COMPRESSOR · BBE의 기준 설계값과 처음 상태 구분, 빠져 있던 최신 내용(카드 놓을 자리 규칙, 맨 앞의 HD 카드, 비교 · 견줄 소리, 논고의 모니터 보정 · PARAMETRIC EQ 소절, 사양서의 384 kHz 틀 길이), 이 색인의 문서 카드 수치와 상호 참조를 바로잡았습니다. 앱은 그대로입니다.</td></tr>
+    <tr><td>Ultra HD 표기 (3.1.14)</td><td>‘ULTRA HD’ 표기를 ‘Ultra HD’로, 줄여 쓴 ‘ULTRA · eXtreme HD’를 ‘Ultra · eXtreme HD’로 바꿨습니다. 앱 화면(복원 모듈 제목 · LIVE 스위치 설명 · 상태 줄 · 내보내기 경로 안내), 문서 여섯 개, README 여섯 언어가 모두 같습니다. 동작과 소리는 그대로입니다.</td></tr>
+    <tr><td>README 여섯 언어 (3.1.13)</td><td>README를 한국어(README.md) · 영어(README.en.md) · 일본어(README.ja.md) · 중국어 간체(README.zh.md) · 프랑스어(README.fr.md) · 스페인어(README.es.md)로 냅니다. 여섯 파일 맨 위의 같은 언어 선택 줄로 서로 오가고, 본문 · 표 · 수식 · 변경 이력까지 모두 옮겼으며 같은 앵커를 써서 어느 언어에서나 같은 절로 갑니다. 화면의 한국어 이름은 번역문 뒤 괄호에 붙였고, 번역판과 한국어 원문이 다르면 한국어 원문을 따릅니다. 결과물 묶음은 8개에서 13개 파일이 되었습니다.</td></tr>
+    <tr><td>카드 끌어 옮기기 (3.1.12)</td><td>카드를 끌어 이웃 카드 자리로 옮기기가 잘 되지 않던 것을 고쳤습니다. 놓을 자리를 커서가 놓인 카드의 왼쪽 · 오른쪽 절반으로 갈라, 이웃 카드의 가까운 절반에 놓으면 원래 자리로 돌아갔습니다. 이제 지금 자리보다 뒤에 있는 카드 위로 들어가면 그 카드 뒤, 앞에 있는 카드 위로 들어가면 그 카드 앞으로 가서, 이웃 카드의 어디에 놓아도 서로 자리가 바뀝니다. MASTER 카드의 왼쪽 절반은 바로 앞, 오른쪽 절반은 재생 단계 맨 앞인 것은 그대로이고, 카드가 미끄러지는 동안 자리 표시가 앞뒤로 깜빡이던 것도 없앴습니다.</td></tr>
     <tr><td>켜짐 효과 · 네온 (3.1.11)</td><td>카드의 켜짐 스위치와 신호 흐름 지도의 불빛이 전구처럼 켜집니다. 누르고 있는 동안 가운데 불빛이 불규칙하게 깜빡이고, 떼는 순간 불빛이 부풀며 충격파 고리 두 겹과 빛 · 불티가 퍼지고, 네온 테두리가 불빛 자리에서 번집니다(카드 0.57초 · 노드 0.35초, 카드와 노드가 함께). 켜진 이펙터는 테두리가 네온처럼 빛나고(야간은 흰빛이 섞인 가는 테두리와 처리기 색 빛무리, 주간은 처리기 색 테두리와 옅은 빛무리), HD 복원 카드는 LIVE가 재생에 걸린 동안 빛납니다. 소리가 바뀌는 때는 그대로 떼는 순간이고, 누른 채 밖으로 나가서 떼면 아무것도 바뀌지 않습니다. 설정 불러오기와 동작 줄이기 설정에서는 효과 없이 바로 바뀝니다.</td></tr>
     <tr><td>고역 복원 차단점 부근 계단 (3.1.11)</td><td>HD · Ultra · eXtreme HD 복원에서 차단점 부근에 서던 계단을 줄였습니다. 차단점 위는 차단점 아래 목표선의 국소 기울기를 이어받아 1옥타브에 걸쳐 풀고(차단점 16 kHz 아래는 그대로), HF SYNTH 50 위의 평탄한 선은 차단점에서 원음 기울기로 출발해 1옥타브에 걸쳐 풀며 3.1.10의 선보다 밝아지지 않습니다. 복원만의 계단은 기본 4.6 → 3.0 %, 최대 19.8 → 11.5 %이고, 최대의 초고역은 28 kHz 위에서 4 ~ 6 dB 낮아졌습니다. 원음 자체의 낙차는 그대로 보입니다.</td></tr>
     <tr><td>값 막대 미끄러짐 (3.1.11)</td><td>막대를 끌지 않고 누르기만 하면 손잡이가 누른 자리로 서서히 출발해 빨라졌다가 브레이크를 걸듯 멈춥니다(거리에 따라 0.24 ~ 0.6초). 움직이는 동안 input을 보내 소리와 MACRO · AUTO가 움직이는 손잡이가 함께 따라오고, change는 끝에서 한 번입니다. 누른 채 끌면 그대로 따라오고 키보드는 바로입니다. HD 복원 PRESET · SG 모드 · ATMOS 장면 · 설정 불러오기 · 초기화로 바뀐 막대는 값과 소리를 누른 순간 바꾸고 손잡이와 채움만 앞 자리에서 미끄러지므로, 그동안 체인을 다시 짜거나 LIVE를 복원하거나 내보내도 끝 값을 씁니다.</td></tr>
     <tr><td>단추 물결 (3.1.11)</td><td>저장 · 불러오기 · 슬롯 · 복사 · 재생 · 내보내기 같은 단추와 SG 모드 · ATMOS 장면 단추를 누르면, 누른 자리에 물방울이 떨어진 듯 원형 파동 세 겹이 퍼지다가 단추 안에서 잦아들며 사라집니다(0.9초). 물결은 단추 글자색을 옅게 써서 바탕 위 · 글자 아래에 그리고 단추 밖으로 나가지 않습니다. 키보드로 누르면 가운데에서 퍼지고, 동작 줄이기 설정이면 옅게 한 번 빛납니다.</td></tr>
+    <tr><td>탭 아이콘 (3.1.11)</td><td>프로그램과 문서 여섯 개가 같은 탭 아이콘(favicon)을 씁니다. 한 가지 색의 선으로 그린 계기 바늘(눈금 호 · 바늘 · 축)로, 밝은 화면에서는 검정, 어두운 화면에서는 흰색으로 그립니다. 파일 안에 data: 주소로 들어 있어 바깥 요청이 없습니다.</td></tr>
     <tr><td>셰이핑 판별 (3.1.10)</td><td>비트 깊이 향상이 하이햇 · 라이드 · 심벌처럼 고역이 늘 깔린 음악을 셰이핑 디더 원본으로 잘못 보던 문제를 고쳤습니다(합성 하이햇 곡에서 참값과의 오차가 최대 34.8 dB 커지고 원본에서 16 LSB까지 옮김). 고역 바닥의 위 끝(+36 dB) · 8 ~ 11 kHz 대비 상승(3배) · 고름(2%와 10% 백분위 틀이 1 dB 안)을 더해, 합성 신호 450가지에서 고역이 늘 깔린 음악 210가지가 모두 평탄 처리(½ LSB 안)로 돌아왔습니다. 셰이핑 원본은 판별 · K · 결과가 그대로이고, 가장 약한 1차 셰이핑은 평탄으로 처리합니다.</td></tr>
     <tr><td>복원 PRESET과 LIVE (3.1.10)</td><td>HD 복원 PRESET으로 손잡이를 바꿔도 LIVE 미리듣기가 이전 값으로 만든 소리 그대로이던 문제를 고쳤습니다. 판을 닫을 때(다른 모드의 판으로 넘어갈 때도) 값이 달라졌으면 한 번 다시 만들고, 다시 만드는 동안 바뀐 손잡이는 끝난 뒤 마지막 값으로 반영합니다.</td></tr>
     <tr><td>카드 하나 빼고 견주기 (3.1.9)</td><td>재생 줄의 견줄 소리로 원음 대신 켜진 카드 하나만 뺀 처리본을 고릅니다. 체인을 하나 더 돌리지 않고 그 카드 둘레에 우회로를 두어, 뒤 카드들은 그 카드를 뺀 소리를 그대로 받습니다. 우회로는 그 카드의 지연만큼 늦춰 박자를 맞추고(두 렌더의 상호상관), 같은 크기는 그 카드만 끈 렌더의 라우드니스로 맞춥니다. 처리본 경로는 우회로가 이어진 채로도 내보내기 체인과 표본까지 같습니다. 원음 비교 단추는 ‘비교’가 되었습니다.</td></tr>
@@ -1357,7 +1362,7 @@ body::before {
     <tr><td>좁은 타일의 값 칸 (3.1.5)</td><td>3열이 막 시작되어 카드 폭이 360 ~ 371 px일 때(화면 스크롤바가 15 px인 창에서 1,175 ~ 1,209 px), 스크롤바 자리 22 px를 비운 VINYL · ATMOS · MASTERING의 손잡이 줄이 카드 안쪽을 넘어 값 칸이 오른쪽에서 최대 12 px 잘렸습니다. 슬라이더 막대가 범위 입력의 기본 폭 129 px 아래로 줄지 않았기 때문이라, 타일에서는 막대가 그보다 짧아질 수 있게 해 이름과 값 칸은 그대로 두고 막대만 줄입니다.</td></tr>
     <tr><td>같은 설정이면 같은 파일 (3.1.4)</td><td>같은 설정으로 내보내도 실행마다 표본이 조금씩 달랐습니다(같은 설정 9번에 9가지, 기본 카드 최대 4.76 × 10⁻⁴). 한 입력에 연결이 셋 이상 모이면 Chromium이 더하는 순서를 실행마다 바꾸고 float 덧셈은 순서에 따라 마지막 자리가 달라지기 때문이라, 그런 합류점(SOUNDGOODIZER · VINYL · ATMOS · MASTERING)을 둘씩 묶어 정해진 순서로 더합니다. 디더 난수도 표본마다 두 개씩 뽑아, 작은 차이 하나가 16 · 24bit 파일 전체로 번지지 않습니다. 이제 같은 원본 · 같은 설정이면 파일이 바이트까지 같습니다. README 4.16 · 4.19, 개발자 논고 §10 · §19.</td></tr>
     <tr><td>글꼴 넣기 (3.1.3)</td><td>Google Fonts에서 받던 글꼴(Barlow · Barlow Condensed · Noto Sans KR · JetBrains Mono)을 문서 묶음에 쓰인 글자만 남겨 각 HTML 안에 넣었습니다. 프로그램과 문서가 열 때 바깥으로 아무것도 요청하지 않고, 인터넷이 없어도 화면이 같습니다. 글꼴은 SIL Open Font License 1.1을 따르며 사용권 전문이 각 파일에 들어 있습니다.</td></tr>
-    <tr><td>카드 아래쪽 손잡이 (3.1.2)</td><td>내용이 넘치는 카드(VINYL · ATMOS · MASTERING)를 끝까지 굴린 뒤 더 굴리면 화면이 따라 올라가, 카드 아래쪽이 위에 붙은 재생 줄 밑으로 들어가 눌리지 않던 문제를 고쳤습니다. 카드 안의 휠은 끝에 닿아도 화면으로 넘어가지 않고, 화면을 굴린 직후에도 마우스를 움직이면 카드가 바로 받습니다. 넘치는 카드의 머리줄 단추로 그 카드만 내용 높이만큼 늘여 손잡이를 한 번에 다 볼 수 있습니다.</td></tr>
+    <tr><td>카드 늘이기 · 아래쪽 손잡이 (3.1.2)</td><td>내용이 넘치는 카드(VINYL · ATMOS · MASTERING)를 끝까지 굴린 뒤 더 굴리면 화면이 따라 올라가, 카드 아래쪽이 위에 붙은 재생 줄 밑으로 들어가 눌리지 않던 문제를 고쳤습니다. 카드 안의 휠은 끝에 닿아도 화면으로 넘어가지 않고, 화면을 굴린 직후에도 마우스를 움직이면 카드가 바로 받습니다. 넘치는 카드의 머리줄 단추로 그 카드만 내용 높이만큼 늘여 손잡이를 한 번에 다 볼 수 있습니다.</td></tr>
   </table>
 
   <h3 class="sub-title">v3.0</h3>
@@ -1539,7 +1544,7 @@ body::before {
 
   <h3 class="sub-title">v2.2 — 최초 판</h3>
   <p style="color:var(--c-muted);font-size:15px">
-    여덟 개 처리 모듈과 HD/Ultra · eXtreme HD 복원, 드래그 순서 변경, 기본 스펙트럼 표시를 갖춘 판입니다.
+    여덟 개 처리 모듈과 HD · Ultra · eXtreme HD 복원, 드래그 순서 변경, 기본 스펙트럼 표시를 갖춘 판입니다.
     v2.3에서 고친 항목들은 이 판에 존재하던 것입니다.
   </p>
 </div>
