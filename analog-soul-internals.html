@@ -3145,13 +3145,15 @@ lim.<span class="f">set</span>(p.limCeil, <span class="v">0</span>, <span class=
         <tr><td>낮은 레벨 응답 (−40 dBFS, 31.5 Hz~20 kHz)</td><td class="m">+5.4 ~ +7.1 dB, 기울기 1.7 dB</td><td class="m">0.0 dB</td></tr>
         <tr><td>100 Hz 사각파, OUTPUT +12 dB (천장 −0.3)</td><td class="m">+0.32 dBFS</td><td class="m">−0.30 dBFS</td></tr>
         <tr><td>임펄스열 +12 dBFS, OUTPUT +12 dB</td><td class="m">+2.97 dBFS</td><td class="m">−0.30 dBFS</td></tr>
-        <tr><td>전 모듈 기준 설계값(MACRO 100 %), 분홍 잡음 −20.2 dBFS RMS</td><td class="m">−11.4 dBFS RMS, 봉우리 −0.43</td><td class="m">−17.2 dBFS RMS, 봉우리 −3.98</td></tr>
+        <tr><td>전 모듈 기준 설계값(MACRO 100 % — 3.0.29까지의 기본값), 분홍 잡음 −20.2 dBFS RMS</td><td class="m">−11.4 dBFS RMS, 봉우리 −0.43</td><td class="m">−17.2 dBFS RMS, 봉우리 −3.98</td></tr>
       </tbody>
     </table></div>
     <div class="nb">
       <span class="t">소리 크기의 변화</span>
       <p>
         이전 판의 MASTERING은 조용한 부분까지 약 6 dB 끌어올렸다. 설계가 아니라 네 압축기의 자동 메이크업에서 온 이득이었고, 대역마다 양이 달라 중역이 1.7 dB 도드라졌다. 지금은 압축이 없는 신호를 그대로 통과시키므로, 기본값에서 큰 입력은 압축된 만큼 작아진다. 크게 하려면 MASTERING의 INPUT GAIN으로 리미터를 민다. 전 모듈을 기준 설계값(MACRO 100 %)으로 켠 체인의 RMS 증가는 +8.8 dB에서 +3.0 dB가 됐으며, 남은 증가는 조작한 값(COMPRESSOR MAKEUP 4 dB, BBE 강조)만큼이다.
+        3.1.15에서 같은 조건을 다시 쟀다(48 kHz 1/f 분홍 잡음 20초, −20.2 dBFS RMS, 여덟 카드를 켜고 같은 표본률 32bit float로 내보냄). 지금 판은 MACRO 100 %에서 −15.7 dBFS RMS · 봉우리 −3.80, 처음 상태에서 −16.1 · −4.28이다.
+        표의 값을 잰 잡음 파일이 남아 있지 않아 절대값은 다르다. 같은 파일로 잰 3.0.30 앱도 −15.7 · −4.09 · 처음 상태 −16.1 · −4.44여서, 표와의 차이는 판이 아니라 잡음 파일에서 온다.
       </p>
     <p>
       MACRO 0 %(대역 레시오 1)에서 대역 압축기는 아무것도 누르지 않는다. 큰 마스터(천장까지 누른 것 · 자른 것)로 단계를 나눠 재면

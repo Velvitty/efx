@@ -1728,6 +1728,14 @@ canvas.tube-vis {
   color:var(--muted); margin:12px 0 4px; padding-top:8px; border-top:1px dashed var(--border);
 }
 .vinyl-group:first-child{ margin-top:4px; }
+/* MASTERING MACRO 0 % 안내 — 크게 만든 곡에서만 MACRO 아래에 뜬다 */
+.mz-note { position: relative; margin: -2px 0 10px; padding: 8px 10px; border-left: 2px solid var(--amber); background: color-mix(in srgb, var(--amber) 8%, transparent);
+  font-size: var(--fs-xs); line-height: 1.55; color: var(--text, inherit); border-radius: 0 3px 3px 0; }
+.mz-note[hidden] { display: none; }
+.mz-note p { margin: 0; }
+.mz-note p + p { margin-top: 4px; }
+.mz-more { all: unset; cursor: pointer; color: var(--amber); text-decoration: underline; text-underline-offset: 2px; white-space: nowrap; margin-left: 2px; }
+.mz-more:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; border-radius: 2px; }
 
 /* ============================================================
    디자인 — 야간 콘솔 · 주간 콘솔
@@ -3608,6 +3616,14 @@ input[type=range]::-moz-range-thumb { transform: translateX(var(--glide-dx, 0px)
           <input type="range" id="masterMacro" min="0" max="100" value="95" step="1">
           <span class="slider-val" id="masterMacroV">95 %</span>
         </div>
+        <div class="mz-note" id="masterZeroNote" role="note" hidden>
+          <p id="masterZeroShort">0 %라도 크게 만든 곡은 최대 약 0.9 dB 작아집니다. 원치 않으면 카드를 끄세요 — 끄면 출력 천장도 꺼집니다. <button type="button" class="mz-more" id="masterZeroMore" aria-expanded="false" aria-controls="masterZeroLong">자세히…</button></p>
+          <div id="masterZeroLong" hidden>
+            <p>MACRO 0 %여도 이 카드는 완전히 꺼진 것과 같지 않습니다.</p>
+            <p>소리를 네 대역으로 나눴다 합치면서 봉우리가 커지고, 리미터가 이를 눌러 크게 만든 곡은 최대 약 0.9 dB 작아집니다.</p>
+            <p>이 카드를 아예 거치지 않으려면 끄세요. 다만 끄면 0 dBFS를 넘는 봉우리를 막아 주는 출력 천장(CEILING)도 꺼집니다. <button type="button" class="mz-more" id="masterZeroLess" aria-controls="masterZeroLong">간단히</button></p>
+          </div>
+        </div>
         <div class="slider-row in-gain">
           <span class="slider-label">INPUT GAIN</span>
           <input type="range" id="masterIn" min="-24" max="24" value="0" step="0.1">
@@ -3823,6 +3839,59 @@ const Q_CRIT   = 20 * Math.log10(0.5);            // −6.0206 dB — 임계 감
 
 let audioCtx = null;
 let sourceBuf = null;
+let sourcePeakDb = null;   // 불러온 파일의 표본 봉우리(dBFS) — MASTERING MACRO 0 % 안내의 조건
+function peakDbOf(buf) {
+  let pk = 0;
+  for (let c = 0; c < buf.numberOfChannels; c++) {
+    const d = buf.getChannelData(c);
+    for (let i = 0; i < d.length; i++) { const v = d[i] < 0 ? -d[i] : d[i]; if (v > pk) pk = v; }
+  }
+  return pk > 0 ? 20 * Math.log10(pk) : -Infinity;
+}
+// MASTERING을 MACRO 0 %로 켜 둔 채 크게 만든 곡(봉우리 −1 dBFS 이상)을 다루면, 4대역 분할의 합이 봉우리를 키워
+// 리미터가 누른다(잰 값: 천장까지 누른 곡 −0.18 dB · 자른 곡 −0.91 dB, 분할 없이는 −0.06 · −0.01 dB). 그때만 안내한다
+const MZ_PEAK_DB = -1;
+function updateMasterZeroNote() {
+  const box = document.getElementById('masterZeroNote'); if (!box) return;
+  const on = document.getElementById('masterOn').checked, zero = +document.getElementById('masterMacro').value === 0;
+  const show = on && zero && sourcePeakDb !== null && sourcePeakDb >= MZ_PEAK_DB;
+  if (box.hidden === show) box.hidden = !show;
+  if (!show) setMasterZeroLong(false);
+}
+// 자세히 · 간단히 — 옛 글이 사라지는 동안 새 글이 같은 자리에서 동시에 나타나고(교차 페이드), 상자 높이도 같은 0.3초에
+// 같은 곡선으로 늘었다 준다. 옛 글은 바뀌는 동안만 상자 위에 겹쳐 두고(누를 수 없음) 끝나면 숨긴다.
+// 움직이는 도중 반대로 누르면 지금 높이에서 다시 시작한다. 움직임 줄이기 설정이면 바로 바꾸고, 안내가 숨겨질 때도 바로 접는다
+const MZ_MS = 300, MZ_EASE = 'cubic-bezier(.4, 0, .2, 1)';   // 자세히 · 간단히 움직임의 시간 · 곡선
+function finishMasterZeroFade(box) {
+  const m = box._mz; if (!m) return;
+  box._mz = null;
+  m.anims.forEach(function (a) { a.onfinish = null; a.cancel(); });
+  m.out.hidden = true; m.out.style.position = m.out.style.top = m.out.style.left = m.out.style.width = m.out.style.pointerEvents = '';
+  box.style.overflow = '';
+}
+function setMasterZeroLong(open, animate) {
+  const box = document.getElementById('masterZeroNote'), s = document.getElementById('masterZeroShort'), l = document.getElementById('masterZeroLong'), b = document.getElementById('masterZeroMore');
+  if (!s || !l) return;
+  const h0 = box.getBoundingClientRect().height;               // 움직이는 도중이면 지금 높이
+  finishMasterZeroFade(box);
+  if (!l.hidden === open) return;
+  const inEl = open ? l : s, outEl = open ? s : l;
+  const move = animate && !box.hidden && !matchMedia('(prefers-reduced-motion: reduce)').matches && box.animate;
+  if (!move) { s.hidden = open; l.hidden = !open; b.setAttribute('aria-expanded', String(open)); return; }
+  const top = outEl.offsetTop, left = outEl.offsetLeft, w = outEl.getBoundingClientRect().width;
+  outEl.style.position = 'absolute'; outEl.style.top = top + 'px'; outEl.style.left = left + 'px'; outEl.style.width = w + 'px'; outEl.style.pointerEvents = 'none';
+  inEl.hidden = false; b.setAttribute('aria-expanded', String(open));
+  const h1 = box.getBoundingClientRect().height;
+  box.style.overflow = 'hidden';
+  // 상자 높이와 글의 교차 페이드를 같은 시간 · 같은 곡선으로 — 같은 곡선이라 글이 상자보다 늦지 않고, 표준 곡선이라 교차가 고르게 보인다
+  // (빠르게 출발하는 곡선은 0.1초 안에 대부분 바뀌어 교차가 너무 빨랐다). fill forwards는 끝 값을 지켜 옛 글이 끝 무렵 다시 나타나지 않게 한다
+  const t = { duration: MZ_MS, easing: MZ_EASE }, f = { duration: MZ_MS, easing: MZ_EASE, fill: 'forwards' };
+  const anims = [box.animate([{ height: h0 + 'px' }, { height: h1 + 'px' }], t),
+                 outEl.animate([{ opacity: 1 }, { opacity: 0 }], f),
+                 inEl.animate([{ opacity: 0 }, { opacity: 1 }], f)];
+  box._mz = { anims: anims, out: outEl };
+  anims[0].onfinish = function () { finishMasterZeroFade(box); };
+}
 let sourceGrid = null;   // 원본의 정수 격자 { bits, pos, neg } — 손실 압축 · float 원본은 null
 let sourceBits = null;   // 그 비트 깊이(8 · 16 · 24)
 let srcNode = null;
@@ -4071,6 +4140,7 @@ async function loadFile(file) {
   const ch = sourceBuf.numberOfChannels;
   sourceGrid = detectSourceGrid(sourceBuf);
   sourceBits = sourceGrid ? sourceGrid.bits : null;
+  sourcePeakDb = peakDbOf(sourceBuf); updateMasterZeroNote();
   document.getElementById('fiName').textContent = file.name;
   document.getElementById('fiMeta').textContent = `${fmt(dur)} · ${(sr/1000).toFixed(1)}kHz${sourceBits ? ' · ' + sourceBits + 'bit' : ''} · ${ch}ch · ${(file.size/1024/1024).toFixed(2)}MB`;
   document.getElementById('infoSR').textContent = `${(sr/1000).toFixed(1)}kHz / ${Math.round(file.size*8/dur/1000)}kbps`;
@@ -4093,6 +4163,12 @@ async function loadFile(file) {
   updateAxisNote();
   drawCrackle();
 }
+
+// ---- MASTERING MACRO 0 % 안내 ----
+document.getElementById('masterMacro').addEventListener('input', updateMasterZeroNote);
+document.getElementById('masterOn').addEventListener('change', updateMasterZeroNote);
+document.getElementById('masterZeroMore').addEventListener('click', function () { setMasterZeroLong(true, true); document.getElementById('masterZeroLess').focus({ preventScroll: true }); });
+document.getElementById('masterZeroLess').addEventListener('click', function () { setMasterZeroLong(false, true); document.getElementById('masterZeroMore').focus({ preventScroll: true }); });
 
 // ---- Toggle module active state ----
 const modMap = { peqOn:'peq', bbeOn:'bbe', tubeOn:'tube', vinylOn:'vinyl', exciterOn:'exciter', sgOn:'sg', atmosOn:'atmos', compOn:'comp', masterOn:'master' };
@@ -9459,6 +9535,7 @@ function encodeWAV(buffer, bitDepth, dither, grid) {
 document.getElementById('resetBtn').addEventListener('click', () => {
   stopPlay();
   sourceBuf = null; originalFile = null;
+  sourcePeakDb = null; updateMasterZeroNote();
   // 실시간 복원 해제 및 기본 샘플레이트 복귀
   liveHDMode = 'off'; hdLiveBuf = null; hdLiveKey = '';
   ensureCtxRate(null).then(updateHDLiveUI);

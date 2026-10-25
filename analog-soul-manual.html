@@ -1307,6 +1307,8 @@ body::before {
       <tr><td>문서 (3.1.13)</td><td>README를 여섯 언어로 — 한국어 · 영어 · 일본어 · 중국어(간체) · 프랑스어 · 스페인어. 맨 위 언어 선택 줄로 서로 오가고, 번역판과 한국어 원문이 다르면 한국어 원문을 따름</td></tr>
       <tr><td>표기 (3.1.14)</td><td>‘ULTRA HD’를 ‘Ultra HD’로 — 앱 화면(복원 모듈 · LIVE 스위치 설명 · 상태 줄 · 내보내기 경로 안내)과 문서 · README가 모두 같은 표기, 줄여 쓴 ‘Ultra · eXtreme HD’도 · 동작과 소리는 그대로</td></tr>
       <tr><td>문서 (3.1.15)</td><td>문서 여섯 개를 3.1.14 앱과 한 줄씩 대조해 고침 — 이 설명서에서는 원본 샘플레이트 판독 범위(8 ~ 768 kHz) · Ultra · eXtreme HD의 SMOOTH 기본값 40 · MASTERING LOW · HIGH COMP의 실제 상한(4:1 · 3:1) · HD 복원 카드의 자리(카드 맨 앞) · 카드 놓을 자리 규칙 · 내보낸 파일 이름 꼬리 · 프리셋 파일 크기 · 비교와 견줄 소리 안내 · 개정 내역의 3.1.12 ~ 3.1.14</td></tr>
+      <tr><td>문서 (3.1.16)</td><td>SMOOTH 표의 ‘한 옥타브 위의 결’을 지금 계수(약 6분의 1 · 9분의 1 · 13분의 1)로 고치고 음이 뚜렷한 틀 · 치는 순간의 차이를 더함 · VACUUM TUBE · DOLBY ATMOS 카드 이름을 앱과 같게</td></tr>
+      <tr><td>안내 (3.1.17)</td><td>MASTERING CHAIN 카드에 MACRO 0 % 안내 — MASTERING이 켜져 있고 불러온 곡의 표본 봉우리가 −1 dBFS 이상이면 리미터 손실(최대 약 0.9 dB)과 끄면 출력 천장도 꺼진다는 것을 알림. ‘자세히…’ · ‘간단히’로 펼치고 접음</td></tr>
       <tr><td>문서</td><td>PARAMETRIC EQ 절을 모듈 01로 추가(뒤의 모듈 번호가 하나씩 밀림) · 그래프와 큰 편집 창의 마우스 · 키보드 조작표 · 모니터링 도구 절에 모니터 보정(3.1.1)</td></tr>
     </table>
 
@@ -2093,7 +2095,7 @@ body::before {
     <div class="module-card" data-cap="tube">
       <div class="mc-header">
         <span class="mc-num">MOD-04</span>
-        <span class="mc-name">VACUUM TUBE SATURATION</span>
+        <span class="mc-name">VACUUM TUBE</span>
         <span class="mc-sub">짝수 하모닉 포화</span>
       </div>
       <div class="mc-body">
@@ -2332,7 +2334,7 @@ body::before {
     <div class="module-card" data-cap="atmos">
       <div class="mc-header">
         <span class="mc-num">MOD-08</span>
-        <span class="mc-name">DOLBY ATMOS SPATIAL SIMULATOR</span>
+        <span class="mc-name">DOLBY ATMOS</span>
         <span class="mc-sub">공간 오디오 시뮬레이터</span>
       </div>
       <div class="mc-body">
@@ -2417,7 +2419,7 @@ body::before {
           <div class="mc-what">
             제작 체인의 마지막을 담당하는 <strong>4밴드 Linkwitz-Riley 멀티밴드 컴프레서 + 스테레오 익스팬더 + 브릭월 리미터</strong>의 조합입니다. 항상 처리 순서의 마지막에 고정됩니다.<br><br>
             크로스오버: <strong>120Hz / 500Hz / 5kHz</strong> — Sub/Low, LowMid, Mid, High 4개 밴드로 분리해 각각 독립적으로 컴프레서를 통과시킨 후 합산합니다. LR(Linkwitz-Riley) 2단 필터로 위상이 정확하게 보정됩니다.<br><br>
-            <strong>스테레오 폭 조절</strong>로 믹스의 넓이를 0~200% 범위에서 자유롭게 조절합니다. <strong>브릭월 리미터</strong>(Ratio 20:1, Attack 1ms)와 그 뒤의 소프트 클리퍼, 천장 묶음이 출력 표본을 CEILING 아래로 묶습니다. 압축이 걸리지 않는 조용한 부분은 네 대역 모두 그대로 통과합니다. Ceiling을 -0.3dB로 기본 설정하여 스트리밍 서비스의 클리핑 기준에 대응합니다.
+            <strong>스테레오 폭 조절</strong>로 믹스의 넓이를 0~200% 범위에서 자유롭게 조절합니다. <strong>브릭월 리미터</strong>(Ratio 20:1, Attack 1ms)와 그 뒤의 소프트 클리퍼, 천장 묶음이 출력 표본을 CEILING 아래로 묶습니다. 압축이 걸리지 않는 조용한 부분은 네 대역 모두 그대로 통과합니다. MACRO 0 %에서도 리미터는 일하므로, MASTERING이 켜져 있고 불러온 곡의 표본 봉우리가 −1 dBFS 이상이면 카드 안에 ‘최대 약 0.9 dB 작아질 수 있고, 끄면 출력 천장도 꺼진다’는 안내가 뜹니다. Ceiling을 -0.3dB로 기본 설정하여 스트리밍 서비스의 클리핑 기준에 대응합니다.
           </div>
         </div>
         <div class="mc-params">
@@ -2614,10 +2616,15 @@ body::before {
     <table class="spec-table">
       <tr><th>SMOOTH</th><th>한 옥타브 위의 결</th><th>성격</th></tr>
       <tr><td>0</td><td>원천 그대로</td><td>음의 봉우리가 높은 곳까지 남음</td></tr>
-      <tr><td>40</td><td>봉우리 대비 약 절반(dB 기준)</td><td>기본값(HD · Ultra · eXtreme HD 모두 AUTO 75%에서). 대부분의 소스에 적정</td></tr>
-      <tr><td>70</td><td>약 3분의 1</td><td>음질이 낮은 파일의 쇳소리 억제</td></tr>
-      <tr><td>100</td><td>약 4분의 1</td><td>위쪽이 거의 고른 잡음</td></tr>
+      <tr><td>40</td><td>봉우리 대비 약 6분의 1(dB 기준)</td><td>기본값(HD · Ultra · eXtreme HD 모두 AUTO 75%에서). 대부분의 소스에 적정</td></tr>
+      <tr><td>70</td><td>약 9분의 1</td><td>음질이 낮은 파일의 쇳소리 억제</td></tr>
+      <tr><td>100</td><td>약 13분의 1</td><td>위쪽이 거의 고른 잡음</td></tr>
     </table>
+    <p>
+      표의 비율은 결을 고르는 지수 1 / (1 + 12 × SMOOTH × 잘린 지점 위 옥타브)에서 나오며, 음이 뚜렷하지 않은 틀의 값입니다.
+      음이 뚜렷한 틀(악기 소리가 길게 이어지는 곳)은 배음 봉우리가 깎이지 않게 SMOOTH 대신 AUTO %가 정한 약한 강도를 쓰고(AUTO 75%에서 한 옥타브 위 약 3.5분의 1),
+      치는 순간에는 순간 소리가 앞뒤로 번지지 않게 결을 고르지 않습니다.
+    </p>
     <p>
       심벌에서 쇳소리가 들리면 SYNTH를 내리기 전에 SMOOTH를 먼저 올려 보세요.
       잘린 지점이 낮은(음질이 낮은) 파일일수록 효과가 큽니다.
