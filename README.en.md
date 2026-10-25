@@ -154,7 +154,7 @@ DRIVE of VACUUM TUBE is the strength of the sound going into the vacuum tube, an
 
 **Basis.** The high end of the remaining sound follows patterns: the slope at which it gets quieter and which notes are ringing. The filling method and the default values were decided by comparing against the uncut original audio, choosing what brings the filled-in sound closer to the original audio.
 
-**Method.** The **HD** and **ULTRA · eXtreme HD** sections do this job. When saving, if you choose a fineness higher than the original file (48 · 88.2 · 176.4 · 352.8 for a 44.1 kHz file; 96 · 192 · 384 for a 48 kHz file), the sound is filled in up to that height. In tracks where one instrument or voice stands out, the pitch of the filled-in sound is placed to match the harmonic positions of the original sound. How much is filled in is set with **HF SYNTH**, and how evenly the filled-in sound is spread as it goes higher is set with **SMOOTH**. If HF SYNTH is set to 0, nothing is filled in and only the fineness is raised.
+**Method.** The **HD** and **Ultra · eXtreme HD** sections do this job. When saving, if you choose a fineness higher than the original file (48 · 88.2 · 176.4 · 352.8 for a 44.1 kHz file; 96 · 192 · 384 for a 48 kHz file), the sound is filled in up to that height. In tracks where one instrument or voice stands out, the pitch of the filled-in sound is placed to match the harmonic positions of the original sound. How much is filled in is set with **HF SYNTH**, and how evenly the filled-in sound is spread as it goes higher is set with **SMOOTH**. If HF SYNTH is set to 0, nothing is filled in and only the fineness is raised.
 
 Turning on the **LIVE** switch lets you hear the result before saving. You have to wait a moment when you turn it on. This is because it first scans the whole track to find where it was cut off, and then fills in the whole track once. It is rebuilt when you change a control, or when you choose something in the PRESET panel and close the panel.
 
@@ -373,7 +373,7 @@ The sound of a record comes from the physics of how it is made and how it is rea
 
 ### 2.9 Lossy Compression and the Missing Highs
 
-**Motivation.** Lossy-compressed files such as mp3 and AAC are empty above a certain frequency. HD · ULTRA HD · eXtreme HD restoration exists to fill this empty region, and the same processing applies when you choose a sampling frequency higher than the source's in export. To fill it, you first need to know where the spectrum was cut and what slope it had below that point.
+**Motivation.** Lossy-compressed files such as mp3 and AAC are empty above a certain frequency. HD · Ultra HD · eXtreme HD restoration exists to fill this empty region, and the same processing applies when you choose a sampling frequency higher than the source's in export. To fill it, you first need to know where the spectrum was cut and what slope it had below that point.
 
 **Basis.** mp3 and AAC reduce file size by discarding components that people hardly notice. A quiet sound right next to a loud sound is hidden and cannot be heard, and they exploit this **masking** phenomenon. At low bit rates there is more to discard, so everything above a certain frequency is cut off entirely. In the spectrum this produces a steep **cliff**. Natural sounds weaken gradually as they go higher. The cliff created by encoding is much steeper than that. The **SBR** technology of MPEG-4 records the rough shape of the highs separately during encoding, then on playback copies the lows and shapes them to that outline to bring the highs back. This program creates the highs by looking only at the remaining lows, without any such record. This approach is called **blind bandwidth extension**.
 
@@ -798,7 +798,7 @@ flowchart TD
 
 **Method.** The moment the switch is turned on, the whole track is restored in the same way as export (direct interpolation → restoration) and stored, and that result is played.
 
-- HD LIVE is 96 kHz and ULTRA HD LIVE is 192 kHz. For a 44.1 kHz-family source they are 88.2 kHz and 176.4 kHz. The two switches cannot be on at the same time.
+- HD LIVE is 96 kHz and Ultra HD LIVE is 192 kHz. For a 44.1 kHz-family source they are 88.2 kHz and 176.4 kHz. The two switches cannot be on at the same time.
 - While it is on, the audio engine itself is rebuilt at that sample rate. If the device does not accept that rate, the device default is used instead and ‘device limit’ (‘장치 제한’) is shown on screen. In that case the restoration result is also brought down to that rate directly in advance, so that conversion during playback does not fold the highs back in. The playback position and the play state are kept.
 - Only one result, for the mode that is on, is kept. If the combination of mode, SYNTH, SMOOTH, the other restoration controls (AUTO · KNEE · ATTACK · SUSTAIN · WIDTH) and file (name and size) is the same, nothing is recalculated. Turning the switch off or opening a new file discards the stored result, so turning it on again restores from the beginning.
 - The restoration controls respond when you let go of them, and restoration is redone only when that mode’s LIVE is on. Nothing is recalculated continuously while you drag.
@@ -843,7 +843,7 @@ The spectrum in the PARAMETRIC EQ graph is measured separately from this analyze
 | Compared with the source | Processing |
 |---|---|
 | Same | No conversion |
-| Higher | Upscaling — top-spec interpolation (upsampling) → HF restoration (HD settings if the output sample rate is 96 kHz or below, ULTRA HD at 176.4 · 192 kHz, eXtreme HD at 352.8 · 384 kHz) |
+| Higher | Upscaling — top-spec interpolation (upsampling) → HF restoration (HD settings if the output sample rate is 96 kHz or below, Ultra HD at 176.4 · 192 kHz, eXtreme HD at 352.8 · 384 kHz) |
 | Lower | Downsampling — efficient-spec conversion, no restoration |
 
 | Bit depth | Encoding | Processing |
@@ -924,7 +924,7 @@ All screen settings are serialized into a single JSON. The audio is not included
 
 **Method.** If the file’s `format` field is `asde-preset`, it is applied to the current values; if it is `asde-slots`, the slots are restored. Dragging a file onto the panel works the same way. The old names (`uhd…`) in settings saved before 3.0.27 are read as the new names (`uxhd…`).
 
-**Rationale.** The second restoration module was renamed to ULTRA · eXtreme HD, so the old names must be carried over for earlier settings to come back as they were.
+**Rationale.** The second restoration module was renamed to Ultra · eXtreme HD, so the old names must be carried over for earlier settings to come back as they were.
 
 #### Slot Edit Mode
 
@@ -1163,7 +1163,7 @@ Only cutoff detection uses a separate transform with 23.4 Hz resolution (4096 po
 
 **Basis.** Sample rates that are integer multiples of 44.1 kHz have integer ratios between them, which simplifies the conversion stages. The basis is a measurement that raised the same 44.1 kHz input in both families and compared the results.
 
-**Method.** For a source at an integer multiple of 44.1 kHz, the 96 · 192 · 384 kHz ticks become 88.2 · 176.4 · 352.8 kHz. In this family the extension kernel uses 2048 · 4096 · 8192 points (about 23.2 ms, hop 5.8 ms, bin spacing 43.1 Hz), and cutoff detection has 21.5 Hz resolution. HD, ULTRA HD and eXtreme HD are chosen by the output sample rate (96 kHz or below · 176.4 · 192 kHz · 352.8 · 384 kHz), so bringing a 352.8 kHz source down to 176.4 kHz is downsampling without restoration, regardless of the band.
+**Method.** For a source at an integer multiple of 44.1 kHz, the 96 · 192 · 384 kHz ticks become 88.2 · 176.4 · 352.8 kHz. In this family the extension kernel uses 2048 · 4096 · 8192 points (about 23.2 ms, hop 5.8 ms, bin spacing 43.1 Hz), and cutoff detection has 21.5 Hz resolution. HD, Ultra HD and eXtreme HD are chosen by the output sample rate (96 kHz or below · 176.4 · 192 kHz · 352.8 · 384 kHz), so bringing a 352.8 kHz source down to 176.4 kHz is downsampling without restoration, regardless of the band.
 
 **Rationale.** It is not for sound quality but so that 88.2 · 176.4 · 352.8 kHz sources find their own ticks and go out without conversion by default. Raising the same 44.1 kHz input in both families and comparing them shows a difference far below the rounding floor of the file format.
 
@@ -1357,7 +1357,7 @@ The test on real audio was broadened with three more codecs.
 | Ogg Vorbis (-q 2) | 16.6 · 15.7 kHz | 16.7 → 12.2 dB | +0.7 · +1.5 · +4.1 dB | 80.4 → 43.3% |
 | Opus 32 kbps | 20.0 kHz (no transition) | 15.0 → 13.7 dB | — · +6.8 · +7.5 dB | 80.8 → 70.7% |
 
-The restoration buffer of the LIVE preview goes through the same sample-rate conversion and restoration as the export and is identical sample for sample (real Chromium, maximum difference 0 at HD 88.2 kHz and ULTRA HD 176.4 kHz). The differences are the bit-depth enhancement (½ LSB or less) and the DSP chain, which only the export goes through, and the playback conversion used when the device rejects the target sample rate.
+The restoration buffer of the LIVE preview goes through the same sample-rate conversion and restoration as the export and is identical sample for sample (real Chromium, maximum difference 0 at HD 88.2 kHz and Ultra HD 176.4 kHz). The differences are the bit-depth enhancement (½ LSB or less) and the DSP chain, which only the export goes through, and the playback conversion used when the device rejects the target sample rate.
 
 **Rationale.** The previous target curve (an almost straight extension line with a curvature of 3 dB/oct²) predicted well when the highs grew louder or softer (16 ~ 20 kHz temporal correlation 0.84 ~ 0.88, unchanged now), but it could not follow this recording steepening from −20 dB to −45 dB per octave above 16 kHz, so it overfilled 20 ~ 24 kHz by 10 ~ 20 dB. The new curve (4.4) follows that shape (it drops, then flattens), and its starting slope is 0, so there is no cliff at the seam. Using an inverted cycloid as it is drops vertically at the cutoff and gave a 16.5 ~ 24 kHz error of 3.7 dB; the cosine S-curve gave 1.0 dB.
 
@@ -1369,7 +1369,7 @@ The conditions to keep are single-note f0 sync at 100%, two-note harmonic hits a
 
 **Steps Near the Cutoff**
 
-**Motivation.** Steps were visible in the analyzer bars near the cutoff (16 ~ 20 kHz for a 44.1 kHz source). They were most pronounced with PRESET Max (‘최대’), and also appeared with the default values and other presets, in all of HD · ULTRA · eXtreme HD.
+**Motivation.** Steps were visible in the analyzer bars near the cutoff (16 ~ 20 kHz for a 44.1 kHz source). They were most pronounced with PRESET Max (‘최대’), and also appeared with the default values and other presets, in all of HD · Ultra · eXtreme HD.
 
 **Basis.** The app's analyzer was emulated exactly (2048-point Blackman window, smoothing 0.8, 128 bars, each bar taking the maximum of its range), the bars were drawn every 0.25 s, and places where the drop was more than 3.3 dB larger than the usual drop in the band below and the following bars were flatter than usual were counted as steps. Steps also present at the same place in the original-signal bars, and drops caused by bars hitting the floor (−100 dB), were excluded (restoration-only steps). As in the app, the whole file was analyzed once, and four sections of two tracks in MP3 and AAC at 320 kbps were measured at the app's sample rates (88.2 · 176.4 · 352.8 kHz). The ground truth was 84 cases in which decodes of the same two tracks (with music up to 19.5 kHz) were re-encoded with MP3, AAC and Vorbis at several bit rates.
 
@@ -1466,7 +1466,7 @@ $`E_S(x)`$ is the S-curve branch above the cutoff ($`\bar\alpha_m x + J(x) - (D 
 
 **Basis.** The controls connect directly to the parameters of the target curve and of grain smoothing. The AUTO rules come from the cross-validation of the manipulated variables in 4.3.
 
-**Method.** The HD and ULTRA · eXtreme HD modules have the following controls (KNEE 2 only on ULTRA · eXtreme HD).
+**Method.** The HD and Ultra · eXtreme HD modules have the following controls (KNEE 2 only on Ultra · eXtreme HD).
 
 | Control | Range · default | What it does |
 |---|---|---|
@@ -1496,7 +1496,7 @@ $`E_S(x)`$ is the S-curve branch above the cutoff ($`\bar\alpha_m x + J(x) - (D 
 
 **Basis.** The Baseline (‘기준’) tab is the AUTO percentage validated against the ground truth; the other tabs are taste presets aligned with the directions in which the controls change the sound.
 
-**Method.** Pressing the PRESET button on either restoration module opens a panel divided into tabs (Baseline, Brightness (‘밝기’), Texture (‘질감’), Space (‘공간’), Genre (‘음악 종류’); the ULTRA · eXtreme HD modules add Ultra-High (‘초고역’)). One option can be chosen per tab and combined. The Baseline tab sets AUTO % (Natural (‘자연’) 75%, Accurate (‘정확’) 100%, Keep Original Grain (‘원음 결 보존’) 0%), and the other tabs set how far to move from the values AUTO set for the track (e.g. Bright (‘밝게’) = SYNTH +15 · KNEE +1 kHz, Hip-Hop / Electronic (‘힙합 · 전자음’) = SYNTH +10 · KNEE +1 kHz · ATTACK +2 · SUSTAIN −1 dB). So when a file is opened, the chosen preset is applied again on top of the values AUTO fitted to the track, and moving a slider directly changes the summary to 'Custom' ('사용자 조정'). If LIVE is on, closing the panel runs the restoration once more with the chosen values (see 3.6).
+**Method.** Pressing the PRESET button on either restoration module opens a panel divided into tabs (Baseline, Brightness (‘밝기’), Texture (‘질감’), Space (‘공간’), Genre (‘음악 종류’); the Ultra · eXtreme HD modules add Ultra-High (‘초고역’)). One option can be chosen per tab and combined. The Baseline tab sets AUTO % (Natural (‘자연’) 75%, Accurate (‘정확’) 100%, Keep Original Grain (‘원음 결 보존’) 0%), and the other tabs set how far to move from the values AUTO set for the track (e.g. Bright (‘밝게’) = SYNTH +15 · KNEE +1 kHz, Hip-Hop / Electronic (‘힙합 · 전자음’) = SYNTH +10 · KNEE +1 kHz · ATTACK +2 · SUSTAIN −1 dB). So when a file is opened, the chosen preset is applied again on top of the values AUTO fitted to the track, and moving a slider directly changes the summary to 'Custom' ('사용자 조정'). If LIVE is on, closing the panel runs the restoration once more with the chosen values (see 3.6).
 
 **Rationale.** Presets are offsets rather than fixed values so that each track's AUTO stays in effect. Only the Baseline tab has been validated against the ground truth.
 
@@ -2372,7 +2372,7 @@ When a listener in their 20s hears a 128 kbps mp3 (cut off at about 17 kHz with 
 
 **Basis.** The nonlinearity of amplifier stages and intermodulation. There is a report that ultrasound affects brain activity (Oohashi et al., 2000), but it has not been consistently reproduced in follow-up studies.
 
-**Method.** Components above the upper limit of hearing can meet the nonlinearity of an amplifier stage and create intermodulation products inside the audible band. This is distortion, not improvement. Restoration fades the synthesized component with a cosine from 70% of the output Nyquist so that it reaches 0 at Nyquist, and ULTRA · eXtreme HD lowers the range above the music’s end (KNEE 2) by a further 30 dB over 2 octaves ([4.4](#s44)).
+**Method.** Components above the upper limit of hearing can meet the nonlinearity of an amplifier stage and create intermodulation products inside the audible band. This is distortion, not improvement. Restoration fades the synthesized component with a cosine from 70% of the output Nyquist so that it reaches 0 at Nyquist, and Ultra · eXtreme HD lowers the range above the music’s end (KNEE 2) by a further 30 dB over 2 octaves ([4.4](#s44)).
 
 **Rationale.** Intermodulation is the physical reason why settings that add too many high-order harmonics can backfire. That is why the ultra-high frequencies are made to close off at the top like the converter filter of a real file, and to reduce the load on the playback equipment you can use the Gear Protection (‘기기 보호’) preset, which lowers KNEE 2.
 
@@ -2708,7 +2708,7 @@ The music floor and shaping noise are told apart by three figures. The rise rela
 | **The movement of the synthesized highs has a prediction limit** | Differences from the ground truth remain in movement over 0.1 s or longer | The temporal correlation between the synthesized highs and the ground truth (0.84 ~ 0.88) already equals that of the lower band (0.85), which is the best predictor of the ground truth | The remaining difference (20 ~ 24% in the perceptual approximation) is the share of the highs erased by the codec that cannot be inferred from the lower band | A correction matching per-frame levels to the instantaneous level of the lower band was tested, but it did not reduce the envelope error, so it was not included |
 | **The roll-off curve is a provisional value set from one track** | 30 dB over 1 octave was fitted with one lossless source (produced at 48 kHz) as ground truth | For recordings whose highs extend further it may be drawn lower than reality, and for those that bend earlier, higher | Raising HF SYNTH shifts it toward flat. The transition band lowers the original sound to half, so half of the instantaneous level preserved by the codec is replaced by synthesis | It is kept as a provisional value fitted to the one track of the ground-truth test, and roll-off that differs per track is adjusted with SYNTH |
 | **The original sound’s own roll-off can look like a step** | Music naturally steepens from around 16 kHz, and restoration does not change the original sound below the transition start | In two test tracks (320 kbps), the 16 ~ 20 kHz drops all belonged to the original sound, judged by grain, by the bins the codec discarded and by re-encoding | Compared with the original sound in the analyzer, the same drop appears in the same place. At moments when the top of the original sound is very steep, two or three bars just above the cutoff stay flat even at Max (‘최대’) (e.g. original 91, then 88 · 90 · 88; 3.1.10 gave 90 · 96 · 98) | Raising the original sound to the trend line would change sound that was there originally. A mechanism that matches the starting level per frame moved the step or broke the monotonicity of SYNTH, so it was not included |
-| **The ultra-highs at Max and Bright (‘밝게’) are lower than in 3.1.10** | The flat line now starts at the cutoff with the slope of the original sound and eases out over 1 octave, so it runs lower by the amount eased | Whole-track analysis of the test tracks: Max 20 ~ 25 kHz −1.8 ~ −1.9 dB, above 28 kHz −4.3 ~ −4.7 dB (ULTRA HD); at the HD sample rate, above 28 kHz −5.6 dB; in a single 1/24-octave band, −5.9 dB around 32 kHz. Bright: −1.9 · −3.7 dB | The audible band below 20 kHz is unchanged. Just above the cutoff, raising KNEE makes it brighter | Easing out over a narrower span created a new step just above the cutoff. The ground truth only reaches 19.5 kHz, so levels above 20 kHz have no ground-truth basis |
+| **The ultra-highs at Max and Bright (‘밝게’) are lower than in 3.1.10** | The flat line now starts at the cutoff with the slope of the original sound and eases out over 1 octave, so it runs lower by the amount eased | Whole-track analysis of the test tracks: Max 20 ~ 25 kHz −1.8 ~ −1.9 dB, above 28 kHz −4.3 ~ −4.7 dB (Ultra HD); at the HD sample rate, above 28 kHz −5.6 dB; in a single 1/24-octave band, −5.9 dB around 32 kHz. Bright: −1.9 · −3.7 dB | The audible band below 20 kHz is unchanged. Just above the cutoff, raising KNEE makes it brighter | Easing out over a narrower span created a new step just above the cutoff. The ground truth only reaches 19.5 kHz, so levels above 20 kHz have no ground-truth basis |
 | **The seam blend uses values set from two tracks** | The 16 → 17 kHz cutoff gate and the 1-octave width were chosen with the 84 ground-truth cases of two test tracks | Even the default changes above the cutoff (test tracks: in the 1/3 octave at 25 kHz, Warak −3.4 dB · QWER −1.2 dB; at 20 kHz, −0.4 · −0.2 dB) | The first drop just above the cutoff becomes a ramp instead of a flat tread and deepens (median seam drop −2.2 → −3.0 dB). At Max with a 48 kHz source raised to HD (96 kHz), step events just above the cutoff increased (Warak, 6 sections: 9 → 22) | There is no ground truth for other tracks, so this is an in-sample evaluation |
 | **With several notes mixed, the harmonic grid cannot be matched** | The shift amount is set to an integer multiple of $`f_0`$ only when one note stands out, so in frames with several notes mixed, the shifted partials are inharmonic | In a two-note test, 50.1% on the grid (±10 Hz) (AUTO 75%) | In files with a low cutoff below 8 kHz, this can sound like a metallic coloration. Raising SMOOTH reduces it | What is heard in this band is the periodicity of the envelope rather than the individual positions, so it is unlikely to be a problem ([4.13](#s413)) |
 | **A single cutoff is estimated** for the whole track | Some VBR files change their bandwidth greatly from section to section | Only what is missing is filled, so the original sound and the synthesis do not overlap | Holes below the cutoff are found per frame and filled down to 75% of the cutoff | Frames cut off even lower stay empty below that point |
@@ -2805,7 +2805,7 @@ This records what changed in each build. The newest build comes first.
 
 | Version | Builds | Period | Summary |
 |---|---|---|---|
-| [3.1](#cl-v31) | 3.1.0 ~ 3.1.13 (14 builds) | 2026-10-11 ~ 2026-10-21 | Parametric EQ (20 bands · graph · spectrum · large editor window · presets), Import AutoEQ · Monitor Correction, INPUT GAIN in 0.1 dB steps, card expand · bottom handle for overflowing cards, embedded fonts (no external requests), same settings give the same file, document order of the HD cards · value fields in narrow tiles, Korean font in fixed-width fields, SOUNDGOODIZER compression at AMOUNT 0 · MACRO 0 % measurements, Compare to Original · Same Loudness, comparing with one card removed · consistent terminology, restoration presets reflected in LIVE · shaping detection, power-on effect · neon glow · value-bar glide · button ripple · tab icon, steps near the cutoff in HF restoration, card dragging, README in six languages |
+| [3.1](#cl-v31) | 3.1.0 ~ 3.1.14 (15 builds) | 2026-10-11 ~ 2026-10-25 | Parametric EQ (20 bands · graph · spectrum · large editor window · presets), Import AutoEQ · Monitor Correction, INPUT GAIN in 0.1 dB steps, card expand · bottom handle for overflowing cards, embedded fonts (no external requests), same settings give the same file, document order of the HD cards · value fields in narrow tiles, Korean font in fixed-width fields, SOUNDGOODIZER compression at AMOUNT 0 · MACRO 0 % measurements, Compare to Original · Same Loudness, comparing with one card removed · consistent terminology, restoration presets reflected in LIVE · shaping detection, power-on effect · neon glow · value-bar glide · button ripple · tab icon, steps near the cutoff in HF restoration, card dragging, README in six languages |
 | [3.0](#cl-v30) | 3.0.0 ~ 3.0.36 (37 builds) | 2026-09-28 ~ 2026-10-11 | Recording-console interface, signal flow map, night and day consoles, unified documentation screens, card motion, export format · bit depth · 384kHz · f0 sync · noise-shaped source · seam · source display · per-frame seam · patch-pattern correction · ground-truth test and new target curve · broader verification · AUTO and restoration controls · naming system and restoration presets · card tiles and scrolling · playback stage · MACRO and default state · flow map motion · TeX equations in the Treatise · explanation cleanup · VINYL channel leakage · elliptical EQ phase |
 | [2.4](#cl-v24) | 2.4.0 ~ 2.4.32 (33 builds) | 2026-09-14 ~ 2026-09-28 | Presets and quick slots, physical rebuild of the effects, VINYL record model, HD restoration redesign, README |
 | [2.3](#cl-v23) | 2.3.0 ~ 2.3.29 (30 builds) | 2026-03-06 ~ 2026-09-14 | A/B analyzer, LIVE preview, INPUT GAIN, matching order in the two engines, the five documents and the Index |
@@ -2816,6 +2816,12 @@ This records what changed in each build. The newest build comes first.
 ### 3.1
 
 This version adds the PARAMETRIC EQ card. You can place up to 20 bands and edit them by dragging on the graph, and during playback the spectra before and after the EQ are overlaid. The graph is drawn from the response of the same filters that make the sound, so it sounds as drawn. It also adds Monitor Correction, which reads AutoEQ correction files to flatten the headphones you listen with, in playback only. There is also Compare, which lets you hear the processed version against the original sound or against the sound with one card removed, at the same loudness.
+
+#### 3.1.14 — 2026-10-25
+
+**Changed**
+
+- The ‘ULTRA HD’ label is now written ‘Ultra HD’. This applies everywhere: the app screen (restoration module title, LIVE switch description, status line and export-path note), all six documents, the README in all six languages and earlier changelog entries. The shortened form ‘ULTRA · eXtreme HD’ is now ‘Ultra · eXtreme HD’ as well. Behaviour and sound are unchanged.
 
 #### 3.1.13 — 2026-10-21
 
@@ -2830,7 +2836,7 @@ This version adds the PARAMETRIC EQ card. You can place up to 20 bands and edit 
 
 **Fixed**
 
-- Fixed two typos in the Korean original found during translation: in the 3.0.20 entry, ‘HD · ULTRA · eXtreme HD · eXtreme HD’ now reads ‘HD · ULTRA HD · eXtreme HD’ (README and Index), and in the value-bar sentence of the 3.1.11 Notes, ‘끄기’ (turning off) now reads ‘끌기’ (dragging).
+- Fixed two typos in the Korean original found during translation: in the 3.0.20 entry, ‘HD · ULTRA · eXtreme HD · eXtreme HD’ now reads ‘HD · Ultra HD · eXtreme HD’ (README and Index), and in the value-bar sentence of the 3.1.11 Notes, ‘끄기’ (turning off) now reads ‘끌기’ (dragging).
 
 #### 3.1.12 — 2026-10-21
 
@@ -2850,19 +2856,19 @@ This version adds the PARAMETRIC EQ card. You can place up to 20 bands and edit 
 - At the moment of release, the neon spreads out from the light. On a card, the neon border spreads from the switch around the card (0.57 s), and a faint ripple of light passes over the card along its leading edge. On a node, the lit background and the neon spread out from the light (0.35 s). The leading edge is drawn with a soft-edged round mask so no hard arc remains in the glow, and it advances at an almost even speed, slowing at the end. Cards and nodes switch on and off together at the same moment, whichever one you press.
 - When switching off, the light lingers briefly like a cooling filament before going dark (0.3 s), and the neon fades over 0.25 s. The dimmed body of an off card also brightens and dims over 0.3 s when it is switched on and off.
 - Pressing a value bar without dragging makes the handle glide to the pressed point. It starts slowly, speeds up and stops as if braking (cubic-bezier(.65, 0, .25, 1)), and the time taken is 0.24 ~ 0.6 s depending on the fraction of the bar traveled (240 + 360 × √fraction ms). While it moves, input events are sent as if the handle were being dragged, so the sound follows, and the controls moved by MACRO · AUTO travel along the same curve. change fires once at the end, so the HD restoration controls restore again only once, after the move is complete. If you keep pressing and drag, the browser’s own behavior takes over from that point; pressing only the handle does not move it; and the keyboard arrows change the value one step at a time immediately. Pressing another point on the same bar during the move continues from the current position toward it, and pressing elsewhere or pressing a key puts it straight at the end position. The tick switch for the export format is unchanged.
-- When a button changes several controls at once (HD · ULTRA HD restoration PRESET, SOUNDGOODIZER mode, ATMOS scene, loading a slot or a file, Reset (‘초기화’)), the changed bars travel with the same motion. The values and the sound change at the moment the button is pressed; only the handle and the fill are drawn gliding from the previous position. So if the chain is rebuilt, LIVE is restored or an export is made during that time, the final values are used, the HD restoration PRESET does not switch to ‘Custom’ (‘사용자 조정’), and saved control values are not overwritten by MACRO.
+- When a button changes several controls at once (HD · Ultra HD restoration PRESET, SOUNDGOODIZER mode, ATMOS scene, loading a slot or a file, Reset (‘초기화’)), the changed bars travel with the same motion. The values and the sound change at the moment the button is pressed; only the handle and the fill are drawn gliding from the previous position. So if the chain is rebuilt, LIVE is restored or an export is made during that time, the final values are used, the HD restoration PRESET does not switch to ‘Custom’ (‘사용자 조정’), and saved control values are not overwritten by MACRO.
 - When you press buttons such as Save, Load, the slots, Copy, Play and Export, or the SOUNDGOODIZER mode and ATMOS scene buttons, a small light splashes at the pressed point as if a water drop fell, the surface brightens, and three circular waves spread out and then die away inside the button (0.9 s). The ripple uses a faint version of the button’s text color, is drawn above the background and below the text, and is clipped to the button shape so it does not spill outside. Pressed from the keyboard, it spreads from the center; disabled buttons do not ripple.
 - Added a tab icon (favicon). The program and the six documents use the same icon. It is a gauge needle drawn in lines of a single color without fill (scale arc · needle · pivot), drawn in black on light screens and in white on dark screens according to the computer’s display setting. The icon is embedded in the file as a data: URL, so there are no external requests (confirmed by opening the seven files over local HTTP: the only requests received were for the documents themselves).
 
 **Changed**
 
 - The border of a card that is on changed from a line mixed with 42% of the processor color to neon, and the border of a lit flow map node changed from a processor-color line to neon. Playback-stage nodes keep their teal border and glow teal as well; playback-stage cards keep the teal line along the top (3 px) and add neon. While a flow map node is being dragged, the drag shadow is used and the neon is paused.
-- Above HF SYNTH 50 (PRESET Bright (‘밝게’) · Max (‘최대’) · Rich (‘풍부’) and so on), the flat line now starts at the cutoff with the original slope and relaxes over 1 octave, so the ultra-high frequencies are lower by the amount of that relaxation. On the test tracks (whole-track analysis), Max is −1.8 ~ −1.9 dB at 20 ~ 25 kHz, −4.3 ~ −4.7 dB (ULTRA HD) · −5.6 dB (HD) above 28 kHz, and −5.9 dB around 32 kHz for a single 1/24-octave band; Bright is −1.9 · −3.7 dB. The audible band below 20 kHz is unchanged. It never gets brighter than the old flat line (−3 dB per octave).
+- Above HF SYNTH 50 (PRESET Bright (‘밝게’) · Max (‘최대’) · Rich (‘풍부’) and so on), the flat line now starts at the cutoff with the original slope and relaxes over 1 octave, so the ultra-high frequencies are lower by the amount of that relaxation. On the test tracks (whole-track analysis), Max is −1.8 ~ −1.9 dB at 20 ~ 25 kHz, −4.3 ~ −4.7 dB (Ultra HD) · −5.6 dB (HD) above 28 kHz, and −5.9 dB around 32 kHz for a single 1/24-octave band; Bright is −1.9 · −3.7 dB. The audible band below 20 kHz is unchanged. It never gets brighter than the old flat line (−3 dB per octave).
 - With the default (SYNTH 50) as well, files whose cutoff is above 16 kHz are slightly lower above the cutoff. On the test tracks, the 1/3-octave band at 25 kHz is Warak −3.4 · QWER −1.2 dB, and at 20 kHz −0.4 · −0.2 dB. Files whose cutoff is below 16 kHz are sample-identical to 3.1.10.
 
 **Fixed**
 
-- Reduced the step that appeared in the analyzer bars near the cutoff (16 ~ 20 kHz for a 44.1 kHz source) in high-frequency restoration (HD · ULTRA · eXtreme HD). There were two causes. The target curve came down just below the cutoff along the steep local slope of the original, but above the cutoff it restarted from the global slope, so a flat tread formed behind the steep top of the original. And above HF SYNTH 50, the nearly flat line bent all at once to −3 dB per octave at the cutoff, so at Max a flat tread formed right after the drop.
+- Reduced the step that appeared in the analyzer bars near the cutoff (16 ~ 20 kHz for a 44.1 kHz source) in high-frequency restoration (HD · Ultra · eXtreme HD). There were two causes. The target curve came down just below the cutoff along the steep local slope of the original, but above the cutoff it restarted from the global slope, so a flat tread formed behind the steep top of the original. And above HF SYNTH 50, the nearly flat line bent all at once to −3 dB per octave at the cutoff, so at Max a flat tread formed right after the drop.
 - Above the cutoff, the local slope difference of the transition band is carried over and relaxed over 1 octave, and the first S-curve is made shallower by the same amount, so the total attenuation above it (30 dB) is unchanged. This is not applied when the cutoff is below 16 kHz and is fully applied from 17 kHz (because for files cut just above 16 kHz, where the natural roll-off of music begins, it made the already dark region above the cutoff even darker). The same join was added to the end-of-music calculation (AUTO KNEE 2).
 - The flat line starts at the cutoff with the same slope as the S-curve branch and relaxes to flat over 1 octave; it never gets brighter than the old flat line (−3 dB per octave) and never goes below the S-curve branch. So raising SYNTH never makes anything darker, and the preset order (Subtle < Default < Bright ≤ Max) holds right up to just above the cutoff.
 - Measured values (3.1.10 → 3.1.11, whole-file analysis as in the app, two tracks, four segments, 88.2 · 176.4 · 352.8 kHz): restoration-only steps Subtle 3.1 → 1.8 · Default 4.6 → 3.0 · Bright 9.1 → 4.2 · Rich 6.5 → 3.4 · Max 19.8 → 11.5 %, with 0 cells getting worse. Seam step at the cutoff for Max 3.6 → 1.3 %. 84 ground-truth cases (the same two tracks re-encoded with several codecs and bit rates): Default LSD 6.06 → 6.02 dB, Max LSD 7.36 → 6.74 dB · bias from 1 kHz above the cutoff to 19.5 kHz 4.74 → 3.77 dB, with no group getting worse. The original band (below the transition start) is unchanged (difference below −150 dB).
@@ -2889,7 +2895,7 @@ This version adds the PARAMETRIC EQ card. You can place up to 20 bands and edit 
 
 **Fixed**
 
-- Fixed values chosen in the PRESET panel of HD · ULTRA · eXtreme HD restoration not being reflected in the LIVE preview. A preset moves the controls but did not send the signal to restore again (the one emitted when a control is released), so the controls showed the new value (SYNTH 65 when Bright (‘밝게’) is chosen) while the sound you heard had been made with the previous value (50). Now, when the panel is closed (by clicking outside or pressing Esc, and also when moving to another mode’s panel), restoration runs once more if the chosen result differs from the current preview. While the panel is open and you pick and combine options on each tab, nothing is rebuilt, and nothing is rebuilt if the values are the same, so playback is not interrupted. If that mode’s LIVE is on, a note below the panel says ‘The LIVE preview will be rebuilt when you close the window.’
+- Fixed values chosen in the PRESET panel of HD · Ultra · eXtreme HD restoration not being reflected in the LIVE preview. A preset moves the controls but did not send the signal to restore again (the one emitted when a control is released), so the controls showed the new value (SYNTH 65 when Bright (‘밝게’) is chosen) while the sound you heard had been made with the previous value (50). Now, when the panel is closed (by clicking outside or pressing Esc, and also when moving to another mode’s panel), restoration runs once more if the chosen result differs from the current preview. While the panel is open and you pick and combine options on each tab, nothing is rebuilt, and nothing is rebuilt if the values are the same, so playback is not interrupted. If that mode’s LIVE is on, a note below the panel says ‘The LIVE preview will be rebuilt when you close the window.’
 - Fixed requests that arrived during re-restoration being discarded. When you moved a control repeatedly with the keyboard, restoration used only the first value and the last value was not reflected. Now the last request is kept, and if the mode or the values have changed by the time the current run finishes, restoration runs again.
 - Fixed a problem where a result made with values changed in the meantime could be stored under the name of the previous values, because the key for storing LIVE restoration results was computed before the 30 ms wait while the restoration controls were read after waiting for resampling. The controls used for restoration are now read all at once before the first wait, and the key is also computed right before rendering.
 - Fixed bit-depth enhancement mistaking music with constant high-frequency content, such as hi-hats, rides and cymbals, for a noise-shaped dithered source. The detection only checked whether the 15 ~ 19.5 kHz floor in quiet moments was at least 10 times the flat-rounding level and at least 3 times the 3 ~ 5 kHz floor, but in music whose highs never rest, that floor is the music, so it passed these conditions. The music was then treated as noise and removed: on a synthetic hi-hat track, the error against the true value grew by up to 34.8 dB, and samples were moved up to 16 LSB from the source.
@@ -3300,23 +3306,23 @@ The version that redesigned the screen in the style of a recording console. It e
 
 **Added**
 
-- HF restoration presets: pressing the PRESET button of either restoration module opens a panel divided into tabs (Baseline (‘기준’), Brightness (‘밝기’), Texture (‘질감’), Space (‘공간’) and Genre (‘음악 종류’), plus Ultra-High (‘초고역’) for ULTRA · eXtreme HD). One option per tab can be picked and combined; Baseline sets AUTO %, and the others set how far to move from the values AUTO has set for the track. Moving a slider directly changes the summary to Custom (‘사용자 조정’). Only the Baseline tab has been validated against ground truth; the rest are taste presets.
+- HF restoration presets: pressing the PRESET button of either restoration module opens a panel divided into tabs (Baseline (‘기준’), Brightness (‘밝기’), Texture (‘질감’), Space (‘공간’) and Genre (‘음악 종류’), plus Ultra-High (‘초고역’) for Ultra · eXtreme HD). One option per tab can be picked and combined; Baseline sets AUTO %, and the others set how far to move from the values AUTO has set for the track. Moving a slider directly changes the summary to Custom (‘사용자 조정’). Only the Baseline tab has been validated against ground truth; the rest are taste presets.
 
 **Changed**
 
-- Naming scheme: the output tiers are divided into HD (88.2 · 96kHz) · ULTRA HD (176.4 · 192kHz) · eXtreme HD (352.8 · 384kHz). The second restoration module became ULTRA · eXtreme HD RESTORE; the export summary reads HD · ULTRA HD · eXtreme HD restoration depending on the output sample rate, and the file name tags _HD · _UHD · _XHD are appended (e.g. _UHD176.4k16bit, _XHD352.8k16bit).
+- Naming scheme: the output tiers are divided into HD (88.2 · 96kHz) · Ultra HD (176.4 · 192kHz) · eXtreme HD (352.8 · 384kHz). The second restoration module became Ultra · eXtreme HD RESTORE; the export summary reads HD · Ultra HD · eXtreme HD restoration depending on the output sample rate, and the file name tags _HD · _UHD · _XHD are appended (e.g. _UHD176.4k16bit, _XHD352.8k16bit).
 - Along with the labels on screen and in the documents, the identifiers (uhd… → uxhd…) and comments in the source were also changed. The setting name of the end-of-music roll-off applied to every output was corrected from uhdRoll to endRoll. Old names in previously saved settings (slots, settings files) carry over to the new names on loading.
 
 **Docs**
 
-- Changed every tier label in the README, Index, manual, Technical Guide, Plain Language and Specification to the new naming scheme (places referring only to 176.4 · 192kHz, and the LIVE labels for playback up to 192kHz, use ULTRA HD), and added the preset description. Paragraphs in the Technical Guide written around the old export buttons, which no longer exist, were rewritten for the current method, and the code quotes in the Treatise were re-extracted with the changed identifiers.
+- Changed every tier label in the README, Index, manual, Technical Guide, Plain Language and Specification to the new naming scheme (places referring only to 176.4 · 192kHz, and the LIVE labels for playback up to 192kHz, use Ultra HD), and added the preset description. Paragraphs in the Technical Guide written around the old export buttons, which no longer exist, were rewritten for the current method, and the code quotes in the Treatise were re-extracted with the changed identifiers.
 
 #### 3.0.26 — 2026-09-30
 
 **Added**
 
-- AUTO %: each HD · ULTRA · eXtreme HD module has an AUTO control (default 75%). When a file is opened, it analyzes the original sound, sets SMOOTH · ATTACK · KNEE to suit the track, and adjusts the grain smoothing strength for strongly tonal frames. The rules were made by measuring every combination on four lossless source tracks and keeping only those that improved everything on two or more tracks (low-frequency slope −14.8 dB/oct or below → ATTACK −3 dB; topmost local slope above −21.9 dB/oct → KNEE cutoff + 0.5 kHz). 0% is the default behavior of 3.0.25.
-- Added the KNEE (first knee, 12 ~ 24kHz) · KNEE 2 (end of music, ULTRA · eXtreme HD, 24 ~ 64kHz) · ATTACK · SUSTAIN (±6 dB) · WIDTH (0 ~ 150%) controls. ATTACK · SUSTAIN adjust only the moment of the hit and the decaying ring in the restored highs, and leave the body as it is.
+- AUTO %: each HD · Ultra · eXtreme HD module has an AUTO control (default 75%). When a file is opened, it analyzes the original sound, sets SMOOTH · ATTACK · KNEE to suit the track, and adjusts the grain smoothing strength for strongly tonal frames. The rules were made by measuring every combination on four lossless source tracks and keeping only those that improved everything on two or more tracks (low-frequency slope −14.8 dB/oct or below → ATTACK −3 dB; topmost local slope above −21.9 dB/oct → KNEE cutoff + 0.5 kHz). 0% is the default behavior of 3.0.25.
+- Added the KNEE (first knee, 12 ~ 24kHz) · KNEE 2 (end of music, Ultra · eXtreme HD, 24 ~ 64kHz) · ATTACK · SUSTAIN (±6 dB) · WIDTH (0 ~ 150%) controls. ATTACK · SUSTAIN adjust only the moment of the hit and the decaying ring in the restored highs, and leave the body as it is.
 
 **Changed**
 
@@ -3339,7 +3345,7 @@ The version that redesigned the screen in the style of a recording console. It e
 **Docs**
 
 - Extended the ground-truth test to MP3 VBR (−V 6), Ogg Vorbis (−q 2) and Opus 32k (LSD 3.0.23 → 3.0.24: 15.8 → 11.9, 16.7 → 12.2, 15.0 → 13.7 dB). In Opus, whose cutoff is as high as 20kHz, the natural roll-off already begins below the cutoff, so 20 ~ 22kHz comes out a little more than +7 dB above the ground truth; this is recorded under the limitations.
-- Confirmed in real Chromium that the LIVE preview’s restoration buffer goes through the same sample-rate conversion and restoration as export and is identical sample for sample (HD 88.2, ULTRA HD 176.4kHz, maximum difference 0). The remaining differences are bit-depth enhancement and the DSP chain, which only export goes through, and the playback conversion used when the device rejects the target sample rate.
+- Confirmed in real Chromium that the LIVE preview’s restoration buffer goes through the same sample-rate conversion and restoration as export and is identical sample for sample (HD 88.2, Ultra HD 176.4kHz, maximum difference 0). The remaining differences are bit-depth enhancement and the DSP chain, which only export goes through, and the playback conversion used when the device rejects the target sample rate.
 - Re-measured the remaining restoration figures: filled harmonic numbers for a single note 35/35 and 72/72; fill-energy difference between the versions with f0 sync on and off −0.27 dB for a single note and −0.02 dB for several notes; click-only smearing of the discarded alternative (peak-wise integer-multiple transposition, after refinement) −28.7 dB (f0 sync measured at the same time: −31.2 dB). Replaced the −16.6 and −30.5 dB figures written under the old definition.
 - Tested a correction that matches the per-frame level of the synthesized highs to the instantaneous intensity of the band just below the transition start, but it did not reduce the envelope error, so it was not included. The time correlation between the synthesized highs and the ground truth (0.84 ~ 0.88) is already equal to the correlation of the lower band (0.85), which predicts the ground truth best, so the remaining difference in temporal movement is recorded in README 4.18 as a limit on predicting highs that the codec erased.
 - Updated README 4.3, 4.16 and 4.18, Specification 03, Treatise §3, the manual, the troubleshooting sections of the Technical Guide and Plain Language, and the Index.
@@ -3407,7 +3413,7 @@ The version that redesigned the screen in the style of a recording console. It e
 
 **Changed**
 
-- HD · ULTRA HD · eXtreme HD are now told apart by the output sample rate. 96kHz and below uses the HD setting, 176.4 and 192kHz the ULTRA HD setting, and 352.8 and 384kHz the eXtreme HD setting; when exporting below the source rate, only downsampling is done, without restoration, whatever the band. Changed the restoration module’s labels to HD 48 ~ 96kHz and ULTRA HD 176.4 ~ 384kHz.
+- HD · Ultra HD · eXtreme HD are now told apart by the output sample rate. 96kHz and below uses the HD setting, 176.4 and 192kHz the Ultra HD setting, and 352.8 and 384kHz the eXtreme HD setting; when exporting below the source rate, only downsampling is done, without restoration, whatever the band. Changed the restoration module’s labels to HD 48 ~ 96kHz and Ultra HD 176.4 ~ 384kHz.
 - The LIVE preview sample rate follows the source’s family: 88.2 and 176.4kHz for a source in the 44.1 family, 96 and 192kHz otherwise.
 - The (source) tag on the ticks sits on a second line below the number, so it does not overlap neighboring text even in the end positions.
 
@@ -3453,7 +3459,7 @@ The version that redesigned the screen in the style of a recording console. It e
 **Added**
 
 - 384kHz sample rate and a five-position switch: SAMPLE RATE now has five positions, 44.1 · 48 · 96 · 192 · 384. When a file is loaded, it is set to the value that matches the source (or the next value up if there is none), and the notice beside it tells which of the following happens: same as the source, interpolation and restoration, or efficient conversion.
-- At any sample rate above the source, the highs are filled up to the target Nyquist. 96kHz and below uses the HD setting, 192kHz the ULTRA HD setting and 384kHz the eXtreme HD setting; at 384kHz the highs are filled up to 192kHz.
+- At any sample rate above the source, the highs are filled up to the target Nyquist. 96kHz and below uses the HD setting, 192kHz the Ultra HD setting and 384kHz the eXtreme HD setting; at 384kHz the highs are filled up to 192kHz.
 - f0-synced shift in HF restoration: at moments when a single note stands out, the amount by which the original’s upper band is shifted is set to an integer multiple of that note’s fundamental frequency, so the shifted harmonics all land on the original harmonic grid. In the single-note test, the share on the grid went from 0% to 100% and the filled harmonic numbers from 0/35 and 0/72 to 34/35 and 72/72, while transient pre-smearing (−34.9 → −33.8 dB), fill energy (within 0.1 dB) and continuity stay as before.
 
 **Changed**
@@ -3461,7 +3467,7 @@ The version that redesigned the screen in the style of a recording console. It e
 - Split sample-rate conversion into two paths. Going up (interpolation) filters without regard to cost, flat to 99.5% of the input Nyquist with 200 dB; going down puts efficiency first, flat to 98% of the output Nyquist with 180 dB. The sharp filter is applied only once, by FFT convolution, and if the input is 4 or more times the target, it is first reduced with short half-band stages.
 - Comparing the same input with SoX (libsoxr) confirmed that the passband is wider and flatter than SoX VHQ (95%) and SoX’s best setting (0.0000 dB up to 21.9kHz at 44.1 → 96kHz), and that image, aliasing and residual suppression match SoX to within 4 dB (−160 ~ −180 dBc).
 - Changed the polyphase stage’s weight table to double precision. Rounding of the float32 coefficients left clustered components at around −166 dBc.
-- Changed the labels of the high-resolution restoration module to HD 48 · 96kHz and ULTRA · eXtreme HD 192 · 384kHz.
+- Changed the labels of the high-resolution restoration module to HD 48 · 96kHz and Ultra · eXtreme HD 192 · 384kHz.
 
 **Fixed**
 
@@ -3477,7 +3483,7 @@ The version that redesigned the screen in the style of a recording console. It e
 
 **Added**
 
-- Export format selection: instead of the three buttons WAV · HD · ULTRA HD, the sample rate (source · 48 · 96 · 192) and the bit depth (16 · 24 · 32) are chosen separately with tick switches like the spectrum’s X-AXIS, and a single export button saves the file. The switches can also be moved with the keyboard arrow keys.
+- Export format selection: instead of the three buttons WAV · HD · Ultra HD, the sample rate (source · 48 · 96 · 192) and the bit depth (16 · 24 · 32) are chosen separately with tick switches like the spectrum’s X-AXIS, and a single export button saves the file. The switches can also be moved with the keyboard arrow keys.
 - The button text shows the selected format, and below it the processing path (e.g. bit-depth enhancement → 96kHz conversion → HD restoration → DSP processing → 24bit (dither)). Next to the two switches, what changes from the source is shown.
 - A sample rate of 48kHz can be selected. If the source is higher, it is lowered; only the sample rate changes, with no restoration.
 - Bit-depth enhancement: when a 16bit integer source is written at 24 or 32bit, only the rounding noise is reduced, without leaving the cell where the original value was (±½ LSB). On signals whose true values are known, the error dropped by 1.4 dB for music (2.7 dB in fade-out sections) and by about 7 dB for a quiet sine. The strength is set with REFINE in the BIT DEPTH column of the high-resolution restoration module (default 100).
@@ -3486,8 +3492,8 @@ The version that redesigned the screen in the style of a recording console. It e
 
 **Changed**
 
-- Separated the bit depth from the sample rate. Previously HD was tied to 24bit and ULTRA HD to 32bit; now they can be combined freely, such as 96kHz 16bit or the source sample rate at 24bit.
-- Split the badges of the high-resolution restoration module into 96kHz · 192kHz · 24 · 32bit, and placed a BIT DEPTH column next to the HD · ULTRA · eXtreme HD columns. A wide screen shows three columns, which flow into two and then one as the screen narrows.
+- Separated the bit depth from the sample rate. Previously HD was tied to 24bit and Ultra HD to 32bit; now they can be combined freely, such as 96kHz 16bit or the source sample rate at 24bit.
+- Split the badges of the high-resolution restoration module into 96kHz · 192kHz · 24 · 32bit, and placed a BIT DEPTH column next to the HD · Ultra · eXtreme HD columns. A wide screen shows three columns, which flow into two and then one as the screen narrows.
 - The file name suffix reflects the path taken: _HD96k24bit or _UHD192k32bit when restoration is applied, otherwise something like _dsp44.1k16bit.
 - The sample rate, bit depth, REFINE and DITHER are saved in presets as well.
 - Matched the link colors of the documentation nav bar to the app. In all seven files, home is amber, the other documents are gray and the current document is in bright text.
@@ -3739,7 +3745,7 @@ The version that created the way to keep settings and load them again. Every eff
 
 **Changed**
 
-- Rebuilt HD · ULTRA · eXtreme HD restoration as a frequency-shift method. The old method copied the octave below the cut point to the 2 · 4 · 8 … times positions at 1/k strength; the new one shifts only the frequency of the original’s upper band (single-sideband shift) to continue it and matches it to a curve that continues the original’s slope, which removed the step layers that formed at every octave (maximum jump 4.2 dB → 0.5 dB).
+- Rebuilt HD · Ultra · eXtreme HD restoration as a frequency-shift method. The old method copied the octave below the cut point to the 2 · 4 · 8 … times positions at 1/k strength; the new one shifts only the frequency of the original’s upper band (single-sideband shift) to continue it and matches it to a curve that continues the original’s slope, which removed the step layers that formed at every octave (maximum jump 4.2 dB → 0.5 dB).
 - Upsampling is no longer left to the conversion in the browser’s playback node but computed directly with a Kaiser-window sinc polyphase conversion. Passband ±0.0002 dB, images −100 dB or lower (previously it was linear interpolation, so 14.4 kHz was cut by −3.2 dB and −16.5 dB images remained above 22 kHz).
 - Export also processes in the same 'restoration → chain' order as LIVE. What you heard becomes the file as it is, and MASTERING’s ceiling is also kept through to after restoration.
 
@@ -4071,7 +4077,7 @@ The version that created the way to keep settings and load them again. Every eff
 
 ### 2.3
 
-This version added the original/processed (wet) A/B analyzer and spectrogram, HD · ULTRA HD LIVE preview and per-module INPUT GAIN, and made playback and export follow the same order and apply the same processing. Defects found while reading the implementation code during the writing of the five documents and the Index were also fixed in this version.
+This version added the original/processed (wet) A/B analyzer and spectrogram, HD · Ultra HD LIVE preview and per-module INPUT GAIN, and made playback and export follow the same order and apply the same processing. Defects found while reading the implementation code during the writing of the five documents and the Index were also fixed in this version.
 
 #### 2.3.29 — 2026-09-14
 
@@ -4229,7 +4235,7 @@ This version added the original/processed (wet) A/B analyzer and spectrogram, HD
 
 **Changed**
 
-- Renamed the AIR MIX label of ULTRA · eXtreme HD to SMOOTH. It actually controls the same smoothing parameter.
+- Renamed the AIR MIX label of Ultra · eXtreme HD to SMOOTH. It actually controls the same smoothing parameter.
 
 **Fixed**
 
@@ -4244,7 +4250,7 @@ This version added the original/processed (wet) A/B analyzer and spectrogram, HD
 
 **Docs**
 
-- Added the Technical Guide (`analog-soul-guide.html`). Its 11 chapters carry beginner, intermediate and advanced marks so that reading them in order works as self-study, and all of chapter 5 (8 sections) is about HD · ULTRA · eXtreme HD restoration. It covers the 8 steps of the restoration algorithm, the differences between HD and ULTRA · eXtreme HD, how LIVE works, a summary on whether the result is actually audible, and a spectrogram verification procedure.
+- Added the Technical Guide (`analog-soul-guide.html`). Its 11 chapters carry beginner, intermediate and advanced marks so that reading them in order works as self-study, and all of chapter 5 (8 sections) is about HD · Ultra · eXtreme HD restoration. It covers the 8 steps of the restoration algorithm, the differences between HD and Ultra · eXtreme HD, how LIVE works, a summary on whether the result is actually audible, and a spectrogram verification procedure.
 - Recorded two defects found while writing it (SMOOTH did not work; playback and export used different module orders) as limitations. These were fixed in 2.3.13.
 
 #### 2.3.11 — 2026-09-13
@@ -4272,7 +4278,7 @@ This version added the original/processed (wet) A/B analyzer and spectrogram, HD
 
 **Fixed**
 
-- The frequency ticks were labeled at a fixed 20 Hz ~ 20 kHz and evenly spaced, so they did not match the actual graph (log axis, up to the Nyquist frequency of the device sample rate). The ticks are now computed from the actual Nyquist frequency and placed on log coordinates (48 kHz 24k, HD LIVE 48k, ULTRA HD LIVE 96k), and the end tick is emphasized. Ticks are at least 80 px apart.
+- The frequency ticks were labeled at a fixed 20 Hz ~ 20 kHz and evenly spaced, so they did not match the actual graph (log axis, up to the Nyquist frequency of the device sample rate). The ticks are now computed from the actual Nyquist frequency and placed on log coordinates (48 kHz 24k, HD LIVE 48k, Ultra HD LIVE 96k), and the end tick is emphasized. Ticks are at least 80 px apart.
 
 #### 2.3.8 — 2026-09-13
 
@@ -4303,7 +4309,7 @@ This version added the original/processed (wet) A/B analyzer and spectrogram, HD
 
 **Added**
 
-- LIVE preview for HD · ULTRA · eXtreme HD RESTORE. It plays the restoration result before export. The moment it is turned on, it restores the whole track once and plays that buffer, rebuilding it only when a parameter changes. The two are never on at the same time; the audio device is reopened at 96 or 192 kHz, and if the device refuses, the default is used instead and ‘device limit’ (‘장치 제한’) is shown. The playback position and state are kept.
+- LIVE preview for HD · Ultra · eXtreme HD RESTORE. It plays the restoration result before export. The moment it is turned on, it restores the whole track once and plays that buffer, rebuilding it only when a parameter changes. The two are never on at the same time; the audio device is reopened at 96 or 192 kHz, and if the device refuses, the default is used instead and ‘device limit’ (‘장치 제한’) is shown. The playback position and state are kept.
 
 **Notes**
 
@@ -4357,7 +4363,7 @@ This version added the original/processed (wet) A/B analyzer and spectrogram, HD
 
 ### 2.2 — Initial Release
 
-The version with eight processing modules (COMPRESSOR, BBE SONIC MAXIMIZER, VACUUM TUBE, EXCITER, SOUNDGOODIZER, VINYL RECORD, DOLBY ATMOS, MASTERING CHAIN), HD · ULTRA · eXtreme HD restoration export, a processing order changed by dragging the cards, a basic spectrum display and the Official Manual. It predates build numbering, so there is no detailed history. The defects fixed in 2.3 and later were present in this version.
+The version with eight processing modules (COMPRESSOR, BBE SONIC MAXIMIZER, VACUUM TUBE, EXCITER, SOUNDGOODIZER, VINYL RECORD, DOLBY ATMOS, MASTERING CHAIN), HD · Ultra · eXtreme HD restoration export, a processing order changed by dragging the cards, a basic spectrum display and the Official Manual. It predates build numbering, so there is no detailed history. The defects fixed in 2.3 and later were present in this version.
 
 ---
 

@@ -732,7 +732,7 @@ body::before {
   opacity: 0.7;
 }
 
-/* HD · ULTRA · eXtreme HD 컬럼 헤더 — 제목 + LIVE 토글 */
+/* HD · Ultra · eXtreme HD 컬럼 헤더 — 제목 + LIVE 토글 */
 .hd-cols {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -1290,7 +1290,7 @@ canvas.tube-vis {
 @media (max-width: 640px) {
   .dsp-grid { grid-template-columns: 1fr; }
   .hd-module { grid-column: 1; }
-  .hd-cols { grid-template-columns: 1fr; }   /* 좁은 화면에서는 HD · ULTRA · eXtreme HD를 위아래로 */
+  .hd-cols { grid-template-columns: 1fr; }   /* 좁은 화면에서는 HD · Ultra · eXtreme HD를 위아래로 */
 }
 
 /* ===== LICENSE FOOTER ===== */
@@ -2535,7 +2535,7 @@ canvas.peq-vis.mon-vis { height: clamp(170px, 30vh, 280px); margin: 0; cursor: d
 /* 눈금 세 개 · 다섯 개 — 기둥 간격(60 px)은 네 눈금과 같게 두고 폭만 바꾼다 */
 .axis-switch.n3 { width: 136px; }
 .axis-switch.n5 { width: 256px; }
-/* 복원 모듈 — HD · ULTRA · eXtreme HD · 비트 깊이 세 열, 좁으면 두 열 · 한 열로 흐른다.
+/* 복원 모듈 — HD · Ultra · eXtreme HD · 비트 깊이 세 열, 좁으면 두 열 · 한 열로 흐른다.
    열이 좁아지면 이름과 값은 그대로 두고 슬라이더 막대만 줄인다 */
 .hd-cols { grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); }
 .hd-cols .slider-row input[type=range] { min-width: 0; }
@@ -3056,8 +3056,8 @@ input[type=range]::-moz-range-thumb { transform: translateX(var(--glide-dx, 0px)
           </div>
           <div>
             <div class="hd-col-head">
-              <div style="font-size:var(--fs-sm);color:var(--purple);letter-spacing:0.1em">▸ ULTRA · eXtreme HD RESTORE — 176.4 ~ 384kHz</div>
-              <label class="hd-live-toggle" title="실시간 재생에 ULTRA HD 복원 적용">
+              <div style="font-size:var(--fs-sm);color:var(--purple);letter-spacing:0.1em">▸ Ultra · eXtreme HD RESTORE — 176.4 ~ 384kHz</div>
+              <label class="hd-live-toggle" title="실시간 재생에 Ultra HD 복원 적용">
                 <span>LIVE</span>
                 <span class="led-toggle"><input type="checkbox" id="uxhdLiveOn" disabled><span class="led-btn"></span></span>
               </label>
@@ -7110,7 +7110,7 @@ const SG_GRADIENT_CSS = 'linear-gradient(to right,' + SG_STOPS.map(function(st) 
 // 표시 범위는 AudioContext의 샘플레이트를 따라간다.
 //   48kHz  → 20Hz ~ 24kHz
 //   96kHz  → 20Hz ~ 48kHz   (HD LIVE)
-//   192kHz → 20Hz ~ 96kHz   (ULTRA HD LIVE)
+//   192kHz → 20Hz ~ 96kHz   (Ultra HD LIVE)
 // ============================================================
 
 let _lastNyq = 24000;  // 모드 전환 시 축을 다시 그리기 위해 보관
@@ -7868,7 +7868,7 @@ function getParams(inputBuffer) {
 
 // ---- HD 업스케일링: 업샘플(보간) → FFT 기반 스펙트럼 연장 복원 ----
 // ============================================================
-// 고해상도 복원 — HD RESTORE (88.2 · 96 kHz) · ULTRA · eXtreme HD RESTORE (176.4 · 192 kHz는 ULTRA HD, 352.8 · 384 kHz는 eXtreme HD)
+// 고해상도 복원 — HD RESTORE (88.2 · 96 kHz) · Ultra · eXtreme HD RESTORE (176.4 · 192 kHz는 Ultra HD, 352.8 · 384 kHz는 eXtreme HD)
 // ------------------------------------------------------------
 // 1) 업샘플: 브라우저 변환기에 맡기지 않고 Kaiser 창 sinc 다상 필터로 직접 올린다.
 //    AudioBufferSourceNode의 변환 품질은 명세가 정하지 않으며, 선형 보간 구현은
@@ -8758,7 +8758,7 @@ async function applyHDRestoration(buffer, srcSR, hfStrength, smooth, onProgress,
 }
 
 // ============================================================
-// 실시간 HD / ULTRA HD 복원
+// 실시간 HD / Ultra HD 복원
 // ------------------------------------------------------------
 // 복원 알고리즘(applyHDRestoration)은 STFT 전역 분석이 필요해
 // 프레임 단위 실시간 처리가 불가능하다. 따라서 토글 시 원본을
@@ -8882,7 +8882,7 @@ async function setLiveHDMode(mode) {
 
       if (key !== hdLiveKey || !hdLiveBuf) {
         showOverlay(
-          mode === 'hd' ? 'HD RESTORE 준비 중...' : 'ULTRA · eXtreme HD RESTORE 준비 중...',
+          mode === 'hd' ? 'HD RESTORE 준비 중...' : 'Ultra · eXtreme HD RESTORE 준비 중...',
           '복원 결과를 미리 만들어 재생에 적용합니다',
           5
         );
@@ -8954,7 +8954,7 @@ function updateHDLiveUI() {
     } else {
       const want = liveTargetSR(liveHDMode);
       const got  = audioCtx ? audioCtx.sampleRate : 0;
-      const tag  = (liveHDMode === 'hd') ? 'HD' : 'ULTRA HD';
+      const tag  = (liveHDMode === 'hd') ? 'HD' : 'Ultra HD';
       st.textContent = (got === want)
         ? ('실시간 ' + tag + ' — ' + (got / 1000) + 'kHz')
         : ('실시간 ' + tag + ' — 출력 ' + (got / 1000) + 'kHz (장치 제한)');
@@ -8996,7 +8996,7 @@ function hdLiveRefresh(m, force) {
 // 내보낼 형식 — 표본률(원본 · 48 · 96 · 192)과 비트 깊이(16 · 24 · 32)
 // ------------------------------------------------------------
 // 목표가 원본보다 높으면 최고 규격 보간 뒤 목표 나이퀴스트까지 고역을 채우고(96kHz 이하는 HD,
-// 176.4 · 192kHz는 ULTRA HD, 352.8 · 384kHz는 eXtreme HD — 같은 uxhd 설정), 낮으면 효율 변환으로 내리기만 하며, 같으면 변환하지 않는다.
+// 176.4 · 192kHz는 Ultra HD, 352.8 · 384kHz는 eXtreme HD — 같은 uxhd 설정), 낮으면 효율 변환으로 내리기만 하며, 같으면 변환하지 않는다.
 // 16bit 이하 정수 원본을 그보다 깊게(24 · 32bit) 쓰면 비트 깊이 향상을 먼저 거친다.
 // ============================================================
 // 표본률 눈금 — 아래 두 칸(44.1 · 48)은 늘 같고, 위 세 칸은 원본의 계열을 따른다.
@@ -9005,7 +9005,7 @@ const RATES_48  = [44100, 48000, 96000, 192000, 384000];
 const RATES_441 = [44100, 48000, 88200, 176400, 352800];
 const is441Family = sr => !!sr && sr % 11025 === 0;
 function exportRates() { return is441Family(sourceBuf ? sourceBuf.sampleRate : 0) ? RATES_441 : RATES_48; }
-// LIVE 미리듣기 표본률 — HD는 88.2 또는 96, ULTRA HD는 176.4 또는 192
+// LIVE 미리듣기 표본률 — HD는 88.2 또는 96, Ultra HD는 176.4 또는 192
 function liveTargetSR(mode) { return (is441Family(sourceBuf ? sourceBuf.sampleRate : 0) ? 44100 : 48000) * (mode === 'hd' ? 2 : 4); }
 // 원본과 같은 눈금, 사이면 바로 위 눈금, 눈금보다 낮으면 맨 아래, 높으면 맨 위
 function defaultRateIndex(sr) {
@@ -9042,7 +9042,7 @@ function exportChoice() {
   const bits = EXPORT_BITS[bi] || 16;
   const R = exportRates(), targetSR = R[ri] || R[0];
   const dir = !srcSR || targetSR === srcSR ? 'same' : (targetSR > srcSR ? 'up' : 'down');
-  const restore = dir === 'up' ? (targetSR >= 176400 ? 'uxhd' : 'hd') : null;   // 나가는 표본률로 가른다: 176.4 · 192kHz는 ULTRA HD, 352.8 · 384kHz는 eXtreme HD (같은 uxhd 모듈)
+  const restore = dir === 'up' ? (targetSR >= 176400 ? 'uxhd' : 'hd') : null;   // 나가는 표본률로 가른다: 176.4 · 192kHz는 Ultra HD, 352.8 · 384kHz는 eXtreme HD (같은 uxhd 모듈)
   const hf = restore ? parseFloat(document.getElementById(restore === 'hd' ? 'hdHF' : 'uxhdHF').value) / 100 : 0;
   const refine = parseFloat(document.getElementById('bitRefine').value) / 100;
   return {
@@ -9067,7 +9067,7 @@ function updateExportUI() {
   if (!srcSR) rn = '파일을 올리면 원본 표본률에 맞춰집니다';
   else if (c.dir === 'same') rn = '원본과 같음 — 변환 없음';
   else if (c.dir === 'up') rn = fmtKHz(srcSR) + ' → ' + fmtKHz(c.targetSR) + ' · 업스케일링 — 최고 규격 보간'
-         + (c.restoring ? (c.restore === 'hd' ? ' + HD 복원' : (c.targetSR >= 352800 ? ' + eXtreme HD 복원' : ' + ULTRA HD 복원')) : '만(SYNTH 0)');
+         + (c.restoring ? (c.restore === 'hd' ? ' + HD 복원' : (c.targetSR >= 352800 ? ' + eXtreme HD 복원' : ' + Ultra HD 복원')) : '만(SYNTH 0)');
   else rn = fmtKHz(srcSR) + ' → ' + fmtKHz(c.targetSR) + ' · 다운샘플링 — 효율 규격 변환(98%까지 평탄)';
   let bn = c.bits === 32 ? '32bit float' : c.bits + 'bit 정수' + (c.dither ? ' · TPDF 디더' : '');
   if (c.enhance) bn += ' · 비트 깊이 향상';
@@ -9083,7 +9083,7 @@ function updateExportUI() {
   const steps = [];
   if (c.enhance) steps.push('비트 깊이 향상');
   if (srcSR && c.dir !== 'same') steps.push(fmtKHz(c.targetSR) + (c.dir === 'up' ? ' 보간' : ' 변환'));
-  if (c.restoring) steps.push(c.restore === 'hd' ? 'HD 복원' : (c.targetSR >= 352800 ? 'eXtreme HD 복원' : 'ULTRA HD 복원'));
+  if (c.restoring) steps.push(c.restore === 'hd' ? 'HD 복원' : (c.targetSR >= 352800 ? 'eXtreme HD 복원' : 'Ultra HD 복원'));
   steps.push('DSP 처리');
   steps.push(c.bits === 32 ? '32bit float' : c.bits + 'bit' + (c.dither ? '(디더)' : ''));
   document.getElementById('expGoNote').textContent = steps.join(' → ');
@@ -11147,7 +11147,7 @@ drawTubeViz();
   // 합성기로 넘어간 뒤) 한 번만 한다. 그사이 또 불러오면 마지막 것만 한다.
   var swapSeq = 0;
   function apply(d) {
-    // 3.0.27 이전에 저장한 설정의 옛 이름(uhd…)을 새 이름(uxhd…)으로 잇는다 — 두 번째 복원 모듈이 ULTRA · eXtreme HD로 바뀌었다
+    // 3.0.27 이전에 저장한 설정의 옛 이름(uhd…)을 새 이름(uxhd…)으로 잇는다 — 두 번째 복원 모듈이 Ultra · eXtreme HD로 바뀌었다
     if (d) ['sliders', 'toggles'].forEach(function (g) { var o = d[g]; if (!o) return;
       Object.keys(o).forEach(function (k) { if (/^uhd[A-Z]/.test(k)) { var nk = 'uxhd' + k.slice(3); if (!(nk in o)) o[nk] = o[k]; delete o[k]; } }); });
     if (!d || d.format !== FORMAT) throw new Error('프리셋 형식이 아닙니다');
