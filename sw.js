@@ -1,11 +1,11 @@
 /* Project-local PWA cache. Offline launches display a connection notice. */
 'use strict';
-const VERSION = "bcd0050d2f220b8a";
+const VERSION = "4e563048d4d03b29";
 const APP = "efx";
 const CORE = ["./manifest.webmanifest", "./pwa.js", "./offline.html", "./pwa-icon-192.png", "./pwa-icon-512.png", "./pwa-icon-maskable.png", "./apple-touch-icon.png"];
 const OPTIONAL = [];
 const SCOPE = self.registration.scope;
-const UI_SOURCE = "./index.html";
+const UI_SOURCE = "./analog-soul-dsp.html";
 const PREFIX = 'velvitty-pwa:' + APP + ':' + encodeURIComponent(SCOPE) + ':';
 const SHELL = PREFIX + VERSION + ':shell';
 const RUNTIME = PREFIX + VERSION + ':runtime';
