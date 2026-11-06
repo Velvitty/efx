@@ -1,6 +1,6 @@
 /* Project-local PWA cache. Offline launches display a connection notice. */
 'use strict';
-const VERSION = "a166ebd963d855bf";
+const VERSION = "79b67ceb1fe2bd96";
 const APP = "efx";
 const CORE = ["./manifest.webmanifest", "./pwa.js", "./offline.html", "./pwa-icon-192.png", "./pwa-icon-512.png", "./pwa-icon-maskable.png", "./apple-touch-icon.png"];
 const OPTIONAL = [];
