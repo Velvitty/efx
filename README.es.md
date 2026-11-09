@@ -2783,6 +2783,7 @@ El suelo de la música y el ruido con modelado se distinguen por tres cifras. La
 | `README.md` | Este documento. Lenguaje sencillo, principios, funcionamiento, algoritmos y registro de cambios |
 | `README.en.md` · `README.ja.md` · `README.zh.md` · `README.fr.md` · `README.es.md` | Traducciones de este documento (inglés · japonés · chino · francés · español). Si difieren del original en coreano, prevalece el original |
 | `LICENSE.md` | Texto completo de la licencia (inglés · coreano). El mismo texto que la ventana de aceptación que se muestra en la primera ejecución |
+| `sw.js` | Elimina un service worker PWA instalado antes. No descarga nada, borra las cachés PWA de este sitio y luego anula su registro |
 | `CNAME` | Configuración del dominio personalizado para la publicación web |
 
 Los documentos se enlazan entre sí por el nombre de archivo dentro de la misma carpeta, de modo que, si se descarga el repositorio completo, se puede pasar de uno a otro desde `index.html` incluso sin internet. Cada archivo lleva sus fuentes dentro (WOFF2 reducido a los caracteres usados), por lo que el programa y los documentos no hacen ninguna solicitud externa al abrirse.
@@ -2807,7 +2808,7 @@ Se anota lo que cambió en cada compilación. La compilación más reciente va a
 
 | Versión | Compilación | Periodo | Resumen |
 |---|---|---|---|
-| [3.1](#cl-v31) | 3.1.0 ~ 3.1.17 (18) | 2026-10-11 ~ 2026-10-25 | EQ paramétrico (20 bandas, gráfica, espectro, ventana de edición grande, preajustes), importación de AutoEQ y corrección de escucha, INPUT GAIN en pasos de 0.1 dB, ampliación de tarjetas y control inferior (de redimensionado) de las tarjetas que desbordan, fuentes incrustadas (sin solicitudes externas), mismos ajustes, mismo archivo, orden de documentación de las tarjetas HD y casillas de valor en mosaicos estrechos, fuente coreana en las celdas de ancho fijo, compresión de SOUNDGOODIZER con AMOUNT 0 y medición de MACRO 0 %, comparación con el original y mismo volumen, comparación quitando una tarjeta y unificación de términos, aplicación de los preajustes de restauración a LIVE y detección del modelado de ruido, efecto de encendido, neón, deslizamiento de la barra de valor, onda del botón e icono de pestaña, escalones cerca de la frecuencia de corte en la restauración de agudos, arrastre de tarjetas, README en seis idiomas, aviso de MASTERING 0 % · archivo de licencia |
+| [3.1](#cl-v31) | 3.1.0 ~ 3.1.18 (19) | 2026-10-11 ~ 2026-11-09 | EQ paramétrico (20 bandas, gráfica, espectro, ventana de edición grande, preajustes), importación de AutoEQ y corrección de escucha, INPUT GAIN en pasos de 0.1 dB, ampliación de tarjetas y control inferior (de redimensionado) de las tarjetas que desbordan, fuentes incrustadas (sin solicitudes externas), mismos ajustes, mismo archivo, orden de documentación de las tarjetas HD y casillas de valor en mosaicos estrechos, fuente coreana en las celdas de ancho fijo, compresión de SOUNDGOODIZER con AMOUNT 0 y medición de MACRO 0 %, comparación con el original y mismo volumen, comparación quitando una tarjeta y unificación de términos, aplicación de los preajustes de restauración a LIVE y detección del modelado de ruido, efecto de encendido, neón, deslizamiento de la barra de valor, onda del botón e icono de pestaña, escalones cerca de la frecuencia de corte en la restauración de agudos, arrastre de tarjetas, README en seis idiomas, aviso de MASTERING 0 % · archivo de licencia, retirada de la PWA |
 | [3.0](#cl-v30) | 3.0.0 ~ 3.0.36 (37) | 2026-09-28 ~ 2026-10-11 | Pantalla de consola de grabación, mapa del flujo de señal, consola nocturna y diurna, unificación de las pantallas de documentación, movimiento de las tarjetas, formato de exportación, profundidad de bits, 384kHz, sincronía con f0, original con modelado de ruido, uniones, indicación del original, uniones por trama, corrección del patrón de parches, prueba con referencia real y nueva curva objetivo, ampliación de la verificación, AUTO y controles de restauración, sistema de nombres y preajustes de restauración, mosaico de tarjetas y desplazamiento, etapa de reproducción, MACRO y estado inicial, movimiento del mapa del flujo, ecuaciones del Tratado en TeX, revisión de las explicaciones, fuga entre canales de VINYL, fase del EQ elíptico |
 | [2.4](#cl-v24) | 2.4.0 ~ 2.4.32 (33) | 2026-09-14 ~ 2026-09-28 | Preajustes y ranuras rápidas, reconstrucción física de los efectos, modelo de disco de VINYL, rediseño de la restauración HD, README |
 | [2.3](#cl-v23) | 2.3.0 ~ 2.3.29 (30) | 2026-03-06 ~ 2026-09-14 | Analizador A/B, preescucha LIVE, INPUT GAIN, mismo orden en los dos motores, cinco documentos e Índice general |
@@ -2818,6 +2819,24 @@ Se anota lo que cambió en cada compilación. La compilación más reciente va a
 ### 3.1
 
 Versión que añade la tarjeta de EQ paramétrico. Admite hasta 20 bandas, que se corrigen arrastrando en la gráfica, y durante la reproducción se ven superpuestos los espectros antes y después del EQ. La gráfica se dibuja con la respuesta de los mismos filtros que producen el sonido, así que suena tal como se dibuja. También se añadió la corrección de escucha, que lee archivos de corrección de AutoEQ y ecualiza los auriculares con que se escucha solo en la reproducción. Además hay una función de comparación que permite escuchar la versión procesada frente al sonido original, o frente al sonido sin una de las tarjetas, al mismo volumen.
+
+#### 3.1.18 — 2026-11-09
+
+**Cambiado**
+
+- El paquete entregado pasa de 14 a 15 archivos (se añade sw.js).
+
+**Eliminado**
+
+- Se quitó la PWA. Se retiraron el manifiesto de instalación, los iconos, la pantalla de aviso de conexión y el service worker añadidos el 6 de noviembre (PWA.md · manifest.webmanifest · pwa.js · offline.html · cuatro iconos), así como la pantalla de inicio añadida al Índice, de modo que index.html es igual que en 3.1.17. Al abrirse desde el sitio, la primera página obtenía archivos y un service worker del mismo sitio y, sin conexión a internet, mostraba un aviso de conexión en lugar de la aplicación, lo que iba contra el principio del programa de no pedir nada al exterior al abrirse y funcionar sin internet.
+
+**A tener en cuenta**
+
+- Solo queda sw.js, para eliminar los service workers ya instalados. Cuando un navegador que abrió el sitio después del 6 de noviembre recibe este archivo, no descarga ni intercepta nada, borra solo las cachés PWA de este sitio y luego anula su propio registro. Probado con un navegador que tenía instalada la PWA antigua: tras volver a abrir el sitio hay 0 workers y 0 cachés PWA, y el aviso de conexión sin internet ya no aparece.
+
+**Documentación**
+
+- Se añadió una fila sw.js a la tabla de composición del repositorio del README (seis idiomas).
 
 #### 3.1.17 — 2026-10-25
 

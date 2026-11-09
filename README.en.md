@@ -2783,6 +2783,7 @@ The music floor and shaping noise are told apart by three figures. The rise rela
 | `README.md` | This document. Plain words, principles, how it works, algorithms and the changelog |
 | `README.en.md` · `README.ja.md` · `README.zh.md` · `README.fr.md` · `README.es.md` | Translations of this document (English · Japanese · Chinese · French · Spanish). Where they differ from the Korean original, the original prevails |
 | `LICENSE.md` | Full license text (English · Korean). The same text as the agreement window shown on first run |
+| `sw.js` | Removes a previously installed PWA service worker. Downloads nothing, deletes this site’s PWA caches, then unregisters itself |
 | `CNAME` | Custom domain setting for web publishing |
 
 The documents link to each other by file name within the same folder, so if you download the whole repository you can move between all of them from `index.html` even without an internet connection. Each file has its fonts embedded (WOFF2 reduced to the characters used), so the program and the documents request nothing from outside when opened.
@@ -2807,7 +2808,7 @@ This records what changed in each build. The newest build comes first.
 
 | Version | Builds | Period | Summary |
 |---|---|---|---|
-| [3.1](#cl-v31) | 3.1.0 ~ 3.1.17 (18 builds) | 2026-10-11 ~ 2026-10-25 | Parametric EQ (20 bands · graph · spectrum · large editor window · presets), Import AutoEQ · Monitor Correction, INPUT GAIN in 0.1 dB steps, card expand · bottom handle for overflowing cards, embedded fonts (no external requests), same settings give the same file, document order of the HD cards · value fields in narrow tiles, Korean font in fixed-width fields, SOUNDGOODIZER compression at AMOUNT 0 · MACRO 0 % measurements, Compare to Original · Same Loudness, comparing with one card removed · consistent terminology, restoration presets reflected in LIVE · shaping detection, power-on effect · neon glow · value-bar glide · button ripple · tab icon, steps near the cutoff in HF restoration, card dragging, README in six languages, MASTERING 0 % notice · license file |
+| [3.1](#cl-v31) | 3.1.0 ~ 3.1.18 (19 builds) | 2026-10-11 ~ 2026-11-09 | Parametric EQ (20 bands · graph · spectrum · large editor window · presets), Import AutoEQ · Monitor Correction, INPUT GAIN in 0.1 dB steps, card expand · bottom handle for overflowing cards, embedded fonts (no external requests), same settings give the same file, document order of the HD cards · value fields in narrow tiles, Korean font in fixed-width fields, SOUNDGOODIZER compression at AMOUNT 0 · MACRO 0 % measurements, Compare to Original · Same Loudness, comparing with one card removed · consistent terminology, restoration presets reflected in LIVE · shaping detection, power-on effect · neon glow · value-bar glide · button ripple · tab icon, steps near the cutoff in HF restoration, card dragging, README in six languages, MASTERING 0 % notice · license file, PWA removal |
 | [3.0](#cl-v30) | 3.0.0 ~ 3.0.36 (37 builds) | 2026-09-28 ~ 2026-10-11 | Recording-console interface, signal flow map, night and day consoles, unified documentation screens, card motion, export format · bit depth · 384kHz · f0 sync · noise-shaped source · seam · source display · per-frame seam · patch-pattern correction · ground-truth test and new target curve · broader verification · AUTO and restoration controls · naming system and restoration presets · card tiles and scrolling · playback stage · MACRO and default state · flow map motion · TeX equations in the Treatise · explanation cleanup · VINYL channel leakage · elliptical EQ phase |
 | [2.4](#cl-v24) | 2.4.0 ~ 2.4.32 (33 builds) | 2026-09-14 ~ 2026-09-28 | Presets and quick slots, physical rebuild of the effects, VINYL record model, HD restoration redesign, README |
 | [2.3](#cl-v23) | 2.3.0 ~ 2.3.29 (30 builds) | 2026-03-06 ~ 2026-09-14 | A/B analyzer, LIVE preview, INPUT GAIN, matching order in the two engines, the five documents and the Index |
@@ -2818,6 +2819,24 @@ This records what changed in each build. The newest build comes first.
 ### 3.1
 
 This version adds the PARAMETRIC EQ card. You can place up to 20 bands and edit them by dragging on the graph, and during playback the spectra before and after the EQ are overlaid. The graph is drawn from the response of the same filters that make the sound, so it sounds as drawn. It also adds Monitor Correction, which reads AutoEQ correction files to flatten the headphones you listen with, in playback only. There is also Compare, which lets you hear the processed version against the original sound or against the sound with one card removed, at the same loudness.
+
+#### 3.1.18 — 2026-11-09
+
+**Changed**
+
+- The deliverable bundle goes from 14 to 15 files (sw.js is added).
+
+**Removed**
+
+- Removed the PWA. The installation manifest, icons, connection notice screen and service worker added on November 6 (PWA.md · manifest.webmanifest · pwa.js · offline.html · four icons) and the launch screen added to the Index have all been taken out, so index.html is the same as in 3.1.17. When opened from the site, the first page fetched files and a service worker from the same site and, without an internet connection, showed a connection notice instead of the app, which went against this program’s principle of requesting nothing from outside when opened and working without the internet.
+
+**Notes**
+
+- Only sw.js remains, to remove service workers already installed. When a browser that opened the site after November 6 receives this file, it downloads and intercepts nothing, deletes only this site’s PWA caches and then unregisters itself. Tested with a browser that had the old PWA installed: after reopening the site there are 0 workers and 0 PWA caches, and the offline connection notice no longer appears.
+
+**Docs**
+
+- Added an sw.js row to the README’s repository table (six languages).
 
 #### 3.1.17 — 2026-10-25
 
